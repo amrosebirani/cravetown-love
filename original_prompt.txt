@@ -1,0 +1,46 @@
+Ok so I am trying to determine the starting scene and the key elements of it for the cravetown game
+
+High level thoughts so far are in this flow
+
+The society is moving from an agricultural civilization to an industrial civilisation
+
+There are different classes, like the elites, the merchants, the peasants etc
+
+The Cravings are generally for things which are scarce etc
+
+Key categories are
+
+Exotic foreign items
+Rare Local items
+Shiny Objects
+Taste driven
+Addiction driven
+Emotional/Psychological
+Biological
+Aromatic
+Visual
+Auditory
+Complex sensorial
+Touch based
+Social Status/Currency
+Safety/Security
+One allegory here is let's say
+
+For the craving of safety/security one generation leads fortification, the next generation then adds military, the next generation puts a monarchy layer on top of it and then the next generation now craves freedom form this
+
+So there is a hierarchy of classes in the society and each of them have their own cravings, now as the key governor of this society your task is to balance the tradeoffs between these cravings. You don't want to alienate the elites because maybe they are providing you with funds and men for your growth and control
+You also don't want to alienate the lower classes because they are the workers and labourers 
+
+You want to fulfil cravings to maintain law and order and the existing status quo
+
+Also generally cravings flow from top to bottom, what the elites are craving today might be the craving for the next generation of the middle class
+
+Now there is also an angle of immigration, as a governor you want your town to grow and as a result you want less people moving out and more people coming into the town as citizens
+
+But more immigration also leads to troubles, their is a new set of people with different cravings and also existing citizens might now feel uncomfortable and their cravings might be sidelined
+
+Also you control the trade for the town, so whatever resources are created by the townsfolk, you can decide what stays in the local markets and what gets traded on a global market for other items
+
+At a high level if for an individual or a tribe cravings are not fulfilled then they might self destruct in many different ways, might leave the town, might riot, might end up in a civil war etc
+
+Now what we want your help on is to define the initial agricultural scene, the types of people, the types of buildings etc, and the basic geography of the town and how it grows overtime to an industrial civ
