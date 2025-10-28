@@ -2,13 +2,16 @@
 -- TownViewState - main state for viewing the town and moving around
 --
 
+require("code/TopBar")
+
 TownViewState = {}
 TownViewState.__index = TownViewState
 
 function TownViewState:Create()
     local this = {
         mCameraSpeed = 300,
-        mBuildingMenu = nil
+        mBuildingMenu = nil,
+        mTopBar = nil
     }
 
     setmetatable(this, self)
@@ -16,10 +19,11 @@ function TownViewState:Create()
 end
 
 function TownViewState:Enter(params)
-    -- Create the building menu when entering this state
+    -- Create and push UI elements onto the state stack
+    self.mTopBar = TopBar:Create()
     self.mBuildingMenu = BuildingMenu:Create()
 
-    -- Push menu onto the state stack
+    gStateStack:Push(self.mTopBar)
     gStateStack:Push(self.mBuildingMenu)
 end
 

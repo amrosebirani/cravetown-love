@@ -97,3 +97,15 @@ function love.mousereleased(x, y, button, istouch, presses)
     -- Store mouse release for state handling
     gMouseReleased = {x = x, y = y, button = button}
 end
+
+function love.wheelmoved(dx, dy)
+    -- Handle mouse wheel for scrolling in UI elements
+    -- Pass to state stack states (like InventoryDrawer)
+    for i = #gStateStack.mStates, 1, -1 do
+        local state = gStateStack.mStates[i]
+        if state.OnMouseWheel then
+            state:OnMouseWheel(dx, dy)
+            break
+        end
+    end
+end

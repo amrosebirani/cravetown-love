@@ -2,13 +2,36 @@
 -- Town - manages all buildings and town state
 --
 
+require("code/Inventory")
+
 Town = {}
 Town.__index = Town
 
 function Town:Create()
     local this = {
-        mBuildings = {}
+        mBuildings = {},
+        mInventory = Inventory:Create()
     }
+
+    -- Add comprehensive starting resources to bootstrap economy
+
+    -- Raw building materials
+    this.mInventory:Add("stone", 200)      -- Enough for Lumberjack + other buildings
+    this.mInventory:Add("wood", 150)       -- Basic construction
+    this.mInventory:Add("timber", 100)     -- For advanced buildings
+    this.mInventory:Add("ore", 100)        -- For smelter
+    this.mInventory:Add("clay", 80)        -- For bricks
+    this.mInventory:Add("sand", 60)        -- For glass
+
+    -- Processed materials
+    this.mInventory:Add("iron", 50)        -- Tools and nails
+    this.mInventory:Add("nails", 100)      -- Common construction
+    this.mInventory:Add("bricks", 80)      -- Building material
+    this.mInventory:Add("planks", 60)      -- Refined wood
+
+    -- Food and farming
+    this.mInventory:Add("wheat", 100)      -- Starting food
+    this.mInventory:Add("bread", 50)       -- Processed food
 
     setmetatable(this, self)
     return this
@@ -67,4 +90,8 @@ end
 
 function Town:GetBuildingCount()
     return #self.mBuildings
+end
+
+function Town:GetInventory()
+    return self.mInventory
 end

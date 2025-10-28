@@ -2,20 +2,46 @@
 -- Building - represents a building in the town
 --
 
+require("code/BuildingTypes")
+
 Building = {}
 Building.__index = Building
 
 function Building:Create(params)
+    -- Get building type definition
+    local buildingType = params.buildingType or BuildingTypes.FAMILY_HOME
+
+    -- Deep copy properties
+    local properties = {}
+    if buildingType.properties then
+        for k, v in pairs(buildingType.properties) do
+            if type(v) == "table" then
+                properties[k] = {}
+                for k2, v2 in pairs(v) do
+                    properties[k][k2] = v2
+                end
+            else
+                properties[k] = v
+            end
+        end
+    end
+
     local this = {
-        mType = params.type or "house",
+        mBuildingType = buildingType,
+        mTypeId = buildingType.id,
+        mName = buildingType.name,
+        mCategory = buildingType.category,
         mX = params.x or 0,
         mY = params.y or 0,
-        mWidth = params.width or 70,  -- Changed for hot reload test
-        mHeight = params.height or 70, -- Changed for hot reload test
-        mColor = params.color or {0.2, 0.4, 0.8}, -- Blue color for house
-        mTextColor = {1, 1, 1}, -- White color for text
-        mLabel = params.label or "H",
-        mPlaced = params.placed or false -- Whether the building is placed on map
+        mWidth = params.width or buildingType.baseWidth,
+        mHeight = params.height or buildingType.baseHeight,
+        mColor = params.color or buildingType.color,
+        mTextColor = {1, 1, 1},
+        mLabel = params.label or buildingType.label,
+        mPlaced = params.placed or false,
+        mProperties = properties,
+        mWorkers = {},  -- Array of worker IDs assigned to this building
+        mAutoAssignWorkers = true
     }
 
     setmetatable(this, self)
@@ -52,6 +78,18 @@ function Building:CheckCollision(other)
            x1 + w1 > x2 and
            y1 < y2 + h2 and
            y1 + h1 > y2
+end
+
+function Building:GetProperty(key)
+    return self.mProperties[key]
+end
+
+function Building:SetProperty(key, value)
+    self.mProperties[key] = value
+end
+
+function Building:GetAllProperties()
+    return self.mProperties
 end
 
 function Building:Render(canPlace)
