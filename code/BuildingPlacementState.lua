@@ -114,8 +114,10 @@ function BuildingPlacementState:Update(dt)
         worldY - self.mBuildingToPlace.mHeight / 2
     )
 
-    -- Check for collisions
-    self.mCanPlace = not gTown:CheckCollision(self.mBuildingToPlace)
+    -- Check for collisions and boundaries
+    local hasCollision = gTown:CheckCollision(self.mBuildingToPlace)
+    local isWithinBounds = gTown:IsWithinBoundaries(self.mBuildingToPlace)
+    self.mCanPlace = not hasCollision and isWithinBounds
 
     -- Handle mouse input
     if gMouseReleased then
@@ -200,6 +202,9 @@ function BuildingPlacementState:Render()
             love.graphics.setColor(1, 1, 1)
         end
     end
+
+    -- Render out-of-bounds areas (gray fog)
+    gTown:RenderOutOfBounds()
 
     gCamera:detach()
 

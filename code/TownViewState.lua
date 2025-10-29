@@ -35,6 +35,9 @@ function TownViewState:Exit()
 end
 
 function TownViewState:Update(dt)
+    -- Update town (river animation, etc.)
+    gTown:Update(dt)
+
     -- Camera movement with WASD
     local dx, dy = 0, 0
     if love.keyboard.isDown('w') then
@@ -61,6 +64,9 @@ function TownViewState:Render()
 
     -- Render the town (buildings in world space)
     gTown:Render()
+
+    -- Render out-of-bounds areas (gray fog)
+    gTown:RenderOutOfBounds()
 
     gCamera:detach()
 end

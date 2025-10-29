@@ -15,50 +15,59 @@ function BuildingMenu:Create()
         mButtonHeight = 60,
         mButtons = {},
         mScrollOffset = 0,
-        mMaxScroll = 0
+        mMaxScroll = 0,
+        mButtonSpacing = 5
     }
 
     setmetatable(this, self)
 
-    -- Create buttons for all building types
+    -- Create buttons for all building types (just store the building type data)
     local allTypes = BuildingTypes.getAllTypes()
-    local screenW = love.graphics.getWidth()
-    local menuY = love.graphics.getHeight() - this.mHeight
-    local buttonSpacing = 5
-    local currentX = this.mPadding
-    local currentY = menuY + this.mPadding
-    local rowHeight = this.mButtonHeight + buttonSpacing
-
     for i, buildingType in ipairs(allTypes) do
-        -- Check if we need to wrap to next row
-        if currentX + this.mButtonWidth > screenW - this.mPadding then
-            currentX = this.mPadding
-            currentY = currentY + rowHeight
-        end
-
         table.insert(this.mButtons, {
             buildingType = buildingType,
             label = buildingType.label,
             color = buildingType.color,
             name = buildingType.name,
-            x = currentX,
-            y = currentY,
             width = this.mButtonWidth,
-            height = this.mButtonHeight,
-            baseY = currentY  -- Store base Y for scrolling
+            height = this.mButtonHeight
         })
+    end
 
-        currentX = currentX + this.mButtonWidth + buttonSpacing
+    -- Calculate initial positions
+    this:RecalculateLayout()
+
+    return this
+end
+
+function BuildingMenu:RecalculateLayout()
+    -- Recalculate button positions based on current screen size
+    local screenW = love.graphics.getWidth()
+    local menuY = love.graphics.getHeight() - self.mHeight
+    local currentX = self.mPadding
+    local currentY = menuY + self.mPadding
+    local rowHeight = self.mButtonHeight + self.mButtonSpacing
+
+    for i, button in ipairs(self.mButtons) do
+        -- Check if we need to wrap to next row
+        if currentX + self.mButtonWidth > screenW - self.mPadding then
+            currentX = self.mPadding
+            currentY = currentY + rowHeight
+        end
+
+        button.x = currentX
+        button.y = currentY
+        button.baseY = currentY
+
+        currentX = currentX + self.mButtonWidth + self.mButtonSpacing
     end
 
     -- Calculate max scroll
-    local lastButton = this.mButtons[#this.mButtons]
+    local lastButton = self.mButtons[#self.mButtons]
     if lastButton then
         local totalHeight = (lastButton.baseY - menuY) + rowHeight
-        this.mMaxScroll = math.max(0, totalHeight - this.mHeight + this.mPadding * 2)
+        self.mMaxScroll = math.max(0, totalHeight - self.mHeight + self.mPadding * 2)
     end
-
-    return this
 end
 
 function BuildingMenu:Enter()

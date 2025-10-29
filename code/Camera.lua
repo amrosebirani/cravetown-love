@@ -111,6 +111,17 @@ end
 
 function Camera:move(dx, dy)
     self.x, self.y = self.x + dx, self.y + dy
+
+    -- Clamp camera position to bounds if set
+    if self.bound then
+        -- Calculate visible area based on scale
+        local halfVisibleWidth = (self.w / (2 * self.scale))
+        local halfVisibleHeight = (self.h / (2 * self.scale))
+
+        -- Clamp camera so it can't go outside bounds
+        self.x = math.max(self.bounds_min_x + halfVisibleWidth, math.min(self.x, self.bounds_max_x - halfVisibleWidth))
+        self.y = math.max(self.bounds_min_y + halfVisibleHeight, math.min(self.y, self.bounds_max_y - halfVisibleHeight))
+    end
 end
 
 function Camera:toWorldCoords(x, y)

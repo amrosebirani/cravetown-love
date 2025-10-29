@@ -13,9 +13,16 @@ require("code/BuildingMenu")
 Camera = require("code/Camera")
 
 function love.load()
+    -- Initialize random seed for randomization
+    math.randomseed(os.time())
+
     -- Set up window
     love.window.setTitle("CraveTown")
-    love.window.setMode(1280, 720, {resizable=false})
+    love.window.setMode(1280, 720, {
+        resizable = true,
+        minwidth = 800,
+        minheight = 600
+    })
 
     -- Set white background color
     love.graphics.setBackgroundColor(1, 1, 1)
@@ -33,6 +40,10 @@ function love.load()
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
     gCamera = Camera.new(0, 0, screenW, screenH)
     gCamera:setFollowLerp(0.1)  -- Smooth camera following with lag
+
+    -- Set camera bounds to match town boundaries
+    local minX, minY, maxX, maxY = gTown:GetBoundaries()
+    gCamera:setBounds(minX, minY, maxX - minX, maxY - minY)
 
     gStateStack = StateStack:Create()
 
@@ -107,5 +118,26 @@ function love.wheelmoved(dx, dy)
             state:OnMouseWheel(dx, dy)
             break
         end
+    end
+end
+
+function love.resize(w, h)
+    -- Update camera dimensions when window is resized
+    gCamera.w = w
+    gCamera.h = h
+
+    -- Recalculate UI layouts for all states in the state stack
+    for _, state in ipairs(gStateStack.mStates) do
+        if state.RecalculateLayout then
+            state:RecalculateLayout()
+        end
+    end
+end
+
+function love.keypressed(key)
+    -- Toggle fullscreen with F11 or Alt+Enter
+    if key == "f11" or (key == "return" and (love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt"))) then
+        local fullscreen = love.window.getFullscreen()
+        love.window.setFullscreen(not fullscreen)
     end
 end
