@@ -11,18 +11,31 @@ require("code/CommodityTypes")
 Mine = {}
 Mine.__index = Mine
 
--- Define mine types with their associated ores and colors
+-- Define mine types with their associated ores, colors, and size classifications
+-- Size determines fixed quantity: large=10 units, medium=5 units, small=3 units
 local MINE_TYPES = {
-    {ore = "coal", color = {0.1, 0.1, 0.1}, name = "Coal"},
-    {ore = "ore", color = {0.5, 0.4, 0.3}, name = "Iron Ore"},
-    {ore = "copper_ore", color = {0.6, 0.4, 0.2}, name = "Copper Ore"},
-    {ore = "gold_ore", color = {0.9, 0.8, 0.3}, name = "Gold Ore"},
-    {ore = "silver_ore", color = {0.7, 0.7, 0.7}, name = "Silver Ore"},
-    {ore = "stone", color = {0.5, 0.5, 0.5}, name = "Stone"},
-    {ore = "marble", color = {0.9, 0.9, 0.9}, name = "Marble"},
-    {ore = "clay", color = {0.6, 0.5, 0.4}, name = "Clay"},
-    {ore = "sand", color = {0.8, 0.7, 0.6}, name = "Sand"}
+    {ore = "coal", color = {0.1, 0.1, 0.1}, name = "Coal", size = "large"},
+    {ore = "ore", color = {0.5, 0.4, 0.3}, name = "Iron Ore", size = "large"},
+    {ore = "copper_ore", color = {0.6, 0.4, 0.2}, name = "Copper Ore", size = "medium"},
+    {ore = "gold_ore", color = {0.9, 0.8, 0.3}, name = "Gold Ore", size = "small"},
+    {ore = "silver_ore", color = {0.7, 0.7, 0.7}, name = "Silver Ore", size = "small"},
+    {ore = "stone", color = {0.5, 0.5, 0.5}, name = "Stone", size = "large"},
+    {ore = "marble", color = {0.9, 0.9, 0.9}, name = "Marble", size = "small"},
+    {ore = "clay", color = {0.6, 0.5, 0.4}, name = "Clay", size = "medium"},
+    {ore = "sand", color = {0.8, 0.7, 0.6}, name = "Sand", size = "medium"}
 }
+
+-- Helper function to get fixed quantity based on ore size
+local function GetOreQuantity(oreSize)
+    if oreSize == "large" then
+        return 10
+    elseif oreSize == "medium" then
+        return 5
+    elseif oreSize == "small" then
+        return 3
+    end
+    return 0
+end
 
 function Mine:Create(params)
     local abundanceLevels = {"Depleted", "Partial", "Abundant"}
@@ -49,40 +62,38 @@ function Mine:GenerateMineSites(params)
     -- Create at least one mine of each type
     local numMinesPerType = 1  -- Each ore type gets at least one mine
     local totalMines = numMinesPerType * #MINE_TYPES
-    
+
     for mineTypeIndex, mineType in ipairs(MINE_TYPES) do
         for i = 1, numMinesPerType do
             local attempts = 0
-            local maxAttempts = 50
+            local maxAttempts = 100  -- Increased from 50
             local mineX, mineY, mineSize
             local found = false
-            
+
             repeat
+                -- Try completely random positions within bounds
                 mineX = math.random(self.mBoundaryMinX + 100, self.mBoundaryMaxX - 100)
                 mineY = math.random(self.mBoundaryMinY + 100, self.mBoundaryMaxY - 100)
-                
-                -- Prefer positions near river or forest but not too close
-                if math.random() > 0.3 then  -- 70% chance to be near features
-                    if math.random() > 0.5 then
-                        -- Try to be near river (around X=0)
-                        mineX = math.random(-200, 200)
-                    else
-                        -- Try to be near forest edges
-                        mineX = math.random() > 0.5 and math.random(-400, -250) or math.random(250, 400)
-                    end
+
+                -- On later attempts, try anywhere on the map
+                if attempts > 50 then
+                    mineX = math.random(self.mBoundaryMinX + 50, self.mBoundaryMaxX - 50)
+                    mineY = math.random(self.mBoundaryMinY + 50, self.mBoundaryMaxY - 50)
                 end
-                
+
                 mineSize = math.random(30, 45)
-                
+
                 attempts = attempts + 1
-                
+
                 if self:IsValidMineLocation(mineX, mineY, mineSize) then
                     found = true
                 end
             until (attempts >= maxAttempts or found)
-            
+
             -- Place the mine if we found a valid location
             if found and mineX and mineY and mineSize then
+                local quantity = GetOreQuantity(mineType.size)
+
                 table.insert(self.mSites, {
                     x = mineX,
                     y = mineY,
@@ -90,8 +101,19 @@ function Mine:GenerateMineSites(params)
                     ore = mineType.ore,
                     oreName = mineType.name,
                     color = mineType.color,
-                    typeIndex = mineTypeIndex
+                    typeIndex = mineTypeIndex,
+                    oreSize = mineType.size,
+                    quantity = quantity
                 })
+
+                -- Add fixed quantity to town inventory
+                if gTown and gTown.mInventory then
+                    gTown.mInventory:Add(mineType.ore, quantity)
+                end
+
+                print("Mine placed: " .. mineType.name .. " (size: " .. mineType.size .. ", quantity: " .. quantity .. ")")
+            else
+                print("WARNING: Could not place mine for " .. mineType.name .. " after " .. maxAttempts .. " attempts")
             end
         end
     end
@@ -234,30 +256,31 @@ function Mine:GetSiteCount()
     return #self.mSites
 end
 
-function Mine:Update(dt)
-    -- Mine production happens automatically over time
-    for _, mine in ipairs(self.mSites) do
-        if mine.ore and mine.size then
-            -- Production rate based on mine size and abundance
-            local baseRate = 0.1  -- Ore per second
-            local sizeMultiplier = mine.size / 30  -- Bigger mines produce more
-            local abundanceMultiplier = 1
-            
-            if self.mAbundanceStatus == "Abundant" then
-                abundanceMultiplier = 1.5
-            elseif self.mAbundanceStatus == "Partial" then
-                abundanceMultiplier = 0.7
-            else  -- Depleted
-                abundanceMultiplier = 0.2
-            end
-            
-            local productionRate = baseRate * sizeMultiplier * abundanceMultiplier
-            local amountProduced = productionRate * dt
-            
-            -- Add to town inventory
-            if gTown and gTown.mInventory then
-                gTown.mInventory:Add(mine.ore, amountProduced)
-            end
-        end
-    end
-end
+-- Commented out: Using fixed quantities instead of time-based production
+-- function Mine:Update(dt)
+--     -- Mine production happens automatically over time
+--     for _, mine in ipairs(self.mSites) do
+--         if mine.ore and mine.size then
+--             -- Production rate based on mine size and abundance
+--             local baseRate = 0.1  -- Ore per second
+--             local sizeMultiplier = mine.size / 30  -- Bigger mines produce more
+--             local abundanceMultiplier = 1
+--
+--             if self.mAbundanceStatus == "Abundant" then
+--                 abundanceMultiplier = 1.5
+--             elseif self.mAbundanceStatus == "Partial" then
+--                 abundanceMultiplier = 0.7
+--             else  -- Depleted
+--                 abundanceMultiplier = 0.2
+--             end
+--
+--             local productionRate = baseRate * sizeMultiplier * abundanceMultiplier
+--             local amountProduced = productionRate * dt
+--
+--             -- Add to town inventory
+--             if gTown and gTown.mInventory then
+--                 gTown.mInventory:Add(mine.ore, amountProduced)
+--             end
+--         end
+--     end
+-- end

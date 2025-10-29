@@ -115,7 +115,24 @@ function TopBar:OnButtonClick(buttonId)
             gStateStack:Push(drawer)
         end
     elseif buttonId == "stats" then
-        print("Stats button clicked - not implemented yet")
+        -- Toggle stats drawer
+        local drawerOpen = false
+        for i = #gStateStack.mStates, 1, -1 do
+            local state = gStateStack.mStates[i]
+            if state.mIsStatsDrawer then
+                -- Close drawer
+                gStateStack:Pop()
+                drawerOpen = true
+                break
+            end
+        end
+
+        if not drawerOpen then
+            -- Open drawer
+            require("code/StatsDrawer")
+            local drawer = StatsDrawer:Create()
+            gStateStack:Push(drawer)
+        end
     end
 end
 
@@ -123,6 +140,11 @@ function TopBar:Render()
     -- Draw background
     love.graphics.setColor(0.25, 0.25, 0.25, 0.95)
     love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), self.mHeight)
+
+    -- Town name
+    love.graphics.setColor(1, 1, 1)
+    local townName = (gTown and gTown.mName) and (gTown.mName .. " - ") or ""
+    love.graphics.print(townName, 10, 5)
 
     -- Draw buttons
     local mx, my = love.mouse.getPosition()

@@ -143,8 +143,21 @@ function BuildingPlacementState:Update(dt)
                 gTown:AddBuilding(placedBuilding)
                 print("Placed", placedBuilding.mName, "at", placedBuilding.mX, placedBuilding.mY)
 
-                -- Return to TownView state
-                gStateMachine:Change("TownView")
+                -- If this is a farm, show grain selection modal
+                if placedBuilding.mTypeId == "farm" then
+                    require("code/GrainSelectionModal")
+                    local modal = GrainSelectionModal:Create(placedBuilding)
+                    gStateMachine:Change("TownView")
+                    gStateStack:Push(modal)
+                elseif placedBuilding.mTypeId == "bakery" then
+                    require("code/BakerySetupModal")
+                    local modal = BakerySetupModal:Create(placedBuilding)
+                    gStateMachine:Change("TownView")
+                    gStateStack:Push(modal)
+                else
+                    -- Return to TownView state
+                    gStateMachine:Change("TownView")
+                end
             end
         elseif gMouseReleased.button == 2 then -- Right click
             -- Cancel placement and return to TownView state

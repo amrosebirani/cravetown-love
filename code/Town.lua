@@ -6,12 +6,14 @@ require("code/Inventory")
 require("code/River")
 require("code/Forest")
 require("code/Mine")
+require("code/Mountain")
 
 Town = {}
 Town.__index = Town
 
-function Town:Create()
+function Town:Create(params)
     local this = {
+        mName = (params and params.name) or "Cravetown",
         mBuildings = {},
         mInventory = Inventory:Create(),
         -- Town boundaries centered at world origin (0, 0)
@@ -53,25 +55,155 @@ function Town:Create()
         forest = this.mForest
     })
 
-    -- Add comprehensive starting resources to bootstrap economy
+    -- Create mountain ranges at edges (after all other nature elements)
+    this.mMountains = Mountain:Create({
+        minX = -1250,
+        minY = -1250,
+        maxX = 1250,
+        maxY = 1250,
+        river = this.mRiver,
+        forest = this.mForest,
+        mines = this.mMines
+    })
 
-    -- Raw building materials
-    this.mInventory:Add("stone", 200)  -- Enough for Lumberjack + other buildings
-    this.mInventory:Add("wood", 150)   -- Basic construction
-    this.mInventory:Add("timber", 100) -- For advanced buildings
-    this.mInventory:Add("ore", 100)    -- For smelter
-    this.mInventory:Add("clay", 80)    -- For bricks
-    this.mInventory:Add("sand", 60)    -- For glass
+    -- Add comprehensive starting resources - 1000 of each item
 
-    -- Processed materials
-    this.mInventory:Add("iron", 50)   -- Tools and nails
-    this.mInventory:Add("nails", 100) -- Common construction
-    this.mInventory:Add("bricks", 80) -- Building material
-    this.mInventory:Add("planks", 60) -- Refined wood
+    -- GRAINS
+    this.mInventory:Add("wheat", 1000)
+    this.mInventory:Add("maize", 1000)
+    this.mInventory:Add("rice", 1000)
+    this.mInventory:Add("barley", 1000)
+    this.mInventory:Add("oats", 1000)
+    this.mInventory:Add("rye", 1000)
 
-    -- Food and farming
-    this.mInventory:Add("wheat", 100) -- Starting food
-    this.mInventory:Add("bread", 50)  -- Processed food
+    -- FRUITS (berries added by mountains automatically)
+    this.mInventory:Add("apple", 1000)
+    this.mInventory:Add("mango", 1000)
+    this.mInventory:Add("orange", 1000)
+    this.mInventory:Add("grapes", 1000)
+    this.mInventory:Add("berries", 1000)
+    this.mInventory:Add("peach", 1000)
+    this.mInventory:Add("pear", 1000)
+
+    -- VEGETABLES
+    this.mInventory:Add("potato", 1000)
+    this.mInventory:Add("carrot", 1000)
+    this.mInventory:Add("onion", 1000)
+    this.mInventory:Add("cabbage", 1000)
+    this.mInventory:Add("tomato", 1000)
+    this.mInventory:Add("lettuce", 1000)
+    this.mInventory:Add("beans", 1000)
+    this.mInventory:Add("pumpkin", 1000)
+
+    -- CROPS
+    this.mInventory:Add("flowers", 1000)
+    this.mInventory:Add("indigo", 1000)
+    this.mInventory:Add("sugar_cane", 1000)
+
+    -- ANIMAL PRODUCTS
+    this.mInventory:Add("wool", 1000)
+    this.mInventory:Add("milk", 1000)
+    this.mInventory:Add("eggs", 1000)
+    this.mInventory:Add("meat", 1000)
+    this.mInventory:Add("leather", 1000)
+
+    -- PROCESSED FOOD
+    this.mInventory:Add("cheese", 1000)
+    this.mInventory:Add("butter", 1000)
+    this.mInventory:Add("bread", 1000)
+    this.mInventory:Add("flour", 1000)
+    this.mInventory:Add("sugar", 1000)
+    this.mInventory:Add("honey", 1000)
+    this.mInventory:Add("wine", 1000)
+    this.mInventory:Add("beer", 1000)
+    this.mInventory:Add("pastries", 1000)
+    this.mInventory:Add("preserved_food", 1000)
+
+    -- DYES
+    this.mInventory:Add("red_dye", 1000)
+    this.mInventory:Add("blue_dye", 1000)
+    this.mInventory:Add("yellow_dye", 1000)
+    this.mInventory:Add("black_dye", 1000)
+
+    -- TEXTILES
+    this.mInventory:Add("paper", 1000)
+    this.mInventory:Add("cotton", 1000)
+    this.mInventory:Add("flax", 1000)
+    this.mInventory:Add("thread", 1000)
+    this.mInventory:Add("cloth", 1000)
+    this.mInventory:Add("linen", 1000)
+    this.mInventory:Add("silk", 1000)
+
+    -- CLOTHING
+    this.mInventory:Add("simple_clothes", 1000)
+    this.mInventory:Add("work_clothes", 1000)
+    this.mInventory:Add("fine_clothes", 1000)
+    this.mInventory:Add("luxury_clothes", 1000)
+    this.mInventory:Add("winter_coat", 1000)
+    this.mInventory:Add("shoes", 1000)
+    this.mInventory:Add("boots", 1000)
+    this.mInventory:Add("hat", 1000)
+
+    -- TOOLS
+    this.mInventory:Add("axe", 1000)
+    this.mInventory:Add("hammer", 1000)
+    this.mInventory:Add("saw", 1000)
+    this.mInventory:Add("pickaxe", 1000)
+    this.mInventory:Add("shovel", 1000)
+    this.mInventory:Add("hoe", 1000)
+    this.mInventory:Add("scythe", 1000)
+    this.mInventory:Add("chisel", 1000)
+    this.mInventory:Add("needle", 1000)
+
+    -- FURNITURE
+    this.mInventory:Add("chair", 1000)
+    this.mInventory:Add("table", 1000)
+    this.mInventory:Add("bed", 1000)
+    this.mInventory:Add("cabinet", 1000)
+    this.mInventory:Add("wardrobe", 1000)
+    this.mInventory:Add("bench", 1000)
+    this.mInventory:Add("bookshelf", 1000)
+    this.mInventory:Add("desk", 1000)
+
+    -- RAW MINERALS (added by mines automatically, but adding some extra)
+    this.mInventory:Add("coal", 1000)
+    this.mInventory:Add("stone", 1000)
+    this.mInventory:Add("marble", 1000)
+    this.mInventory:Add("clay", 1000)
+    this.mInventory:Add("sand", 1000)
+
+    -- REFINED METALS
+    this.mInventory:Add("iron", 1000)
+    this.mInventory:Add("steel", 1000)
+    this.mInventory:Add("copper", 1000)
+    this.mInventory:Add("bronze", 1000)
+    this.mInventory:Add("gold", 1000)
+    this.mInventory:Add("silver", 1000)
+
+    -- BUILDING MATERIALS
+    this.mInventory:Add("bricks", 1000)
+    this.mInventory:Add("timber", 1000)
+    this.mInventory:Add("planks", 1000)
+    this.mInventory:Add("cement", 1000)
+    this.mInventory:Add("glass", 1000)
+    this.mInventory:Add("nails", 1000)
+    this.mInventory:Add("wood", 1000)
+
+    -- CRAFTED GOODS
+    this.mInventory:Add("pottery", 1000)
+    this.mInventory:Add("jewelry", 1000)
+    this.mInventory:Add("perfume", 1000)
+    this.mInventory:Add("painting", 1000)
+    this.mInventory:Add("sculpture", 1000)
+    this.mInventory:Add("book", 1000)
+
+    -- UTILITIES
+    this.mInventory:Add("candle", 1000)
+    this.mInventory:Add("lamp_oil", 1000)
+    this.mInventory:Add("soap", 1000)
+    this.mInventory:Add("medicine", 1000)
+    this.mInventory:Add("charcoal", 1000)
+    this.mInventory:Add("oil", 1000)
 
     setmetatable(this, self)
     return this
@@ -110,6 +242,11 @@ function Town:CheckCollision(building)
         return true
     end
 
+    -- Check if the building collides with mountain ranges
+    if self.mMountains and self.mMountains:CheckCollision(building) then
+        return true
+    end
+
     return false
 end
 
@@ -133,10 +270,17 @@ function Town:Update(dt)
     if self.mRiver then
         self.mRiver:Update(dt)
     end
-    
-    -- Update mine production
-    if self.mMines then
-        self.mMines:Update(dt)
+
+    -- Commented out: Using fixed quantities instead of time-based mine production
+    -- if self.mMines then
+    --     self.mMines:Update(dt)
+    -- end
+
+    -- Update all buildings for production
+    for _, building in ipairs(self.mBuildings) do
+        if building.Update then
+            building:Update(dt)
+        end
     end
 end
 
@@ -154,6 +298,11 @@ function Town:Render()
         self.mBoundaryMinX, self.mBoundaryMinY,
         self.mBoundaryWidth, self.mBoundaryHeight)
     love.graphics.setLineWidth(1)
+
+    -- Draw mountain ranges (in background, at edges)
+    if self.mMountains then
+        self.mMountains:Render()
+    end
 
     -- Draw mine sites (before forest and river so they're on bottom)
     if self.mMines then
@@ -196,8 +345,74 @@ function Town:Render()
         end
     end
 
+    -- Check for hovered farm and show production info
+    if gCamera and gCamera.toWorldCoords then
+        local mx, my = love.mouse.getPosition()
+        local worldX, worldY = gCamera:toWorldCoords(mx, my)
+
+        for _, building in ipairs(self.mBuildings) do
+            if (building.mTypeId == "farm" or building.mTypeId == "bakery") and building:IsMouseOver(worldX, worldY) then
+                local productionInfo = building:GetProductionInfo()
+                if productionInfo then
+                    self:RenderProductionBubble(building, productionInfo)
+                end
+                break  -- Only show one tooltip at a time
+            end
+        end
+    end
+
     -- Reset color
     love.graphics.setColor(1, 1, 1)
+end
+
+function Town:RenderProductionBubble(building, info)
+    -- Render production info bubble above the building
+    local bubbleX = building.mX + building.mWidth / 2
+    local bubbleY = building.mY - 10
+
+    local font = love.graphics.getFont()
+    local lines = {}
+    for line in info:gmatch("[^\n]+") do
+        table.insert(lines, line)
+    end
+
+    local maxWidth = 0
+    for _, line in ipairs(lines) do
+        local lineWidth = font:getWidth(line)
+        maxWidth = math.max(maxWidth, lineWidth)
+    end
+
+    local lineHeight = font:getHeight()
+    local bubbleWidth = maxWidth + 20
+    local bubbleHeight = (#lines * lineHeight) + 15
+    local bubbleTopY = bubbleY - bubbleHeight - 5
+
+    -- Draw bubble background
+    love.graphics.setColor(0.1, 0.1, 0.1, 0.9)
+    love.graphics.rectangle("fill", bubbleX - bubbleWidth/2, bubbleTopY, bubbleWidth, bubbleHeight, 5, 5)
+
+    -- Draw bubble border
+    love.graphics.setColor(0.6, 0.8, 0.6)
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", bubbleX - bubbleWidth/2, bubbleTopY, bubbleWidth, bubbleHeight, 5, 5)
+    love.graphics.setLineWidth(1)
+
+    -- Draw pointer (triangle pointing down to building)
+    love.graphics.setColor(0.1, 0.1, 0.1, 0.9)
+    love.graphics.polygon("fill",
+        bubbleX, bubbleY,
+        bubbleX - 8, bubbleY - 8,
+        bubbleX + 8, bubbleY - 8
+    )
+
+    -- Draw text
+    love.graphics.setColor(1, 1, 1)
+    local textY = bubbleTopY + 8
+    for _, line in ipairs(lines) do
+        local textWidth = font:getWidth(line)
+        love.graphics.print(line, bubbleX - textWidth/2, textY)
+        textY = textY + lineHeight
+    end
 end
 
 function Town:RenderOutOfBounds()
@@ -273,4 +488,8 @@ end
 
 function Town:GetForest()
     return self.mForest
+end
+
+function Town:GetMountains()
+    return self.mMountains
 end

@@ -51,6 +51,18 @@ function NatureDrawer:Update(dt)
     return true -- Continue processing input for states below
 end
 
+function NatureDrawer:OnMouseWheel(dx, dy)
+    -- Handle scroll
+    local screenW = love.graphics.getWidth()
+    local drawerX = screenW - self.mWidth
+    local mx, my = love.mouse.getPosition()
+
+    if mx >= drawerX then
+        self.mScrollOffset = self.mScrollOffset - dy * 30
+        self.mScrollOffset = math.max(0, math.min(self.mScrollOffset, self.mMaxScroll))
+    end
+end
+
 function NatureDrawer:Render()
     local screenW = love.graphics.getWidth()
     local screenH = love.graphics.getHeight()
@@ -75,15 +87,22 @@ function NatureDrawer:Render()
 
     -- Draw title
     love.graphics.setColor(1, 1, 1)
-    love.graphics.print("Nature Status", drawerX + self.mPadding, topBarHeight + 15)
+    local townName = (gTown and gTown.mName) or "Cravetown"
+    love.graphics.print(townName .. " - Nature", drawerX + self.mPadding, topBarHeight + 15)
 
     -- Get nature data from town
     local river = gTown:GetRiver()
     local forest = gTown:GetForest()
     local mines = gTown:GetMines()
+    local mountains = gTown:GetMountains()
 
-    local y = topBarHeight + 50
+    local contentY = topBarHeight + 50
+    local y = contentY - self.mScrollOffset
     local lineHeight = 25
+
+    -- Set up scissor for scrollable content
+    local contentHeight = screenH - contentY
+    love.graphics.setScissor(drawerX, contentY, self.mWidth, contentHeight)
 
     -- River Status
     if river then
@@ -104,6 +123,42 @@ function NatureDrawer:Render()
         y = y + lineHeight * 3 + 10
     end
 
+    -- Mountains Status (show before mines so they're always visible)
+    if mountains then
+        love.graphics.setColor(0.6, 0.4, 0.5)
+        love.graphics.print("Mountains", drawerX + self.mPadding, y)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.print("Total Ranges: " .. #mountains.mRanges, drawerX + self.mPadding, y + lineHeight)
+        y = y + lineHeight * 2 + 10
+
+        -- List all mountain ranges and their berries
+        love.graphics.setColor(0.8, 0.8, 0.8)
+        love.graphics.print("Mountain Ranges:", drawerX + self.mPadding, y)
+        y = y + lineHeight
+
+        for i, range in ipairs(mountains.mRanges) do
+            local berryName = CommodityTypes[range.berry:upper()]
+            if berryName and berryName.name then
+                berryName = berryName.name
+            else
+                berryName = range.berry or "Unknown"
+            end
+
+            -- Show actual inventory count for this berry to keep in-sync with Inventory
+            local invCount = 0
+            if gTown and gTown.mInventory and range.berry then
+                invCount = gTown.mInventory:Get(range.berry) or 0
+            end
+            local mountainInfo = string.format("%s - %d berries", berryName, invCount)
+
+            love.graphics.setColor(0.6, 0.6, 0.6)
+            love.graphics.print(i .. ". " .. mountainInfo, drawerX + self.mPadding + 10, y)
+            y = y + lineHeight
+        end
+
+        y = y + 10  -- Extra spacing after mountains
+    end
+
     -- Mines Status
     if mines then
         love.graphics.setColor(0.7, 0.5, 0.3)
@@ -112,28 +167,55 @@ function NatureDrawer:Render()
         love.graphics.print("Status: " .. (mines.mAbundanceStatus or "Unknown"), drawerX + self.mPadding, y + lineHeight)
         love.graphics.print("Total Sites: " .. #mines.mSites, drawerX + self.mPadding, y + lineHeight * 2)
         y = y + lineHeight * 3 + 10
-        
+
         -- List all mines
         love.graphics.setColor(0.8, 0.8, 0.8)
         love.graphics.print("Mine List:", drawerX + self.mPadding, y)
         y = y + lineHeight
-        
-        for i, mine in ipairs(mines.mSites) do
-            if y < screenH - 50 then  -- Don't draw off screen
-                local mineInfo = (mine.oreName or "Unknown") .. " - "
-                if mine.size <= 35 then
-                    mineInfo = mineInfo .. "Small"
-                elseif mine.size <= 40 then
-                    mineInfo = mineInfo .. "Medium"
-                else
-                    mineInfo = mineInfo .. "Large"
-                end
-                
-                love.graphics.setColor(0.6, 0.6, 0.6)
-                love.graphics.print(i .. ". " .. mineInfo, drawerX + self.mPadding + 10, y)
-                y = y + lineHeight
-            end
+
+        -- Sort mines by size: small (3), medium (5), large (10)
+        local sortedMines = {}
+        for _, mine in ipairs(mines.mSites) do
+            table.insert(sortedMines, mine)
         end
+        table.sort(sortedMines, function(a, b)
+            local sizeOrder = {small = 1, medium = 2, large = 3}
+            local orderA = sizeOrder[a.oreSize] or 0
+            local orderB = sizeOrder[b.oreSize] or 0
+            return orderA < orderB
+        end)
+
+        for i, mine in ipairs(sortedMines) do
+            local mineInfo = (mine.oreName or "Unknown") .. " - "
+            if mine.oreSize == "large" then
+                mineInfo = mineInfo .. "Large (10 units)"
+            elseif mine.oreSize == "medium" then
+                mineInfo = mineInfo .. "Medium (5 units)"
+            elseif mine.oreSize == "small" then
+                mineInfo = mineInfo .. "Small (3 units)"
+            else
+                mineInfo = mineInfo .. "Unknown"
+            end
+
+            love.graphics.setColor(0.6, 0.6, 0.6)
+            love.graphics.print(i .. ". " .. mineInfo, drawerX + self.mPadding + 10, y)
+            y = y + lineHeight
+        end
+    end
+
+    -- Calculate max scroll based on content height
+    local totalContentHeight = y - (contentY - self.mScrollOffset)
+    self.mMaxScroll = math.max(0, totalContentHeight - contentHeight + 20)
+
+    love.graphics.setScissor()
+
+    -- Draw scrollbar if needed
+    if self.mMaxScroll > 0 then
+        local scrollbarHeight = contentHeight * (contentHeight / (totalContentHeight + 20))
+        local scrollbarY = contentY + (self.mScrollOffset / self.mMaxScroll) * (contentHeight - scrollbarHeight)
+
+        love.graphics.setColor(0.5, 0.5, 0.5, 0.8)
+        love.graphics.rectangle("fill", screenW - 8, scrollbarY, 6, scrollbarHeight, 3, 3)
     end
 
     -- Reset color

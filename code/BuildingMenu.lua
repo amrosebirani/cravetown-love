@@ -9,10 +9,10 @@ BuildingMenu.__index = BuildingMenu
 
 function BuildingMenu:Create()
     local this = {
-        mHeight = 120,
+        mHeight = 200,  -- Increased from 120 to show more rows
         mPadding = 5,
-        mButtonWidth = 60,
-        mButtonHeight = 60,
+        mButtonWidth = 72,
+        mButtonHeight = 72,
         mButtons = {},
         mScrollOffset = 0,
         mMaxScroll = 0,
@@ -34,6 +34,11 @@ function BuildingMenu:Create()
         })
     end
 
+    -- Sort buttons alphabetically by label
+    table.sort(this.mButtons, function(a, b)
+        return a.label < b.label
+    end)
+
     -- Calculate initial positions
     this:RecalculateLayout()
 
@@ -44,8 +49,9 @@ function BuildingMenu:RecalculateLayout()
     -- Recalculate button positions based on current screen size
     local screenW = love.graphics.getWidth()
     local menuY = love.graphics.getHeight() - self.mHeight
+    local labelHeight = 25  -- Space for "Sites" label
     local currentX = self.mPadding
-    local currentY = menuY + self.mPadding
+    local currentY = menuY + self.mPadding + labelHeight
     local rowHeight = self.mButtonHeight + self.mButtonSpacing
 
     for i, button in ipairs(self.mButtons) do
@@ -132,6 +138,13 @@ function BuildingMenu:Render()
     love.graphics.setColor(0.3, 0.3, 0.3, 0.9)
     love.graphics.rectangle("fill", 0, menuY, love.graphics.getWidth(), self.mHeight)
 
+    -- Draw "Sites" label at the top of the menu
+    love.graphics.setColor(1, 1, 1)
+    local font = love.graphics.getFont()
+    local labelText = "Sites"
+    local labelWidth = font:getWidth(labelText)
+    love.graphics.print(labelText, 10, menuY + 5)
+
     -- Scissor to clip buttons to menu area
     love.graphics.setScissor(0, menuY, love.graphics.getWidth(), self.mHeight)
 
@@ -153,36 +166,43 @@ function BuildingMenu:Render()
                 hoveredButton = button
             end
 
-            -- Draw button background
+            -- Draw button background (improved tile UI)
             if not canAfford then
                 -- Gray out if can't afford
-                love.graphics.setColor(0.3, 0.3, 0.3)
+                love.graphics.setColor(0.28, 0.28, 0.28)
             elseif isHovering then
-                love.graphics.setColor(button.color[1] * 1.3, button.color[2] * 1.3, button.color[3] * 1.3)
+                love.graphics.setColor(button.color[1] * 1.25, button.color[2] * 1.25, button.color[3] * 1.25)
             else
                 love.graphics.setColor(button.color[1], button.color[2], button.color[3])
             end
-            love.graphics.rectangle("fill", button.x, button.y, button.width, button.height)
+            -- subtle shadow
+            love.graphics.rectangle("fill", button.x + 2, button.y + 2, button.width, button.height, 8, 8)
+            -- main tile
+            love.graphics.setColor(0.15, 0.15, 0.15)
+            love.graphics.rectangle("fill", button.x, button.y, button.width, button.height, 8, 8)
+            love.graphics.setColor(button.color[1], button.color[2], button.color[3])
+            love.graphics.rectangle("line", button.x, button.y, button.width, button.height, 8, 8)
 
-            -- Draw button border
-            if not canAfford then
-                love.graphics.setColor(0.5, 0, 0)  -- Red border for unaffordable
-            else
-                love.graphics.setColor(0, 0, 0)
-            end
-            love.graphics.rectangle("line", button.x, button.y, button.width, button.height)
-
-            -- Draw label
+            -- Draw label (two-letter uppercase) - centered
             if not canAfford then
                 love.graphics.setColor(0.6, 0.6, 0.6)  -- Dimmed text
             else
                 love.graphics.setColor(1, 1, 1)
             end
             local font = love.graphics.getFont()
-            local textWidth = font:getWidth(button.label)
+            local function toUpperTwo(lbl)
+                local letters = string.gsub(lbl or "", "[^A-Za-z]", "")
+                letters = string.upper(letters)
+                if #letters >= 2 then
+                    return string.sub(letters, 1, 2)
+                end
+                return letters
+            end
+            local labelText = toUpperTwo(button.label)
+            local textWidth = font:getWidth(labelText)
             local textHeight = font:getHeight()
             love.graphics.print(
-                button.label,
+                labelText,
                 button.x + button.width / 2 - textWidth / 2,
                 button.y + button.height / 2 - textHeight / 2
             )
@@ -216,14 +236,22 @@ function BuildingMenu:Render()
             maxWidth = math.max(maxWidth, lineWidth)
         end
 
-        local tooltipWidth = maxWidth + 10
-        local tooltipHeight = (#tooltipLines * lineHeight) + 6
+        local tooltipWidth = maxWidth + 20
+        local tooltipHeight = (#tooltipLines * lineHeight) + 10
         local tooltipX = hoveredButton.x + hoveredButton.width / 2 - tooltipWidth / 2
         local tooltipY = hoveredButton.y - tooltipHeight - 10
 
+        -- Keep tooltip on screen
+        local screenW = love.graphics.getWidth()
+        if tooltipX < 5 then
+            tooltipX = 5
+        elseif tooltipX + tooltipWidth > screenW - 5 then
+            tooltipX = screenW - tooltipWidth - 5
+        end
+
         -- Tooltip background
         love.graphics.setColor(0, 0, 0, 0.9)
-        love.graphics.rectangle("fill", tooltipX - 5, tooltipY - 3, tooltipWidth, tooltipHeight)
+        love.graphics.rectangle("fill", tooltipX, tooltipY, tooltipWidth, tooltipHeight, 5, 5)
 
         -- Tooltip text
         for i, line in ipairs(tooltipLines) do

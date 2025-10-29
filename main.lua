@@ -5,6 +5,7 @@ require("code/StateMachine")
 require("code/StateStack")
 require("code/Building")
 require("code/Town")
+require("code/TownNameModal")
 require("code/TownViewState")
 require("code/BuildingPlacementState")
 require("code/BuildingMenu")
@@ -34,7 +35,7 @@ function love.load()
     lurker.interval = 0.5 -- Check for changes every 0.5 seconds
 
     -- Initialize global game state
-    gTown = Town:Create()
+    gTown = Town:Create({ name = "Cravetown" })
 
     -- Initialize camera at world origin
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
@@ -63,6 +64,34 @@ function love.load()
 
     -- Start in TownView state
     gStateMachine:Change("TownView")
+
+    -- Background music with fade-in after 2s
+    gMusic = {
+        source = nil,
+        delay = 2.0,
+        timer = 0,
+        fadingIn = false,
+        fadeDuration = 3.0,
+        fadeTimer = 0
+    }
+    local ok, src = pcall(love.audio.newSource, "Fikrimin İnce Gülü.mp3", "stream")
+    if ok and src then
+        gMusic.source = src
+        gMusic.source:setLooping(true)
+        gMusic.source:setVolume(0)
+    else
+        -- Try alternative filename without diacritics if needed
+        local ok2, src2 = pcall(love.audio.newSource, "Fikrimin Ince Gulu.mp3", "stream")
+        if ok2 and src2 then
+            gMusic.source = src2
+            gMusic.source:setLooping(true)
+            gMusic.source:setVolume(0)
+        end
+    end
+
+    -- Push town name modal
+    local nameModal = TownNameModal:Create()
+    gStateStack:Push(nameModal)
 end
 
 function love.update(dt)
@@ -74,6 +103,22 @@ function love.update(dt)
 
     gStateMachine:Update(dt)
     gStateStack:Update(dt)
+
+    -- Handle background music fade in
+    if gMusic and gMusic.source then
+        if not gMusic.fadingIn then
+            gMusic.timer = gMusic.timer + dt
+            if gMusic.timer >= gMusic.delay then
+                gMusic.fadingIn = true
+                gMusic.fadeTimer = 0
+                gMusic.source:play()
+            end
+        else
+            gMusic.fadeTimer = gMusic.fadeTimer + dt
+            local t = math.min(1, gMusic.fadeTimer / gMusic.fadeDuration)
+            gMusic.source:setVolume(t)
+        end
+    end
 
     -- Clear mouse events after processing
     gMousePressed = nil
@@ -135,9 +180,27 @@ function love.resize(w, h)
 end
 
 function love.keypressed(key)
+    -- forward to focused modal (for name input)
+    for i = #gStateStack.mStates, 1, -1 do
+        local state = gStateStack.mStates[i]
+        if state.keypressed then
+            state:keypressed(key)
+            break
+        end
+    end
     -- Toggle fullscreen with F11 or Alt+Enter
     if key == "f11" or (key == "return" and (love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt"))) then
         local fullscreen = love.window.getFullscreen()
         love.window.setFullscreen(not fullscreen)
+    end
+end
+
+function love.textinput(t)
+    for i = #gStateStack.mStates, 1, -1 do
+        local state = gStateStack.mStates[i]
+        if state.textinput then
+            state:textinput(t)
+            break
+        end
     end
 end

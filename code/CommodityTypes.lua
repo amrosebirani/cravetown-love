@@ -98,6 +98,35 @@ CommodityTypes.BERRIES = createCommodity({
     perishable = true, description = "Mixed berries"
 })
 
+-- ==================== SPECIAL MOUNTAIN BERRIES ====================
+CommodityTypes.HEALTH_BERRY = createCommodity({
+    id = "health_berry", name = "Health Berry", category = "fruit",
+    icon = "HB", stackSize = 200, baseValue = 25,
+    isRaw = true,
+    perishable = true, description = "Rare berry that boosts health"
+})
+
+CommodityTypes.TASTE_BERRY = createCommodity({
+    id = "taste_berry", name = "Taste Berry", category = "fruit",
+    icon = "TB", stackSize = 200, baseValue = 20,
+    isRaw = true,
+    perishable = true, description = "Rare berry that enhances flavors"
+})
+
+CommodityTypes.HAPPY_BERRY = createCommodity({
+    id = "happy_berry", name = "Happy Berry", category = "fruit",
+    icon = "HPB", stackSize = 200, baseValue = 22,
+    isRaw = true,
+    perishable = true, description = "Rare berry that lifts spirits"
+})
+
+CommodityTypes.POWER_BERRY = createCommodity({
+    id = "power_berry", name = "Power Berry", category = "fruit",
+    icon = "PB", stackSize = 200, baseValue = 30,
+    isRaw = true,
+    perishable = true, description = "Rare berry that increases strength"
+})
+
 CommodityTypes.PEACH = createCommodity({
     id = "peach", name = "Peach", category = "fruit",
     icon = "Pc", stackSize = 600, baseValue = 5,

@@ -21,6 +21,7 @@ function InventoryDrawer:Create()
             {id = "nonzero", name = "In Stock"},
             {id = "grain", name = "Grains"},
             {id = "fruit", name = "Fruits"},
+            {id = "mountain_berries", name = "Mountain Berries"},
             {id = "vegetable", name = "Vegetables"},
             {id = "animal_product", name = "Animal Products"},
             {id = "processed_food", name = "Processed Food"},
@@ -60,6 +61,14 @@ function InventoryDrawer:GetFilteredCommodities()
             include = true
         elseif self.mFilter == "nonzero" then
             include = quantity > 0
+        elseif self.mFilter == "mountain_berries" then
+            -- Special sub-filter for the four mountain berries
+            if commodity.id == "health_berry" or
+               commodity.id == "taste_berry" or
+               commodity.id == "happy_berry" or
+               commodity.id == "power_berry" then
+                include = true
+            end
         else
             include = commodity.category == self.mFilter
         end
@@ -142,7 +151,8 @@ function InventoryDrawer:Render()
 
     -- Draw title
     love.graphics.setColor(1, 1, 1)
-    love.graphics.print("Town Inventory", drawerX + self.mPadding, topBarHeight + 15)
+    local townName = (gTown and gTown.mName) or "Cravetown"
+    love.graphics.print(townName .. " - Inventory", drawerX + self.mPadding, topBarHeight + 15)
 
     -- Draw category filters (left side)
     local filterY = topBarHeight + 50
