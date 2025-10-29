@@ -5,6 +5,7 @@
 require("code/Inventory")
 require("code/River")
 require("code/Forest")
+require("code/Mine")
 
 Town = {}
 Town.__index = Town
@@ -40,6 +41,16 @@ function Town:Create()
         maxY = 1250,
         numRegions = math.random(3, 6),
         river = this.mRiver
+    })
+
+    -- Create mine sites (after river and forest so we can avoid them)
+    this.mMines = Mine:Create({
+        minX = -1250,
+        minY = -1250,
+        maxX = 1250,
+        maxY = 1250,
+        river = this.mRiver,
+        forest = this.mForest
     })
 
     -- Add comprehensive starting resources to bootstrap economy
@@ -94,6 +105,11 @@ function Town:CheckCollision(building)
         return true
     end
 
+    -- Check if the building collides with mine sites
+    if self.mMines and self.mMines:CheckCollision(building) then
+        return true
+    end
+
     return false
 end
 
@@ -117,6 +133,11 @@ function Town:Update(dt)
     if self.mRiver then
         self.mRiver:Update(dt)
     end
+    
+    -- Update mine production
+    if self.mMines then
+        self.mMines:Update(dt)
+    end
 end
 
 function Town:Render()
@@ -133,6 +154,11 @@ function Town:Render()
         self.mBoundaryMinX, self.mBoundaryMinY,
         self.mBoundaryWidth, self.mBoundaryHeight)
     love.graphics.setLineWidth(1)
+
+    -- Draw mine sites (before forest and river so they're on bottom)
+    if self.mMines then
+        self.mMines:Render()
+    end
 
     -- Draw the forest (before river so river is on top)
     if self.mForest then
@@ -228,4 +254,23 @@ end
 
 function Town:GetInventory()
     return self.mInventory
+end
+
+function Town:GetMines()
+    return self.mMines
+end
+
+function Town:GetMineAtPosition(x, y)
+    if self.mMines then
+        return self.mMines:GetMineAtPosition(x, y)
+    end
+    return nil
+end
+
+function Town:GetRiver()
+    return self.mRiver
+end
+
+function Town:GetForest()
+    return self.mForest
 end

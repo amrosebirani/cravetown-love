@@ -207,8 +207,16 @@ function InventoryDrawer:Render()
             love.graphics.setColor(1, 1, 1)
             love.graphics.print(item.commodity.name, listX + 30, y + 5)
 
-            -- Draw quantity
-            local quantityText = tostring(item.quantity)
+            -- Draw quantity (round to 2 decimal places)
+            local roundedQuantity = math.floor(item.quantity * 100 + 0.5) / 100
+            local quantityText = tostring(roundedQuantity)
+            -- Format to remove trailing zeros
+            if roundedQuantity == math.floor(roundedQuantity) then
+                quantityText = string.format("%.0f", roundedQuantity)
+            else
+                quantityText = string.format("%.2f", roundedQuantity)
+            end
+            
             local quantityColor = item.quantity > 0 and {0.4, 1, 0.4} or {0.6, 0.6, 0.6}
             love.graphics.setColor(quantityColor[1], quantityColor[2], quantityColor[3])
             local textWidth = love.graphics.getFont():getWidth(quantityText)

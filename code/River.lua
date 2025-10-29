@@ -6,6 +6,7 @@ River = {}
 River.__index = River
 
 function River:Create(params)
+    local flowLevels = {"Dry", "Low Flow", "Mid Flow", "Full Flow"}
     local this = {
         -- River flows from top to bottom with natural curves
         mBaseWidth = params.baseWidth or 180,
@@ -14,7 +15,8 @@ function River:Create(params)
         mBankWidth = 15,
         mPoints = {},  -- Array of {x, y, width, flowSpeed, clarity} points defining the river path
         mSegmentLength = 3,  -- Much smaller segments for smoother curves
-        mTime = 0  -- Animation time
+        mTime = 0,  -- Animation time
+        mFlowStatus = flowLevels[math.random(1, #flowLevels)]  -- Random flow level
     }
 
     setmetatable(this, self)

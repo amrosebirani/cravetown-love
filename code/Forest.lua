@@ -6,6 +6,7 @@ Forest = {}
 Forest.__index = Forest
 
 function Forest:Create(params)
+    local densityLevels = {"Clear", "Sparse", "Moderate", "Dense"}
     local this = {
         mBoundaryMinX = params.minX or -1250,
         mBoundaryMinY = params.minY or -1250,
@@ -13,7 +14,8 @@ function Forest:Create(params)
         mBoundaryMaxY = params.maxY or 1250,
         mRiver = params.river,  -- Reference to river for collision checking
         mRegions = {},  -- Array of forest regions
-        mTrees = {}     -- Array of individual trees {x, y, size}
+        mTrees = {},    -- Array of individual trees {x, y, size}
+        mDensityStatus = densityLevels[math.random(1, #densityLevels)]  -- Random density level
     }
 
     setmetatable(this, self)

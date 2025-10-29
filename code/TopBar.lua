@@ -27,10 +27,21 @@ function TopBar:Create()
 
     -- Could add more buttons here (Settings, Stats, etc.)
     table.insert(this.mButtons, {
+        id = "nature",
+        label = "Nature",
+        icon = "N",
+        x = 140,
+        y = 5,
+        width = 100,
+        height = 40,
+        color = {0.3, 0.7, 0.5}
+    })
+    
+    table.insert(this.mButtons, {
         id = "stats",
         label = "Stats",
         icon = "S",
-        x = 140,
+        x = 250,
         y = 5,
         width = 100,
         height = 40,
@@ -82,6 +93,25 @@ function TopBar:OnButtonClick(buttonId)
             -- Open drawer
             require("code/InventoryDrawer")
             local drawer = InventoryDrawer:Create()
+            gStateStack:Push(drawer)
+        end
+    elseif buttonId == "nature" then
+        -- Toggle nature drawer
+        local drawerOpen = false
+        for i = #gStateStack.mStates, 1, -1 do
+            local state = gStateStack.mStates[i]
+            if state.mIsNatureDrawer then
+                -- Close drawer
+                gStateStack:Pop()
+                drawerOpen = true
+                break
+            end
+        end
+
+        if not drawerOpen then
+            -- Open drawer
+            require("code/NatureDrawer")
+            local drawer = NatureDrawer:Create()
             gStateStack:Push(drawer)
         end
     elseif buttonId == "stats" then
