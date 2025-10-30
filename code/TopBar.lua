@@ -48,6 +48,18 @@ function TopBar:Create()
         color = {0.4, 0.4, 0.6}
     })
 
+    table.insert(this.mButtons, {
+        id = "music",
+        label = "Music",
+        icon = "M",
+        x = 360,
+        y = 5,
+        width = 100,
+        height = 40,
+        color = {0.6, 0.4, 0.6},
+        musicOn = true  -- Track music state
+    })
+
     return this
 end
 
@@ -133,6 +145,24 @@ function TopBar:OnButtonClick(buttonId)
             local drawer = StatsDrawer:Create()
             gStateStack:Push(drawer)
         end
+    elseif buttonId == "music" then
+        -- Toggle music on/off
+        if gMusic and gMusic.source then
+            -- Find the music button
+            for _, btn in ipairs(self.mButtons) do
+                if btn.id == "music" then
+                    btn.musicOn = not btn.musicOn
+                    if btn.musicOn then
+                        gMusic.source:play()
+                        print("Music ON")
+                    else
+                        gMusic.source:pause()
+                        print("Music OFF")
+                    end
+                    break
+                end
+            end
+        end
     end
 end
 
@@ -153,8 +183,14 @@ function TopBar:Render()
         local isHovering = mx >= button.x and mx <= button.x + button.width and
                           my >= button.y and my <= button.y + button.height
 
+        -- Check if music is off for music button
+        local isMusicOff = button.id == "music" and button.musicOn == false
+
         -- Button background
-        if isHovering then
+        if isMusicOff then
+            -- Dim the button when music is off
+            love.graphics.setColor(button.color[1] * 0.4, button.color[2] * 0.4, button.color[3] * 0.4)
+        elseif isHovering then
             love.graphics.setColor(button.color[1] * 1.3, button.color[2] * 1.3, button.color[3] * 1.3)
         else
             love.graphics.setColor(button.color[1], button.color[2], button.color[3])
@@ -166,12 +202,21 @@ function TopBar:Render()
         love.graphics.rectangle("line", button.x, button.y, button.width, button.height, 5, 5)
 
         -- Button text
-        love.graphics.setColor(1, 1, 1)
+        if isMusicOff then
+            love.graphics.setColor(0.6, 0.6, 0.6)  -- Dimmed text when music is off
+        else
+            love.graphics.setColor(1, 1, 1)
+        end
         local font = love.graphics.getFont()
-        local textWidth = font:getWidth(button.label)
+        local label = button.label
+        -- Show "Music: OFF" when music is off
+        if button.id == "music" and not button.musicOn then
+            label = "Music: OFF"
+        end
+        local textWidth = font:getWidth(label)
         local textHeight = font:getHeight()
         love.graphics.print(
-            button.label,
+            label,
             button.x + button.width / 2 - textWidth / 2,
             button.y + button.height / 2 - textHeight / 2
         )

@@ -63,7 +63,8 @@ function Town:Create(params)
         maxY = 1250,
         river = this.mRiver,
         forest = this.mForest,
-        mines = this.mMines
+        mines = this.mMines,
+        inventory = this.mInventory  -- Pass inventory reference
     })
 
     -- Add comprehensive starting resources - 1000 of each item
@@ -345,18 +346,36 @@ function Town:Render()
         end
     end
 
-    -- Check for hovered farm and show production info
+    -- Check for hovered farm/bakery and show production info
     if gCamera and gCamera.toWorldCoords then
         local mx, my = love.mouse.getPosition()
         local worldX, worldY = gCamera:toWorldCoords(mx, my)
+        local tooltipShown = false
 
+        -- Check buildings first
         for _, building in ipairs(self.mBuildings) do
-            if (building.mTypeId == "farm" or building.mTypeId == "bakery") and building:IsMouseOver(worldX, worldY) then
-                local productionInfo = building:GetProductionInfo()
-                if productionInfo then
-                    self:RenderProductionBubble(building, productionInfo)
+            if building:IsMouseOver(worldX, worldY) then
+                -- Check for farm/bakery production info
+                if (building.mTypeId == "farm" or building.mTypeId == "bakery") then
+                    local productionInfo = building:GetProductionInfo()
+                    if productionInfo then
+                        self:RenderProductionBubble(building, productionInfo)
+                        tooltipShown = true
+                    end
+                -- Check for custom mines
+                elseif building.mIsCustomMine then
+                    self:RenderCustomMineTooltip(building)
+                    tooltipShown = true
                 end
                 break  -- Only show one tooltip at a time
+            end
+        end
+
+        -- Check mines if no building tooltip shown
+        if not tooltipShown and self.mMines then
+            local hoveredMine = self.mMines:GetMineAtPosition(worldX, worldY)
+            if hoveredMine then
+                self:RenderMineTooltip(hoveredMine)
             end
         end
     end
@@ -413,6 +432,122 @@ function Town:RenderProductionBubble(building, info)
         love.graphics.print(line, bubbleX - textWidth/2, textY)
         textY = textY + lineHeight
     end
+end
+
+function Town:RenderMineTooltip(mine)
+    -- Render tooltip for mine showing ore name and size
+    local bubbleX = mine.x
+    local bubbleY = mine.y - mine.size
+
+    local font = love.graphics.getFont()
+    local oreName = mine.oreName or "Unknown Ore"
+    local sizeText = ""
+    if mine.oreSize == "large" then
+        sizeText = "Large (10 units)"
+    elseif mine.oreSize == "medium" then
+        sizeText = "Medium (5 units)"
+    elseif mine.oreSize == "small" then
+        sizeText = "Small (3 units)"
+    end
+
+    local lineHeight = font:getHeight()
+    local nameWidth = font:getWidth(oreName)
+    local sizeWidth = font:getWidth(sizeText)
+    local maxWidth = math.max(nameWidth, sizeWidth)
+
+    local bubbleWidth = maxWidth + 20
+    local bubbleHeight = (lineHeight * 2) + 15
+    local bubbleTopY = bubbleY - bubbleHeight - 10
+
+    -- Draw bubble background
+    love.graphics.setColor(0.1, 0.1, 0.1, 0.9)
+    love.graphics.rectangle("fill", bubbleX - bubbleWidth/2, bubbleTopY, bubbleWidth, bubbleHeight, 5, 5)
+
+    -- Draw bubble border using ore color
+    love.graphics.setColor(mine.color[1], mine.color[2], mine.color[3])
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", bubbleX - bubbleWidth/2, bubbleTopY, bubbleWidth, bubbleHeight, 5, 5)
+    love.graphics.setLineWidth(1)
+
+    -- Draw pointer (triangle pointing down to mine)
+    love.graphics.setColor(0.1, 0.1, 0.1, 0.9)
+    love.graphics.polygon("fill",
+        bubbleX, bubbleY - 5,
+        bubbleX - 8, bubbleY - 13,
+        bubbleX + 8, bubbleY - 13
+    )
+
+    -- Draw text
+    love.graphics.setColor(1, 1, 1)
+    local textY = bubbleTopY + 8
+
+    -- Ore name
+    local textWidth = font:getWidth(oreName)
+    love.graphics.print(oreName, bubbleX - textWidth/2, textY)
+    textY = textY + lineHeight
+
+    -- Size info
+    love.graphics.setColor(0.8, 0.8, 0.8)
+    textWidth = font:getWidth(sizeText)
+    love.graphics.print(sizeText, bubbleX - textWidth/2, textY)
+end
+
+function Town:RenderCustomMineTooltip(building)
+    -- Render tooltip for custom mine buildings
+    local bubbleX = building.mX + building.mWidth / 2
+    local bubbleY = building.mY - 10
+
+    local font = love.graphics.getFont()
+    local oreName = building.mMineOreName or "Unknown Ore"
+    local sizeText = ""
+    if building.mMineOreSize == "large" then
+        sizeText = "Large (10 units)"
+    elseif building.mMineOreSize == "medium" then
+        sizeText = "Medium (5 units)"
+    elseif building.mMineOreSize == "small" then
+        sizeText = "Small (3 units)"
+    end
+
+    local lineHeight = font:getHeight()
+    local nameWidth = font:getWidth(oreName)
+    local sizeWidth = font:getWidth(sizeText)
+    local maxWidth = math.max(nameWidth, sizeWidth)
+
+    local bubbleWidth = maxWidth + 20
+    local bubbleHeight = (lineHeight * 2) + 15
+    local bubbleTopY = bubbleY - bubbleHeight - 10
+
+    -- Draw bubble background
+    love.graphics.setColor(0.1, 0.1, 0.1, 0.9)
+    love.graphics.rectangle("fill", bubbleX - bubbleWidth/2, bubbleTopY, bubbleWidth, bubbleHeight, 5, 5)
+
+    -- Draw bubble border using ore color
+    love.graphics.setColor(building.mMineOreColor[1], building.mMineOreColor[2], building.mMineOreColor[3])
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", bubbleX - bubbleWidth/2, bubbleTopY, bubbleWidth, bubbleHeight, 5, 5)
+    love.graphics.setLineWidth(1)
+
+    -- Draw pointer (triangle pointing down to mine)
+    love.graphics.setColor(0.1, 0.1, 0.1, 0.9)
+    love.graphics.polygon("fill",
+        bubbleX, bubbleY - 5,
+        bubbleX - 8, bubbleY - 13,
+        bubbleX + 8, bubbleY - 13
+    )
+
+    -- Draw text
+    love.graphics.setColor(1, 1, 1)
+    local textY = bubbleTopY + 8
+
+    -- Ore name
+    local textWidth = font:getWidth(oreName)
+    love.graphics.print(oreName, bubbleX - textWidth/2, textY)
+    textY = textY + lineHeight
+
+    -- Size info
+    love.graphics.setColor(0.8, 0.8, 0.8)
+    textWidth = font:getWidth(sizeText)
+    love.graphics.print(sizeText, bubbleX - textWidth/2, textY)
 end
 
 function Town:RenderOutOfBounds()

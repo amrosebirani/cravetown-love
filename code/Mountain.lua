@@ -25,6 +25,7 @@ function Mountain:Create(params)
         mRiver = params.river,  -- Reference to river for collision checking
         mForest = params.forest,  -- Reference to forest for collision checking
         mMines = params.mines,  -- Reference to mines for collision checking
+        mInventory = params.inventory,  -- Reference to inventory
         mRanges = {}  -- Array of mountain ranges {x, y, width, height, berry, berryName, color}
     }
 
@@ -135,12 +136,13 @@ function Mountain:GenerateMountainRanges(params)
 
             table.insert(self.mRanges, range)
 
-            -- Add fixed quantity to town inventory
-            if gTown and gTown.mInventory then
-                gTown.mInventory:Add(mountainType.berry, 5)
+            -- Add fixed quantity to inventory
+            if self.mInventory then
+                self.mInventory:Add(mountainType.berry, 5)
+                print("Mountain placed: " .. mountainType.name .. " at corner " .. i .. " - Added 5 " .. mountainType.berry)
+            else
+                print("WARNING: Mountain created but no inventory reference - berries not added!")
             end
-
-            print("Mountain placed: " .. mountainType.name .. " at corner " .. i)
         end
     end
 end

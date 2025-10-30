@@ -306,30 +306,74 @@ function Building:IsMouseOver(mx, my)
 end
 
 function Building:Render(canPlace)
-    -- If canPlace is false, show red tinge
-    if canPlace == false then
-        love.graphics.setColor(0.8, 0.2, 0.2, 0.7) -- Red with transparency
+    -- Special rendering for custom mines with 3D ore appearance
+    if self.mIsCustomMine and self.mMineOreColor and self.mPlaced then
+        local x = self.mX + self.mWidth / 2
+        local y = self.mY + self.mHeight / 2
+        local radius = math.min(self.mWidth, self.mHeight) / 2
+        local baseColor = self.mMineOreColor
+
+        -- Shadow layer (bottom-right)
+        love.graphics.setColor(0, 0, 0, 0.4)
+        love.graphics.circle("fill", x + 3, y + 3, radius)
+
+        -- Dark base layer
+        love.graphics.setColor(baseColor[1] * 0.4, baseColor[2] * 0.4, baseColor[3] * 0.4)
+        love.graphics.circle("fill", x, y, radius)
+
+        -- Mid-tone layer (slightly smaller)
+        love.graphics.setColor(baseColor[1] * 0.7, baseColor[2] * 0.7, baseColor[3] * 0.7)
+        love.graphics.circle("fill", x - 1, y - 1, radius * 0.85)
+
+        -- Main color layer
+        love.graphics.setColor(baseColor[1], baseColor[2], baseColor[3])
+        love.graphics.circle("fill", x - 2, y - 2, radius * 0.7)
+
+        -- Highlight layer (top-left, small)
+        love.graphics.setColor(
+            math.min(1, baseColor[1] * 1.5),
+            math.min(1, baseColor[2] * 1.5),
+            math.min(1, baseColor[3] * 1.5),
+            0.8
+        )
+        love.graphics.circle("fill", x - radius * 0.3, y - radius * 0.3, radius * 0.3)
+
+        -- Smaller bright highlight
+        love.graphics.setColor(1, 1, 1, 0.6)
+        love.graphics.circle("fill", x - radius * 0.35, y - radius * 0.35, radius * 0.15)
+
+        -- Dark outline
+        love.graphics.setColor(0, 0, 0, 0.8)
+        love.graphics.setLineWidth(2)
+        love.graphics.circle("line", x, y, radius)
+        love.graphics.setLineWidth(1)
     else
-        love.graphics.setColor(self.mColor[1], self.mColor[2], self.mColor[3])
+        -- Normal building rendering
+        -- If canPlace is false, show red tinge
+        if canPlace == false then
+            love.graphics.setColor(0.8, 0.2, 0.2, 0.7) -- Red with transparency
+        else
+            love.graphics.setColor(self.mColor[1], self.mColor[2], self.mColor[3])
+        end
+
+        -- Draw the building box
+        love.graphics.rectangle("fill", self.mX, self.mY, self.mWidth, self.mHeight)
+
+        -- Draw border
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.rectangle("line", self.mX, self.mY, self.mWidth, self.mHeight)
+
+        -- Draw label in center
+        love.graphics.setColor(self.mTextColor[1], self.mTextColor[2], self.mTextColor[3])
+        local font = love.graphics.getFont()
+        local textWidth = font:getWidth(self.mLabel)
+        local textHeight = font:getHeight()
+        love.graphics.print(
+            self.mLabel,
+            self.mX + self.mWidth / 2 - textWidth / 2,
+            self.mY + self.mHeight / 2 - textHeight / 2
+        )
     end
-
-    -- Draw the building box
-    love.graphics.rectangle("fill", self.mX, self.mY, self.mWidth, self.mHeight)
-
-    -- Draw border
-    love.graphics.setColor(0, 0, 0)
-    love.graphics.rectangle("line", self.mX, self.mY, self.mWidth, self.mHeight)
-
-    -- Draw label in center
-    love.graphics.setColor(self.mTextColor[1], self.mTextColor[2], self.mTextColor[3])
-    local font = love.graphics.getFont()
-    local textWidth = font:getWidth(self.mLabel)
-    local textHeight = font:getHeight()
-    love.graphics.print(
-        self.mLabel,
-        self.mX + self.mWidth / 2 - textWidth / 2,
-        self.mY + self.mHeight / 2 - textHeight / 2
-    )
 
     -- Draw production notifications
     for _, notif in ipairs(self.mProductionNotifications) do

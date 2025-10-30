@@ -154,6 +154,11 @@ function BuildingPlacementState:Update(dt)
                     local modal = BakerySetupModal:Create(placedBuilding)
                     gStateMachine:Change("TownView")
                     gStateStack:Push(modal)
+                elseif placedBuilding.mTypeId == "mine" then
+                    require("code/MineSelectionModal")
+                    local modal = MineSelectionModal:Create(placedBuilding)
+                    gStateMachine:Change("TownView")
+                    gStateStack:Push(modal)
                 else
                     -- Return to TownView state
                     gStateMachine:Change("TownView")

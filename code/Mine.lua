@@ -213,42 +213,51 @@ function Mine:GetMineAtPosition(x, y)
 end
 
 function Mine:Render()
-    -- Draw each mine site as a circle
+    -- Draw each mine site with 3D ore-like appearance
     for _, mine in ipairs(self.mSites) do
         -- Validate mine has all required properties
         if mine and mine.x and mine.y and mine.size and mine.color then
-            -- Draw the mine circle with its color
-            love.graphics.setColor(mine.color[1], mine.color[2], mine.color[3])
-            love.graphics.circle("fill", mine.x, mine.y, mine.size)
-            
-            -- Draw border
-            love.graphics.setColor(0, 0, 0)
-            love.graphics.setLineWidth(3)
-            love.graphics.circle("line", mine.x, mine.y, mine.size)
+            local x, y = mine.x, mine.y
+            local radius = mine.size
+            local baseColor = mine.color
+
+            -- Shadow layer (bottom-right)
+            love.graphics.setColor(0, 0, 0, 0.4)
+            love.graphics.circle("fill", x + 3, y + 3, radius)
+
+            -- Dark base layer
+            love.graphics.setColor(baseColor[1] * 0.4, baseColor[2] * 0.4, baseColor[3] * 0.4)
+            love.graphics.circle("fill", x, y, radius)
+
+            -- Mid-tone layer (slightly smaller)
+            love.graphics.setColor(baseColor[1] * 0.7, baseColor[2] * 0.7, baseColor[3] * 0.7)
+            love.graphics.circle("fill", x - 1, y - 1, radius * 0.85)
+
+            -- Main color layer
+            love.graphics.setColor(baseColor[1], baseColor[2], baseColor[3])
+            love.graphics.circle("fill", x - 2, y - 2, radius * 0.7)
+
+            -- Highlight layer (top-left, small)
+            love.graphics.setColor(
+                math.min(1, baseColor[1] * 1.5),
+                math.min(1, baseColor[2] * 1.5),
+                math.min(1, baseColor[3] * 1.5),
+                0.8
+            )
+            love.graphics.circle("fill", x - radius * 0.3, y - radius * 0.3, radius * 0.3)
+
+            -- Smaller bright highlight
+            love.graphics.setColor(1, 1, 1, 0.6)
+            love.graphics.circle("fill", x - radius * 0.35, y - radius * 0.35, radius * 0.15)
+
+            -- Dark outline
+            love.graphics.setColor(0, 0, 0, 0.8)
+            love.graphics.setLineWidth(2)
+            love.graphics.circle("line", x, y, radius)
             love.graphics.setLineWidth(1)
-            
-            -- Draw full ore name in center
-            if mine.oreName then
-                local font = love.graphics.getFont()
-                local textWidth = font:getWidth(mine.oreName)
-                local textHeight = font:getHeight()
-                
-                -- Draw background behind text for readability
-                local padding = 4
-                love.graphics.setColor(0, 0, 0, 0.7)
-                love.graphics.rectangle("fill", 
-                    mine.x - textWidth/2 - padding, 
-                    mine.y - textHeight/2 - padding, 
-                    textWidth + padding*2, 
-                    textHeight + padding*2)
-                
-                -- Draw the ore name
-                love.graphics.setColor(1, 1, 1)
-                love.graphics.print(mine.oreName, mine.x - textWidth/2, mine.y - textHeight/2)
-            end
         end
     end
-    
+
     love.graphics.setColor(1, 1, 1)
 end
 
