@@ -1,6 +1,9 @@
 --
 -- CommodityTypes - defines all resource/commodity types in the game
+-- Now loads from external data/commodities.json file for modding support
 --
+
+local DataLoader = require("code/DataLoader")
 
 CommodityTypes = {}
 
@@ -19,8 +22,16 @@ local function createCommodity(config)
     }
 end
 
--- ==================== GRAINS (RAW) ====================
-CommodityTypes.WHEAT = createCommodity({
+-- Load all commodities from JSON file
+local commoditiesData = DataLoader.loadCommodities()
+for _, commodityConfig in ipairs(commoditiesData) do
+    -- Create uppercase key from ID (e.g., "wheat" -> "WHEAT")
+    local key = string.upper(commodityConfig.id)
+    CommodityTypes[key] = createCommodity(commodityConfig)
+end
+
+-- Helper functions
+function CommodityTypes.getAllCommodities()
     id = "wheat", name = "Wheat", category = "grain",
     icon = "Wt", stackSize = 5000, baseValue = 1,
     isRaw = true,
