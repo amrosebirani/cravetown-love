@@ -1,5 +1,9 @@
 # Cravetown Implementation Plans
 
+> **Note:** For a comprehensive presentation-ready overview of the development strategy, see [`cravetown_development_plan.md`](./cravetown_development_plan.md). This file contains the detailed technical implementation notes and specifications.
+
+---
+
 ## Cravetown Resource Allocation & Craving System using a Hierarchy-based Design
 
 ### Task 1: Unified Resource Taxonomy → Create ResourceTaxonomy.lua
