@@ -1,0 +1,228 @@
+{
+  "workerTypes": [
+    {
+      "id": "farmer",
+      "name": "Farmer",
+      "category": "Agriculture",
+      "minimumWage": 8,
+      "skillLevel": "Basic",
+      "description": "Works in farms to grow crops, vegetables, fruits, and fibers"
+    },
+    {
+      "id": "baker",
+      "name": "Baker",
+      "category": "Food Production",
+      "minimumWage": 10,
+      "skillLevel": "Intermediate",
+      "description": "Bakes bread and other baked goods"
+    },
+    {
+      "id": "cook",
+      "name": "Cook",
+      "category": "Food Production",
+      "minimumWage": 12,
+      "skillLevel": "Intermediate",
+      "description": "Prepares meals in restaurants"
+    },
+    {
+      "id": "barman",
+      "name": "Barman",
+      "category": "Food Production",
+      "minimumWage": 10,
+      "skillLevel": "Intermediate",
+      "description": "Brews beer and distills whiskey"
+    },
+    {
+      "id": "carpenter",
+      "name": "Carpenter",
+      "category": "Construction",
+      "minimumWage": 15,
+      "skillLevel": "Skilled",
+      "description": "Crafts furniture and wooden structures"
+    },
+    {
+      "id": "woodworker",
+      "name": "Woodworker",
+      "category": "Production",
+      "minimumWage": 12,
+      "skillLevel": "Intermediate",
+      "description": "Processes timber into lumber and planks"
+    },
+    {
+      "id": "lumberjack",
+      "name": "Lumberjack",
+      "category": "Resource Extraction",
+      "minimumWage": 10,
+      "skillLevel": "Basic",
+      "description": "Harvests timber and wood from forests"
+    },
+    {
+      "id": "woodcutter",
+      "name": "Woodcutter",
+      "category": "Resource Extraction",
+      "minimumWage": 9,
+      "skillLevel": "Basic",
+      "description": "Cuts trees and processes wood"
+    },
+    {
+      "id": "miner",
+      "name": "Miner",
+      "category": "Resource Extraction",
+      "minimumWage": 14,
+      "skillLevel": "Intermediate",
+      "description": "Extracts ore, coal, gold, and other minerals from mines"
+    },
+    {
+      "id": "blacksmith",
+      "name": "Blacksmith",
+      "category": "Metalworking",
+      "minimumWage": 16,
+      "skillLevel": "Skilled",
+      "description": "Forges tools, weapons, and metal goods"
+    },
+    {
+      "id": "smelter",
+      "name": "Smelter",
+      "category": "Metalworking",
+      "minimumWage": 13,
+      "skillLevel": "Intermediate",
+      "description": "Smelts ore into metal ingots"
+    },
+    {
+      "id": "metalworker",
+      "name": "Metalworker",
+      "category": "Metalworking",
+      "minimumWage": 14,
+      "skillLevel": "Intermediate",
+      "description": "Works with metal to create various products"
+    },
+    {
+      "id": "goldsmith",
+      "name": "Goldsmith",
+      "category": "Luxury Crafts",
+      "minimumWage": 20,
+      "skillLevel": "Expert",
+      "description": "Crafts jewelry and gold items"
+    },
+    {
+      "id": "tailor",
+      "name": "Tailor",
+      "category": "Textile",
+      "minimumWage": 11,
+      "skillLevel": "Skilled",
+      "description": "Creates clothing and garments"
+    },
+    {
+      "id": "weaver",
+      "name": "Weaver",
+      "category": "Textile",
+      "minimumWage": 10,
+      "skillLevel": "Intermediate",
+      "description": "Weaves thread into cloth and yarn"
+    },
+    {
+      "id": "spinner",
+      "name": "Spinner",
+      "category": "Textile",
+      "minimumWage": 9,
+      "skillLevel": "Basic",
+      "description": "Spins cotton and other fibers into thread"
+    },
+    {
+      "id": "shoemaker",
+      "name": "Shoemaker",
+      "category": "Textile",
+      "minimumWage": 12,
+      "skillLevel": "Skilled",
+      "description": "Manufactures shoes and footwear"
+    },
+    {
+      "id": "mason",
+      "name": "Mason",
+      "category": "Construction",
+      "minimumWage": 15,
+      "skillLevel": "Skilled",
+      "description": "Works with bricks and stone for construction"
+    },
+    {
+      "id": "glassblower",
+      "name": "Glassblower",
+      "category": "Luxury Crafts",
+      "minimumWage": 17,
+      "skillLevel": "Expert",
+      "description": "Creates glass products through glassblowing"
+    },
+    {
+      "id": "artisan",
+      "name": "Artisan",
+      "category": "Luxury Crafts",
+      "minimumWage": 18,
+      "skillLevel": "Expert",
+      "description": "Skilled craftsperson creating high-quality goods"
+    },
+    {
+      "id": "herder",
+      "name": "Herder",
+      "category": "Agriculture",
+      "minimumWage": 9,
+      "skillLevel": "Basic",
+      "description": "Raises and cares for livestock"
+    },
+    {
+      "id": "worker",
+      "name": "General Worker",
+      "category": "General Labor",
+      "minimumWage": 7,
+      "skillLevel": "Basic",
+      "description": "Performs general labor tasks"
+    },
+    {
+      "id": "doctor",
+      "name": "Doctor",
+      "category": "Healthcare",
+      "minimumWage": 30,
+      "skillLevel": "Expert",
+      "description": "Provides medical care and treatment"
+    },
+    {
+      "id": "nurse",
+      "name": "Nurse",
+      "category": "Healthcare",
+      "minimumWage": 18,
+      "skillLevel": "Skilled",
+      "description": "Assists doctors and provides patient care"
+    },
+    {
+      "id": "teacher",
+      "name": "Teacher",
+      "category": "Education",
+      "minimumWage": 20,
+      "skillLevel": "Expert",
+      "description": "Educates students in schools"
+    },
+    {
+      "id": "merchant",
+      "name": "Merchant",
+      "category": "Commerce",
+      "minimumWage": 12,
+      "skillLevel": "Intermediate",
+      "description": "Trades and sells goods"
+    },
+    {
+      "id": "banker",
+      "name": "Banker",
+      "category": "Finance",
+      "minimumWage": 25,
+      "skillLevel": "Expert",
+      "description": "Manages financial transactions and banking operations"
+    },
+    {
+      "id": "philosopher",
+      "name": "Philosopher",
+      "category": "Education",
+      "skillLevel": "Expert",
+      "minimumWage": 40,
+      "description": "Gives meaning to life, might be positive but sometimes can create negative effects as well."
+    }
+  ]
+}

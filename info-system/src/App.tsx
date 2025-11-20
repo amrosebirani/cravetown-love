@@ -1,0 +1,102 @@
+import { useState, useEffect } from 'react';
+import { Layout, Menu, Spin } from 'antd';
+import { DatabaseOutlined, AppstoreOutlined, TeamOutlined } from '@ant-design/icons';
+import RecipeManager from './components/RecipeManager';
+import CommodityManager from './components/CommodityManager';
+import WorkerTypeManager from './components/WorkerTypeManager';
+import './App.css';
+
+const { Header, Content, Sider } = Layout;
+
+type TabKey = 'recipes' | 'commodities' | 'workers';
+
+function App() {
+  const [selectedTab, setSelectedTab] = useState<TabKey>('recipes');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Initial load delay to allow Tauri to initialize
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  }, []);
+
+  return (
+    <Layout style={{ minHeight: '100vh' }}>
+      <Header style={{
+        display: 'flex',
+        alignItems: 'center',
+        background: '#001529',
+        padding: '0 24px'
+      }}>
+        <div style={{
+          color: 'white',
+          fontSize: '20px',
+          fontWeight: 'bold',
+          marginRight: '24px'
+        }}>
+          CraveTown Information System
+        </div>
+      </Header>
+
+      <Layout>
+        <Sider width={200} style={{ background: '#fff' }}>
+          <Menu
+            mode="inline"
+            selectedKeys={[selectedTab]}
+            onClick={({ key }) => setSelectedTab(key as TabKey)}
+            style={{ height: '100%', borderRight: 0 }}
+            items={[
+              {
+                key: 'recipes',
+                icon: <DatabaseOutlined />,
+                label: 'Building Recipes',
+              },
+              {
+                key: 'commodities',
+                icon: <AppstoreOutlined />,
+                label: 'Commodities',
+              },
+              {
+                key: 'workers',
+                icon: <TeamOutlined />,
+                label: 'Worker Types',
+              },
+            ]}
+          />
+        </Sider>
+
+        <Layout style={{ padding: '24px' }}>
+          <Content
+            style={{
+              padding: 24,
+              margin: 0,
+              minHeight: 280,
+              background: '#fff',
+              borderRadius: '8px',
+            }}
+          >
+            {loading ? (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '400px'
+              }}>
+                <Spin size="large" tip="Loading..." />
+              </div>
+            ) : (
+              <>
+                {selectedTab === 'recipes' && <RecipeManager />}
+                {selectedTab === 'commodities' && <CommodityManager />}
+                {selectedTab === 'workers' && <WorkerTypeManager />}
+              </>
+            )}
+          </Content>
+        </Layout>
+      </Layout>
+    </Layout>
+  );
+}
+
+export default App;

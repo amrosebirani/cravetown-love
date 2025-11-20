@@ -1,0 +1,519 @@
+{
+  "recipes": [
+    {
+      "buildingType": "sawmill",
+      "name": "Saw Mill",
+      "recipeName": "Lumber Production",
+      "category": "Production",
+      "productionTime": 600,
+      "inputs": {
+        "tree": 1
+      },
+      "outputs": {
+        "lumber": 10
+      },
+      "workers": {
+        "required": 2,
+        "max": 3,
+        "vocations": [
+          "woodworker"
+        ],
+        "efficiencyBonus": 0.2,
+        "wages": 10
+      },
+      "accelerationClause": "1 Additional Worker to work in Saw Mill for generating 10 Lumbers (in 1 cycle), can reduce production time by 20%, so three workers will reduce production time to 8 minutes from 10 minutes.",
+      "additionalLogic": "Needs proximity near Trees",
+      "notes": "Production time: 10 minutes with 2 workers. Workers earn $10 per hour."
+    },
+    {
+      "buildingType": "bakery",
+      "name": "Bakery",
+      "recipeName": "Bread Baking",
+      "category": "Consumable",
+      "productionTime": 900,
+      "inputs": {
+        "wheat": 1
+      },
+      "outputs": {
+        "bread": 1
+      },
+      "workers": {
+        "required": 1,
+        "max": 2,
+        "vocations": [
+          "baker"
+        ],
+        "efficiencyBonus": 0.2
+      },
+      "notes": "Production time: 15 minutes. 1 Baker required."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Meal Preparation",
+      "category": "Consumable",
+      "productionTime": 1800,
+      "inputs": {
+        "grain": 1,
+        "vegetable": 1
+      },
+      "outputs": {
+        "meal": 1
+      },
+      "workers": {
+        "required": 1,
+        "max": 3,
+        "vocations": [
+          "cook"
+        ],
+        "efficiencyBonus": 0.15
+      },
+      "notes": "Production time: 30 minutes. Requires grains and vegetables."
+    },
+    {
+      "buildingType": "bar",
+      "name": "Bar",
+      "recipeName": "Beer Brewing",
+      "category": "Consumable",
+      "productionTime": 604800,
+      "inputs": {
+        "wheat": 1,
+        "barley": 1
+      },
+      "outputs": {
+        "beer": 1
+      },
+      "workers": {
+        "required": 1,
+        "max": 2,
+        "vocations": [
+          "barman"
+        ],
+        "efficiencyBonus": 0.1
+      },
+      "notes": "Production time: 1 week (604800 seconds). Produces beer from wheat and barley."
+    },
+    {
+      "buildingType": "bar",
+      "name": "Bar",
+      "recipeName": "Whiskey Distilling",
+      "category": "Consumable",
+      "productionTime": 604800,
+      "inputs": {
+        "rye": 1
+      },
+      "outputs": {
+        "whiskey": 1
+      },
+      "workers": {
+        "required": 1,
+        "max": 2,
+        "vocations": [
+          "barman"
+        ],
+        "efficiencyBonus": 0.1
+      },
+      "notes": "Production time: 1 week (604800 seconds). Produces whiskey from rye."
+    },
+    {
+      "buildingType": "shoe_factory",
+      "name": "Shoe Factory",
+      "recipeName": "Shoe Manufacturing",
+      "category": "Merchandise",
+      "productionTime": 86400,
+      "inputs": {
+        "rubber": 1,
+        "cloth": 2
+      },
+      "outputs": {
+        "shoes": 1
+      },
+      "workers": {
+        "required": 1,
+        "max": 3,
+        "vocations": [
+          "shoemaker"
+        ],
+        "efficiencyBonus": 0.15
+      },
+      "notes": "Production time: 1 day (86400 seconds). Rubber extracted from trees."
+    },
+    {
+      "buildingType": "textile_mill",
+      "name": "Textile Mill",
+      "recipeName": "Yarn Production",
+      "category": "Merchandise",
+      "productionTime": 604800,
+      "inputs": {
+        "cotton": 1
+      },
+      "outputs": {
+        "yarn": 100
+      },
+      "workers": {
+        "required": 2,
+        "max": 4,
+        "vocations": [
+          "weaver",
+          "spinner"
+        ],
+        "efficiencyBonus": 0.12
+      },
+      "notes": "Production time: 1 week (604800 seconds). Produces 100m of yarn."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Clothing Production",
+      "category": "Merchandise",
+      "productionTime": 86400,
+      "inputs": {
+        "cotton": 1
+      },
+      "outputs": {
+        "clothing": 1
+      },
+      "workers": {
+        "required": 2,
+        "max": 4,
+        "vocations": [
+          "tailor"
+        ],
+        "efficiencyBonus": 0.18
+      },
+      "notes": "Production time: 1 day (86400 seconds). Creates clothing from cotton."
+    },
+    {
+      "buildingType": "brickyard",
+      "name": "Brickyard",
+      "recipeName": "Brick Production",
+      "category": "Production",
+      "productionTime": 604800,
+      "inputs": {
+        "soil": 1
+      },
+      "outputs": {
+        "bricks": 100
+      },
+      "workers": {
+        "required": 4,
+        "max": 8,
+        "vocations": [
+          "worker",
+          "mason"
+        ],
+        "efficiencyBonus": 0.1
+      },
+      "notes": "Production time: 1 week (604800 seconds). Produces 100 bricks from soil."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Wheat Farming",
+      "category": "Production",
+      "productionTime": 604800,
+      "inputs": {
+        "wheat_seed": 0.1
+      },
+      "outputs": {
+        "wheat": 1
+      },
+      "workers": {
+        "required": 1,
+        "max": 4,
+        "vocations": [
+          "farmer"
+        ],
+        "efficiencyBonus": 0.15
+      },
+      "notes": "Production time: 1 week (604800 seconds). Uses 100g of seed per 1kg output. 10% of harvest is stored as seeds for next cycle."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Vegetable Farming",
+      "category": "Production",
+      "productionTime": 604800,
+      "inputs": {
+        "vegetable_seed": 0.1
+      },
+      "outputs": {
+        "vegetable": 1
+      },
+      "workers": {
+        "required": 1,
+        "max": 4,
+        "vocations": [
+          "farmer"
+        ],
+        "efficiencyBonus": 0.15
+      },
+      "notes": "Production time: 1 week (604800 seconds). Uses 100g of seed per 1kg output. 10% of harvest is stored as seeds for next cycle."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Fruit Farming",
+      "category": "Production",
+      "productionTime": 604800,
+      "inputs": {
+        "fruit_seed": 0.1
+      },
+      "outputs": {
+        "fruit": 1
+      },
+      "workers": {
+        "required": 1,
+        "max": 4,
+        "vocations": [
+          "farmer"
+        ],
+        "efficiencyBonus": 0.15
+      },
+      "notes": "Production time: 1 week (604800 seconds). Uses 100g of seed per 1kg output. 10% of harvest is stored as seeds for next cycle."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Cotton Farming",
+      "category": "Production",
+      "productionTime": 604800,
+      "inputs": {
+        "cotton_seed": 0.1
+      },
+      "outputs": {
+        "cotton": 1
+      },
+      "workers": {
+        "required": 1,
+        "max": 4,
+        "vocations": [
+          "farmer"
+        ],
+        "efficiencyBonus": 0.15
+      },
+      "notes": "Production time: 1 week (604800 seconds). Uses 100g of seed per 1kg output. 10% of harvest is stored as seeds for next cycle."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Bed Crafting",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {
+        "tree": 1
+      },
+      "outputs": {
+        "bed": 1
+      },
+      "workers": {
+        "required": 4,
+        "max": 6,
+        "vocations": [
+          "carpenter"
+        ],
+        "efficiencyBonus": 0.15
+      },
+      "notes": "Production time: 1 day (86400 seconds). 1 tree per bed."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Table & Chairs Set",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {
+        "tree": 1
+      },
+      "outputs": {
+        "table": 1,
+        "chair": 4
+      },
+      "workers": {
+        "required": 4,
+        "max": 6,
+        "vocations": [
+          "carpenter"
+        ],
+        "efficiencyBonus": 0.15
+      },
+      "notes": "Production time: 1 day (86400 seconds). 1 tree produces 1 table and 4 chairs."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Wardrobe Crafting",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {
+        "tree": 1
+      },
+      "outputs": {
+        "wardrobe": 1
+      },
+      "workers": {
+        "required": 4,
+        "max": 6,
+        "vocations": [
+          "carpenter"
+        ],
+        "efficiencyBonus": 0.15
+      },
+      "notes": "Production time: 1 day (86400 seconds). 1 tree per wardrobe (Almirah)."
+    },
+    {
+      "buildingType": "jewellery_shop",
+      "name": "Jewellery Shop / Goldsmith",
+      "recipeName": "Gold Item Crafting",
+      "category": "Luxury",
+      "productionTime": 86400,
+      "inputs": {
+        "gold_ore": 100
+      },
+      "outputs": {
+        "gold_item": 10
+      },
+      "workers": {
+        "required": 4,
+        "max": 6,
+        "vocations": [
+          "goldsmith",
+          "artisan"
+        ],
+        "efficiencyBonus": 0.2
+      },
+      "notes": "Production time: 1 day (86400 seconds). 100g of gold ore produces 10g of gold items."
+    },
+    {
+      "buildingType": "central_bank",
+      "name": "Central Bank",
+      "recipeName": "Currency Printing",
+      "category": "Mint",
+      "productionTime": 1800,
+      "inputs": {
+        "tree": 0.1
+      },
+      "outputs": {
+        "currency_note": 100
+      },
+      "workers": {
+        "required": 2,
+        "max": 4,
+        "vocations": [
+          "worker"
+        ],
+        "efficiencyBonus": 0.1
+      },
+      "notes": "Production time: 30 minutes. 0.1 tree produces 100 currency notes."
+    },
+    {
+      "buildingType": "forge",
+      "name": "Forge",
+      "recipeName": "Knife Forging",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {
+        "iron_ore": 100,
+        "tree": 0.1
+      },
+      "outputs": {
+        "knife": 1
+      },
+      "workers": {
+        "required": 4,
+        "max": 6,
+        "vocations": [
+          "blacksmith"
+        ],
+        "efficiencyBonus": 0.15
+      },
+      "notes": "Production time: 1 day (86400 seconds). Requires 100g iron ore and 0.1 tree."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Hammer Forging",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {
+        "iron_ore": 100,
+        "tree": 0.1
+      },
+      "outputs": {
+        "hammer": 1
+      },
+      "workers": {
+        "required": 2,
+        "max": 4,
+        "vocations": [
+          "blacksmith"
+        ],
+        "efficiencyBonus": 0.2
+      },
+      "notes": "Production time: 1 day (86400 seconds). Requires 100g iron ore and 0.1 tree."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Shovel Forging",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {
+        "iron_ore": 100,
+        "tree": 0.1
+      },
+      "outputs": {
+        "shovel": 1
+      },
+      "workers": {
+        "required": 2,
+        "max": 4,
+        "vocations": [
+          "blacksmith"
+        ],
+        "efficiencyBonus": 0.2
+      },
+      "notes": "Production time: 1 day (86400 seconds). Requires 100g iron ore and 0.1 tree."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Gold Mine",
+      "recipeName": "Gold Ore Mining",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {},
+      "outputs": {
+        "gold_ore": 100
+      },
+      "workers": {
+        "required": 3,
+        "max": 10,
+        "vocations": [
+          "miner"
+        ],
+        "efficiencyBonus": 0.1
+      },
+      "notes": "Production time: 1 day (86400 seconds). Extracts 100g of gold ore."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Iron Mine",
+      "recipeName": "Iron Ore Mining",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {},
+      "outputs": {
+        "iron_ore": 100
+      },
+      "workers": {
+        "required": 3,
+        "max": 10,
+        "vocations": [
+          "miner"
+        ],
+        "efficiencyBonus": 0.1
+      },
+      "notes": "Production time: 1 day (86400 seconds). Extracts 100g of iron ore."
+    }
+  ]
+}
