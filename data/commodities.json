@@ -1316,6 +1316,208 @@
       "name": "Cake",
       "category": "processed_food",
       "description": "Cake is a sweet delicacy"
+    },
+    {
+      "id": "wheat_seed",
+      "name": "Wheat Seeds",
+      "category": "seed",
+      "icon": "WS",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing wheat"
+    },
+    {
+      "id": "vegetable_seed",
+      "name": "Vegetable Seeds",
+      "category": "seed",
+      "icon": "VS",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing vegetables"
+    },
+    {
+      "id": "fruit_seed",
+      "name": "Fruit Seeds",
+      "category": "seed",
+      "icon": "FS",
+      "stackSize": 800,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Seeds for growing fruit"
+    },
+    {
+      "id": "cotton_seed",
+      "name": "Cotton Seeds",
+      "category": "seed",
+      "icon": "CS",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing cotton"
+    },
+    {
+      "id": "grain",
+      "name": "Grain",
+      "category": "grain",
+      "icon": "Gr",
+      "stackSize": 5000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "General grain commodity"
+    },
+    {
+      "id": "vegetable",
+      "name": "Vegetable",
+      "category": "vegetable",
+      "icon": "Vg",
+      "stackSize": 2000,
+      "baseValue": 2,
+      "isRaw": true,
+      "perishable": true,
+      "description": "General vegetable commodity"
+    },
+    {
+      "id": "fruit",
+      "name": "Fruit",
+      "category": "fruit",
+      "icon": "Fr",
+      "stackSize": 1000,
+      "baseValue": 3,
+      "isRaw": true,
+      "perishable": true,
+      "description": "General fruit commodity"
+    },
+    {
+      "id": "tree",
+      "name": "Tree",
+      "category": "raw_resource",
+      "icon": "Tr",
+      "stackSize": 100,
+      "baseValue": 10,
+      "isRaw": true,
+      "description": "Whole tree for lumber or crafting"
+    },
+    {
+      "id": "lumber",
+      "name": "Lumber",
+      "category": "construction",
+      "icon": "Lm",
+      "stackSize": 2000,
+      "baseValue": 12,
+      "dependencies": [
+        "tree"
+      ],
+      "description": "Processed wood from trees"
+    },
+    {
+      "id": "soil",
+      "name": "Soil",
+      "category": "raw_mineral",
+      "icon": "So",
+      "stackSize": 10000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "Earth for making bricks"
+    },
+    {
+      "id": "iron_ore",
+      "name": "Iron Ore",
+      "category": "raw_mineral",
+      "icon": "IO",
+      "stackSize": 8000,
+      "baseValue": 5,
+      "isRaw": true,
+      "description": "Raw iron ore for smelting"
+    },
+    {
+      "id": "yarn",
+      "name": "Yarn",
+      "category": "textile",
+      "icon": "Yn",
+      "stackSize": 3000,
+      "baseValue": 5,
+      "dependencies": [
+        "cotton"
+      ],
+      "description": "Spun thread from cotton"
+    },
+    {
+      "id": "clothing",
+      "name": "Clothing",
+      "category": "clothing",
+      "icon": "Cl",
+      "stackSize": 300,
+      "baseValue": 30,
+      "dependencies": [
+        "cotton",
+        "thread"
+      ],
+      "description": "General garments"
+    },
+    {
+      "id": "meal",
+      "name": "Meal",
+      "category": "processed_food",
+      "icon": "Me",
+      "stackSize": 500,
+      "baseValue": 15,
+      "dependencies": [
+        "grain",
+        "vegetable"
+      ],
+      "perishable": true,
+      "description": "Prepared food"
+    },
+    {
+      "id": "whiskey",
+      "name": "Whiskey",
+      "category": "processed_food",
+      "icon": "Wh",
+      "stackSize": 300,
+      "baseValue": 30,
+      "dependencies": [
+        "rye"
+      ],
+      "description": "Distilled spirit from rye"
+    },
+    {
+      "id": "knife",
+      "name": "Knife",
+      "category": "tools",
+      "icon": "Kn",
+      "stackSize": 300,
+      "baseValue": 35,
+      "dependencies": [
+        "iron_ore",
+        "tree"
+      ],
+      "description": "Cutting tool"
+    },
+    {
+      "id": "gold_item",
+      "name": "Gold Item",
+      "category": "luxury",
+      "icon": "GI",
+      "stackSize": 200,
+      "baseValue": 180,
+      "dependencies": [
+        "gold_ore"
+      ],
+      "description": "Crafted gold jewelry or ornament"
+    },
+    {
+      "id": "currency_note",
+      "name": "Currency Note",
+      "category": "misc",
+      "icon": "CN",
+      "stackSize": 10000,
+      "baseValue": 1,
+      "dependencies": [
+        "tree"
+      ],
+      "description": "Paper money printed by central bank"
     }
   ]
 }

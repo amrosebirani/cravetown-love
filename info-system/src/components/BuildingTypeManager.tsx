@@ -67,7 +67,11 @@ const BuildingTypeManager = () => {
       color: [0.5, 0.5, 0.5],
       baseWidth: 70,
       baseHeight: 70,
-      description: ''
+      description: '',
+      storage: {
+        inputCapacity: 100,
+        outputCapacity: 100
+      }
     };
     setEditingBuildingType(newBuildingType);
     form.setFieldsValue({
@@ -494,6 +498,31 @@ const BuildingTypeManager = () => {
                   onChange={setWorkerEfficiencies}
                 />
               </Form.Item>
+            </Card>
+
+            <Card title="Storage Configuration" style={{ marginBottom: 16 }}>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Form.Item
+                    label="Input Storage Capacity"
+                    name={['storage', 'inputCapacity']}
+                    tooltip="Maximum units of input materials this building can store locally"
+                    rules={[{ required: true, message: 'Input capacity is required' }]}
+                  >
+                    <InputNumber min={0} max={10000} style={{ width: '100%' }} />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  <Form.Item
+                    label="Output Storage Capacity"
+                    name={['storage', 'outputCapacity']}
+                    tooltip="Maximum units of output products this building can store locally"
+                    rules={[{ required: true, message: 'Output capacity is required' }]}
+                  >
+                    <InputNumber min={0} max={10000} style={{ width: '100%' }} />
+                  </Form.Item>
+                </Col>
+              </Row>
             </Card>
           </Form>
         </Modal>

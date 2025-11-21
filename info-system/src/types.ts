@@ -69,6 +69,10 @@ export interface BuildingType {
   workerEfficiency?: Record<string, number>;  // Efficiency multiplier per work category (0.0 to 1.0)
   properties?: Record<string, any>;  // Building-specific properties
   constructionMaterials?: Record<string, number>;  // Materials needed to construct
+  storage?: {
+    inputCapacity: number;    // Max units of input materials that can be stored
+    outputCapacity: number;   // Max units of output products that can be stored
+  };
 }
 
 export interface BuildingTypesData {

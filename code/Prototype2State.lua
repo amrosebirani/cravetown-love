@@ -19,7 +19,7 @@ function Prototype2State:Create()
         mBuildingTypesById = {},  -- Map of id -> building type for quick lookup
 
         -- UI state
-        mRightPanelWidth = 300,
+        mRightPanelWidth = 400,
         mSelectedBuildingType = nil,
         mHoveredBuildingType = nil,
 
@@ -54,6 +54,15 @@ function Prototype2State:Create()
         mCommodities = {},
         mCommodityCounts = {},  -- {commodityId: count}
 
+        -- Time scale and production
+        mTimeScale = "normal",  -- "slow", "normal", "fast"
+        mTimeScales = {
+            slow = 500,
+            normal = 1500,
+            fast = 3000
+        },
+        mGameTime = 0,  -- Accumulated game time in seconds
+
         -- View state
         mShowHRPoolView = false,  -- Toggle between Buildings view and HR Pool view
 
@@ -62,6 +71,9 @@ function Prototype2State:Create()
         mHRScrollMax = 0,
         mCommodityScrollOffset = 0,
         mCommodityScrollMax = 0,
+        mCommodityCategoryScrollOffset = 0,
+        mCommodityCategoryScrollMax = 0,
+        mSelectedCommodityCategory = nil,  -- nil shows all, otherwise filter by category
 
         -- Recipe picker modal state
         mShowRecipeModal = false,
@@ -193,6 +205,14 @@ function Prototype2State:Update(dt)
         self.mModalJustOpened = false
     end
 
+    -- Update game time based on time scale
+    local timeMultiplier = self.mTimeScales[self.mTimeScale]
+    local gameDt = dt * timeMultiplier
+    self.mGameTime = self.mGameTime + gameDt
+
+    -- Update production for all buildings
+    self:UpdateProduction(gameDt)
+
     -- TEST: Press 'T' to manually trigger recipe modal (for debugging)
     if love.keyboard.isDown("t") and #self.mBuildings > 0 then
         if not self.mShowRecipeModal then
@@ -257,6 +277,146 @@ function Prototype2State:Update(dt)
             print("Skipping HandleRecipeModalClick - modal just opened")
         end
     end
+end
+
+function Prototype2State:UpdateProduction(gameDt)
+    -- Update production state and progress for all buildings
+    for _, building in ipairs(self.mBuildings) do
+        local prod = building.production
+        local recipe = prod.recipe
+
+        -- State 1: Check if building has a recipe
+        if not recipe then
+            prod.state = "WAITING_FOR_RECIPE"
+            prod.progress = 0
+            goto continue
+        end
+
+        -- State 2: Check if building has workers
+        local assignedWorkers = self.mEmployment.byBuilding[building.id] or {}
+        if #assignedWorkers < recipe.workers.required then
+            prod.state = "NO_WORKERS"
+            prod.progress = 0
+            goto continue
+        end
+
+        -- State 3: Check if building has raw materials (only when starting production)
+        if prod.state ~= "PRODUCING" or prod.progress == 0 then
+            local hasAllInputs = true
+
+            -- Check each input requirement
+            for commodityId, requiredAmount in pairs(recipe.inputs) do
+                local availableInInventory = self.mCommodityCounts[commodityId] or 0
+                local availableInStorage = building.storage.inputs[commodityId] or 0
+                local totalAvailable = availableInInventory + availableInStorage
+
+                if totalAvailable < requiredAmount then
+                    hasAllInputs = false
+                    break
+                end
+            end
+
+            if not hasAllInputs then
+                prod.state = "NO_RAW_MATERIALS"
+                prod.progress = 0
+                goto continue
+            end
+
+            -- If we reach here and state was not PRODUCING, pull inputs from inventory
+            if prod.state ~= "PRODUCING" then
+                self:PullInputsForBuilding(building)
+            end
+        end
+
+        -- State 4: Production is active
+        prod.state = "PRODUCING"
+
+        -- Update progress based on game time
+        local progressIncrement = gameDt / recipe.productionTime
+        prod.progress = prod.progress + progressIncrement
+
+        -- Check if production cycle completed
+        if prod.progress >= 1.0 then
+            self:CompleteProduction(building)
+            prod.progress = 0  -- Reset for next cycle
+
+            -- After completing, check again if we can continue (loop back to state checks)
+            -- This will be handled on the next update cycle
+        end
+
+        ::continue::
+    end
+end
+
+function Prototype2State:PullInputsForBuilding(building)
+    -- Pull required inputs from inventory to building's local storage
+    local recipe = building.production.recipe
+    if not recipe then return end
+
+    for commodityId, requiredAmount in pairs(recipe.inputs) do
+        local availableInInventory = self.mCommodityCounts[commodityId] or 0
+        local availableInStorage = building.storage.inputs[commodityId] or 0
+        local needed = requiredAmount - availableInStorage
+
+        if needed > 0 then
+            -- Pull from inventory
+            local toPull = math.min(needed, availableInInventory)
+
+            -- Check if we have capacity in input storage
+            local storageNeeded = toPull
+            local storageAvailable = building.storage.inputCapacity - building.storage.inputUsed
+
+            if storageNeeded <= storageAvailable then
+                -- Transfer from inventory to building storage
+                self.mCommodityCounts[commodityId] = self.mCommodityCounts[commodityId] - toPull
+                building.storage.inputs[commodityId] = availableInStorage + toPull
+                building.storage.inputUsed = building.storage.inputUsed + toPull
+            end
+        end
+    end
+end
+
+function Prototype2State:CompleteProduction(building)
+    -- Handle production completion: consume inputs, produce outputs
+    local recipe = building.production.recipe
+    if not recipe then return end
+
+    -- Consume inputs from building storage
+    for commodityId, amount in pairs(recipe.inputs) do
+        local currentAmount = building.storage.inputs[commodityId] or 0
+        local actualConsumed = math.min(currentAmount, amount)  -- Only consume what's actually there
+        local newAmount = currentAmount - actualConsumed
+        building.storage.inputs[commodityId] = newAmount
+        building.storage.inputUsed = math.max(0, building.storage.inputUsed - actualConsumed)
+
+        -- If commodity is now 0, remove it from storage to keep things clean
+        if newAmount <= 0 then
+            building.storage.inputs[commodityId] = nil
+        end
+    end
+
+    -- Produce outputs to building storage (with overflow to inventory)
+    for commodityId, amount in pairs(recipe.outputs) do
+        local currentAmount = building.storage.outputs[commodityId] or 0
+        local storageAvailable = building.storage.outputCapacity - building.storage.outputUsed
+
+        -- How much can fit in local storage?
+        local toStorage = math.min(amount, storageAvailable)
+        local overflow = amount - toStorage
+
+        -- Add to local storage
+        if toStorage > 0 then
+            building.storage.outputs[commodityId] = currentAmount + toStorage
+            building.storage.outputUsed = building.storage.outputUsed + toStorage
+        end
+
+        -- Add overflow to town inventory
+        if overflow > 0 then
+            self.mCommodityCounts[commodityId] = (self.mCommodityCounts[commodityId] or 0) + overflow
+        end
+    end
+
+    print("Production completed at " .. building.name .. " (" .. recipe.recipeName .. ")")
 end
 
 function Prototype2State:HandleRightPanelClick(mx, my)
@@ -396,25 +556,93 @@ end
 function Prototype2State:HandleCommodityPanelClick(mx, my)
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
     local panelX = screenW - self.mRightPanelWidth
-    local listY = 110
 
     -- Check if clicking inside the panel
     if mx < panelX then
         return
     end
 
+    -- Get unique categories
+    local categories = {
+        {id = "all", name = "All"},
+        {id = "nonzero", name = "In Stock"}
+    }
+    local categorySet = {}
+    for _, c in ipairs(self.mCommodities) do
+        if c.category and not categorySet[c.category] then
+            categorySet[c.category] = true
+            table.insert(categories, {id = c.category, name = c.category})
+        end
+    end
+    table.sort(categories, function(a, b)
+        if a.id == "all" then return true end
+        if b.id == "all" then return false end
+        if a.id == "nonzero" then return true end
+        if b.id == "nonzero" then return false end
+        return a.name < b.name
+    end)
+
+    -- Check category button clicks (left side bar with scroll)
+    local filterY = 110
+    local filterWidth = 150
+    local filterX = panelX
+    local filterHeight = screenH - filterY
+
+    local btnY = filterY + 5 - self.mCommodityCategoryScrollOffset
+
+    for i, category in ipairs(categories) do
+        local btnX = filterX + 5
+        local btnW = filterWidth - 10
+        local btnH = 25
+
+        if mx >= btnX and mx <= btnX + btnW and
+           my >= btnY and my <= btnY + btnH and
+           my >= filterY and my <= filterY + filterHeight then  -- Within visible area
+            self.mSelectedCommodityCategory = category.id
+            self.mCommodityScrollOffset = 0  -- Reset scroll when changing category
+            return
+        end
+
+        btnY = btnY + 28
+    end
+
+    -- Commodity list (right side)
+    local listX = filterX + filterWidth + 10
+    local listY = filterY + 5
+
+    -- Filter commodities by selected category
+    local filteredCommodities = {}
+    for _, c in ipairs(self.mCommodities) do
+        local include = false
+
+        if self.mSelectedCommodityCategory == nil or self.mSelectedCommodityCategory == "all" then
+            include = true
+        elseif self.mSelectedCommodityCategory == "nonzero" then
+            include = (self.mCommodityCounts[c.id] or 0) > 0
+        else
+            include = c.category == self.mSelectedCommodityCategory
+        end
+
+        if include then
+            table.insert(filteredCommodities, c)
+        end
+    end
+
     local yOffset = listY - self.mCommodityScrollOffset
     local itemHeight = 50
     local spacing = 5
 
-    for _, c in ipairs(self.mCommodities) do
+    -- Get listWidth for button positioning
+    local listWidth = self.mRightPanelWidth - 150 - 20  -- Same as in render
+
+    for _, c in ipairs(filteredCommodities) do
         if my >= yOffset and my <= yOffset + itemHeight then
             -- Check if clicking + or - button
             local buttonY = yOffset + 15
             local buttonSize = 25
 
             -- - button (subtract 10)
-            local minusX = panelX + self.mRightPanelWidth - 80
+            local minusX = listX + listWidth - 60
             if mx >= minusX and mx <= minusX + buttonSize and
                my >= buttonY and my <= buttonY + buttonSize then
                 self.mCommodityCounts[c.id] = math.max(0, self.mCommodityCounts[c.id] - 10)
@@ -422,7 +650,7 @@ function Prototype2State:HandleCommodityPanelClick(mx, my)
             end
 
             -- + button (add 10)
-            local plusX = panelX + self.mRightPanelWidth - 40
+            local plusX = listX + listWidth - 30
             if mx >= plusX and mx <= plusX + buttonSize and
                my >= buttonY and my <= buttonY + buttonSize then
                 self.mCommodityCounts[c.id] = self.mCommodityCounts[c.id] + 10
@@ -541,6 +769,19 @@ function Prototype2State:AddBuilding(buildingTypeId)
             inputs = {},
             outputs = {},
             recipe = nil  -- Selected recipe for this building
+        },
+
+        -- Local storage
+        storage = {
+            -- Input storage: {commodityId: currentAmount}
+            inputs = {},
+            inputCapacity = buildingType.storage and buildingType.storage.inputCapacity or 300,
+            inputUsed = 0,
+
+            -- Output storage: {commodityId: currentAmount}
+            outputs = {},
+            outputCapacity = buildingType.storage and buildingType.storage.outputCapacity or 300,
+            outputUsed = 0
         }
     }
 
@@ -1007,9 +1248,26 @@ function Prototype2State:RenderBuildingCard(building, x, y, width, height)
         love.graphics.print("Click to select recipe", x + 15, y + 55)
     end
 
-    -- Production state
-    love.graphics.setColor(0.6, 0.6, 0.6)
-    love.graphics.print("State: " .. building.production.state, x + 15, y + 75)
+    -- Production state with color coding
+    local stateColor = {0.6, 0.6, 0.6}
+    local stateText = building.production.state
+
+    if building.production.state == "WAITING_FOR_RECIPE" then
+        stateColor = {0.8, 0.6, 0.3}  -- Orange
+        stateText = "No Recipe"
+    elseif building.production.state == "NO_WORKERS" then
+        stateColor = {0.8, 0.5, 0.5}  -- Red
+        stateText = "Need Workers"
+    elseif building.production.state == "NO_RAW_MATERIALS" then
+        stateColor = {0.9, 0.7, 0.3}  -- Yellow
+        stateText = "Need Materials"
+    elseif building.production.state == "PRODUCING" then
+        stateColor = {0.4, 0.8, 0.4}  -- Green
+        stateText = "Producing"
+    end
+
+    love.graphics.setColor(unpack(stateColor))
+    love.graphics.print("State: " .. stateText, x + 15, y + 75)
 
     -- Worker info
     local workers = self:GetWorkersForBuilding(building.id)
@@ -1021,14 +1279,35 @@ function Prototype2State:RenderBuildingCard(building, x, y, width, height)
         love.graphics.print("Workers: " .. workerCount .. "/" .. maxWorkers, x + 15, y + 95)
     end
 
-    -- Progress bar placeholder
+    -- Progress bar background
     love.graphics.setColor(0.3, 0.3, 0.3)
     love.graphics.rectangle("fill", x + 15, y + height - 25, width - 30, 15, 3, 3)
 
-    love.graphics.setColor(0.4, 0.7, 0.4)
+    -- Progress bar fill (color based on state)
+    local progressBarColor = {0.4, 0.7, 0.4}  -- Default green
+
+    if building.production.state == "PRODUCING" then
+        progressBarColor = {0.4, 0.8, 0.4}  -- Bright green
+    elseif building.production.state == "NO_RAW_MATERIALS" then
+        progressBarColor = {0.9, 0.7, 0.3}  -- Yellow
+    elseif building.production.state == "NO_WORKERS" then
+        progressBarColor = {0.8, 0.5, 0.5}  -- Red
+    elseif building.production.state == "WAITING_FOR_RECIPE" then
+        progressBarColor = {0.6, 0.6, 0.6}  -- Gray
+    end
+
+    love.graphics.setColor(unpack(progressBarColor))
     local progressWidth = (width - 30) * building.production.progress
     if progressWidth > 0 then
         love.graphics.rectangle("fill", x + 15, y + height - 25, progressWidth, 15, 3, 3)
+    end
+
+    -- Progress percentage text
+    if building.production.state == "PRODUCING" and building.production.progress > 0 then
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.setNewFont(11)
+        local progressText = string.format("%d%%", building.production.progress * 100)
+        love.graphics.print(progressText, x + width - 45, y + height - 24)
     end
 end
 
@@ -1397,7 +1676,7 @@ function Prototype2State:RenderHRPanel()
 
     -- Scrollable area dimensions
     local listY = 110
-    local listHeight = screenH - listY - 10
+    local listHeight = (screenH - 40) - listY  -- Stop before summary area
     local listWidth = self.mRightPanelWidth - 10
 
     -- Enable scissor (clipping) for scrollable area
@@ -1500,21 +1779,119 @@ function Prototype2State:RenderCommodityPanel()
     love.graphics.setNewFont(20)
     love.graphics.print("Commodities", rightPanelX + 20, 75)
 
-    -- Scrollable area dimensions
-    local listY = 110
-    local listHeight = screenH - listY - 50  -- Extra space for summary
-    local listWidth = self.mRightPanelWidth - 10
+    -- Get unique categories from commodities
+    local categories = {
+        {id = "all", name = "All"},
+        {id = "nonzero", name = "In Stock"}
+    }
+    local categorySet = {}
+    for _, c in ipairs(self.mCommodities) do
+        if c.category and not categorySet[c.category] then
+            categorySet[c.category] = true
+            table.insert(categories, {id = c.category, name = c.category})
+        end
+    end
+    -- Sort categories (skip first 2: all, nonzero)
+    table.sort(categories, function(a, b)
+        if a.id == "all" then return true end
+        if b.id == "all" then return false end
+        if a.id == "nonzero" then return true end
+        if b.id == "nonzero" then return false end
+        return a.name < b.name
+    end)
+
+    -- LEFT SIDE: Category filter bar
+    local filterY = 110
+    local filterWidth = 150
+    local filterX = rightPanelX
+    local filterHeight = (screenH - 40) - filterY  -- Stop before summary area
+
+    -- Dark background for category bar
+    love.graphics.setColor(0.15, 0.15, 0.15)
+    love.graphics.rectangle("fill", filterX, filterY, filterWidth, filterHeight)
+
+    -- Enable scissor for category scrolling
+    love.graphics.setScissor(filterX, filterY, filterWidth, filterHeight)
+
+    -- Draw category buttons with scroll
+    local btnY = filterY + 5 - self.mCommodityCategoryScrollOffset
+    local categoryContentHeight = 0
+
+    for i, category in ipairs(categories) do
+        local btnX = filterX + 5
+        local btnW = filterWidth - 10
+        local btnH = 25
+
+        -- Only render if visible
+        if btnY + btnH >= filterY and btnY <= filterY + filterHeight then
+            local isSelected = (self.mSelectedCommodityCategory == category.id) or
+                              (self.mSelectedCommodityCategory == nil and category.id == "all")
+
+            if isSelected then
+                love.graphics.setColor(0.3, 0.5, 0.7)  -- Blue highlight
+            else
+                love.graphics.setColor(0.25, 0.25, 0.25)
+            end
+
+            love.graphics.rectangle("fill", btnX, btnY, btnW, btnH, 3, 3)
+
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.setNewFont(13)
+            love.graphics.print(category.name, btnX + 8, btnY + 5)
+        end
+
+        btnY = btnY + 28
+        categoryContentHeight = categoryContentHeight + 28
+    end
+
+    -- Calculate max scroll for categories
+    self.mCommodityCategoryScrollMax = math.max(0, categoryContentHeight - filterHeight)
+
+    love.graphics.setScissor()
+
+    -- Draw scrollbar for categories if needed
+    if self.mCommodityCategoryScrollMax > 0 then
+        local scrollbarHeight = filterHeight * (filterHeight / categoryContentHeight)
+        local scrollbarY = filterY + (self.mCommodityCategoryScrollOffset / self.mCommodityCategoryScrollMax) * (filterHeight - scrollbarHeight)
+
+        love.graphics.setColor(0.5, 0.5, 0.5, 0.8)
+        love.graphics.rectangle("fill", filterX + filterWidth - 8, scrollbarY, 6, scrollbarHeight, 3, 3)
+    end
+
+    -- RIGHT SIDE: Commodity list
+    local listX = filterX + filterWidth + 10
+    local listY = filterY + 5
+    local listWidth = self.mRightPanelWidth - filterWidth - 20
+    local listHeight = (screenH - 40) - listY  -- Stop before summary area
 
     -- Enable scissor (clipping) for scrollable area
-    love.graphics.setScissor(rightPanelX, listY, listWidth, listHeight)
+    love.graphics.setScissor(listX, listY, listWidth, listHeight)
 
-    -- Render commodities (with scroll offset)
+    -- Filter commodities by selected category
+    local filteredCommodities = {}
+    for _, c in ipairs(self.mCommodities) do
+        local include = false
+
+        if self.mSelectedCommodityCategory == nil or self.mSelectedCommodityCategory == "all" then
+            include = true
+        elseif self.mSelectedCommodityCategory == "nonzero" then
+            include = (self.mCommodityCounts[c.id] or 0) > 0
+        else
+            include = c.category == self.mSelectedCommodityCategory
+        end
+
+        if include then
+            table.insert(filteredCommodities, c)
+        end
+    end
+
+    -- Render filtered commodities (with scroll offset)
     local yOffset = listY - self.mCommodityScrollOffset
     local itemHeight = 50
     local spacing = 5
     local totalContentHeight = 0
 
-    for _, c in ipairs(self.mCommodities) do
+    for _, c in ipairs(filteredCommodities) do
         -- Skip rendering if outside visible area (optimization)
         if yOffset + itemHeight >= listY and yOffset <= listY + listHeight then
             local count = self.mCommodityCounts[c.id] or 0
@@ -1525,29 +1902,29 @@ function Prototype2State:RenderCommodityPanel()
             else
                 love.graphics.setColor(0.35, 0.35, 0.38)
             end
-            love.graphics.rectangle("fill", rightPanelX + 15, yOffset, self.mRightPanelWidth - 30, itemHeight, 5, 5)
+            love.graphics.rectangle("fill", listX, yOffset, listWidth, itemHeight - 2, 5, 5)
 
             -- Commodity name
             love.graphics.setColor(1, 1, 1)
             love.graphics.setNewFont(14)
-            love.graphics.print(c.name, rightPanelX + 25, yOffset + 8)
+            love.graphics.print(c.name, listX + 10, yOffset + 8)
 
             -- Commodity category (smaller, gray)
             love.graphics.setColor(0.7, 0.7, 0.7)
             love.graphics.setNewFont(11)
-            love.graphics.print(c.category, rightPanelX + 25, yOffset + 28)
+            love.graphics.print(c.category, listX + 10, yOffset + 28)
 
             -- Count display
             love.graphics.setColor(1, 1, 1)
             love.graphics.setNewFont(16)
             local countText = tostring(count)
             local countWidth = love.graphics.getFont():getWidth(countText)
-            love.graphics.print(countText, rightPanelX + self.mRightPanelWidth - 120, yOffset + 15)
+            love.graphics.print(countText, listX + listWidth - 100, yOffset + 15)
 
             -- - button (subtract 10)
             local buttonY = yOffset + 15
             local buttonSize = 25
-            local minusX = rightPanelX + self.mRightPanelWidth - 80
+            local minusX = listX + listWidth - 60
             love.graphics.setColor(0.5, 0.3, 0.3)
             love.graphics.rectangle("fill", minusX, buttonY, buttonSize, buttonSize, 3, 3)
             love.graphics.setColor(1, 1, 1)
@@ -1555,7 +1932,7 @@ function Prototype2State:RenderCommodityPanel()
             love.graphics.print("-", minusX + 8, buttonY + 1)
 
             -- + button (add 10)
-            local plusX = rightPanelX + self.mRightPanelWidth - 40
+            local plusX = listX + listWidth - 30
             love.graphics.setColor(0.3, 0.5, 0.3)
             love.graphics.rectangle("fill", plusX, buttonY, buttonSize, buttonSize, 3, 3)
             love.graphics.setColor(1, 1, 1)
@@ -1777,9 +2154,20 @@ function Prototype2State:OnMouseWheel(dx, dy)
             self.mHRScrollOffset = self.mHRScrollOffset - dy * 120
             self.mHRScrollOffset = math.max(0, math.min(self.mHRScrollOffset, self.mHRScrollMax))
         elseif self.mShowCommodityPanel then
-            -- Scroll Commodity panel
-            self.mCommodityScrollOffset = self.mCommodityScrollOffset - dy * 120
-            self.mCommodityScrollOffset = math.max(0, math.min(self.mCommodityScrollOffset, self.mCommodityScrollMax))
+            -- Scroll Commodity panel - check if mouse is over category bar or commodity list
+            local filterY = 110
+            local filterWidth = 150
+            local filterX = rightPanelX
+
+            if mx >= filterX and mx < filterX + filterWidth and my >= filterY then
+                -- Mouse over category bar - scroll categories
+                self.mCommodityCategoryScrollOffset = self.mCommodityCategoryScrollOffset - dy * 30
+                self.mCommodityCategoryScrollOffset = math.max(0, math.min(self.mCommodityCategoryScrollOffset, self.mCommodityCategoryScrollMax))
+            else
+                -- Mouse over commodity list - scroll commodities
+                self.mCommodityScrollOffset = self.mCommodityScrollOffset - dy * 120
+                self.mCommodityScrollOffset = math.max(0, math.min(self.mCommodityScrollOffset, self.mCommodityScrollMax))
+            end
         else
             -- Scroll right panel (building picker)
             self.mRightScrollOffset = self.mRightScrollOffset - dy * 120
@@ -1895,7 +2283,56 @@ function Prototype2State:RenderBuildingModal()
 
     yOffset = yOffset + 130
 
-    -- Section 2: Workers
+    -- Section 2: Storage
+    love.graphics.setColor(0.35, 0.35, 0.38)
+    love.graphics.rectangle("fill", modalX + 20, yOffset, modalWidth - 40, 120, 8, 8)
+
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setNewFont(18)
+    love.graphics.print("Storage", modalX + 30, yOffset + 10)
+
+    local storage = self.mSelectedBuilding.storage
+
+    -- Input storage
+    love.graphics.setNewFont(14)
+    love.graphics.setColor(0.9, 0.8, 0.6)
+    love.graphics.print("Input Storage:", modalX + 30, yOffset + 40)
+    love.graphics.setColor(0.8, 0.8, 0.8)
+    love.graphics.print(storage.inputUsed .. " / " .. storage.inputCapacity .. " units", modalX + 160, yOffset + 40)
+
+    -- Input storage bar
+    local barWidth = modalWidth - 100
+    local barHeight = 12
+    local barX = modalX + 30
+    local barY = yOffset + 60
+    love.graphics.setColor(0.3, 0.3, 0.3)
+    love.graphics.rectangle("fill", barX, barY, barWidth, barHeight, 3, 3)
+    if storage.inputCapacity > 0 then
+        local fillWidth = (storage.inputUsed / storage.inputCapacity) * barWidth
+        love.graphics.setColor(0.9, 0.8, 0.6)
+        love.graphics.rectangle("fill", barX, barY, fillWidth, barHeight, 3, 3)
+    end
+
+    -- Output storage
+    love.graphics.setNewFont(14)
+    love.graphics.setColor(0.6, 0.9, 0.7)
+    love.graphics.print("Output Storage:", modalX + 30, yOffset + 82)
+    love.graphics.setColor(0.8, 0.8, 0.8)
+    love.graphics.print(storage.outputUsed .. " / " .. storage.outputCapacity .. " units", modalX + 180, yOffset + 82)
+
+    -- Output storage bar
+    barY = yOffset + 102
+    love.graphics.setColor(0.3, 0.3, 0.3)
+    love.graphics.rectangle("fill", barX, barY, barWidth, barHeight, 3, 3)
+    if storage.outputCapacity > 0 then
+        local fillWidth = (storage.outputUsed / storage.outputCapacity) * barWidth
+        love.graphics.setColor(0.6, 0.9, 0.7)
+        love.graphics.rectangle("fill", barX, barY, fillWidth, barHeight, 3, 3)
+    end
+
+    yOffset = yOffset + 130
+
+    -- Section 3: Workers
     local workers = self:GetWorkersForBuilding(self.mSelectedBuilding.id)
     local workerSectionHeight = 50 + (#workers * 150)  -- Header + worker cards
 
@@ -1942,7 +2379,8 @@ function Prototype2State:RenderBuildingModal()
     end
 
     -- Calculate total content height for scrolling
-    local totalContentHeight = 130 + workerSectionHeight + 20
+    -- Recipe (130) + Storage (130) + Workers (variable) + padding (20)
+    local totalContentHeight = 130 + 130 + workerSectionHeight + 20
     self.mBuildingModalScrollMax = math.max(0, totalContentHeight - contentHeight)
 
     love.graphics.setScissor()
