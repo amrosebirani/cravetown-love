@@ -1,5 +1,6 @@
--- Hot reloading
+-- Hot reloading (manual mode - press F5 to reload)
 local lurker = require("lurker")
+local manualHotReload = true  -- Set to true for manual reload, false for automatic
 
 require("code/StateMachine")
 require("code/StateStack")
@@ -34,11 +35,21 @@ function love.load()
     -- Set white background color
     love.graphics.setBackgroundColor(1, 1, 1)
 
+    -- Toast notification state
+    gToastMessage = nil
+    gToastTimer = 0
+    gToastDuration = 2.0  -- Show toast for 2 seconds
+
     -- Configure hot reloading
     lurker.postswap = function(f)
         print("Hot reloaded: " .. f)
+        -- Show toast notification
+        gToastMessage = "Hot Reloaded: " .. f
+        gToastTimer = gToastDuration
     end
-    lurker.interval = 0.5 -- Check for changes every 0.5 seconds
+    if not manualHotReload then
+        lurker.interval = 0.5 -- Check for changes every 0.5 seconds (automatic mode)
+    end
 
     -- Mouse state tracking
     gMousePressed = nil
@@ -156,8 +167,18 @@ function ReturnToLauncher()
 end
 
 function love.update(dt)
-    -- Hot reload files
-    lurker.update()
+    -- Hot reload files (only if automatic mode)
+    if not manualHotReload then
+        lurker.update()
+    end
+
+    -- Update toast timer
+    if gToastTimer > 0 then
+        gToastTimer = gToastTimer - dt
+        if gToastTimer <= 0 then
+            gToastMessage = nil
+        end
+    end
 
     if gMode == "launcher" then
         -- Update launcher
@@ -271,6 +292,45 @@ function love.draw()
             gInfoSystem:Render()
         end
     end
+
+    -- Render toast notification (on top of everything)
+    if gToastMessage then
+        local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+
+        -- Measure text width
+        love.graphics.setNewFont(16)
+        local textWidth = love.graphics.getFont():getWidth(gToastMessage)
+        local textHeight = love.graphics.getFont():getHeight()
+
+        -- Toast dimensions
+        local padding = 20
+        local toastWidth = textWidth + padding * 2
+        local toastHeight = textHeight + padding
+        local toastX = (screenW - toastWidth) / 2
+        local toastY = screenH - toastHeight - 40
+
+        -- Fade effect based on remaining time
+        local alpha = 1.0
+        if gToastTimer < 0.5 then
+            alpha = gToastTimer / 0.5  -- Fade out in last 0.5 seconds
+        end
+
+        -- Toast background (semi-transparent dark)
+        love.graphics.setColor(0.2, 0.2, 0.2, 0.9 * alpha)
+        love.graphics.rectangle("fill", toastX, toastY, toastWidth, toastHeight, 8, 8)
+
+        -- Toast border
+        love.graphics.setColor(0.4, 0.8, 0.4, alpha)
+        love.graphics.setLineWidth(2)
+        love.graphics.rectangle("line", toastX, toastY, toastWidth, toastHeight, 8, 8)
+
+        -- Toast text
+        love.graphics.setColor(1, 1, 1, alpha)
+        love.graphics.print(gToastMessage, toastX + padding, toastY + padding / 2)
+
+        -- Reset color
+        love.graphics.setColor(1, 1, 1, 1)
+    end
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
@@ -331,9 +391,18 @@ function love.resize(w, h)
 end
 
 function love.keypressed(key)
-    -- ESC to return to launcher (from prototypes)
+    -- F5 to manually trigger hot reload (when in manual mode)
+    if key == "f5" and manualHotReload then
+        print("Manual hot reload triggered...")
+        gToastMessage = "Hot Reload Triggered (F5)"
+        gToastTimer = gToastDuration
+        lurker.update()
+        return
+    end
+
+    -- ESC to return to launcher (from prototypes and main game)
     if key == "escape" then
-        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" then
+        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" or gMode == "main" then
             ReturnToLauncher()
             return
         elseif gMode == "launcher" then

@@ -17,11 +17,23 @@ const RecipeManager = () => {
     loadRecipes();
   }, []);
 
+  // Normalize recipe to ensure buildingType is always a string
+  const normalizeRecipe = (recipe: BuildingRecipe): BuildingRecipe => {
+    return {
+      ...recipe,
+      buildingType: Array.isArray(recipe.buildingType)
+        ? recipe.buildingType[0] || ''
+        : recipe.buildingType
+    };
+  };
+
   const loadRecipes = async () => {
     setLoading(true);
     try {
       const data = await loadBuildingRecipes();
-      setRecipes(data.recipes);
+      // Normalize all recipes when loading
+      const normalizedRecipes = data.recipes.map(normalizeRecipe);
+      setRecipes(normalizedRecipes);
       messageApi.success('Recipes loaded successfully');
     } catch (error) {
       messageApi.error(`Failed to load recipes: ${error}`);
@@ -33,9 +45,11 @@ const RecipeManager = () => {
 
   const saveRecipes = async (updatedRecipes: BuildingRecipe[]) => {
     try {
-      const data: BuildingRecipesData = { recipes: updatedRecipes };
+      // Normalize all recipes before saving
+      const normalizedRecipes = updatedRecipes.map(normalizeRecipe);
+      const data: BuildingRecipesData = { recipes: normalizedRecipes };
       await saveBuildingRecipes(data);
-      setRecipes(updatedRecipes);
+      setRecipes(normalizedRecipes);
       messageApi.success('Recipes saved successfully');
     } catch (error) {
       messageApi.error(`Failed to save recipes: ${error}`);
@@ -205,8 +219,14 @@ const RecipeManager = () => {
   // Filter recipes based on search text
   const filteredRecipes = recipes.filter(recipe => {
     const searchLower = searchText.toLowerCase();
+
+    // Normalize buildingType to string (handle array from tags mode)
+    const buildingType = Array.isArray(recipe.buildingType)
+      ? recipe.buildingType[0]
+      : recipe.buildingType;
+
     return (
-      recipe.buildingType.toLowerCase().includes(searchLower) ||
+      (buildingType && buildingType.toLowerCase().includes(searchLower)) ||
       recipe.name.toLowerCase().includes(searchLower) ||
       recipe.recipeName.toLowerCase().includes(searchLower) ||
       Object.keys(recipe.inputs).some(input => input.toLowerCase().includes(searchLower)) ||

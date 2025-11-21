@@ -28,4 +28,22 @@ function DataLoader.loadBuildings()
     return data.buildings or {}
 end
 
+function DataLoader.loadWorkerTypes()
+    print("Loading worker types from data/worker_types.json...")
+    local data = DataLoader.loadJSON("data/worker_types.json")
+    return data.workerTypes or {}
+end
+
+function DataLoader.loadBuildingRecipes()
+    print("Loading building recipes from data/building_recipes.json...")
+    local data = DataLoader.loadJSON("data/building_recipes.json")
+    return data.recipes or {}
+end
+
+function DataLoader.loadBuildingTypes()
+    print("Loading building types from data/building_types.json...")
+    local data = DataLoader.loadJSON("data/building_types.json")
+    return data.buildingTypes or {}
+end
+
 return DataLoader

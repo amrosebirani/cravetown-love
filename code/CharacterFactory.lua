@@ -144,6 +144,65 @@ function CharacterFactory.CreateCharacter(characterType, x, y)
     })
 end
 
+-- Create a worker character for the production system
+-- workerTypeData should have: id, name, category, skillLevel, minimumWage, description
+function CharacterFactory.CreateWorker(workerTypeData)
+    require("code/NameGenerator")
+
+    -- Generate basic character info
+    local gender = NameGenerator.GenerateGender()
+    local name = NameGenerator.GenerateName(gender)
+    local age = math.random(22, 55)  -- Working age adults
+    local status = CharacterFactory.GenerateStatus()
+    local diet = CharacterFactory.GenerateDiet()
+    local class = CharacterFactory.GenerateClass()
+
+    -- Generate work-related biography
+    local bioTemplates = {
+        "A {skill} {role} with a strong work ethic.",
+        "An experienced {role} who has been in the trade for years.",
+        "A dedicated {role} known for quality work.",
+        "A reliable {role} who takes pride in their craft.",
+        "A skilled {role} from a family of craftspeople.",
+    }
+    local template = bioTemplates[math.random(#bioTemplates)]
+    local biography = template:gsub("{role}", workerTypeData.name:lower())
+                              :gsub("{skill}", workerTypeData.skillLevel:lower())
+
+    local traits = CharacterFactory.GenerateTraits()
+    local cravings = CharacterFactory.GenerateCravings()
+
+    -- Create worker character data (not requiring Character class)
+    return {
+        id = "worker_" .. os.time() .. "_" .. math.random(1000, 9999),
+        name = name,
+        age = age,
+        gender = gender,
+        workerType = workerTypeData.id,
+        workerTypeName = workerTypeData.name,
+        category = workerTypeData.category,
+        skillLevel = workerTypeData.skillLevel,
+        minimumWage = workerTypeData.minimumWage,
+        currentWage = workerTypeData.minimumWage,  -- Start at minimum
+        class = class,
+        status = status,
+        diet = diet,
+        biography = biography,
+        traits = traits,
+        cravings = cravings,
+
+        -- Work status
+        employed = false,
+        assignedBuilding = nil,
+        experience = 0,
+        efficiency = 1.0,  -- Base efficiency
+
+        -- Timestamps
+        hiredDate = nil,
+        createdDate = os.time()
+    }
+end
+
 -- Helper function to check if table contains value
 function table.contains(table, element)
     for _, value in pairs(table) do

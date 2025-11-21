@@ -209,6 +209,7 @@ These files are shared between the game and the Information System.
 ```
 cravetown-love/
 ├── main.lua                  # Game entry point
+
 ├── data/                     # Shared JSON data files
 │   ├── building_recipes.json
 │   ├── commodities.json

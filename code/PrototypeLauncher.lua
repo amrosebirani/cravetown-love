@@ -15,12 +15,6 @@ function PrototypeLauncher:Create()
                 color = {0.2, 0.6, 0.9}
             },
             {
-                id = "infosystem",
-                name = "Information System",
-                description = "CRUD interface for building recipes, workers, and data",
-                color = {0.9, 0.7, 0.3}
-            },
-            {
                 id = "prototype1",
                 name = "Prototype 1: Consumption Engine",
                 description = "Character behavior, craving systems, resource allocation",

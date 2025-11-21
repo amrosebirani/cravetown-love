@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Form, Input, InputNumber, Button, Divider, Select } from 'antd';
 import type { BuildingRecipe } from '../types';
 import InputOutputEditor from './InputOutputEditor';
 import WorkerEditor from './WorkerEditor';
+import { loadBuildingTypes } from '../api';
 
 const BUILDING_CATEGORIES = ['Production', 'Consumable', 'Merchandise', 'Luxury', 'Mint'];
 
@@ -15,10 +16,36 @@ interface RecipeEditorProps {
 const RecipeEditor = ({ recipe, onSave, onCancel }: RecipeEditorProps) => {
   const [form] = Form.useForm();
   const [editedRecipe, setEditedRecipe] = useState<BuildingRecipe>(recipe);
+  const [buildingTypeOptions, setBuildingTypeOptions] = useState<Array<{ value: string; label: string }>>([]);
+
+  useEffect(() => {
+    loadBuildingTypeOptions();
+  }, []);
+
+  const loadBuildingTypeOptions = async () => {
+    try {
+      const data = await loadBuildingTypes();
+      const options = data.buildingTypes.map(bt => ({
+        value: bt.id,
+        label: `${bt.name} (${bt.id})`
+      }));
+      setBuildingTypeOptions(options);
+    } catch (error) {
+      console.error('Failed to load building types:', error);
+      // Silently fail, user can still type custom building type
+    }
+  };
 
   const handleSubmit = () => {
     form.validateFields().then(() => {
-      onSave(editedRecipe);
+      // Ensure buildingType is a string (not array from tags mode)
+      const normalizedRecipe = {
+        ...editedRecipe,
+        buildingType: Array.isArray(editedRecipe.buildingType)
+          ? editedRecipe.buildingType[0]
+          : editedRecipe.buildingType
+      };
+      onSave(normalizedRecipe);
     });
   };
 
@@ -34,14 +61,33 @@ const RecipeEditor = ({ recipe, onSave, onCancel }: RecipeEditorProps) => {
       onFinish={handleSubmit}
     >
       <Form.Item
-        label="Building Type ID"
+        label="Building Type"
         name="buildingType"
         rules={[{ required: true, message: 'Building type is required' }]}
-        tooltip="Unique identifier for the building type (e.g., 'farm', 'bakery')"
+        tooltip="Select building type from Building Types tab or type custom ID"
       >
-        <Input
+        <Select
+          showSearch
           value={editedRecipe.buildingType}
-          onChange={(e) => updateRecipe({ buildingType: e.target.value })}
+          onChange={(value) => {
+            // Handle both array (from tags mode) and string
+            const buildingType = Array.isArray(value) ? value[0] : value;
+            updateRecipe({ buildingType });
+          }}
+          placeholder="Select or type building type ID"
+          options={buildingTypeOptions}
+          mode="tags"
+          maxCount={1}
+          dropdownRender={(menu) => (
+            <>
+              {menu}
+              <div style={{ padding: '8px', borderTop: '1px solid #f0f0f0' }}>
+                <small style={{ color: '#999' }}>
+                  Type to add custom building type or manage in Building Types tab
+                </small>
+              </div>
+            </>
+          )}
         />
       </Form.Item>
 

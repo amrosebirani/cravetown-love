@@ -1,0 +1,362 @@
+{
+  "buildingTypes": [
+    {
+      "id": "farm",
+      "name": "Farm",
+      "category": "production",
+      "label": "Fr",
+      "color": [0.3, 0.6, 0.2],
+      "baseWidth": 120,
+      "baseHeight": 120,
+      "variableSize": true,
+      "minWidth": 80,
+      "minHeight": 80,
+      "maxWidth": 300,
+      "maxHeight": 300,
+      "description": "Grows crops and raises livestock",
+      "workCategories": ["Agriculture", "Animal Husbandry", "General Labor"],
+      "workerEfficiency": {
+        "Agriculture": 1.0,
+        "Animal Husbandry": 1.0,
+        "General Labor": 0.3
+      },
+      "properties": {
+        "maxFarmers": 8,
+        "currentFarmers": 0,
+        "baseFarmYield": 10,
+        "farmArea": 0,
+        "localStorageCapacity": 1000,
+        "currentStorage": 0,
+        "cropType": "wheat"
+      },
+      "constructionMaterials": {
+        "wood": 50,
+        "hoe": 8,
+        "scythe": 5
+      }
+    },
+    {
+      "id": "sawmill",
+      "name": "Saw Mill",
+      "category": "production",
+      "label": "SM",
+      "color": [0.6, 0.4, 0.2],
+      "baseWidth": 90,
+      "baseHeight": 90,
+      "description": "Processes trees into lumber",
+      "workCategories": ["Lumber Processing", "Forestry", "General Labor"],
+      "workerEfficiency": {
+        "Lumber Processing": 1.0,
+        "Forestry": 0.8,
+        "General Labor": 0.5
+      },
+      "properties": {
+        "maxWorkers": 5,
+        "localStorageCapacity": 500
+      },
+      "constructionMaterials": {
+        "wood": 40,
+        "stone": 30
+      }
+    },
+    {
+      "id": "bakery",
+      "name": "Bakery",
+      "category": "production",
+      "label": "Bk",
+      "color": [0.8, 0.6, 0.3],
+      "baseWidth": 70,
+      "baseHeight": 70,
+      "description": "Produces bread and baked goods from grain",
+      "workCategories": ["Baking"],
+      "workerEfficiency": {
+        "Baking": 1.0
+      },
+      "properties": {
+        "maxBakers": 3,
+        "localStorageCapacity": 300
+      },
+      "constructionMaterials": {
+        "bricks": 50,
+        "wood": 30
+      }
+    },
+    {
+      "id": "restaurant",
+      "name": "Restaurant",
+      "category": "production",
+      "label": "Rs",
+      "color": [0.9, 0.5, 0.2],
+      "baseWidth": 80,
+      "baseHeight": 80,
+      "description": "Prepares and serves meals",
+      "workCategories": ["Food Preparation", "Hospitality", "General Labor"],
+      "workerEfficiency": {
+        "Food Preparation": 1.0,
+        "Hospitality": 0.8,
+        "General Labor": 0.4
+      },
+      "properties": {
+        "maxWorkers": 6,
+        "localStorageCapacity": 200
+      },
+      "constructionMaterials": {
+        "wood": 40,
+        "bricks": 30
+      }
+    },
+    {
+      "id": "bar",
+      "name": "Bar",
+      "category": "production",
+      "label": "Br",
+      "color": [0.7, 0.3, 0.5],
+      "baseWidth": 70,
+      "baseHeight": 70,
+      "description": "Serves alcoholic beverages to townsfolk",
+      "workCategories": ["Brewing & Distilling", "Hospitality", "General Labor"],
+      "workerEfficiency": {
+        "Brewing & Distilling": 1.0,
+        "Hospitality": 0.8,
+        "General Labor": 0.3
+      },
+      "properties": {
+        "maxWorkers": 4,
+        "localStorageCapacity": 250
+      },
+      "constructionMaterials": {
+        "wood": 45,
+        "glass": 20
+      }
+    },
+    {
+      "id": "shoe_factory",
+      "name": "Shoe Factory",
+      "category": "production",
+      "label": "SF",
+      "color": [0.5, 0.4, 0.3],
+      "baseWidth": 80,
+      "baseHeight": 80,
+      "description": "Manufactures footwear",
+      "workCategories": ["Footwear Manufacturing", "General Labor"],
+      "workerEfficiency": {
+        "Footwear Manufacturing": 1.0,
+        "General Labor": 0.5
+      },
+      "properties": {
+        "maxWorkers": 6,
+        "localStorageCapacity": 400
+      },
+      "constructionMaterials": {
+        "wood": 35,
+        "leather": 20
+      }
+    },
+    {
+      "id": "textile_mill",
+      "name": "Textile Mill",
+      "category": "production",
+      "label": "TM",
+      "color": [0.4, 0.5, 0.6],
+      "baseWidth": 100,
+      "baseHeight": 100,
+      "description": "Produces fabric and textiles",
+      "workCategories": ["Textile Weaving", "Spinning", "General Labor"],
+      "workerEfficiency": {
+        "Textile Weaving": 1.0,
+        "Spinning": 0.8,
+        "General Labor": 0.5
+      },
+      "properties": {
+        "maxWorkers": 8,
+        "localStorageCapacity": 600
+      },
+      "constructionMaterials": {
+        "wood": 60,
+        "iron": 30
+      }
+    },
+    {
+      "id": "tailor_shop",
+      "name": "Tailor Shop",
+      "category": "production",
+      "label": "Tl",
+      "color": [0.6, 0.5, 0.7],
+      "baseWidth": 65,
+      "baseHeight": 65,
+      "description": "Creates clothing and garments",
+      "workCategories": ["Tailoring", "General Labor"],
+      "workerEfficiency": {
+        "Tailoring": 1.0,
+        "General Labor": 0.4
+      },
+      "properties": {
+        "maxWorkers": 4,
+        "localStorageCapacity": 300
+      },
+      "constructionMaterials": {
+        "wood": 30,
+        "fabric": 20
+      }
+    },
+    {
+      "id": "brickyard",
+      "name": "Brickyard",
+      "category": "production",
+      "label": "BY",
+      "color": [0.7, 0.3, 0.2],
+      "baseWidth": 90,
+      "baseHeight": 90,
+      "description": "Produces bricks for construction",
+      "workCategories": ["Brick Making", "General Labor"],
+      "workerEfficiency": {
+        "Brick Making": 1.0,
+        "General Labor": 0.4
+      },
+      "properties": {
+        "maxWorkers": 6,
+        "localStorageCapacity": 800
+      },
+      "constructionMaterials": {
+        "wood": 40,
+        "clay": 50
+      }
+    },
+    {
+      "id": "furniture_shop",
+      "name": "Furniture Shop",
+      "category": "production",
+      "label": "FS",
+      "color": [0.5, 0.4, 0.2],
+      "baseWidth": 75,
+      "baseHeight": 75,
+      "description": "Crafts furniture from lumber",
+      "workCategories": ["Woodworking"],
+      "workerEfficiency": {
+        "Woodworking": 1.0
+      },
+      "properties": {
+        "maxWorkers": 5,
+        "localStorageCapacity": 400
+      },
+      "constructionMaterials": {
+        "wood": 50,
+        "tools": 15
+      }
+    },
+    {
+      "id": "jewellery_shop",
+      "name": "Jewellery Shop",
+      "category": "production",
+      "label": "JS",
+      "color": [0.9, 0.8, 0.2],
+      "baseWidth": 60,
+      "baseHeight": 60,
+      "description": "Creates fine jewelry from precious metals and gems",
+      "workCategories": ["Jewelry Crafting"],
+      "workerEfficiency": {
+        "Jewelry Crafting": 1.0
+      },
+      "properties": {
+        "maxWorkers": 3,
+        "localStorageCapacity": 100
+      },
+      "constructionMaterials": {
+        "wood": 25,
+        "glass": 15,
+        "gold": 10
+      }
+    },
+    {
+      "id": "central_bank",
+      "name": "Central Bank",
+      "category": "production",
+      "label": "CB",
+      "color": [0.2, 0.6, 0.3],
+      "baseWidth": 100,
+      "baseHeight": 100,
+      "description": "Manages town finances and currency",
+      "workCategories": ["Banking & Finance"],
+      "workerEfficiency": {
+        "Banking & Finance": 1.0
+      },
+      "properties": {
+        "maxWorkers": 5,
+        "localStorageCapacity": 0
+      },
+      "constructionMaterials": {
+        "stone": 80,
+        "iron": 40,
+        "glass": 30
+      }
+    },
+    {
+      "id": "forge",
+      "name": "Forge",
+      "category": "production",
+      "label": "Fg",
+      "color": [0.8, 0.3, 0.1],
+      "baseWidth": 85,
+      "baseHeight": 85,
+      "description": "Crafts metal goods and weapons",
+      "workCategories": ["Metalworking", "Smelting"],
+      "workerEfficiency": {
+        "Metalworking": 1.0,
+        "Smelting": 0.8
+      },
+      "properties": {
+        "maxWorkers": 5,
+        "localStorageCapacity": 500
+      },
+      "constructionMaterials": {
+        "stone": 60,
+        "iron": 40
+      }
+    },
+    {
+      "id": "blacksmith",
+      "name": "Blacksmith",
+      "category": "production",
+      "label": "BS",
+      "color": [0.3, 0.3, 0.3],
+      "baseWidth": 70,
+      "baseHeight": 70,
+      "description": "Forges metal tools and equipment",
+      "workCategories": ["Blacksmithing"],
+      "workerEfficiency": {
+        "Blacksmithing": 1.0
+      },
+      "properties": {
+        "maxWorkers": 3,
+        "localStorageCapacity": 300
+      },
+      "constructionMaterials": {
+        "stone": 50,
+        "iron": 30
+      }
+    },
+    {
+      "id": "mine",
+      "name": "Mine",
+      "category": "production",
+      "label": "Mi",
+      "color": [0.4, 0.3, 0.2],
+      "baseWidth": 90,
+      "baseHeight": 90,
+      "description": "Extracts minerals and ores from the ground",
+      "workCategories": ["Mining", "General Labor"],
+      "workerEfficiency": {
+        "Mining": 1.0,
+        "General Labor": 0.5
+      },
+      "properties": {
+        "maxWorkers": 10,
+        "localStorageCapacity": 1000
+      },
+      "constructionMaterials": {
+        "wood": 60,
+        "pickaxe": 10
+      }
+    }
+  ]
+}

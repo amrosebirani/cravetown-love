@@ -1310,6 +1310,12 @@
       "name": "Rubber",
       "category": "tree_product",
       "description": "Product which is derived from Rubber trees, is used as a input for producing many other products like shoes"
+    },
+    {
+      "id": "cake",
+      "name": "Cake",
+      "category": "processed_food",
+      "description": "Cake is a sweet delicacy"
     }
   ]
 }

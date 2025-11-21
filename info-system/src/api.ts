@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core';
-import type { BuildingRecipesData, CommoditiesData, WorkerTypesData } from './types';
+import type { BuildingRecipesData, CommoditiesData, WorkerTypesData, BuildingTypesData, WorkCategoriesData } from './types';
 
 /**
  * Get the path to the data directory
@@ -78,6 +78,46 @@ export async function loadWorkerTypes(): Promise<WorkerTypesData> {
 export async function saveWorkerTypes(data: WorkerTypesData): Promise<void> {
   const dataDir = await getDataDir();
   const filePath = `${dataDir}/worker_types.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load building types from JSON file
+ */
+export async function loadBuildingTypes(): Promise<BuildingTypesData> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/building_types.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save building types to JSON file
+ */
+export async function saveBuildingTypes(data: BuildingTypesData): Promise<void> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/building_types.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load work categories from JSON file
+ */
+export async function loadWorkCategories(): Promise<WorkCategoriesData> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/work_categories.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save work categories to JSON file
+ */
+export async function saveWorkCategories(data: WorkCategoriesData): Promise<void> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/work_categories.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }

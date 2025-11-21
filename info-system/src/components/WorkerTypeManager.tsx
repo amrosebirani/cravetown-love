@@ -3,6 +3,7 @@ import { Table, Button, Space, message, Popconfirm, Modal, Form, Input, InputNum
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
 import type { WorkerType, WorkerTypesData } from '../types';
 import { loadWorkerTypes, saveWorkerTypes } from '../api';
+import { WORK_CATEGORIES } from '../constants';
 
 const WORKER_CATEGORIES = [
   'Agriculture',
@@ -138,6 +139,18 @@ const WorkerTypeManager = () => {
       width: 150,
       align: 'center' as const,
       render: (wage: number) => `$${wage}/hr`
+    },
+    {
+      title: 'Work Categories',
+      dataIndex: 'workCategories',
+      key: 'workCategories',
+      width: 200,
+      render: (categories: string[] | undefined) => {
+        if (!categories || categories.length === 0) {
+          return <span style={{ color: '#999' }}>Not set</span>;
+        }
+        return categories.join(', ');
+      },
     },
     {
       title: 'Description',
@@ -294,6 +307,22 @@ const WorkerTypeManager = () => {
                 prefix="$"
                 suffix="/hr"
               />
+            </Form.Item>
+
+            <Form.Item
+              label="Work Categories"
+              name="workCategories"
+              tooltip="Select which types of buildings this worker can work at"
+            >
+              <Select
+                mode="multiple"
+                placeholder="Select work categories"
+                style={{ width: '100%' }}
+              >
+                {WORK_CATEGORIES.map(category => (
+                  <Select.Option key={category} value={category}>{category}</Select.Option>
+                ))}
+              </Select>
             </Form.Item>
 
             <Form.Item
