@@ -355,7 +355,9 @@
       "icon": "Ch",
       "stackSize": 300,
       "baseValue": 12,
-      "dependencies": ["milk"],
+      "dependencies": [
+        "milk"
+      ],
       "description": "Aged dairy"
     },
     {
@@ -365,7 +367,9 @@
       "icon": "Bu",
       "stackSize": 400,
       "baseValue": 10,
-      "dependencies": ["milk"],
+      "dependencies": [
+        "milk"
+      ],
       "perishable": true,
       "description": "Dairy fat"
     },
@@ -376,7 +380,9 @@
       "icon": "Bd",
       "stackSize": 1000,
       "baseValue": 5,
-      "dependencies": ["wheat"],
+      "dependencies": [
+        "wheat"
+      ],
       "perishable": true,
       "description": "Baked wheat"
     },
@@ -387,7 +393,9 @@
       "icon": "Fl",
       "stackSize": 2000,
       "baseValue": 2,
-      "dependencies": ["wheat"],
+      "dependencies": [
+        "wheat"
+      ],
       "description": "Ground grain"
     },
     {
@@ -397,7 +405,9 @@
       "icon": "Su",
       "stackSize": 2000,
       "baseValue": 10,
-      "dependencies": ["sugar_cane"],
+      "dependencies": [
+        "sugar_cane"
+      ],
       "description": "Refined sweetener"
     },
     {
@@ -417,7 +427,9 @@
       "icon": "Wn",
       "stackSize": 300,
       "baseValue": 25,
-      "dependencies": ["grapes"],
+      "dependencies": [
+        "grapes"
+      ],
       "description": "Fermented grapes"
     },
     {
@@ -427,7 +439,9 @@
       "icon": "Be",
       "stackSize": 500,
       "baseValue": 8,
-      "dependencies": ["barley"],
+      "dependencies": [
+        "barley"
+      ],
       "description": "Brewed barley"
     },
     {
@@ -437,7 +451,9 @@
       "icon": "Pa",
       "stackSize": 400,
       "baseValue": 12,
-      "dependencies": ["wheat"],
+      "dependencies": [
+        "wheat"
+      ],
       "perishable": true,
       "description": "Baked sweets"
     },
@@ -457,7 +473,9 @@
       "icon": "RD",
       "stackSize": 500,
       "baseValue": 12,
-      "dependencies": ["berries"],
+      "dependencies": [
+        "berries"
+      ],
       "description": "Red coloring from berries"
     },
     {
@@ -467,7 +485,9 @@
       "icon": "BD",
       "stackSize": 500,
       "baseValue": 15,
-      "dependencies": ["indigo"],
+      "dependencies": [
+        "indigo"
+      ],
       "description": "Blue coloring from indigo"
     },
     {
@@ -477,7 +497,9 @@
       "icon": "YD",
       "stackSize": 500,
       "baseValue": 14,
-      "dependencies": ["flowers"],
+      "dependencies": [
+        "flowers"
+      ],
       "description": "Yellow coloring from flowers"
     },
     {
@@ -487,7 +509,9 @@
       "icon": "BkD",
       "stackSize": 500,
       "baseValue": 10,
-      "dependencies": ["charcoal"],
+      "dependencies": [
+        "charcoal"
+      ],
       "description": "Black coloring from charcoal"
     },
     {
@@ -497,7 +521,9 @@
       "icon": "Pp",
       "stackSize": 1000,
       "baseValue": 8,
-      "dependencies": ["wood"],
+      "dependencies": [
+        "wood"
+      ],
       "description": "Writing material from pulp"
     },
     {
@@ -527,7 +553,9 @@
       "icon": "Th",
       "stackSize": 3000,
       "baseValue": 4,
-      "dependencies": ["cotton"],
+      "dependencies": [
+        "cotton"
+      ],
       "description": "Spun fiber"
     },
     {
@@ -537,7 +565,10 @@
       "icon": "Cl",
       "stackSize": 1000,
       "baseValue": 15,
-      "dependencies": ["cotton", "thread"],
+      "dependencies": [
+        "cotton",
+        "thread"
+      ],
       "description": "Woven fabric"
     },
     {
@@ -547,7 +578,9 @@
       "icon": "Li",
       "stackSize": 500,
       "baseValue": 20,
-      "dependencies": ["flax"],
+      "dependencies": [
+        "flax"
+      ],
       "description": "Fine fabric"
     },
     {
@@ -567,7 +600,10 @@
       "icon": "SC",
       "stackSize": 300,
       "baseValue": 25,
-      "dependencies": ["cloth", "thread"],
+      "dependencies": [
+        "cloth",
+        "thread"
+      ],
       "description": "Basic garments"
     },
     {
@@ -577,7 +613,10 @@
       "icon": "WC",
       "stackSize": 250,
       "baseValue": 35,
-      "dependencies": ["cloth", "thread"],
+      "dependencies": [
+        "cloth",
+        "thread"
+      ],
       "description": "Durable workwear"
     },
     {
@@ -587,7 +626,10 @@
       "icon": "FC",
       "stackSize": 150,
       "baseValue": 80,
-      "dependencies": ["linen", "thread"],
+      "dependencies": [
+        "linen",
+        "thread"
+      ],
       "description": "Quality garments"
     },
     {
@@ -597,7 +639,10 @@
       "icon": "LC",
       "stackSize": 50,
       "baseValue": 200,
-      "dependencies": ["silk", "thread"],
+      "dependencies": [
+        "silk",
+        "thread"
+      ],
       "description": "Silk garments"
     },
     {
@@ -607,7 +652,10 @@
       "icon": "WCo",
       "stackSize": 100,
       "baseValue": 120,
-      "dependencies": ["wool", "thread"],
+      "dependencies": [
+        "wool",
+        "thread"
+      ],
       "description": "Warm outerwear"
     },
     {
@@ -617,7 +665,10 @@
       "icon": "Sh",
       "stackSize": 200,
       "baseValue": 40,
-      "dependencies": ["leather", "thread"],
+      "dependencies": [
+        "leather",
+        "thread"
+      ],
       "description": "Leather footwear"
     },
     {
@@ -627,7 +678,10 @@
       "icon": "Bo",
       "stackSize": 150,
       "baseValue": 60,
-      "dependencies": ["leather", "thread"],
+      "dependencies": [
+        "leather",
+        "thread"
+      ],
       "description": "Work boots"
     },
     {
@@ -637,7 +691,10 @@
       "icon": "Ha",
       "stackSize": 300,
       "baseValue": 15,
-      "dependencies": ["cloth", "thread"],
+      "dependencies": [
+        "cloth",
+        "thread"
+      ],
       "description": "Head covering"
     },
     {
@@ -647,7 +704,10 @@
       "icon": "Ax",
       "stackSize": 200,
       "baseValue": 40,
-      "dependencies": ["ore", "wood"],
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
       "description": "Chopping tool"
     },
     {
@@ -657,7 +717,10 @@
       "icon": "Hm",
       "stackSize": 300,
       "baseValue": 30,
-      "dependencies": ["ore", "wood"],
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
       "description": "Striking tool"
     },
     {
@@ -667,7 +730,10 @@
       "icon": "Sa",
       "stackSize": 200,
       "baseValue": 45,
-      "dependencies": ["ore", "wood"],
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
       "description": "Cutting tool"
     },
     {
@@ -677,7 +743,10 @@
       "icon": "Pk",
       "stackSize": 200,
       "baseValue": 50,
-      "dependencies": ["ore", "wood"],
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
       "description": "Mining tool"
     },
     {
@@ -687,7 +756,10 @@
       "icon": "Sv",
       "stackSize": 250,
       "baseValue": 35,
-      "dependencies": ["ore", "wood"],
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
       "description": "Digging tool"
     },
     {
@@ -697,7 +769,10 @@
       "icon": "Ho",
       "stackSize": 250,
       "baseValue": 30,
-      "dependencies": ["ore", "wood"],
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
       "description": "Farming tool"
     },
     {
@@ -707,7 +782,10 @@
       "icon": "Sc",
       "stackSize": 150,
       "baseValue": 55,
-      "dependencies": ["ore", "wood"],
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
       "description": "Harvesting tool"
     },
     {
@@ -717,7 +795,10 @@
       "icon": "Ch",
       "stackSize": 300,
       "baseValue": 25,
-      "dependencies": ["ore", "wood"],
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
       "description": "Carving tool"
     },
     {
@@ -727,7 +808,9 @@
       "icon": "Ne",
       "stackSize": 500,
       "baseValue": 5,
-      "dependencies": ["ore"],
+      "dependencies": [
+        "ore"
+      ],
       "description": "Sewing tool"
     },
     {
@@ -737,7 +820,10 @@
       "icon": "Ch",
       "stackSize": 50,
       "baseValue": 40,
-      "dependencies": ["wood", "nails"],
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
       "description": "Seating furniture"
     },
     {
@@ -747,7 +833,10 @@
       "icon": "Tb",
       "stackSize": 30,
       "baseValue": 80,
-      "dependencies": ["wood", "nails"],
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
       "description": "Dining furniture"
     },
     {
@@ -757,7 +846,11 @@
       "icon": "Bd",
       "stackSize": 20,
       "baseValue": 150,
-      "dependencies": ["wood", "cloth", "nails"],
+      "dependencies": [
+        "wood",
+        "cloth",
+        "nails"
+      ],
       "description": "Sleeping furniture"
     },
     {
@@ -767,7 +860,10 @@
       "icon": "Cb",
       "stackSize": 30,
       "baseValue": 100,
-      "dependencies": ["wood", "nails"],
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
       "description": "Storage furniture"
     },
     {
@@ -777,7 +873,10 @@
       "icon": "Wd",
       "stackSize": 20,
       "baseValue": 180,
-      "dependencies": ["wood", "nails"],
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
       "description": "Clothing storage"
     },
     {
@@ -787,7 +886,10 @@
       "icon": "Bn",
       "stackSize": 40,
       "baseValue": 50,
-      "dependencies": ["wood", "nails"],
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
       "description": "Long seat"
     },
     {
@@ -797,7 +899,10 @@
       "icon": "Bs",
       "stackSize": 25,
       "baseValue": 120,
-      "dependencies": ["wood", "nails"],
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
       "description": "Book storage"
     },
     {
@@ -807,7 +912,10 @@
       "icon": "Ds",
       "stackSize": 25,
       "baseValue": 90,
-      "dependencies": ["wood", "nails"],
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
       "description": "Work surface"
     },
     {
@@ -907,7 +1015,9 @@
       "icon": "Fe",
       "stackSize": 5000,
       "baseValue": 15,
-      "dependencies": ["ore"],
+      "dependencies": [
+        "ore"
+      ],
       "description": "Refined metal"
     },
     {
@@ -917,7 +1027,10 @@
       "icon": "St",
       "stackSize": 3000,
       "baseValue": 35,
-      "dependencies": ["ore", "coal"],
+      "dependencies": [
+        "ore",
+        "coal"
+      ],
       "description": "Strong alloy"
     },
     {
@@ -927,7 +1040,9 @@
       "icon": "Cu",
       "stackSize": 4000,
       "baseValue": 18,
-      "dependencies": ["copper_ore"],
+      "dependencies": [
+        "copper_ore"
+      ],
       "description": "Refined copper"
     },
     {
@@ -937,7 +1052,9 @@
       "icon": "Br",
       "stackSize": 3000,
       "baseValue": 25,
-      "dependencies": ["copper_ore"],
+      "dependencies": [
+        "copper_ore"
+      ],
       "description": "Copper alloy"
     },
     {
@@ -947,7 +1064,9 @@
       "icon": "Au",
       "stackSize": 500,
       "baseValue": 150,
-      "dependencies": ["gold_ore"],
+      "dependencies": [
+        "gold_ore"
+      ],
       "description": "Precious metal"
     },
     {
@@ -957,7 +1076,9 @@
       "icon": "Ag",
       "stackSize": 1000,
       "baseValue": 80,
-      "dependencies": ["silver_ore"],
+      "dependencies": [
+        "silver_ore"
+      ],
       "description": "Valuable metal"
     },
     {
@@ -967,7 +1088,9 @@
       "icon": "Bk",
       "stackSize": 5000,
       "baseValue": 5,
-      "dependencies": ["clay"],
+      "dependencies": [
+        "clay"
+      ],
       "description": "Fired clay blocks"
     },
     {
@@ -987,7 +1110,9 @@
       "icon": "Pl",
       "stackSize": 1000,
       "baseValue": 15,
-      "dependencies": ["timber"],
+      "dependencies": [
+        "timber"
+      ],
       "description": "Processed wood"
     },
     {
@@ -997,7 +1122,9 @@
       "icon": "Ce",
       "stackSize": 4000,
       "baseValue": 10,
-      "dependencies": ["stone"],
+      "dependencies": [
+        "stone"
+      ],
       "description": "Binding material"
     },
     {
@@ -1007,7 +1134,9 @@
       "icon": "Gl",
       "stackSize": 500,
       "baseValue": 25,
-      "dependencies": ["sand"],
+      "dependencies": [
+        "sand"
+      ],
       "description": "Transparent material"
     },
     {
@@ -1017,7 +1146,9 @@
       "icon": "Na",
       "stackSize": 2000,
       "baseValue": 8,
-      "dependencies": ["ore"],
+      "dependencies": [
+        "ore"
+      ],
       "description": "Fasteners"
     },
     {
@@ -1027,7 +1158,9 @@
       "icon": "Po",
       "stackSize": 300,
       "baseValue": 25,
-      "dependencies": ["clay"],
+      "dependencies": [
+        "clay"
+      ],
       "description": "Ceramic vessels"
     },
     {
@@ -1037,7 +1170,10 @@
       "icon": "Jw",
       "stackSize": 100,
       "baseValue": 200,
-      "dependencies": ["gold_ore", "silver_ore"],
+      "dependencies": [
+        "gold_ore",
+        "silver_ore"
+      ],
       "description": "Decorative items"
     },
     {
@@ -1047,7 +1183,9 @@
       "icon": "Pf",
       "stackSize": 200,
       "baseValue": 80,
-      "dependencies": ["flowers"],
+      "dependencies": [
+        "flowers"
+      ],
       "description": "Fragrant liquid"
     },
     {
@@ -1057,7 +1195,12 @@
       "icon": "Pa",
       "stackSize": 50,
       "baseValue": 300,
-      "dependencies": ["cloth", "red_dye", "blue_dye", "yellow_dye"],
+      "dependencies": [
+        "cloth",
+        "red_dye",
+        "blue_dye",
+        "yellow_dye"
+      ],
       "description": "Art piece"
     },
     {
@@ -1067,7 +1210,10 @@
       "icon": "Sc",
       "stackSize": 30,
       "baseValue": 400,
-      "dependencies": ["marble", "ore"],
+      "dependencies": [
+        "marble",
+        "ore"
+      ],
       "description": "Stone art carved with metal tools"
     },
     {
@@ -1077,7 +1223,10 @@
       "icon": "Bk",
       "stackSize": 200,
       "baseValue": 60,
-      "dependencies": ["paper", "black_dye"],
+      "dependencies": [
+        "paper",
+        "black_dye"
+      ],
       "description": "Written work"
     },
     {
@@ -1087,7 +1236,9 @@
       "icon": "Ca",
       "stackSize": 1000,
       "baseValue": 5,
-      "dependencies": ["honey"],
+      "dependencies": [
+        "honey"
+      ],
       "description": "Light source made from beeswax"
     },
     {
@@ -1097,7 +1248,9 @@
       "icon": "LO",
       "stackSize": 800,
       "baseValue": 8,
-      "dependencies": ["oil"],
+      "dependencies": [
+        "oil"
+      ],
       "description": "Fuel for lamps"
     },
     {
@@ -1107,7 +1260,9 @@
       "icon": "So",
       "stackSize": 500,
       "baseValue": 10,
-      "dependencies": ["oil"],
+      "dependencies": [
+        "oil"
+      ],
       "description": "Cleaning agent from oil and lye"
     },
     {
@@ -1117,7 +1272,9 @@
       "icon": "Md",
       "stackSize": 300,
       "baseValue": 50,
-      "dependencies": ["flowers"],
+      "dependencies": [
+        "flowers"
+      ],
       "description": "Healing herbs and remedies"
     },
     {
@@ -1147,6 +1304,220 @@
       "stackSize": 2000,
       "baseValue": 12,
       "description": "Liquid fuel"
+    },
+    {
+      "id": "rubber",
+      "name": "Rubber",
+      "category": "tree_product",
+      "description": "Product which is derived from Rubber trees, is used as a input for producing many other products like shoes"
+    },
+    {
+      "id": "cake",
+      "name": "Cake",
+      "category": "processed_food",
+      "description": "Cake is a sweet delicacy"
+    },
+    {
+      "id": "wheat_seed",
+      "name": "Wheat Seeds",
+      "category": "seed",
+      "icon": "WS",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing wheat"
+    },
+    {
+      "id": "vegetable_seed",
+      "name": "Vegetable Seeds",
+      "category": "seed",
+      "icon": "VS",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing vegetables"
+    },
+    {
+      "id": "fruit_seed",
+      "name": "Fruit Seeds",
+      "category": "seed",
+      "icon": "FS",
+      "stackSize": 800,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Seeds for growing fruit"
+    },
+    {
+      "id": "cotton_seed",
+      "name": "Cotton Seeds",
+      "category": "seed",
+      "icon": "CS",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing cotton"
+    },
+    {
+      "id": "grain",
+      "name": "Grain",
+      "category": "grain",
+      "icon": "Gr",
+      "stackSize": 5000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "General grain commodity"
+    },
+    {
+      "id": "vegetable",
+      "name": "Vegetable",
+      "category": "vegetable",
+      "icon": "Vg",
+      "stackSize": 2000,
+      "baseValue": 2,
+      "isRaw": true,
+      "perishable": true,
+      "description": "General vegetable commodity"
+    },
+    {
+      "id": "fruit",
+      "name": "Fruit",
+      "category": "fruit",
+      "icon": "Fr",
+      "stackSize": 1000,
+      "baseValue": 3,
+      "isRaw": true,
+      "perishable": true,
+      "description": "General fruit commodity"
+    },
+    {
+      "id": "tree",
+      "name": "Tree",
+      "category": "raw_resource",
+      "icon": "Tr",
+      "stackSize": 100,
+      "baseValue": 10,
+      "isRaw": true,
+      "description": "Whole tree for lumber or crafting"
+    },
+    {
+      "id": "lumber",
+      "name": "Lumber",
+      "category": "construction",
+      "icon": "Lm",
+      "stackSize": 2000,
+      "baseValue": 12,
+      "dependencies": [
+        "tree"
+      ],
+      "description": "Processed wood from trees"
+    },
+    {
+      "id": "soil",
+      "name": "Soil",
+      "category": "raw_mineral",
+      "icon": "So",
+      "stackSize": 10000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "Earth for making bricks"
+    },
+    {
+      "id": "iron_ore",
+      "name": "Iron Ore",
+      "category": "raw_mineral",
+      "icon": "IO",
+      "stackSize": 8000,
+      "baseValue": 5,
+      "isRaw": true,
+      "description": "Raw iron ore for smelting"
+    },
+    {
+      "id": "yarn",
+      "name": "Yarn",
+      "category": "textile",
+      "icon": "Yn",
+      "stackSize": 3000,
+      "baseValue": 5,
+      "dependencies": [
+        "cotton"
+      ],
+      "description": "Spun thread from cotton"
+    },
+    {
+      "id": "clothing",
+      "name": "Clothing",
+      "category": "clothing",
+      "icon": "Cl",
+      "stackSize": 300,
+      "baseValue": 30,
+      "dependencies": [
+        "cotton",
+        "thread"
+      ],
+      "description": "General garments"
+    },
+    {
+      "id": "meal",
+      "name": "Meal",
+      "category": "processed_food",
+      "icon": "Me",
+      "stackSize": 500,
+      "baseValue": 15,
+      "dependencies": [
+        "grain",
+        "vegetable"
+      ],
+      "perishable": true,
+      "description": "Prepared food"
+    },
+    {
+      "id": "whiskey",
+      "name": "Whiskey",
+      "category": "processed_food",
+      "icon": "Wh",
+      "stackSize": 300,
+      "baseValue": 30,
+      "dependencies": [
+        "rye"
+      ],
+      "description": "Distilled spirit from rye"
+    },
+    {
+      "id": "knife",
+      "name": "Knife",
+      "category": "tools",
+      "icon": "Kn",
+      "stackSize": 300,
+      "baseValue": 35,
+      "dependencies": [
+        "iron_ore",
+        "tree"
+      ],
+      "description": "Cutting tool"
+    },
+    {
+      "id": "gold_item",
+      "name": "Gold Item",
+      "category": "luxury",
+      "icon": "GI",
+      "stackSize": 200,
+      "baseValue": 180,
+      "dependencies": [
+        "gold_ore"
+      ],
+      "description": "Crafted gold jewelry or ornament"
+    },
+    {
+      "id": "currency_note",
+      "name": "Currency Note",
+      "category": "misc",
+      "icon": "CN",
+      "stackSize": 10000,
+      "baseValue": 1,
+      "dependencies": [
+        "tree"
+      ],
+      "description": "Paper money printed by central bank"
     }
   ]
 }

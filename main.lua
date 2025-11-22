@@ -1,5 +1,6 @@
--- Hot reloading
+-- Hot reloading (manual mode - press F5 to reload)
 local lurker = require("lurker")
+local manualHotReload = true  -- Set to true for manual reload, false for automatic
 
 require("code/StateMachine")
 require("code/StateStack")
@@ -9,6 +10,12 @@ require("code/TownNameModal")
 require("code/TownViewState")
 require("code/BuildingPlacementState")
 require("code/BuildingMenu")
+
+-- Prototype states
+require("code/PrototypeLauncher")
+require("code/Prototype1State")
+require("code/Prototype2State")
+require("code/InfoSystemState")
 
 -- Camera library
 Camera = require("code/Camera")
@@ -28,11 +35,43 @@ function love.load()
     -- Set white background color
     love.graphics.setBackgroundColor(1, 1, 1)
 
+    -- Toast notification state
+    gToastMessage = nil
+    gToastTimer = 0
+    gToastDuration = 2.0  -- Show toast for 2 seconds
+
     -- Configure hot reloading
     lurker.postswap = function(f)
         print("Hot reloaded: " .. f)
+        -- Show toast notification
+        gToastMessage = "Hot Reloaded: " .. f
+        gToastTimer = gToastDuration
     end
-    lurker.interval = 0.5 -- Check for changes every 0.5 seconds
+    if not manualHotReload then
+        lurker.interval = 0.5 -- Check for changes every 0.5 seconds (automatic mode)
+    end
+
+    -- Mouse state tracking
+    gMousePressed = nil
+    gMouseReleased = nil
+
+    -- Global mode: "launcher", "main", "prototype1", "prototype2"
+    gMode = "launcher"
+    gPrototypeLauncher = PrototypeLauncher:Create()
+
+    -- These will be initialized when a mode is selected
+    gTown = nil
+    gCamera = nil
+    gStateStack = nil
+    gStateMachine = nil
+    gMusic = nil
+    gPrototype1 = nil
+    gPrototype2 = nil
+    gInfoSystem = nil
+end
+
+function InitializeMainGame()
+    print("Initializing Main Game...")
 
     -- Initialize global game state
     gTown = Town:Create({ name = "Cravetown" })
@@ -47,10 +86,6 @@ function love.load()
     gCamera:setBounds(minX, minY, maxX - minX, maxY - minY)
 
     gStateStack = StateStack:Create()
-
-    -- Mouse state tracking
-    gMousePressed = nil
-    gMouseReleased = nil
 
     -- Create state machine with main game states
     gStateMachine = StateMachine:Create({
@@ -92,31 +127,118 @@ function love.load()
     -- Push town name modal
     local nameModal = TownNameModal:Create()
     gStateStack:Push(nameModal)
+
+    gMode = "main"
+end
+
+function InitializePrototype1()
+    print("Initializing Prototype 1...")
+    gPrototype1 = Prototype1State:Create()
+    gPrototype1:Enter()
+    gMode = "prototype1"
+end
+
+function InitializePrototype2()
+    print("Initializing Prototype 2...")
+    gPrototype2 = Prototype2State:Create()
+    gPrototype2:Enter()
+    gMode = "prototype2"
+end
+
+function InitializeInfoSystem()
+    print("Initializing Information System...")
+    gInfoSystem = InfoSystemState:Create()
+    gInfoSystem:Enter()
+    gMode = "infosystem"
+end
+
+function ReturnToLauncher()
+    print("Returning to launcher...")
+    -- Clean up current mode
+    gTown = nil
+    gCamera = nil
+    gStateStack = nil
+    gStateMachine = nil
+    gMusic = nil
+    gPrototype1 = nil
+    gPrototype2 = nil
+    gInfoSystem = nil
+    gMode = "launcher"
 end
 
 function love.update(dt)
-    -- Hot reload files
-    lurker.update()
+    -- Hot reload files (only if automatic mode)
+    if not manualHotReload then
+        lurker.update()
+    end
 
-    -- Update camera
-    gCamera:update(dt)
+    -- Update toast timer
+    if gToastTimer > 0 then
+        gToastTimer = gToastTimer - dt
+        if gToastTimer <= 0 then
+            gToastMessage = nil
+        end
+    end
 
-    gStateMachine:Update(dt)
-    gStateStack:Update(dt)
-
-    -- Handle background music fade in
-    if gMusic and gMusic.source then
-        if not gMusic.fadingIn then
-            gMusic.timer = gMusic.timer + dt
-            if gMusic.timer >= gMusic.delay then
-                gMusic.fadingIn = true
-                gMusic.fadeTimer = 0
-                gMusic.source:play()
+    if gMode == "launcher" then
+        -- Update launcher
+        local launched = gPrototypeLauncher:Update(dt)
+        if launched then
+            local selected = gPrototypeLauncher:GetSelectedPrototype()
+            if selected == "main" then
+                InitializeMainGame()
+            elseif selected == "infosystem" then
+                InitializeInfoSystem()
+            elseif selected == "prototype1" then
+                InitializePrototype1()
+            elseif selected == "prototype2" then
+                InitializePrototype2()
             end
-        else
-            gMusic.fadeTimer = gMusic.fadeTimer + dt
-            local t = math.min(1, gMusic.fadeTimer / gMusic.fadeDuration)
-            gMusic.source:setVolume(t)
+        end
+
+    elseif gMode == "main" then
+        -- Update camera
+        if gCamera then
+            gCamera:update(dt)
+        end
+
+        if gStateMachine then
+            gStateMachine:Update(dt)
+        end
+
+        if gStateStack then
+            gStateStack:Update(dt)
+        end
+
+        -- Handle background music fade in
+        if gMusic and gMusic.source then
+            if not gMusic.fadingIn then
+                gMusic.timer = gMusic.timer + dt
+                if gMusic.timer >= gMusic.delay then
+                    gMusic.fadingIn = true
+                    gMusic.fadeTimer = 0
+                    gMusic.source:play()
+                end
+            else
+                gMusic.fadeTimer = gMusic.fadeTimer + dt
+                local t = math.min(1, gMusic.fadeTimer / gMusic.fadeDuration)
+                gMusic.source:setVolume(t)
+            end
+        end
+
+    elseif gMode == "prototype1" then
+        if gPrototype1 then
+            gPrototype1:Update(dt)
+        end
+
+    elseif gMode == "prototype2" then
+        if gPrototype2 then
+            gPrototype2:Update(dt)
+        end
+
+    elseif gMode == "infosystem" then
+        if gInfoSystem then
+            gInfoSystem:Update(dt)
         end
     end
 
@@ -126,22 +248,89 @@ function love.update(dt)
 end
 
 function love.draw()
-    gStateMachine:Render()
+    if gMode == "launcher" then
+        gPrototypeLauncher:Render()
 
-    -- Draw debug info
-    love.graphics.setColor(0, 0, 0)
-    love.graphics.print("Buildings: " .. gTown:GetBuildingCount(), 10, 10)
-    love.graphics.print("Camera: " .. math.floor(gCamera.x) .. ", " .. math.floor(gCamera.y), 10, 30)
+    elseif gMode == "main" then
+        if gStateMachine then
+            gStateMachine:Render()
+        end
 
-    -- Debug: show building positions
-    local buildings = gTown:GetBuildings()
-    for i, b in ipairs(buildings) do
-        love.graphics.print(string.format("B%d: %.0f, %.0f", i, b.mX, b.mY), 10, 50 + (i-1)*20)
+        -- Draw debug info
+        if gTown then
+            love.graphics.setColor(0, 0, 0)
+            love.graphics.print("Buildings: " .. gTown:GetBuildingCount(), 10, 10)
+            if gCamera then
+                love.graphics.print("Camera: " .. math.floor(gCamera.x) .. ", " .. math.floor(gCamera.y), 10, 30)
+            end
+
+            -- Debug: show building positions
+            local buildings = gTown:GetBuildings()
+            for i, b in ipairs(buildings) do
+                love.graphics.print(string.format("B%d: %.0f, %.0f", i, b.mX, b.mY), 10, 50 + (i-1)*20)
+            end
+
+            love.graphics.setColor(1, 1, 1)
+        end
+
+        if gStateStack then
+            gStateStack:Render()
+        end
+
+    elseif gMode == "prototype1" then
+        if gPrototype1 then
+            gPrototype1:Render()
+        end
+
+    elseif gMode == "prototype2" then
+        if gPrototype2 then
+            gPrototype2:Render()
+        end
+
+    elseif gMode == "infosystem" then
+        if gInfoSystem then
+            gInfoSystem:Render()
+        end
     end
 
-    love.graphics.setColor(1, 1, 1)
+    -- Render toast notification (on top of everything)
+    if gToastMessage then
+        local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
 
-    gStateStack:Render()
+        -- Measure text width
+        love.graphics.setNewFont(16)
+        local textWidth = love.graphics.getFont():getWidth(gToastMessage)
+        local textHeight = love.graphics.getFont():getHeight()
+
+        -- Toast dimensions
+        local padding = 20
+        local toastWidth = textWidth + padding * 2
+        local toastHeight = textHeight + padding
+        local toastX = (screenW - toastWidth) / 2
+        local toastY = screenH - toastHeight - 40
+
+        -- Fade effect based on remaining time
+        local alpha = 1.0
+        if gToastTimer < 0.5 then
+            alpha = gToastTimer / 0.5  -- Fade out in last 0.5 seconds
+        end
+
+        -- Toast background (semi-transparent dark)
+        love.graphics.setColor(0.2, 0.2, 0.2, 0.9 * alpha)
+        love.graphics.rectangle("fill", toastX, toastY, toastWidth, toastHeight, 8, 8)
+
+        -- Toast border
+        love.graphics.setColor(0.4, 0.8, 0.4, alpha)
+        love.graphics.setLineWidth(2)
+        love.graphics.rectangle("line", toastX, toastY, toastWidth, toastHeight, 8, 8)
+
+        -- Toast text
+        love.graphics.setColor(1, 1, 1, alpha)
+        love.graphics.print(gToastMessage, toastX + padding, toastY + padding / 2)
+
+        -- Reset color
+        love.graphics.setColor(1, 1, 1, 1)
+    end
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
@@ -155,39 +344,90 @@ function love.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.wheelmoved(dx, dy)
-    -- Handle mouse wheel for scrolling in UI elements
-    -- Pass to state stack states (like InventoryDrawer)
-    for i = #gStateStack.mStates, 1, -1 do
-        local state = gStateStack.mStates[i]
-        if state.OnMouseWheel then
-            state:OnMouseWheel(dx, dy)
-            break
+    if gMode == "main" then
+        -- Handle mouse wheel for scrolling in UI elements
+        -- Pass to state stack states (like InventoryDrawer)
+        if gStateStack then
+            for i = #gStateStack.mStates, 1, -1 do
+                local state = gStateStack.mStates[i]
+                if state.OnMouseWheel then
+                    state:OnMouseWheel(dx, dy)
+                    break
+                end
+            end
+        end
+    elseif gMode == "prototype2" then
+        if gPrototype2 and gPrototype2.OnMouseWheel then
+            gPrototype2:OnMouseWheel(dx, dy)
+        end
+    elseif gMode == "prototype1" then
+        if gPrototype1 and gPrototype1.OnMouseWheel then
+            gPrototype1:OnMouseWheel(dx, dy)
+        end
+    elseif gMode == "infosystem" then
+        if gInfoSystem and gInfoSystem.OnMouseWheel then
+            gInfoSystem:OnMouseWheel(dx, dy)
         end
     end
 end
 
 function love.resize(w, h)
-    -- Update camera dimensions when window is resized
-    gCamera.w = w
-    gCamera.h = h
+    if gMode == "main" then
+        -- Update camera dimensions when window is resized
+        if gCamera then
+            gCamera.w = w
+            gCamera.h = h
+        end
 
-    -- Recalculate UI layouts for all states in the state stack
-    for _, state in ipairs(gStateStack.mStates) do
-        if state.RecalculateLayout then
-            state:RecalculateLayout()
+        -- Recalculate UI layouts for all states in the state stack
+        if gStateStack then
+            for _, state in ipairs(gStateStack.mStates) do
+                if state.RecalculateLayout then
+                    state:RecalculateLayout()
+                end
+            end
         end
     end
 end
 
 function love.keypressed(key)
-    -- forward to focused modal (for name input)
-    for i = #gStateStack.mStates, 1, -1 do
-        local state = gStateStack.mStates[i]
-        if state.keypressed then
-            state:keypressed(key)
-            break
+    -- F5 to manually trigger hot reload (when in manual mode)
+    if key == "f5" and manualHotReload then
+        print("Manual hot reload triggered...")
+        gToastMessage = "Hot Reload Triggered (F5)"
+        gToastTimer = gToastDuration
+        lurker.update()
+        return
+    end
+
+    -- ESC to return to launcher (from prototypes and main game)
+    if key == "escape" then
+        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" or gMode == "main" then
+            ReturnToLauncher()
+            return
+        elseif gMode == "launcher" then
+            love.event.quit()
+            return
         end
     end
+
+    if gMode == "main" then
+        -- forward to focused modal (for name input)
+        if gStateStack then
+            for i = #gStateStack.mStates, 1, -1 do
+                local state = gStateStack.mStates[i]
+                if state.keypressed then
+                    state:keypressed(key)
+                    break
+                end
+            end
+        end
+    elseif gMode == "infosystem" then
+        if gInfoSystem and gInfoSystem.keypressed then
+            gInfoSystem:keypressed(key)
+        end
+    end
+
     -- Toggle fullscreen with F11 or Alt+Enter
     if key == "f11" or (key == "return" and (love.keyboard.isDown("lalt") or love.keyboard.isDown("ralt"))) then
         local fullscreen = love.window.getFullscreen()
@@ -196,11 +436,19 @@ function love.keypressed(key)
 end
 
 function love.textinput(t)
-    for i = #gStateStack.mStates, 1, -1 do
-        local state = gStateStack.mStates[i]
-        if state.textinput then
-            state:textinput(t)
-            break
+    if gMode == "main" then
+        if gStateStack then
+            for i = #gStateStack.mStates, 1, -1 do
+                local state = gStateStack.mStates[i]
+                if state.textinput then
+                    state:textinput(t)
+                    break
+                end
+            end
+        end
+    elseif gMode == "infosystem" then
+        if gInfoSystem and gInfoSystem.textinput then
+            gInfoSystem:textinput(t)
         end
     end
 end
