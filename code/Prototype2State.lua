@@ -238,6 +238,9 @@ function Prototype2State:Update(dt)
             self:HandleTopBarClick(mx, my)
         end
 
+        -- Check for speed control clicks (bottom left)
+        self:HandleSpeedControlClick(mx, my)
+
         -- Check if clicking on right panel (building picker)
         local screenW = love.graphics.getWidth()
         local rightPanelX = screenW - self.mRightPanelWidth
@@ -349,28 +352,38 @@ function Prototype2State:UpdateProduction(gameDt)
 end
 
 function Prototype2State:PullInputsForBuilding(building)
-    -- Pull required inputs from inventory to building's local storage
+    -- Pull inputs from inventory to building's local storage
+    -- Strategy: Fill storage to maximum capacity (not just for one cycle)
     local recipe = building.production.recipe
     if not recipe then return end
 
+    -- Calculate available storage capacity
+    local storageAvailable = building.storage.inputCapacity - building.storage.inputUsed
+
+    if storageAvailable <= 0 then
+        return  -- Storage is full
+    end
+
+    -- Try to pull as much as possible for each input commodity
     for commodityId, requiredAmount in pairs(recipe.inputs) do
         local availableInInventory = self.mCommodityCounts[commodityId] or 0
         local availableInStorage = building.storage.inputs[commodityId] or 0
-        local needed = requiredAmount - availableInStorage
 
-        if needed > 0 then
-            -- Pull from inventory
-            local toPull = math.min(needed, availableInInventory)
+        if availableInInventory > 0 then
+            -- Calculate how much we can pull
+            -- Limited by: inventory amount, storage capacity, and maintaining proportions
+            local maxPull = math.min(availableInInventory, storageAvailable)
 
-            -- Check if we have capacity in input storage
-            local storageNeeded = toPull
-            local storageAvailable = building.storage.inputCapacity - building.storage.inputUsed
-
-            if storageNeeded <= storageAvailable then
+            if maxPull > 0 then
                 -- Transfer from inventory to building storage
-                self.mCommodityCounts[commodityId] = self.mCommodityCounts[commodityId] - toPull
-                building.storage.inputs[commodityId] = availableInStorage + toPull
-                building.storage.inputUsed = building.storage.inputUsed + toPull
+                self.mCommodityCounts[commodityId] = self.mCommodityCounts[commodityId] - maxPull
+                building.storage.inputs[commodityId] = availableInStorage + maxPull
+                building.storage.inputUsed = building.storage.inputUsed + maxPull
+                storageAvailable = storageAvailable - maxPull
+
+                if storageAvailable <= 0 then
+                    break  -- Storage is now full
+                end
             end
         end
     end
@@ -417,6 +430,47 @@ function Prototype2State:CompleteProduction(building)
     end
 
     print("Production completed at " .. building.name .. " (" .. recipe.recipeName .. ")")
+
+    -- After production completes, try to refill input storage from inventory
+    self:PullInputsForBuilding(building)
+end
+
+function Prototype2State:HandleSpeedControlClick(mx, my)
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+
+    -- Speed control position (matching RenderSpeedControl)
+    local controlX = 20
+    local controlY = screenH - 60
+    local btnY = controlY + 22
+    local btnSize = 25
+
+    -- Check decrease button (-)
+    local minusX = controlX + 10
+    if mx >= minusX and mx <= minusX + btnSize and
+       my >= btnY and my <= btnY + btnSize then
+        -- Cycle to slower speed
+        if self.mTimeScale == "fast" then
+            self.mTimeScale = "normal"
+        elseif self.mTimeScale == "normal" then
+            self.mTimeScale = "slow"
+        end
+        -- Already at slowest, do nothing
+        return
+    end
+
+    -- Check increase button (+)
+    local plusX = controlX + 165
+    if mx >= plusX and mx <= plusX + btnSize and
+       my >= btnY and my <= btnY + btnSize then
+        -- Cycle to faster speed
+        if self.mTimeScale == "slow" then
+            self.mTimeScale = "normal"
+        elseif self.mTimeScale == "normal" then
+            self.mTimeScale = "fast"
+        end
+        -- Already at fastest, do nothing
+        return
+    end
 end
 
 function Prototype2State:HandleRightPanelClick(mx, my)
@@ -1068,6 +1122,9 @@ function Prototype2State:Render()
     -- Render top bar
     self:RenderTopBar()
 
+    -- Render game speed control
+    self:RenderSpeedControl()
+
     -- Render building detail modal
     if self.mShowBuildingModal then
         self:RenderBuildingModal()
@@ -1659,6 +1716,55 @@ function Prototype2State:RenderTopBar()
     love.graphics.setColor(1, 1, 1)
     love.graphics.setNewFont(14)
     love.graphics.print("Commodity Resources", commButtonX + 5, 22)
+end
+
+function Prototype2State:RenderSpeedControl()
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+
+    -- Position at bottom left
+    local controlX = 20
+    local controlY = screenH - 60
+    local controlWidth = 200
+    local controlHeight = 40
+
+    -- Background
+    love.graphics.setColor(0.2, 0.2, 0.23)
+    love.graphics.rectangle("fill", controlX, controlY, controlWidth, controlHeight, 5, 5)
+
+    -- Speed label
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setNewFont(12)
+    love.graphics.print("Game Speed:", controlX + 10, controlY + 5)
+
+    -- Current speed value
+    local speedValue = self.mTimeScales[self.mTimeScale]
+    love.graphics.setColor(0.7, 0.9, 0.7)
+    love.graphics.setNewFont(14)
+    love.graphics.print(speedValue .. "x", controlX + 85, controlY + 3)
+
+    -- Decrease button (-)
+    local btnY = controlY + 22
+    local btnSize = 25
+    local minusX = controlX + 10
+    love.graphics.setColor(0.5, 0.3, 0.3)
+    love.graphics.rectangle("fill", minusX, btnY, btnSize, btnSize, 3, 3)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setNewFont(18)
+    love.graphics.print("-", minusX + 8, btnY + 1)
+
+    -- Speed indicator
+    love.graphics.setNewFont(12)
+    local speedText = self.mTimeScale
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print(speedText, controlX + 50, btnY + 4)
+
+    -- Increase button (+)
+    local plusX = controlX + 165
+    love.graphics.setColor(0.3, 0.5, 0.3)
+    love.graphics.rectangle("fill", plusX, btnY, btnSize, btnSize, 3, 3)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setNewFont(18)
+    love.graphics.print("+", plusX + 6, btnY + 1)
 end
 
 function Prototype2State:RenderHRPanel()
