@@ -88,3 +88,134 @@ export interface WorkCategory {
 export interface WorkCategoriesData {
   workCategories: WorkCategory[];
 }
+
+// Craving System Types
+
+export interface CoarseDimension {
+  id: string;
+  index: number;
+  name: string;
+  description: string;
+  tier: string;
+  criticalThreshold: number;
+  emigrationWeight: number;
+  productivityImpact: number;
+  decayRate?: number;
+}
+
+export interface FineDimension {
+  id: string;
+  index: number;
+  parentCoarse: string;
+  name: string;
+  tags: string[];
+  aggregationWeight: number;
+  decayRate?: number;
+}
+
+export interface DimensionDefinitions {
+  version: string;
+  dimensionCount: {
+    coarse: number;
+    fine: number;
+  };
+  coarseDimensions: CoarseDimension[];
+  fineDimensions: FineDimension[];
+  metadata: {
+    lastUpdated: string;
+    changeLog: Array<{
+      version: string;
+      date: string;
+      changes: string;
+    }>;
+    futureExpansion: {
+      reservedIndices: {
+        coarse: number[];
+        fine: number[];
+      };
+      notes: string;
+    };
+  };
+}
+
+export interface CharacterClass {
+  id: string;
+  name: string;
+  description: string;
+  allocationPriority: number;
+  baseIncome: number;
+  baseCravingVector: {
+    coarse: number[];
+    fine: number[];
+  };
+  thresholds: {
+    emigration: number;
+    riotContribution: number;
+    criticalSatisfaction: number;
+  };
+  acceptedQualityTiers: string[];
+  rejectedQualityTiers: string[];
+}
+
+export interface CharacterClassesData {
+  version: string;
+  classes: CharacterClass[];
+}
+
+export interface CharacterTrait {
+  id: string;
+  name: string;
+  description: string;
+  rarity: string;
+  cravingMultipliers: {
+    coarse: number[];
+    fine: number[];
+  };
+  specialEffects?: Record<string, any>;
+}
+
+export interface CharacterTraitsData {
+  version: string;
+  traits: CharacterTrait[];
+}
+
+export interface EnablementRule {
+  id: string;
+  name: string;
+  description: string;
+  trigger: {
+    type: string;
+    [key: string]: any;
+  };
+  effect: {
+    cravingModifier: {
+      coarse: number[];
+      fine: number[];
+    };
+    permanent?: boolean;
+  };
+}
+
+export interface EnablementRulesData {
+  version: string;
+  rules: EnablementRule[];
+}
+
+export interface CommodityFulfillment {
+  id: string;
+  fulfillmentVector: {
+    coarse: number[];
+    fine: Record<string, number>;
+  };
+  tags: string[];
+  durability: string;
+  qualityMultipliers: Record<string, number>;
+  reusableValue?: number;
+  notes?: string;
+}
+
+export interface FulfillmentVectorsData {
+  version: string;
+  note?: string;
+  commodities: Record<string, CommodityFulfillment>;
+}

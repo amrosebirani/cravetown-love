@@ -1,5 +1,16 @@
 import { invoke } from '@tauri-apps/api/core';
-import type { BuildingRecipesData, CommoditiesData, WorkerTypesData, BuildingTypesData, WorkCategoriesData } from './types';
+import type {
+  BuildingRecipesData,
+  CommoditiesData,
+  WorkerTypesData,
+  BuildingTypesData,
+  WorkCategoriesData,
+  DimensionDefinitions,
+  CharacterClassesData,
+  CharacterTraitsData,
+  FulfillmentVectorsData,
+  EnablementRulesData
+} from './types';
 
 /**
  * Get the path to the data directory
@@ -118,6 +129,106 @@ export async function loadWorkCategories(): Promise<WorkCategoriesData> {
 export async function saveWorkCategories(data: WorkCategoriesData): Promise<void> {
   const dataDir = await getDataDir();
   const filePath = `${dataDir}/work_categories.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load dimension definitions from JSON file
+ */
+export async function loadDimensionDefinitions(): Promise<DimensionDefinitions> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/craving_system/dimension_definitions.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save dimension definitions to JSON file
+ */
+export async function saveDimensionDefinitions(data: DimensionDefinitions): Promise<void> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/craving_system/dimension_definitions.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load character classes from JSON file
+ */
+export async function loadCharacterClasses(): Promise<CharacterClassesData> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/craving_system/character_classes.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save character classes to JSON file
+ */
+export async function saveCharacterClasses(data: CharacterClassesData): Promise<void> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/craving_system/character_classes.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load character traits from JSON file
+ */
+export async function loadCharacterTraits(): Promise<CharacterTraitsData> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/craving_system/character_traits.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save character traits to JSON file
+ */
+export async function saveCharacterTraits(data: CharacterTraitsData): Promise<void> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/craving_system/character_traits.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load fulfillment vectors from JSON file
+ */
+export async function loadFulfillmentVectors(): Promise<FulfillmentVectorsData> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/craving_system/fulfillment_vectors.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save fulfillment vectors to JSON file
+ */
+export async function saveFulfillmentVectors(data: FulfillmentVectorsData): Promise<void> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/craving_system/fulfillment_vectors.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load enablement rules from JSON file
+ */
+export async function loadEnablementRules(): Promise<EnablementRulesData> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/craving_system/enablement_rules.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save enablement rules to JSON file
+ */
+export async function saveEnablementRules(data: EnablementRulesData): Promise<void> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/craving_system/enablement_rules.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }

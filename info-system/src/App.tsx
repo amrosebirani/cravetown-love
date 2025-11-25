@@ -1,16 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Layout, Menu, Spin } from 'antd';
-import { DatabaseOutlined, AppstoreOutlined, TeamOutlined, HomeOutlined, TagsOutlined } from '@ant-design/icons';
+import { DatabaseOutlined, AppstoreOutlined, TeamOutlined, HomeOutlined, TagsOutlined,
+         BulbOutlined, UserOutlined, SmileOutlined, GiftOutlined, ThunderboltOutlined, SwapOutlined } from '@ant-design/icons';
 import RecipeManager from './components/RecipeManager';
 import CommodityManager from './components/CommodityManager';
 import WorkerTypeManager from './components/WorkerTypeManager';
 import BuildingTypeManager from './components/BuildingTypeManager';
 import WorkCategoryManager from './components/WorkCategoryManager';
+import DimensionManager from './components/DimensionManager';
+import CharacterClassManager from './components/CharacterClassManager';
+import TraitManager from './components/TraitManager';
+import FulfillmentVectorManager from './components/FulfillmentVectorManager';
+import EnablementRulesManager from './components/EnablementRulesManager';
+import SubstitutionCalculator from './components/SubstitutionCalculator';
 import './App.css';
 
 const { Header, Content, Sider } = Layout;
 
-type TabKey = 'recipes' | 'commodities' | 'workers' | 'buildings' | 'work-categories';
+type TabKey = 'recipes' | 'commodities' | 'workers' | 'buildings' | 'work-categories' |
+              'dimensions' | 'character-classes' | 'traits' | 'fulfillment-vectors' | 'enablement-rules' | 'substitution-calculator';
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<TabKey>('recipes');
@@ -50,29 +58,71 @@ function App() {
             style={{ height: '100%', borderRight: 0 }}
             items={[
               {
-                key: 'buildings',
-                icon: <HomeOutlined />,
-                label: 'Building Types',
+                type: 'group',
+                label: 'Production System',
+                children: [
+                  {
+                    key: 'buildings',
+                    icon: <HomeOutlined />,
+                    label: 'Building Types',
+                  },
+                  {
+                    key: 'recipes',
+                    icon: <DatabaseOutlined />,
+                    label: 'Building Recipes',
+                  },
+                  {
+                    key: 'commodities',
+                    icon: <AppstoreOutlined />,
+                    label: 'Commodities',
+                  },
+                  {
+                    key: 'workers',
+                    icon: <TeamOutlined />,
+                    label: 'Worker Types',
+                  },
+                  {
+                    key: 'work-categories',
+                    icon: <TagsOutlined />,
+                    label: 'Work Categories',
+                  },
+                ]
               },
               {
-                key: 'recipes',
-                icon: <DatabaseOutlined />,
-                label: 'Building Recipes',
-              },
-              {
-                key: 'commodities',
-                icon: <AppstoreOutlined />,
-                label: 'Commodities',
-              },
-              {
-                key: 'workers',
-                icon: <TeamOutlined />,
-                label: 'Worker Types',
-              },
-              {
-                key: 'work-categories',
-                icon: <TagsOutlined />,
-                label: 'Work Categories',
+                type: 'group',
+                label: 'Craving System',
+                children: [
+                  {
+                    key: 'dimensions',
+                    icon: <BulbOutlined />,
+                    label: 'Craving Dimensions',
+                  },
+                  {
+                    key: 'character-classes',
+                    icon: <UserOutlined />,
+                    label: 'Character Classes',
+                  },
+                  {
+                    key: 'traits',
+                    icon: <SmileOutlined />,
+                    label: 'Character Traits',
+                  },
+                  {
+                    key: 'fulfillment-vectors',
+                    icon: <GiftOutlined />,
+                    label: 'Fulfillment Vectors',
+                  },
+                  {
+                    key: 'enablement-rules',
+                    icon: <ThunderboltOutlined />,
+                    label: 'Enablement Rules',
+                  },
+                  {
+                    key: 'substitution-calculator',
+                    icon: <SwapOutlined />,
+                    label: 'Substitution Calculator',
+                  },
+                ]
               },
             ]}
           />
@@ -104,6 +154,12 @@ function App() {
                 {selectedTab === 'commodities' && <CommodityManager />}
                 {selectedTab === 'workers' && <WorkerTypeManager />}
                 {selectedTab === 'work-categories' && <WorkCategoryManager />}
+                {selectedTab === 'dimensions' && <DimensionManager />}
+                {selectedTab === 'character-classes' && <CharacterClassManager />}
+                {selectedTab === 'traits' && <TraitManager />}
+                {selectedTab === 'fulfillment-vectors' && <FulfillmentVectorManager />}
+                {selectedTab === 'enablement-rules' && <EnablementRulesManager />}
+                {selectedTab === 'substitution-calculator' && <SubstitutionCalculator />}
               </>
             )}
           </Content>
