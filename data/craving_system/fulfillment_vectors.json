@@ -1,92 +1,155 @@
 {
   "version": "1.0.0",
   "note": "Sample fulfillment vectors for key commodities. Expand with all 133 commodities.",
-
   "commodities": {
     "wheat": {
       "id": "wheat",
       "fulfillmentVector": {
-        "coarse": [8, 0, 0, 0, 0, 0, 0, 0, 0],
+        "coarse": [
+          8,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "fine": {
           "biological_nutrition_grain": 12,
           "biological_nutrition_protein": 1,
           "biological_energy_stimulation": 0.5
         }
       },
-      "tags": ["grain", "nutrition", "basic_food", "raw_material"],
+      "tags": [
+        "grain",
+        "nutrition",
+        "basic_food",
+        "raw_material"
+      ],
       "durability": "consumable",
       "qualityMultipliers": {
         "poor": 0.6,
-        "basic": 1.0,
+        "basic": 1,
         "good": 1.3,
         "luxury": 1.5
       }
     },
-
     "bread": {
       "id": "bread",
       "fulfillmentVector": {
-        "coarse": [12, 0, 2, 0, 0, 0, 0, 0, 0],
+        "coarse": [
+          12,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "fine": {
           "biological_nutrition_grain": 15,
           "biological_nutrition_protein": 2,
           "touch_sensory_luxury": 3
         }
       },
-      "tags": ["grain", "nutrition", "processed_food", "comfort"],
+      "tags": [
+        "grain",
+        "nutrition",
+        "processed_food",
+        "comfort"
+      ],
       "durability": "consumable",
       "qualityMultipliers": {
         "poor": 0.6,
-        "basic": 1.0,
+        "basic": 1,
         "good": 1.4,
-        "luxury": 2.0
+        "luxury": 2
       }
     },
-
     "meat": {
       "id": "meat",
       "fulfillmentVector": {
-        "coarse": [15, 0, 1, 0, 0, 0, 0, 0, 0],
+        "coarse": [
+          15,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "fine": {
           "biological_nutrition_protein": 20,
           "biological_nutrition_grain": 2,
           "touch_sensory_luxury": 2
         }
       },
-      "tags": ["protein", "nutrition", "luxury_food"],
+      "tags": [
+        "protein",
+        "nutrition",
+        "luxury_food"
+      ],
       "durability": "consumable",
       "qualityMultipliers": {
         "poor": 0.5,
-        "basic": 1.0,
+        "basic": 1,
         "good": 1.5,
         "luxury": 2.2
       }
     },
-
     "vegetable": {
       "id": "vegetable",
       "fulfillmentVector": {
-        "coarse": [10, 0, 0, 0, 0, 0, 0, 0, 0],
+        "coarse": [
+          10,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "fine": {
           "biological_nutrition_produce": 15,
           "biological_health_hygiene": 2,
           "biological_hydration": 3
         }
       },
-      "tags": ["produce", "nutrition", "vegetables"],
+      "tags": [
+        "produce",
+        "nutrition",
+        "vegetables"
+      ],
       "durability": "consumable",
       "qualityMultipliers": {
         "poor": 0.7,
-        "basic": 1.0,
+        "basic": 1,
         "good": 1.3,
         "luxury": 1.6
       }
     },
-
     "beer": {
       "id": "beer",
       "fulfillmentVector": {
-        "coarse": [3, 0, 2, 5, 0, 8, 0, 0, 15],
+        "coarse": [
+          3,
+          0,
+          2,
+          5,
+          0,
+          8,
+          0,
+          0,
+          15
+        ],
         "fine": {
           "biological_nutrition_grain": 4,
           "biological_hydration": 5,
@@ -96,20 +159,34 @@
           "vice_alcohol_beer": 20
         }
       },
-      "tags": ["alcohol", "social", "indulgence", "beverages"],
+      "tags": [
+        "alcohol",
+        "social",
+        "indulgence",
+        "beverages"
+      ],
       "durability": "consumable",
       "qualityMultipliers": {
         "poor": 0.6,
-        "basic": 1.0,
+        "basic": 1,
         "good": 1.3,
         "luxury": 1.7
       }
     },
-
     "wine": {
       "id": "wine",
       "fulfillmentVector": {
-        "coarse": [2, 0, 3, 3, 5, 5, 10, 0, 18],
+        "coarse": [
+          2,
+          0,
+          3,
+          3,
+          5,
+          5,
+          10,
+          0,
+          18
+        ],
         "fine": {
           "biological_hydration": 3,
           "touch_sensory_luxury": 5,
@@ -120,7 +197,12 @@
           "vice_alcohol_spirits": 25
         }
       },
-      "tags": ["alcohol", "luxury", "exotic", "status_display"],
+      "tags": [
+        "alcohol",
+        "luxury",
+        "exotic",
+        "status_display"
+      ],
       "durability": "consumable",
       "qualityMultipliers": {
         "good": 0.8,
@@ -128,30 +210,52 @@
         "masterwork": 1.8
       }
     },
-
     "simple_clothes": {
       "id": "simple_clothes",
       "fulfillmentVector": {
-        "coarse": [0, 2, 8, 0, 0, 0, 0, 0, 0],
+        "coarse": [
+          0,
+          2,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "fine": {
           "safety_shelter_warmth": 5,
           "touch_clothing_everyday": 15,
           "touch_textiles_bedding": 2
         }
       },
-      "tags": ["clothing", "everyday", "basic"],
+      "tags": [
+        "clothing",
+        "everyday",
+        "basic"
+      ],
       "durability": "durable",
       "qualityMultipliers": {
         "poor": 0.5,
-        "basic": 1.0,
+        "basic": 1,
         "good": 1.3
       }
     },
-
     "luxury_clothes": {
       "id": "luxury_clothes",
       "fulfillmentVector": {
-        "coarse": [0, 0, 12, 1, 8, 2, 3, 0, 0],
+        "coarse": [
+          0,
+          0,
+          12,
+          1,
+          8,
+          2,
+          3,
+          0,
+          0
+        ],
         "fine": {
           "touch_clothing_formal": 20,
           "touch_clothing_everyday": 5,
@@ -163,19 +267,33 @@
           "exotic_items_textiles": 5
         }
       },
-      "tags": ["clothing", "luxury", "status_display", "fashion"],
+      "tags": [
+        "clothing",
+        "luxury",
+        "status_display",
+        "fashion"
+      ],
       "durability": "durable",
       "qualityMultipliers": {
         "good": 0.8,
-        "luxury": 1.0,
+        "luxury": 1,
         "masterwork": 1.5
       }
     },
-
     "bed": {
       "id": "bed",
       "fulfillmentVector": {
-        "coarse": [0, 5, 20, 2, 0, 0, 0, 0, 0],
+        "coarse": [
+          0,
+          5,
+          20,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "fine": {
           "safety_shelter_housing": 8,
           "touch_furniture_functional": 30,
@@ -184,20 +302,34 @@
           "psychological_purpose_work": 3
         }
       },
-      "tags": ["furniture", "functional", "comfort", "rest"],
+      "tags": [
+        "furniture",
+        "functional",
+        "comfort",
+        "rest"
+      ],
       "durability": "permanent",
       "qualityMultipliers": {
         "poor": 0.5,
-        "basic": 1.0,
+        "basic": 1,
         "good": 1.4,
-        "luxury": 2.0
+        "luxury": 2
       }
     },
-
     "book": {
       "id": "book",
       "fulfillmentVector": {
-        "coarse": [0, 0, 0, 25, 1, 3, 2, 0, 0],
+        "coarse": [
+          0,
+          0,
+          0,
+          25,
+          1,
+          3,
+          2,
+          0,
+          0
+        ],
         "fine": {
           "psychological_education_books": 35,
           "psychological_entertainment_arts": 10,
@@ -207,21 +339,35 @@
           "exotic_items_novelty": 3
         }
       },
-      "tags": ["education", "books", "culture", "knowledge"],
+      "tags": [
+        "education",
+        "books",
+        "culture",
+        "knowledge"
+      ],
       "durability": "durable",
       "reusableValue": 0.1,
       "qualityMultipliers": {
         "basic": 0.8,
-        "good": 1.0,
+        "good": 1,
         "luxury": 1.5,
-        "masterwork": 2.0
+        "masterwork": 2
       }
     },
-
     "gold_item": {
       "id": "gold_item",
       "fulfillmentVector": {
-        "coarse": [0, 0, 5, 0, 20, 5, 15, 40, 0],
+        "coarse": [
+          0,
+          0,
+          5,
+          0,
+          20,
+          5,
+          15,
+          40,
+          0
+        ],
         "fine": {
           "touch_sensory_luxury": 8,
           "status_reputation_display": 35,
@@ -232,55 +378,96 @@
           "shiny_precious_gold": 50
         }
       },
-      "tags": ["jewelry", "precious_metals", "status_display", "gold"],
+      "tags": [
+        "jewelry",
+        "precious_metals",
+        "status_display",
+        "gold"
+      ],
       "durability": "permanent",
       "qualityMultipliers": {
         "luxury": 0.9,
         "masterwork": 1.2
       }
     },
-
     "medicine": {
       "id": "medicine",
       "fulfillmentVector": {
-        "coarse": [30, 0, 0, 0, 0, 0, 0, 0, 0],
+        "coarse": [
+          30,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "fine": {
           "biological_health_medicine": 50
         }
       },
-      "tags": ["health", "medicine", "healing", "critical"],
+      "tags": [
+        "health",
+        "medicine",
+        "healing",
+        "critical"
+      ],
       "durability": "consumable",
       "qualityMultipliers": {
         "basic": 0.7,
-        "good": 1.0,
+        "good": 1,
         "luxury": 1.3
       },
       "notes": "Critical commodity - high fulfillment when needed"
     },
-
     "soap": {
       "id": "soap",
       "fulfillmentVector": {
-        "coarse": [8, 0, 5, 0, 0, 0, 0, 0, 0],
+        "coarse": [
+          8,
+          0,
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "fine": {
           "biological_health_hygiene": 20,
           "touch_sensory_luxury": 8
         }
       },
-      "tags": ["hygiene", "cleanliness", "health"],
+      "tags": [
+        "hygiene",
+        "cleanliness",
+        "health"
+      ],
       "durability": "consumable",
       "qualityMultipliers": {
         "poor": 0.6,
-        "basic": 1.0,
+        "basic": 1,
         "good": 1.3,
         "luxury": 1.7
       }
     },
-
     "painting": {
       "id": "painting",
       "fulfillmentVector": {
-        "coarse": [0, 0, 3, 20, 8, 3, 5, 15, 0],
+        "coarse": [
+          0,
+          0,
+          3,
+          20,
+          8,
+          3,
+          5,
+          15,
+          0
+        ],
         "fine": {
           "touch_sensory_luxury": 5,
           "psychological_education_books": 10,
@@ -291,19 +478,33 @@
           "shiny_decorative_art": 25
         }
       },
-      "tags": ["art", "culture", "decorative", "status_display"],
+      "tags": [
+        "art",
+        "culture",
+        "decorative",
+        "status_display"
+      ],
       "durability": "permanent",
       "qualityMultipliers": {
         "good": 0.7,
-        "luxury": 1.0,
-        "masterwork": 2.0
+        "luxury": 1,
+        "masterwork": 2
       }
     },
-
     "cake": {
       "id": "cake",
       "fulfillmentVector": {
-        "coarse": [8, 0, 5, 3, 2, 3, 3, 0, 15],
+        "coarse": [
+          8,
+          0,
+          5,
+          3,
+          2,
+          3,
+          3,
+          0,
+          15
+        ],
         "fine": {
           "biological_nutrition_grain": 10,
           "biological_nutrition_produce": 3,
@@ -315,14 +516,199 @@
           "vice_indulgence_sweets": 25
         }
       },
-      "tags": ["indulgence", "sweets", "desserts", "luxury_food"],
+      "tags": [
+        "indulgence",
+        "sweets",
+        "desserts",
+        "luxury_food"
+      ],
       "durability": "consumable",
       "qualityMultipliers": {
         "basic": 0.8,
-        "good": 1.0,
+        "good": 1,
         "luxury": 1.5,
-        "masterwork": 2.0
+        "masterwork": 2
       }
+    },
+    "maize": {
+      "id": "maize",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_grain": 12,
+          "biological_nutrition_protein": 1,
+          "biological_energy_stimulation": 0.5
+        }
+      },
+      "tags": [
+        "grain",
+        "nutrition",
+        "basic_food",
+        "raw_material"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.3,
+        "luxury": 1.6,
+        "masterwork": 2
+      },
+      "notes": "Basic grain - staple food"
+    },
+    "rice": {
+      "id": "rice",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_grain": 12,
+          "biological_nutrition_protein": 1,
+          "biological_energy_stimulation": 0.5
+        }
+      },
+      "tags": [
+        "grain",
+        "nutrition",
+        "basic_food",
+        "raw_material"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.3,
+        "luxury": 1.6,
+        "masterwork": 2
+      },
+      "notes": "Basic grain - staple food"
+    },
+    "barley": {
+      "id": "barley",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_grain": 12,
+          "biological_nutrition_protein": 1,
+          "biological_energy_stimulation": 0.5
+        }
+      },
+      "tags": [
+        "grain",
+        "nutrition",
+        "basic_food",
+        "raw_material"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.3,
+        "luxury": 1.6,
+        "masterwork": 2
+      },
+      "notes": "Basic grain - staple food"
+    },
+    "oats": {
+      "id": "oats",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_grain": 12,
+          "biological_nutrition_protein": 1,
+          "biological_energy_stimulation": 0.5
+        }
+      },
+      "tags": [
+        "grain",
+        "nutrition",
+        "basic_food",
+        "raw_material"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.3,
+        "luxury": 1.6,
+        "masterwork": 2
+      },
+      "notes": "Basic grain - staple food"
+    },
+    "rye": {
+      "id": "rye",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_grain": 12,
+          "biological_nutrition_protein": 1,
+          "biological_energy_stimulation": 0.5
+        }
+      },
+      "tags": [
+        "grain",
+        "nutrition",
+        "basic_food",
+        "raw_material"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.3,
+        "luxury": 1.6,
+        "masterwork": 2
+      },
+      "notes": "Basic grain - staple food"
     }
   }
 }
