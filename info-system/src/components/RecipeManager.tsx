@@ -179,12 +179,18 @@ const RecipeManager = () => {
       title: 'Workers',
       key: 'workers',
       width: 150,
-      render: (_: unknown, record: BuildingRecipe) => (
-        <div>
-          <div>Required: {record.workers.required}</div>
-          <div>Max: {record.workers.max}</div>
-        </div>
-      ),
+      render: (_: unknown, record: BuildingRecipe) => {
+        // Workers are now defined at building type level (via stations)
+        if (record.workers) {
+          return (
+            <div>
+              <div>Required: {record.workers.required}</div>
+              <div>Max: {record.workers.max}</div>
+            </div>
+          );
+        }
+        return <span style={{ color: '#999', fontSize: '12px' }}>Defined by building stations</span>;
+      },
     },
     {
       title: 'Actions',

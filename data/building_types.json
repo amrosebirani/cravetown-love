@@ -10,13 +10,6 @@
         0.6,
         0.2
       ],
-      "baseWidth": 120,
-      "baseHeight": 120,
-      "variableSize": true,
-      "minWidth": 80,
-      "minHeight": 80,
-      "maxWidth": 300,
-      "maxHeight": 300,
       "description": "Grows crops and raises livestock",
       "workCategories": [
         "Agriculture",
@@ -28,24 +21,59 @@
         "Animal Husbandry": 1.0,
         "General Labor": 0.3
       },
-      "properties": {
-        "maxFarmers": 8,
-        "currentFarmers": 0,
-        "baseFarmYield": 10,
-        "farmArea": 0,
-        "localStorageCapacity": 1000,
-        "currentStorage": 0,
-        "cropType": "wheat"
-      },
-      "constructionMaterials": {
-        "wood": 50,
-        "hoe": 8,
-        "scythe": 5
-      },
-      "storage": {
-        "inputCapacity": 500,
-        "outputCapacity": 1000
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Small Farm",
+          "description": "A small farm with basic facilities for 2 workers",
+          "stations": 2,
+          "width": 80,
+          "height": 80,
+          "constructionMaterials": {
+            "wood": 30,
+            "hoe": 2
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 500
+          }
+        },
+        {
+          "level": 1,
+          "name": "Medium Farm",
+          "description": "An expanded farm with 4 work stations",
+          "stations": 4,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "wood": 30,
+            "stone": 15,
+            "hoe": 2
+          },
+          "storage": {
+            "inputCapacity": 500,
+            "outputCapacity": 1000
+          }
+        },
+        {
+          "level": 2,
+          "name": "Large Farm",
+          "description": "A large farm with 8 work stations and advanced equipment",
+          "stations": 8,
+          "width": 180,
+          "height": 180,
+          "upgradeMaterials": {
+            "wood": 50,
+            "stone": 30,
+            "hoe": 4,
+            "scythe": 4
+          },
+          "storage": {
+            "inputCapacity": 800,
+            "outputCapacity": 2000
+          }
+        }
+      ]
     },
     {
       "id": "sawmill",
@@ -57,8 +85,6 @@
         0.4,
         0.2
       ],
-      "baseWidth": 90,
-      "baseHeight": 90,
       "description": "Processes trees into lumber",
       "workCategories": [
         "Lumber Processing",
@@ -70,18 +96,56 @@
         "Forestry": 0.8,
         "General Labor": 0.5
       },
-      "properties": {
-        "maxWorkers": 5,
-        "localStorageCapacity": 500
-      },
-      "constructionMaterials": {
-        "wood": 40,
-        "stone": 30
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Saw Mill",
+          "description": "A basic saw mill with 2 work stations",
+          "stations": 2,
+          "width": 62,
+          "height": 62,
+          "constructionMaterials": {
+            "wood": 40,
+            "stone": 30
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Saw Mill",
+          "description": "An improved saw mill with 4 work stations",
+          "stations": 4,
+          "width": 90,
+          "height": 90,
+          "upgradeMaterials": {
+            "wood": 20,
+            "stone": 15
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Saw Mill",
+          "description": "An advanced saw mill with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 135,
+          "height": 135,
+          "upgradeMaterials": {
+            "wood": 32,
+            "stone": 24
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "bakery",
@@ -93,8 +157,6 @@
         0.6,
         0.3
       ],
-      "baseWidth": 70,
-      "baseHeight": 70,
       "description": "Produces bread and baked goods from grain",
       "workCategories": [
         "Baking"
@@ -102,18 +164,56 @@
       "workerEfficiency": {
         "Baking": 1.0
       },
-      "properties": {
-        "maxBakers": 3,
-        "localStorageCapacity": 300
-      },
-      "constructionMaterials": {
-        "bricks": 50,
-        "wood": 30
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Bakery",
+          "description": "A basic bakery with 1 work station",
+          "stations": 1,
+          "width": 49,
+          "height": 49,
+          "constructionMaterials": {
+            "bricks": 50,
+            "wood": 30
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Bakery",
+          "description": "An improved bakery with 2 work stations",
+          "stations": 2,
+          "width": 70,
+          "height": 70,
+          "upgradeMaterials": {
+            "bricks": 25,
+            "wood": 15
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Bakery",
+          "description": "An advanced bakery with 4 work stations and modern equipment",
+          "stations": 4,
+          "width": 105,
+          "height": 105,
+          "upgradeMaterials": {
+            "bricks": 40,
+            "wood": 24
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "restaurant",
@@ -125,8 +225,6 @@
         0.5,
         0.2
       ],
-      "baseWidth": 80,
-      "baseHeight": 80,
       "description": "Prepares and serves meals",
       "workCategories": [
         "Food Preparation",
@@ -138,18 +236,56 @@
         "Hospitality": 0.8,
         "General Labor": 0.4
       },
-      "properties": {
-        "maxWorkers": 6,
-        "localStorageCapacity": 200
-      },
-      "constructionMaterials": {
-        "wood": 40,
-        "bricks": 30
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Restaurant",
+          "description": "A basic restaurant with 2 work stations",
+          "stations": 2,
+          "width": 56,
+          "height": 56,
+          "constructionMaterials": {
+            "wood": 40,
+            "bricks": 30
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Restaurant",
+          "description": "An improved restaurant with 4 work stations",
+          "stations": 4,
+          "width": 80,
+          "height": 80,
+          "upgradeMaterials": {
+            "wood": 20,
+            "bricks": 15
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Restaurant",
+          "description": "An advanced restaurant with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "wood": 32,
+            "bricks": 24
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "bar",
@@ -161,8 +297,6 @@
         0.3,
         0.5
       ],
-      "baseWidth": 70,
-      "baseHeight": 70,
       "description": "Serves alcoholic beverages to townsfolk",
       "workCategories": [
         "Brewing & Distilling",
@@ -174,18 +308,56 @@
         "Hospitality": 0.8,
         "General Labor": 0.3
       },
-      "properties": {
-        "maxWorkers": 4,
-        "localStorageCapacity": 250
-      },
-      "constructionMaterials": {
-        "wood": 45,
-        "glass": 20
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Bar",
+          "description": "A basic bar with 2 work stations",
+          "stations": 2,
+          "width": 49,
+          "height": 49,
+          "constructionMaterials": {
+            "wood": 45,
+            "glass": 20
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Bar",
+          "description": "An improved bar with 4 work stations",
+          "stations": 4,
+          "width": 70,
+          "height": 70,
+          "upgradeMaterials": {
+            "wood": 22,
+            "glass": 10
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Bar",
+          "description": "An advanced bar with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 105,
+          "height": 105,
+          "upgradeMaterials": {
+            "wood": 36,
+            "glass": 16
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "shoe_factory",
@@ -197,8 +369,6 @@
         0.4,
         0.3
       ],
-      "baseWidth": 80,
-      "baseHeight": 80,
       "description": "Manufactures footwear",
       "workCategories": [
         "Footwear Manufacturing",
@@ -208,18 +378,56 @@
         "Footwear Manufacturing": 1.0,
         "General Labor": 0.5
       },
-      "properties": {
-        "maxWorkers": 6,
-        "localStorageCapacity": 400
-      },
-      "constructionMaterials": {
-        "wood": 35,
-        "leather": 20
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Shoe Factory",
+          "description": "A basic shoe factory with 2 work stations",
+          "stations": 2,
+          "width": 56,
+          "height": 56,
+          "constructionMaterials": {
+            "wood": 35,
+            "leather": 20
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Shoe Factory",
+          "description": "An improved shoe factory with 4 work stations",
+          "stations": 4,
+          "width": 80,
+          "height": 80,
+          "upgradeMaterials": {
+            "wood": 17,
+            "leather": 10
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Shoe Factory",
+          "description": "An advanced shoe factory with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "wood": 28,
+            "leather": 16
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "textile_mill",
@@ -231,8 +439,6 @@
         0.5,
         0.6
       ],
-      "baseWidth": 100,
-      "baseHeight": 100,
       "description": "Produces fabric and textiles",
       "workCategories": [
         "Textile Weaving",
@@ -244,18 +450,56 @@
         "Spinning": 0.8,
         "General Labor": 0.5
       },
-      "properties": {
-        "maxWorkers": 8,
-        "localStorageCapacity": 600
-      },
-      "constructionMaterials": {
-        "wood": 60,
-        "iron": 30
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Textile Mill",
+          "description": "A basic textile mill with 2 work stations",
+          "stations": 2,
+          "width": 70,
+          "height": 70,
+          "constructionMaterials": {
+            "wood": 60,
+            "iron": 30
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Textile Mill",
+          "description": "An improved textile mill with 4 work stations",
+          "stations": 4,
+          "width": 100,
+          "height": 100,
+          "upgradeMaterials": {
+            "wood": 30,
+            "iron": 15
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Textile Mill",
+          "description": "An advanced textile mill with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 150,
+          "height": 150,
+          "upgradeMaterials": {
+            "wood": 48,
+            "iron": 24
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "tailor_shop",
@@ -267,8 +511,6 @@
         0.5,
         0.7
       ],
-      "baseWidth": 65,
-      "baseHeight": 65,
       "description": "Creates clothing and garments",
       "workCategories": [
         "Tailoring",
@@ -278,18 +520,56 @@
         "Tailoring": 1.0,
         "General Labor": 0.4
       },
-      "properties": {
-        "maxWorkers": 4,
-        "localStorageCapacity": 300
-      },
-      "constructionMaterials": {
-        "wood": 30,
-        "fabric": 20
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Tailor Shop",
+          "description": "A basic tailor shop with 2 work stations",
+          "stations": 2,
+          "width": 45,
+          "height": 45,
+          "constructionMaterials": {
+            "wood": 30,
+            "fabric": 20
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Tailor Shop",
+          "description": "An improved tailor shop with 4 work stations",
+          "stations": 4,
+          "width": 65,
+          "height": 65,
+          "upgradeMaterials": {
+            "wood": 15,
+            "fabric": 10
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Tailor Shop",
+          "description": "An advanced tailor shop with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 97,
+          "height": 97,
+          "upgradeMaterials": {
+            "wood": 24,
+            "fabric": 16
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "brickyard",
@@ -301,8 +581,6 @@
         0.3,
         0.2
       ],
-      "baseWidth": 90,
-      "baseHeight": 90,
       "description": "Produces bricks for construction",
       "workCategories": [
         "Brick Making",
@@ -312,18 +590,56 @@
         "Brick Making": 1.0,
         "General Labor": 0.4
       },
-      "properties": {
-        "maxWorkers": 6,
-        "localStorageCapacity": 800
-      },
-      "constructionMaterials": {
-        "wood": 40,
-        "clay": 50
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Brickyard",
+          "description": "A basic brickyard with 2 work stations",
+          "stations": 2,
+          "width": 62,
+          "height": 62,
+          "constructionMaterials": {
+            "wood": 40,
+            "clay": 50
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Brickyard",
+          "description": "An improved brickyard with 4 work stations",
+          "stations": 4,
+          "width": 90,
+          "height": 90,
+          "upgradeMaterials": {
+            "wood": 20,
+            "clay": 25
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Brickyard",
+          "description": "An advanced brickyard with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 135,
+          "height": 135,
+          "upgradeMaterials": {
+            "wood": 32,
+            "clay": 40
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "furniture_shop",
@@ -335,8 +651,6 @@
         0.4,
         0.2
       ],
-      "baseWidth": 75,
-      "baseHeight": 75,
       "description": "Crafts furniture from lumber",
       "workCategories": [
         "Woodworking"
@@ -344,18 +658,56 @@
       "workerEfficiency": {
         "Woodworking": 1.0
       },
-      "properties": {
-        "maxWorkers": 5,
-        "localStorageCapacity": 400
-      },
-      "constructionMaterials": {
-        "wood": 50,
-        "tools": 15
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Furniture Shop",
+          "description": "A basic furniture shop with 2 work stations",
+          "stations": 2,
+          "width": 52,
+          "height": 52,
+          "constructionMaterials": {
+            "wood": 50,
+            "tools": 15
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Furniture Shop",
+          "description": "An improved furniture shop with 4 work stations",
+          "stations": 4,
+          "width": 75,
+          "height": 75,
+          "upgradeMaterials": {
+            "wood": 25,
+            "tools": 7
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Furniture Shop",
+          "description": "An advanced furniture shop with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 112,
+          "height": 112,
+          "upgradeMaterials": {
+            "wood": 40,
+            "tools": 12
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "jewellery_shop",
@@ -367,8 +719,6 @@
         0.8,
         0.2
       ],
-      "baseWidth": 60,
-      "baseHeight": 60,
       "description": "Creates fine jewelry from precious metals and gems",
       "workCategories": [
         "Jewelry Crafting"
@@ -376,19 +726,59 @@
       "workerEfficiency": {
         "Jewelry Crafting": 1.0
       },
-      "properties": {
-        "maxWorkers": 3,
-        "localStorageCapacity": 100
-      },
-      "constructionMaterials": {
-        "wood": 25,
-        "glass": 15,
-        "gold": 10
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Jewellery Shop",
+          "description": "A basic jewellery shop with 1 work station",
+          "stations": 1,
+          "width": 42,
+          "height": 42,
+          "constructionMaterials": {
+            "wood": 25,
+            "glass": 15,
+            "gold": 10
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Jewellery Shop",
+          "description": "An improved jewellery shop with 2 work stations",
+          "stations": 2,
+          "width": 60,
+          "height": 60,
+          "upgradeMaterials": {
+            "wood": 12,
+            "glass": 7,
+            "gold": 5
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Jewellery Shop",
+          "description": "An advanced jewellery shop with 4 work stations and modern equipment",
+          "stations": 4,
+          "width": 90,
+          "height": 90,
+          "upgradeMaterials": {
+            "wood": 20,
+            "glass": 12,
+            "gold": 8
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "central_bank",
@@ -400,8 +790,6 @@
         0.6,
         0.3
       ],
-      "baseWidth": 100,
-      "baseHeight": 100,
       "description": "Manages town finances and currency",
       "workCategories": [
         "Banking & Finance"
@@ -409,19 +797,59 @@
       "workerEfficiency": {
         "Banking & Finance": 1.0
       },
-      "properties": {
-        "maxWorkers": 5,
-        "localStorageCapacity": 0
-      },
-      "constructionMaterials": {
-        "stone": 80,
-        "iron": 40,
-        "glass": 30
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Central Bank",
+          "description": "A basic central bank with 2 work stations",
+          "stations": 2,
+          "width": 70,
+          "height": 70,
+          "constructionMaterials": {
+            "stone": 80,
+            "iron": 40,
+            "glass": 30
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Central Bank",
+          "description": "An improved central bank with 4 work stations",
+          "stations": 4,
+          "width": 100,
+          "height": 100,
+          "upgradeMaterials": {
+            "stone": 40,
+            "iron": 20,
+            "glass": 15
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Central Bank",
+          "description": "An advanced central bank with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 150,
+          "height": 150,
+          "upgradeMaterials": {
+            "stone": 64,
+            "iron": 32,
+            "glass": 24
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "forge",
@@ -433,8 +861,6 @@
         0.3,
         0.1
       ],
-      "baseWidth": 85,
-      "baseHeight": 85,
       "description": "Crafts metal goods and weapons",
       "workCategories": [
         "Metalworking",
@@ -444,18 +870,56 @@
         "Metalworking": 1.0,
         "Smelting": 0.8
       },
-      "properties": {
-        "maxWorkers": 5,
-        "localStorageCapacity": 500
-      },
-      "constructionMaterials": {
-        "stone": 60,
-        "iron": 40
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Forge",
+          "description": "A basic forge with 2 work stations",
+          "stations": 2,
+          "width": 59,
+          "height": 59,
+          "constructionMaterials": {
+            "stone": 60,
+            "iron": 40
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Forge",
+          "description": "An improved forge with 4 work stations",
+          "stations": 4,
+          "width": 85,
+          "height": 85,
+          "upgradeMaterials": {
+            "stone": 30,
+            "iron": 20
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Forge",
+          "description": "An advanced forge with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 127,
+          "height": 127,
+          "upgradeMaterials": {
+            "stone": 48,
+            "iron": 32
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "blacksmith",
@@ -467,8 +931,6 @@
         0.3,
         0.3
       ],
-      "baseWidth": 70,
-      "baseHeight": 70,
       "description": "Forges metal tools and equipment",
       "workCategories": [
         "Blacksmithing"
@@ -476,18 +938,56 @@
       "workerEfficiency": {
         "Blacksmithing": 1.0
       },
-      "properties": {
-        "maxWorkers": 3,
-        "localStorageCapacity": 300
-      },
-      "constructionMaterials": {
-        "stone": 50,
-        "iron": 30
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Blacksmith",
+          "description": "A basic blacksmith with 1 work station",
+          "stations": 1,
+          "width": 49,
+          "height": 49,
+          "constructionMaterials": {
+            "stone": 50,
+            "iron": 30
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Blacksmith",
+          "description": "An improved blacksmith with 2 work stations",
+          "stations": 2,
+          "width": 70,
+          "height": 70,
+          "upgradeMaterials": {
+            "stone": 25,
+            "iron": 15
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Blacksmith",
+          "description": "An advanced blacksmith with 4 work stations and modern equipment",
+          "stations": 4,
+          "width": 105,
+          "height": 105,
+          "upgradeMaterials": {
+            "stone": 40,
+            "iron": 24
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     },
     {
       "id": "mine",
@@ -499,8 +999,6 @@
         0.3,
         0.2
       ],
-      "baseWidth": 90,
-      "baseHeight": 90,
       "description": "Extracts minerals and ores from the ground",
       "workCategories": [
         "Mining",
@@ -510,18 +1008,56 @@
         "Mining": 1.0,
         "General Labor": 0.5
       },
-      "properties": {
-        "maxWorkers": 10,
-        "localStorageCapacity": 1000
-      },
-      "constructionMaterials": {
-        "wood": 60,
-        "pickaxe": 10
-      },
-      "storage": {
-        "inputCapacity": 300,
-        "outputCapacity": 300
-      }
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Mine",
+          "description": "A basic mine with 2 work stations",
+          "stations": 2,
+          "width": 62,
+          "height": 62,
+          "constructionMaterials": {
+            "wood": 60,
+            "pickaxe": 10
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Mine",
+          "description": "An improved mine with 4 work stations",
+          "stations": 4,
+          "width": 90,
+          "height": 90,
+          "upgradeMaterials": {
+            "wood": 30,
+            "pickaxe": 5
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Mine",
+          "description": "An advanced mine with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 135,
+          "height": 135,
+          "upgradeMaterials": {
+            "wood": 48,
+            "pickaxe": 8
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     }
   ]
 }

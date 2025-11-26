@@ -5,6 +5,8 @@
 
 require("code/DataLoader")
 require("code/CharacterFactory")
+local ProductionStats = require("code/ProductionStats")
+local StatsVisualization = require("code/StatsVisualization")
 
 Prototype2State = {}
 Prototype2State.__index = Prototype2State
@@ -84,10 +86,19 @@ function Prototype2State:Create()
         -- Building detail modal state
         mShowBuildingModal = false,
         mSelectedBuilding = nil,  -- Building that was clicked
+        mSelectedStation = nil,  -- Station that was clicked (for recipe assignment)
         mBuildingModalScrollOffset = 0,
         mBuildingModalScrollMax = 0,
 
-        mModalJustOpened = false  -- Flag to prevent closing modal on same click that opened it
+        mModalJustOpened = false,  -- Flag to prevent closing modal on same click that opened it
+
+        -- Stats tracking
+        mStats = ProductionStats.new(),
+        mShowStatsPanel = false,  -- Toggle for stats panel visibility
+        mSelectedStatCommodity = nil,  -- Commodity selected for detailed trend view
+        mGameTick = 0,  -- Game tick counter for stats sampling
+        mStatsScrollOffset = 0,  -- Scroll offset for commodity list
+        mStatsScrollMax = 0  -- Max scroll for commodity list
     }
 
     setmetatable(this, self)
@@ -199,6 +210,17 @@ end
 function Prototype2State:Exit()
 end
 
+function Prototype2State:keypressed(key)
+    -- Handle escape key to close stats panel
+    if key == "escape" then
+        if self.mShowStatsPanel then
+            self.mShowStatsPanel = false
+            return true  -- Indicate that we handled the key
+        end
+    end
+    return false  -- Indicate that we didn't handle the key
+end
+
 function Prototype2State:Update(dt)
     -- Reset modal just opened flag at the start of each frame
     if self.mModalJustOpened then
@@ -209,6 +231,26 @@ function Prototype2State:Update(dt)
     local timeMultiplier = self.mTimeScales[self.mTimeScale]
     local gameDt = dt * timeMultiplier
     self.mGameTime = self.mGameTime + gameDt
+
+    -- Update game tick for stats
+    self.mGameTick = self.mGameTick + 1
+    self.mStats:updateTick(self.mGameTick)
+
+    -- Update worker utilization stats
+    local totalWorkers = 0
+    local activeWorkers = 0
+    for _, worker in ipairs(self.mWorkerPool) do
+        totalWorkers = totalWorkers + 1
+        if self.mEmployment.byWorker[worker.id] then
+            activeWorkers = activeWorkers + 1
+        end
+    end
+    self.mStats:recordWorkerStats(totalWorkers, activeWorkers)
+
+    -- Record stockpile levels
+    for commodityId, count in pairs(self.mCommodityCounts) do
+        self.mStats:recordStockpile(commodityId, count)
+    end
 
     -- Update production for all buildings
     self:UpdateProduction(gameDt)
@@ -233,6 +275,55 @@ function Prototype2State:Update(dt)
         print("mShowRecipeModal: " .. tostring(self.mShowRecipeModal))
         print("mModalJustOpened: " .. tostring(self.mModalJustOpened))
 
+        -- PRIORITY 1: Handle modals first (they should block all clicks below)
+
+        -- Check if clicking on Stats panel (full-screen modal - consumes all clicks)
+        if self.mShowStatsPanel then
+            self:HandleStatsPanelClick(mx, my)
+            -- Stats panel is a full-screen modal, don't process any other clicks
+            gMousePressed = nil
+            return
+        end
+
+        -- Check if clicking on recipe modal (but not if it was just opened this frame)
+        if self.mShowRecipeModal and not self.mModalJustOpened then
+            print("Calling HandleRecipeModalClick")
+            self:HandleRecipeModalClick(mx, my)
+            -- Recipe modal is a modal, don't process clicks below it
+            gMousePressed = nil
+            return
+        elseif self.mShowRecipeModal and self.mModalJustOpened then
+            print("Skipping HandleRecipeModalClick - modal just opened")
+            gMousePressed = nil
+            return
+        end
+
+        -- Check if clicking on building detail modal
+        if self.mShowBuildingModal and not self.mModalJustOpened then
+            self:HandleBuildingModalClick(mx, my)
+            -- Building modal is a modal, don't process clicks below it
+            gMousePressed = nil
+            return
+        elseif self.mShowBuildingModal and self.mModalJustOpened then
+            print("Skipping HandleBuildingModalClick - modal just opened")
+            gMousePressed = nil
+            return
+        end
+
+        -- PRIORITY 2: Handle panels (if no modals are open)
+
+        -- Check if clicking on HR panel
+        if self.mShowHRPanel then
+            self:HandleHRPanelClick(mx, my)
+        end
+
+        -- Check if clicking on Commodity panel
+        if self.mShowCommodityPanel then
+            self:HandleCommodityPanelClick(mx, my)
+        end
+
+        -- PRIORITY 3: Handle UI elements (if no modals or panels blocking)
+
         -- Check for top bar button clicks
         if my <= 60 then
             self:HandleTopBarClick(mx, my)
@@ -249,16 +340,6 @@ function Prototype2State:Update(dt)
             self:HandleRightPanelClick(mx, my)
         end
 
-        -- Check if clicking on HR panel
-        if self.mShowHRPanel then
-            self:HandleHRPanelClick(mx, my)
-        end
-
-        -- Check if clicking on Commodity panel
-        if self.mShowCommodityPanel then
-            self:HandleCommodityPanelClick(mx, my)
-        end
-
         -- Check if clicking on a building card (when not in modal)
         if not self.mShowRecipeModal and not self.mShowBuildingModal and not self.mShowHRPoolView then
             print("Calling HandleBuildingCardClick")
@@ -266,88 +347,72 @@ function Prototype2State:Update(dt)
         else
             print("Skipping HandleBuildingCardClick - HRPoolView=" .. tostring(self.mShowHRPoolView) .. ", RecipeModal=" .. tostring(self.mShowRecipeModal) .. ", BuildingModal=" .. tostring(self.mShowBuildingModal))
         end
-
-        -- Check if clicking on building detail modal
-        if self.mShowBuildingModal and not self.mModalJustOpened then
-            self:HandleBuildingModalClick(mx, my)
-        end
-
-        -- Check if clicking on recipe modal (but not if it was just opened this frame)
-        if self.mShowRecipeModal and not self.mModalJustOpened then
-            print("Calling HandleRecipeModalClick")
-            self:HandleRecipeModalClick(mx, my)
-        elseif self.mShowRecipeModal and self.mModalJustOpened then
-            print("Skipping HandleRecipeModalClick - modal just opened")
-        end
     end
 end
 
 function Prototype2State:UpdateProduction(gameDt)
-    -- Update production state and progress for all buildings
+    -- Update production state and progress for each station in each building
     for _, building in ipairs(self.mBuildings) do
-        local prod = building.production
-        local recipe = prod.recipe
+        for _, station in ipairs(building.stations) do
+            local recipe = station.recipe
 
-        -- State 1: Check if building has a recipe
-        if not recipe then
-            prod.state = "WAITING_FOR_RECIPE"
-            prod.progress = 0
-            goto continue
-        end
+            -- State 1: Check if station has a recipe
+            if not recipe then
+                station.state = "IDLE"
+                station.progress = 0
+                goto continue_station
+            end
 
-        -- State 2: Check if building has workers
-        local assignedWorkers = self.mEmployment.byBuilding[building.id] or {}
-        if #assignedWorkers < recipe.workers.required then
-            prod.state = "NO_WORKERS"
-            prod.progress = 0
-            goto continue
-        end
+            -- State 2: Check if station has a worker
+            if not station.worker then
+                station.state = "NO_WORKER"
+                station.progress = 0
+                goto continue_station
+            end
 
-        -- State 3: Check if building has raw materials (only when starting production)
-        if prod.state ~= "PRODUCING" or prod.progress == 0 then
-            local hasAllInputs = true
+            -- State 3: Check if station has raw materials (only when starting production)
+            if station.state ~= "PRODUCING" or station.progress == 0 then
+                local hasAllInputs = true
 
-            -- Check each input requirement
-            for commodityId, requiredAmount in pairs(recipe.inputs) do
-                local availableInInventory = self.mCommodityCounts[commodityId] or 0
-                local availableInStorage = building.storage.inputs[commodityId] or 0
-                local totalAvailable = availableInInventory + availableInStorage
+                -- Check each input requirement
+                for commodityId, requiredAmount in pairs(recipe.inputs) do
+                    local availableInInventory = self.mCommodityCounts[commodityId] or 0
+                    local availableInStorage = building.storage.inputs[commodityId] or 0
+                    local totalAvailable = availableInInventory + availableInStorage
 
-                if totalAvailable < requiredAmount then
-                    hasAllInputs = false
-                    break
+                    if totalAvailable < requiredAmount then
+                        hasAllInputs = false
+                        break
+                    end
+                end
+
+                if not hasAllInputs then
+                    station.state = "NO_MATERIALS"
+                    station.progress = 0
+                    goto continue_station
+                end
+
+                -- If we reach here and state was not PRODUCING, pull inputs from inventory
+                if station.state ~= "PRODUCING" then
+                    self:PullInputsForStation(building, station)
                 end
             end
 
-            if not hasAllInputs then
-                prod.state = "NO_RAW_MATERIALS"
-                prod.progress = 0
-                goto continue
+            -- State 4: Production is active
+            station.state = "PRODUCING"
+
+            -- Update progress based on game time and worker efficiency
+            local progressIncrement = (gameDt / recipe.productionTime) * station.efficiency
+            station.progress = station.progress + progressIncrement
+
+            -- Check if production cycle completed
+            if station.progress >= 1.0 then
+                self:CompleteStationProduction(building, station)
+                station.progress = 0  -- Reset for next cycle
             end
 
-            -- If we reach here and state was not PRODUCING, pull inputs from inventory
-            if prod.state ~= "PRODUCING" then
-                self:PullInputsForBuilding(building)
-            end
+            ::continue_station::
         end
-
-        -- State 4: Production is active
-        prod.state = "PRODUCING"
-
-        -- Update progress based on game time
-        local progressIncrement = gameDt / recipe.productionTime
-        prod.progress = prod.progress + progressIncrement
-
-        -- Check if production cycle completed
-        if prod.progress >= 1.0 then
-            self:CompleteProduction(building)
-            prod.progress = 0  -- Reset for next cycle
-
-            -- After completing, check again if we can continue (loop back to state checks)
-            -- This will be handled on the next update cycle
-        end
-
-        ::continue::
     end
 end
 
@@ -402,6 +467,9 @@ function Prototype2State:CompleteProduction(building)
         building.storage.inputs[commodityId] = newAmount
         building.storage.inputUsed = math.max(0, building.storage.inputUsed - actualConsumed)
 
+        -- Record consumption in stats
+        self.mStats:recordConsumption(commodityId, actualConsumed)
+
         -- If commodity is now 0, remove it from storage to keep things clean
         if newAmount <= 0 then
             building.storage.inputs[commodityId] = nil
@@ -427,12 +495,110 @@ function Prototype2State:CompleteProduction(building)
         if overflow > 0 then
             self.mCommodityCounts[commodityId] = (self.mCommodityCounts[commodityId] or 0) + overflow
         end
+
+        -- Record production in stats (total amount produced)
+        self.mStats:recordProduction(commodityId, amount, building.id)
     end
 
     print("Production completed at " .. building.name .. " (" .. recipe.recipeName .. ")")
 
     -- After production completes, try to refill input storage from inventory
     self:PullInputsForBuilding(building)
+end
+
+-- ============================================================================
+-- STATION-BASED PRODUCTION FUNCTIONS (New system)
+-- ============================================================================
+
+function Prototype2State:PullInputsForStation(building, station)
+    -- Pull inputs for ONE production cycle for this station
+    local recipe = station.recipe
+    if not recipe then return false end
+
+    -- Check if we have enough materials for one cycle
+    local hasAllInputs = true
+    for commodityId, requiredAmount in pairs(recipe.inputs) do
+        local availableInInventory = self.mCommodityCounts[commodityId] or 0
+        local availableInStorage = building.storage.inputs[commodityId] or 0
+        local totalAvailable = availableInInventory + availableInStorage
+
+        if totalAvailable < requiredAmount then
+            hasAllInputs = false
+            break
+        end
+    end
+
+    if not hasAllInputs then
+        return false  -- Can't start production cycle
+    end
+
+    -- Pull exactly what we need for one cycle
+    for commodityId, requiredAmount in pairs(recipe.inputs) do
+        local availableInStorage = building.storage.inputs[commodityId] or 0
+
+        -- Try to pull from building storage first
+        if availableInStorage >= requiredAmount then
+            -- All from storage
+            building.storage.inputs[commodityId] = availableInStorage - requiredAmount
+            building.storage.inputUsed = building.storage.inputUsed - requiredAmount
+
+            -- Clean up if zero
+            if building.storage.inputs[commodityId] <= 0 then
+                building.storage.inputs[commodityId] = nil
+            end
+        else
+            -- Need to pull from both storage and inventory
+            local fromStorage = availableInStorage
+            local fromInventory = requiredAmount - fromStorage
+
+            -- Take from storage
+            if fromStorage > 0 then
+                building.storage.inputs[commodityId] = nil
+                building.storage.inputUsed = building.storage.inputUsed - fromStorage
+            end
+
+            -- Take from inventory
+            self.mCommodityCounts[commodityId] = (self.mCommodityCounts[commodityId] or 0) - fromInventory
+        end
+    end
+
+    return true  -- Successfully pulled inputs
+end
+
+function Prototype2State:CompleteStationProduction(building, station)
+    -- Complete production for this station: produce outputs, record stats
+    local recipe = station.recipe
+    if not recipe then return end
+
+    -- Produce outputs to building storage (with overflow to inventory)
+    for commodityId, amount in pairs(recipe.outputs) do
+        local currentAmount = building.storage.outputs[commodityId] or 0
+        local storageAvailable = building.storage.outputCapacity - building.storage.outputUsed
+
+        -- How much can fit in local storage?
+        local toStorage = math.min(amount, storageAvailable)
+        local overflow = amount - toStorage
+
+        -- Add to local storage
+        if toStorage > 0 then
+            building.storage.outputs[commodityId] = currentAmount + toStorage
+            building.storage.outputUsed = building.storage.outputUsed + toStorage
+        end
+
+        -- Add overflow to town inventory
+        if overflow > 0 then
+            self.mCommodityCounts[commodityId] = (self.mCommodityCounts[commodityId] or 0) + overflow
+        end
+
+        -- Record production in stats (total amount produced)
+        self.mStats:recordProduction(commodityId, amount, building.id)
+    end
+
+    print("Station " .. station.id .. " completed production at " .. building.name .. " (" .. recipe.recipeName .. ")")
+
+    -- Reset station state for next cycle
+    station.progress = 0
+    station.state = "IDLE"  -- Will be updated in next UpdateProduction cycle
 end
 
 function Prototype2State:HandleSpeedControlClick(mx, my)
@@ -542,6 +708,19 @@ function Prototype2State:HandleTopBarClick(mx, my)
         self.mShowCommodityPanel = not self.mShowCommodityPanel
         if self.mShowCommodityPanel then
             self.mShowHRPanel = false
+            self.mShowStatsPanel = false
+        end
+        return
+    end
+
+    -- Stats button
+    local statsButtonX = screenW - 100
+    local statsButtonW = 80
+    if mx >= statsButtonX and mx <= statsButtonX + statsButtonW and my >= 15 and my <= 45 then
+        self.mShowStatsPanel = not self.mShowStatsPanel
+        if self.mShowStatsPanel then
+            self.mShowHRPanel = false
+            self.mShowCommodityPanel = false
         end
         return
     end
@@ -716,6 +895,53 @@ function Prototype2State:HandleCommodityPanelClick(mx, my)
     end
 end
 
+function Prototype2State:HandleStatsPanelClick(mx, my)
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+
+    -- Panel dimensions (same as in RenderStatsPanel)
+    local panelY = 60
+    local panelH = screenH - 120
+
+    local leftPanelX = 20
+    local leftPanelW = 350
+    local leftPanelY = panelY
+    local leftPanelH = panelH
+
+    -- Check if clicking in left panel (commodity list)
+    if mx >= leftPanelX and mx <= leftPanelX + leftPanelW and
+       my >= leftPanelY and my <= leftPanelY + leftPanelH then
+
+        -- Get tracked commodities
+        local trackedCommodities = self.mStats:getTrackedCommodities()
+
+        if #trackedCommodities > 0 then
+            local listY = leftPanelY + 65
+            local listHeight = leftPanelH - 75
+            local itemHeight = 60
+            local spacing = 5
+
+            -- Check which commodity was clicked
+            local yOffset = listY - self.mStatsScrollOffset
+
+            for _, commodityId in ipairs(trackedCommodities) do
+                -- Check if click is on this item
+                if my >= yOffset and my <= yOffset + itemHeight and
+                   mx >= leftPanelX + 10 and mx <= leftPanelX + leftPanelW - 10 then
+                    -- Select this commodity
+                    self.mSelectedStatCommodity = commodityId
+                    return true  -- Consumed the click
+                end
+
+                yOffset = yOffset + itemHeight + spacing
+            end
+        end
+    end
+
+    -- Consume ALL clicks when stats panel is open (don't let them through)
+    -- This is a full-screen modal
+    return true
+end
+
 function Prototype2State:HandleBuildingCardClick(mx, my)
     print("HandleBuildingCardClick called: mx=" .. mx .. ", my=" .. my)
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
@@ -805,6 +1031,26 @@ function Prototype2State:AddBuilding(buildingTypeId)
         return
     end
 
+    -- Get the level 0 upgrade data
+    local level0 = buildingType.upgradeLevels and buildingType.upgradeLevels[1] or nil
+    if not level0 then
+        print("Error: Building type " .. buildingTypeId .. " has no upgrade levels!")
+        return
+    end
+
+    -- Initialize stations array
+    local stationsArray = {}
+    for i = 1, level0.stations do
+        table.insert(stationsArray, {
+            id = i,
+            recipe = nil,          -- Recipe assigned to this station
+            worker = nil,          -- Worker assigned to this station (worker ID)
+            state = "IDLE",        -- IDLE, PRODUCING, NO_MATERIALS, NO_WORKER
+            progress = 0,          -- Production progress (0.0 to 1.0)
+            efficiency = 1.0       -- Worker efficiency multiplier
+        })
+    end
+
     -- Create a simple building record (no spatial position)
     local building = {
         id = #self.mBuildings + 1,
@@ -814,27 +1060,25 @@ function Prototype2State:AddBuilding(buildingTypeId)
         category = buildingType.category,
         addedTime = love.timer.getTime(),
 
-        -- Production state (to be implemented)
-        production = {
-            state = "IDLE",  -- IDLE, PRODUCING, BLOCKED, COMPLETED
-            progress = 0,
-            efficiency = 1.0,
-            workers = {},
-            inputs = {},
-            outputs = {},
-            recipe = nil  -- Selected recipe for this building
-        },
+        -- Upgrade level (starts at 0)
+        level = 0,
+        maxStations = level0.stations,
+        width = level0.width,
+        height = level0.height,
 
-        -- Local storage
+        -- Stations array (each station is independent)
+        stations = stationsArray,
+
+        -- Local storage (from upgrade level) - shared across all stations
         storage = {
             -- Input storage: {commodityId: currentAmount}
             inputs = {},
-            inputCapacity = buildingType.storage and buildingType.storage.inputCapacity or 300,
+            inputCapacity = level0.storage and level0.storage.inputCapacity or 300,
             inputUsed = 0,
 
             -- Output storage: {commodityId: currentAmount}
             outputs = {},
-            outputCapacity = buildingType.storage and buildingType.storage.outputCapacity or 300,
+            outputCapacity = level0.storage and level0.storage.outputCapacity or 300,
             outputUsed = 0
         }
     }
@@ -857,9 +1101,24 @@ function Prototype2State:AssignWorkerToBuilding(worker, building)
         self:UnassignWorkerFromBuilding(worker)
     end
 
-    -- Assign to new building
+    -- Find first available station in the building
+    local availableStation = nil
+    for _, station in ipairs(building.stations) do
+        if not station.worker then
+            availableStation = station
+            break
+        end
+    end
+
+    if not availableStation then
+        print("Cannot assign " .. worker.name .. " to " .. building.name .. " - all stations occupied")
+        return false
+    end
+
+    -- Assign to new building and station
     worker.employed = true
     worker.assignedBuilding = building.id
+    worker.assignedStation = availableStation.id
     worker.hiredDate = love.timer.getTime()
 
     -- Update association structures
@@ -867,10 +1126,22 @@ function Prototype2State:AssignWorkerToBuilding(worker, building)
     table.insert(self.mEmployment.byBuilding[building.id], worker.id)
     self.mEmployment.workerLookup[worker.id] = worker
 
-    -- Add to building's production workers list
-    table.insert(building.production.workers, worker.id)
+    -- Assign worker to the station
+    availableStation.worker = worker.id
 
-    print("Assigned " .. worker.name .. " to " .. building.name)
+    -- Calculate worker efficiency for this station based on work categories
+    local efficiency = 1.0
+    if building.type.workerEfficiency and worker.workCategories then
+        for _, category in ipairs(worker.workCategories) do
+            if building.type.workerEfficiency[category] then
+                efficiency = math.max(efficiency, building.type.workerEfficiency[category])
+            end
+        end
+    end
+    availableStation.efficiency = efficiency
+
+    print("Assigned " .. worker.name .. " to " .. building.name .. " Station " .. availableStation.id .. " (efficiency: " .. efficiency .. ")")
+    return true
 end
 
 function Prototype2State:UnassignWorkerFromBuilding(worker)
@@ -879,6 +1150,7 @@ function Prototype2State:UnassignWorkerFromBuilding(worker)
     end
 
     local buildingId = worker.assignedBuilding
+    local stationId = worker.assignedStation
 
     -- Remove from association structures
     self.mEmployment.byWorker[worker.id] = nil
@@ -893,12 +1165,15 @@ function Prototype2State:UnassignWorkerFromBuilding(worker)
         end
     end
 
-    -- Remove from building's production workers
+    -- Remove from building's station
     for _, building in ipairs(self.mBuildings) do
         if building.id == buildingId then
-            for i, wid in ipairs(building.production.workers) do
-                if wid == worker.id then
-                    table.remove(building.production.workers, i)
+            -- Clear the worker from the station
+            for _, station in ipairs(building.stations) do
+                if station.worker == worker.id then
+                    station.worker = nil
+                    station.state = "NO_WORKER"
+                    station.progress = 0
                     break
                 end
             end
@@ -909,8 +1184,9 @@ function Prototype2State:UnassignWorkerFromBuilding(worker)
     -- Update worker status
     worker.employed = false
     worker.assignedBuilding = nil
+    worker.assignedStation = nil
 
-    print("Unassigned " .. worker.name .. " from building #" .. buildingId)
+    print("Unassigned " .. worker.name .. " from building #" .. buildingId .. " station #" .. (stationId or "?"))
 end
 
 function Prototype2State:GetWorkersForBuilding(buildingId)
@@ -971,8 +1247,16 @@ function Prototype2State:FindBestBuildingForWorker(worker)
 
     -- Check each building
     for _, building in ipairs(self.mBuildings) do
-        -- Skip buildings without a recipe selected
-        if not building.production.recipe then
+        -- Skip buildings where no station has a recipe selected
+        local hasRecipe = false
+        for _, station in ipairs(building.stations) do
+            if station.recipe then
+                hasRecipe = true
+                break
+            end
+        end
+
+        if not hasRecipe then
             goto continue
         end
 
@@ -1001,20 +1285,19 @@ function Prototype2State:FindBestBuildingForWorker(worker)
             goto continue
         end
 
-        -- Check if building has space for more workers
-        local recipe = building.production.recipe
+        -- Check if building has space for more workers (max = number of stations)
         local currentWorkerCount = #(self.mEmployment.byBuilding[building.id] or {})
-        local maxWorkers = recipe.workers and recipe.workers.max or 0
+        local maxWorkers = #building.stations
 
         if currentWorkerCount >= maxWorkers then
             goto continue
         end
 
         -- Calculate score based on:
-        -- 1. Wage offered (from recipe)
+        -- 1. Worker's minimum wage (base)
         -- 2. Efficiency bonus
         -- 3. Current occupancy (prefer less crowded buildings)
-        local wage = recipe.workers and recipe.workers.wages or worker.minimumWage
+        local wage = worker.minimumWage or 10
         local occupancyFactor = 1 - (currentWorkerCount / maxWorkers)
 
         local score = wage * 10 + efficiencyBonus * 100 + occupancyFactor * 50
@@ -1078,16 +1361,37 @@ function Prototype2State:HandleRecipeModalClick(mx, my)
     for _, recipe in ipairs(availableRecipes) do
         if my >= yOffset and my <= yOffset + recipeHeight and
            mx >= modalX + 20 and mx <= modalX + modalWidth - 20 then
-            -- Recipe selected!
-            self.mSelectedBuilding.production.recipe = recipe
-            self.mSelectedBuilding.production.state = "READY"
-            print("Selected recipe: " .. recipe.recipeName .. " for building #" .. self.mSelectedBuilding.id)
+            -- Recipe selected! Assign to the selected station
+            if self.mSelectedStation then
+                -- Assign to specific station
+                self.mSelectedStation.recipe = recipe
+                self.mSelectedStation.state = "IDLE"  -- Will be updated in UpdateProduction
+                print("Selected recipe: " .. recipe.recipeName .. " for building #" .. self.mSelectedBuilding.id .. " station " .. self.mSelectedStation.id)
+            else
+                -- Fallback: assign to first empty station (for backwards compatibility)
+                local assignedCount = 0
+                for _, station in ipairs(self.mSelectedBuilding.stations) do
+                    if not station.recipe then
+                        station.recipe = recipe
+                        station.state = "IDLE"
+                        assignedCount = assignedCount + 1
+                        break
+                    end
+                end
+
+                if assignedCount > 0 then
+                    print("Selected recipe: " .. recipe.recipeName .. " for building #" .. self.mSelectedBuilding.id .. " (assigned to first empty station)")
+                else
+                    print("All stations already have recipes assigned")
+                end
+            end
 
             -- Run free agency to assign workers to this building
             self:RunFreeAgency()
 
-            -- Close recipe modal (but keep building modal open if it was open)
+            -- Close recipe modal and clear selected station
             self.mShowRecipeModal = false
+            self.mSelectedStation = nil
             if not self.mShowBuildingModal then
                 self.mSelectedBuilding = nil
             end
@@ -1124,6 +1428,11 @@ function Prototype2State:Render()
 
     -- Render game speed control
     self:RenderSpeedControl()
+
+    -- Render stats panel (if active, overlays everything except modals)
+    if self.mShowStatsPanel then
+        self:RenderStatsPanel()
+    end
 
     -- Render building detail modal
     if self.mShowBuildingModal then
@@ -1296,74 +1605,98 @@ function Prototype2State:RenderBuildingCard(building, x, y, width, height)
     love.graphics.setColor(0.7, 0.7, 0.7)
     love.graphics.print("ID: " .. building.id, x + 15, y + 35)
 
-    -- Recipe info
-    if building.production.recipe then
-        love.graphics.setColor(0.5, 0.8, 0.5)
-        love.graphics.print("Recipe: " .. building.production.recipe.recipeName, x + 15, y + 55)
-    else
-        love.graphics.setColor(0.8, 0.6, 0.3)
-        love.graphics.print("Click to select recipe", x + 15, y + 55)
+    -- Station summary info
+    local stationsActive = 0
+    local stationsIdle = 0
+    local stationsNoWorker = 0
+    local stationsNoMaterial = 0
+
+    for _, station in ipairs(building.stations) do
+        if station.state == "PRODUCING" then
+            stationsActive = stationsActive + 1
+        elseif station.state == "IDLE" then
+            stationsIdle = stationsIdle + 1
+        elseif station.state == "NO_WORKER" then
+            stationsNoWorker = stationsNoWorker + 1
+        elseif station.state == "NO_MATERIALS" then
+            stationsNoMaterial = stationsNoMaterial + 1
+        end
     end
 
-    -- Production state with color coding
-    local stateColor = {0.6, 0.6, 0.6}
-    local stateText = building.production.state
+    love.graphics.setColor(0.5, 0.8, 0.5)
+    love.graphics.print("Stations: " .. #building.stations, x + 15, y + 55)
 
-    if building.production.state == "WAITING_FOR_RECIPE" then
-        stateColor = {0.8, 0.6, 0.3}  -- Orange
-        stateText = "No Recipe"
-    elseif building.production.state == "NO_WORKERS" then
-        stateColor = {0.8, 0.5, 0.5}  -- Red
-        stateText = "Need Workers"
-    elseif building.production.state == "NO_RAW_MATERIALS" then
-        stateColor = {0.9, 0.7, 0.3}  -- Yellow
-        stateText = "Need Materials"
-    elseif building.production.state == "PRODUCING" then
+    -- Production state summary with color coding
+    local stateColor = {0.6, 0.6, 0.6}
+    local stateText = ""
+
+    if stationsActive > 0 then
         stateColor = {0.4, 0.8, 0.4}  -- Green
-        stateText = "Producing"
+        stateText = stationsActive .. " producing"
+    elseif stationsNoWorker > 0 then
+        stateColor = {0.8, 0.5, 0.5}  -- Red
+        stateText = stationsNoWorker .. " need workers"
+    elseif stationsNoMaterial > 0 then
+        stateColor = {0.9, 0.7, 0.3}  -- Yellow
+        stateText = stationsNoMaterial .. " need materials"
+    elseif stationsIdle > 0 then
+        stateColor = {0.8, 0.6, 0.3}  -- Orange
+        stateText = stationsIdle .. " idle (no recipe)"
+    else
+        stateText = "All stations idle"
     end
 
     love.graphics.setColor(unpack(stateColor))
     love.graphics.print("State: " .. stateText, x + 15, y + 75)
 
-    -- Worker info
+    -- Worker info (show stations)
     local workers = self:GetWorkersForBuilding(building.id)
     local workerCount = #workers
-    local maxWorkers = building.production.recipe and building.production.recipe.workers and building.production.recipe.workers.max or 0
 
-    if building.production.recipe then
-        love.graphics.setColor(0.7, 0.7, 1.0)
-        love.graphics.print("Workers: " .. workerCount .. "/" .. maxWorkers, x + 15, y + 95)
-    end
+    love.graphics.setColor(0.7, 0.7, 1.0)
+    love.graphics.print("Workers: " .. workerCount .. "/" .. #building.stations .. " stations", x + 15, y + 95)
 
     -- Progress bar background
     love.graphics.setColor(0.3, 0.3, 0.3)
     love.graphics.rectangle("fill", x + 15, y + height - 25, width - 30, 15, 3, 3)
 
-    -- Progress bar fill (color based on state)
+    -- Progress bar fill (average progress across all active stations)
+    local totalProgress = 0
+    local activeStationCount = 0
+
+    for _, station in ipairs(building.stations) do
+        if station.state == "PRODUCING" and station.progress > 0 then
+            totalProgress = totalProgress + station.progress
+            activeStationCount = activeStationCount + 1
+        end
+    end
+
+    local avgProgress = activeStationCount > 0 and (totalProgress / activeStationCount) or 0
+
+    -- Progress bar color based on overall state
     local progressBarColor = {0.4, 0.7, 0.4}  -- Default green
 
-    if building.production.state == "PRODUCING" then
+    if stationsActive > 0 then
         progressBarColor = {0.4, 0.8, 0.4}  -- Bright green
-    elseif building.production.state == "NO_RAW_MATERIALS" then
+    elseif stationsNoMaterial > 0 then
         progressBarColor = {0.9, 0.7, 0.3}  -- Yellow
-    elseif building.production.state == "NO_WORKERS" then
+    elseif stationsNoWorker > 0 then
         progressBarColor = {0.8, 0.5, 0.5}  -- Red
-    elseif building.production.state == "WAITING_FOR_RECIPE" then
+    else
         progressBarColor = {0.6, 0.6, 0.6}  -- Gray
     end
 
     love.graphics.setColor(unpack(progressBarColor))
-    local progressWidth = (width - 30) * building.production.progress
+    local progressWidth = (width - 30) * avgProgress
     if progressWidth > 0 then
         love.graphics.rectangle("fill", x + 15, y + height - 25, progressWidth, 15, 3, 3)
     end
 
     -- Progress percentage text
-    if building.production.state == "PRODUCING" and building.production.progress > 0 then
+    if stationsActive > 0 and avgProgress > 0 then
         love.graphics.setColor(1, 1, 1)
         love.graphics.setNewFont(11)
-        local progressText = string.format("%d%%", building.production.progress * 100)
+        local progressText = string.format("%d%%", avgProgress * 100)
         love.graphics.print(progressText, x + width - 45, y + height - 24)
     end
 end
@@ -1716,6 +2049,19 @@ function Prototype2State:RenderTopBar()
     love.graphics.setColor(1, 1, 1)
     love.graphics.setNewFont(14)
     love.graphics.print("Commodity Resources", commButtonX + 5, 22)
+
+    -- Stats button
+    local statsButtonX = screenW - 100
+    local statsButtonW = 80
+    if self.mShowStatsPanel then
+        love.graphics.setColor(0.8, 0.6, 0.3)
+    else
+        love.graphics.setColor(0.4, 0.4, 0.5)
+    end
+    love.graphics.rectangle("fill", statsButtonX, 15, statsButtonW, 30, 5, 5)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setNewFont(14)
+    love.graphics.print("Stats", statsButtonX + 22, 22)
 end
 
 function Prototype2State:RenderSpeedControl()
@@ -2230,6 +2576,21 @@ function Prototype2State:OnMouseWheel(dx, dy)
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
     local rightPanelX = screenW - self.mRightPanelWidth
 
+    -- If stats panel is open, scroll it instead
+    if self.mShowStatsPanel then
+        -- Stats panel dimensions (same as in RenderStatsPanel)
+        local leftPanelX = 20
+        local leftPanelW = 350
+        local panelY = 60
+
+        -- Check if mouse is over left panel (commodity list)
+        if mx >= leftPanelX and mx <= leftPanelX + leftPanelW and my >= panelY then
+            self.mStatsScrollOffset = self.mStatsScrollOffset - dy * 30
+            self.mStatsScrollOffset = math.max(0, math.min(self.mStatsScrollOffset, self.mStatsScrollMax))
+        end
+        return
+    end
+
     -- If building modal is open, scroll it instead
     if self.mShowBuildingModal then
         self.mBuildingModalScrollOffset = self.mBuildingModalScrollOffset - dy * 30
@@ -2335,108 +2696,177 @@ function Prototype2State:RenderBuildingModal()
 
     local yOffset = contentY - self.mBuildingModalScrollOffset
 
-    -- Section 1: Recipe
+    -- Section 1: Stations
+    local stationSectionHeight = 50 + (#self.mSelectedBuilding.stations * 90)
     love.graphics.setColor(0.35, 0.35, 0.38)
-    love.graphics.rectangle("fill", modalX + 20, yOffset, modalWidth - 40, 120, 8, 8)
+    love.graphics.rectangle("fill", modalX + 20, yOffset, modalWidth - 40, stationSectionHeight, 8, 8)
 
     love.graphics.setColor(1, 1, 1)
     love.graphics.setNewFont(18)
-    love.graphics.print("Recipe", modalX + 30, yOffset + 10)
+    love.graphics.print("Stations (" .. #self.mSelectedBuilding.stations .. ")", modalX + 30, yOffset + 10)
 
-    if self.mSelectedBuilding.production.recipe then
-        local recipe = self.mSelectedBuilding.production.recipe
+    -- Render each station
+    local stationY = yOffset + 45
+    for _, station in ipairs(self.mSelectedBuilding.stations) do
+        -- Station card
+        local cardWidth = modalWidth - 80
+        local cardHeight = 80
+        local stateColor = {0.4, 0.4, 0.42}
 
-        love.graphics.setNewFont(16)
-        love.graphics.setColor(0.7, 0.9, 0.7)
-        love.graphics.print(recipe.recipeName, modalX + 30, yOffset + 40)
+        if station.state == "PRODUCING" then
+            stateColor = {0.35, 0.5, 0.35}
+        elseif station.state == "NO_WORKER" then
+            stateColor = {0.5, 0.35, 0.35}
+        elseif station.state == "NO_MATERIALS" then
+            stateColor = {0.5, 0.45, 0.3}
+        end
 
-        love.graphics.setNewFont(13)
+        love.graphics.setColor(unpack(stateColor))
+        love.graphics.rectangle("fill", modalX + 40, stationY, cardWidth, cardHeight, 6, 6)
+
+        -- Station ID
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.setNewFont(14)
+        love.graphics.print("Station " .. station.id, modalX + 50, stationY + 8)
+
+        -- Recipe info
+        if station.recipe then
+            love.graphics.setNewFont(13)
+            love.graphics.setColor(0.8, 0.9, 0.8)
+            love.graphics.print(station.recipe.recipeName, modalX + 50, stationY + 28)
+        else
+            love.graphics.setNewFont(13)
+            love.graphics.setColor(0.7, 0.7, 0.7)
+            love.graphics.print("No recipe", modalX + 50, stationY + 28)
+        end
+
+        -- Worker info
+        if station.worker then
+            local workerObj = self.mEmployment.workerLookup[station.worker]
+            if workerObj then
+                love.graphics.setNewFont(12)
+                love.graphics.setColor(0.7, 0.8, 0.9)
+                love.graphics.print("Worker: " .. workerObj.name, modalX + 50, stationY + 48)
+            end
+        else
+            love.graphics.setNewFont(12)
+            love.graphics.setColor(0.8, 0.6, 0.6)
+            love.graphics.print("No worker assigned", modalX + 50, stationY + 48)
+        end
+
+        -- State and progress
+        love.graphics.setNewFont(11)
         love.graphics.setColor(0.8, 0.8, 0.8)
-        love.graphics.print("Time: " .. math.floor(recipe.productionTime / 60) .. " min", modalX + 30, yOffset + 65)
+        local stateText = station.state
+        if station.state == "PRODUCING" then
+            stateText = stateText .. " (" .. math.floor(station.progress * 100) .. "%)"
+        end
+        love.graphics.print("State: " .. stateText, modalX + 400, stationY + 8)
 
-        -- Change Recipe button
-        local buttonWidth = 140
-        local buttonHeight = 30
-        local buttonX = modalX + modalWidth - buttonWidth - 30
-        local buttonY = yOffset + 75
+        -- Recipe button (per station)
+        local buttonWidth = 120
+        local buttonHeight = 25
+        local buttonX = modalX + cardWidth - buttonWidth + 20
+        local buttonY = stationY + cardHeight - buttonHeight - 8
 
-        love.graphics.setColor(0.4, 0.5, 0.7)
-        love.graphics.rectangle("fill", buttonX, buttonY, buttonWidth, buttonHeight, 5, 5)
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.setNewFont(14)
-        local text = "Change Recipe"
-        local textWidth = love.graphics.getFont():getWidth(text)
-        love.graphics.print(text, buttonX + (buttonWidth - textWidth) / 2, buttonY + 7)
-    else
-        love.graphics.setNewFont(14)
-        love.graphics.setColor(0.7, 0.7, 0.7)
-        love.graphics.print("No recipe selected", modalX + 30, yOffset + 40)
+        if station.recipe then
+            -- Change Recipe button
+            love.graphics.setColor(0.4, 0.5, 0.7)
+            love.graphics.rectangle("fill", buttonX, buttonY, buttonWidth, buttonHeight, 4, 4)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.setNewFont(12)
+            local text = "Change Recipe"
+            local textWidth = love.graphics.getFont():getWidth(text)
+            love.graphics.print(text, buttonX + (buttonWidth - textWidth) / 2, buttonY + 5)
+        else
+            -- Add Recipe button
+            love.graphics.setColor(0.5, 0.7, 0.4)
+            love.graphics.rectangle("fill", buttonX, buttonY, buttonWidth, buttonHeight, 4, 4)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.setNewFont(12)
+            local text = "Add Recipe"
+            local textWidth = love.graphics.getFont():getWidth(text)
+            love.graphics.print(text, buttonX + (buttonWidth - textWidth) / 2, buttonY + 5)
+        end
 
-        -- Select Recipe button
-        local buttonWidth = 140
-        local buttonHeight = 30
-        local buttonX = modalX + modalWidth - buttonWidth - 30
-        local buttonY = yOffset + 75
-
-        love.graphics.setColor(0.5, 0.7, 0.4)
-        love.graphics.rectangle("fill", buttonX, buttonY, buttonWidth, buttonHeight, 5, 5)
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.setNewFont(14)
-        local text = "Select Recipe"
-        local textWidth = love.graphics.getFont():getWidth(text)
-        love.graphics.print(text, buttonX + (buttonWidth - textWidth) / 2, buttonY + 7)
+        stationY = stationY + cardHeight + 10
     end
 
-    yOffset = yOffset + 130
+    yOffset = yOffset + stationSectionHeight + 10
 
-    -- Section 2: Storage
+    -- Section 2: Storage (with commodity breakdown)
+    local storage = self.mSelectedBuilding.storage
+
+    -- Count commodities
+    local inputCommodityCount = 0
+    for _ in pairs(storage.inputs) do inputCommodityCount = inputCommodityCount + 1 end
+    local outputCommodityCount = 0
+    for _ in pairs(storage.outputs) do outputCommodityCount = outputCommodityCount + 1 end
+
+    local storageSectionHeight = 100 + (inputCommodityCount * 25) + (outputCommodityCount * 25)
+
     love.graphics.setColor(0.35, 0.35, 0.38)
-    love.graphics.rectangle("fill", modalX + 20, yOffset, modalWidth - 40, 120, 8, 8)
+    love.graphics.rectangle("fill", modalX + 20, yOffset, modalWidth - 40, storageSectionHeight, 8, 8)
 
     love.graphics.setColor(1, 1, 1)
     love.graphics.setNewFont(18)
     love.graphics.print("Storage", modalX + 30, yOffset + 10)
 
-    local storage = self.mSelectedBuilding.storage
+    local storageY = yOffset + 40
 
-    -- Input storage
+    -- Input storage header
     love.graphics.setNewFont(14)
     love.graphics.setColor(0.9, 0.8, 0.6)
-    love.graphics.print("Input Storage:", modalX + 30, yOffset + 40)
+    love.graphics.print("Input Storage:", modalX + 30, storageY)
     love.graphics.setColor(0.8, 0.8, 0.8)
-    love.graphics.print(storage.inputUsed .. " / " .. storage.inputCapacity .. " units", modalX + 160, yOffset + 40)
+    love.graphics.print(storage.inputUsed .. " / " .. storage.inputCapacity .. " units", modalX + 160, storageY)
+    storageY = storageY + 25
 
-    -- Input storage bar
-    local barWidth = modalWidth - 100
-    local barHeight = 12
-    local barX = modalX + 30
-    local barY = yOffset + 60
-    love.graphics.setColor(0.3, 0.3, 0.3)
-    love.graphics.rectangle("fill", barX, barY, barWidth, barHeight, 3, 3)
-    if storage.inputCapacity > 0 then
-        local fillWidth = (storage.inputUsed / storage.inputCapacity) * barWidth
-        love.graphics.setColor(0.9, 0.8, 0.6)
-        love.graphics.rectangle("fill", barX, barY, fillWidth, barHeight, 3, 3)
+    -- List input commodities
+    if inputCommodityCount > 0 then
+        love.graphics.setNewFont(12)
+        for commodityId, amount in pairs(storage.inputs) do
+            love.graphics.setColor(0.7, 0.7, 0.7)
+            love.graphics.print("  • " .. commodityId .. ":", modalX + 40, storageY)
+            love.graphics.setColor(0.9, 0.9, 0.9)
+            love.graphics.print(amount .. " units", modalX + 200, storageY)
+            storageY = storageY + 20
+        end
+        storageY = storageY + 5
+    else
+        love.graphics.setNewFont(12)
+        love.graphics.setColor(0.6, 0.6, 0.6)
+        love.graphics.print("  (empty)", modalX + 40, storageY)
+        storageY = storageY + 25
     end
 
-    -- Output storage
+    -- Output storage header
     love.graphics.setNewFont(14)
     love.graphics.setColor(0.6, 0.9, 0.7)
-    love.graphics.print("Output Storage:", modalX + 30, yOffset + 82)
+    love.graphics.print("Output Storage:", modalX + 30, storageY)
     love.graphics.setColor(0.8, 0.8, 0.8)
-    love.graphics.print(storage.outputUsed .. " / " .. storage.outputCapacity .. " units", modalX + 180, yOffset + 82)
+    love.graphics.print(storage.outputUsed .. " / " .. storage.outputCapacity .. " units", modalX + 180, storageY)
+    storageY = storageY + 25
 
-    -- Output storage bar
-    barY = yOffset + 102
-    love.graphics.setColor(0.3, 0.3, 0.3)
-    love.graphics.rectangle("fill", barX, barY, barWidth, barHeight, 3, 3)
-    if storage.outputCapacity > 0 then
-        local fillWidth = (storage.outputUsed / storage.outputCapacity) * barWidth
-        love.graphics.setColor(0.6, 0.9, 0.7)
-        love.graphics.rectangle("fill", barX, barY, fillWidth, barHeight, 3, 3)
+    -- List output commodities
+    if outputCommodityCount > 0 then
+        love.graphics.setNewFont(12)
+        for commodityId, amount in pairs(storage.outputs) do
+            love.graphics.setColor(0.7, 0.7, 0.7)
+            love.graphics.print("  • " .. commodityId .. ":", modalX + 40, storageY)
+            love.graphics.setColor(0.9, 0.9, 0.9)
+            love.graphics.print(amount .. " units", modalX + 200, storageY)
+            storageY = storageY + 20
+        end
+        storageY = storageY + 5
+    else
+        love.graphics.setNewFont(12)
+        love.graphics.setColor(0.6, 0.6, 0.6)
+        love.graphics.print("  (empty)", modalX + 40, storageY)
+        storageY = storageY + 25
     end
 
-    yOffset = yOffset + 130
+    yOffset = yOffset + storageSectionHeight + 10
 
     -- Section 3: Workers
     local workers = self:GetWorkersForBuilding(self.mSelectedBuilding.id)
@@ -2485,8 +2915,8 @@ function Prototype2State:RenderBuildingModal()
     end
 
     -- Calculate total content height for scrolling
-    -- Recipe (130) + Storage (130) + Workers (variable) + padding (20)
-    local totalContentHeight = 130 + 130 + workerSectionHeight + 20
+    -- Stations (variable) + Storage (variable) + Workers (variable) + padding (20)
+    local totalContentHeight = stationSectionHeight + 10 + storageSectionHeight + 10 + workerSectionHeight + 20
     self.mBuildingModalScrollMax = math.max(0, totalContentHeight - contentHeight)
 
     love.graphics.setScissor()
@@ -2530,22 +2960,228 @@ function Prototype2State:HandleBuildingModalClick(mx, my)
         return
     end
 
-    -- Check recipe button click
+    -- Check for station recipe button clicks
     local contentY = modalY + 60
     local yOffset = contentY - self.mBuildingModalScrollOffset
 
-    local buttonWidth = 140
-    local buttonHeight = 30
-    local buttonX = modalX + modalWidth - buttonWidth - 30
-    local buttonY = yOffset + 75
+    local stationY = yOffset + 45
+    local cardWidth = modalWidth - 80
+    local cardHeight = 80
 
-    if mx >= buttonX and mx <= buttonX + buttonWidth and
-       my >= buttonY and my <= buttonY + buttonHeight then
-        -- Open recipe modal
-        self.mShowRecipeModal = true
-        self.mModalJustOpened = true
-        self.mRecipeScrollOffset = 0
-        return
+    for _, station in ipairs(self.mSelectedBuilding.stations) do
+        -- Check if clicking on this station's recipe button
+        local buttonWidth = 120
+        local buttonHeight = 25
+        local buttonX = modalX + cardWidth - buttonWidth + 20
+        local buttonY = stationY + cardHeight - buttonHeight - 8
+
+        if mx >= buttonX and mx <= buttonX + buttonWidth and
+           my >= buttonY and my <= buttonY + buttonHeight then
+            -- Store which station was clicked
+            self.mSelectedStation = station
+            -- Open recipe modal
+            self.mShowRecipeModal = true
+            self.mModalJustOpened = true
+            self.mRecipeScrollOffset = 0
+            return
+        end
+
+        stationY = stationY + cardHeight + 10
+    end
+end
+
+function Prototype2State:RenderStatsPanel()
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+
+    -- Full-screen modal background (blocks all clicks below)
+    love.graphics.setColor(0.05, 0.05, 0.08, 0.98)
+    love.graphics.rectangle("fill", 0, 0, screenW, screenH)
+
+    -- Get stats data
+    local summary = self.mStats:getMetricsSummary()
+    local trackedCommodities = self.mStats:getTrackedCommodities()
+
+    -- Panel dimensions (similar to commodity panel)
+    local panelY = 60  -- Below top bar
+    local panelH = screenH - 120  -- Leave space for bottom
+
+    -- LEFT SIDE: Commodity list (master)
+    local leftPanelX = 20
+    local leftPanelW = 350
+    local leftPanelY = panelY
+    local leftPanelH = panelH
+
+    -- Left panel background
+    love.graphics.setColor(0.2, 0.2, 0.22)
+    love.graphics.rectangle("fill", leftPanelX, leftPanelY, leftPanelW, leftPanelH, 5, 5)
+
+    -- Title
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setNewFont(20)
+    love.graphics.print("Production Stats", leftPanelX + 15, leftPanelY + 15)
+
+    -- Hint text
+    love.graphics.setColor(0.7, 0.7, 0.7)
+    love.graphics.setNewFont(12)
+    love.graphics.print("Press ESC to close", leftPanelX + 15, leftPanelY + 40)
+
+    -- Scrollable commodity list
+    local listY = leftPanelY + 65
+    local listHeight = leftPanelH - 75
+
+    -- Enable scissor for scrolling
+    love.graphics.setScissor(leftPanelX, listY, leftPanelW, listHeight)
+
+    if #trackedCommodities > 0 then
+        -- Auto-select first commodity if none selected
+        if not self.mSelectedStatCommodity then
+            self.mSelectedStatCommodity = trackedCommodities[1]
+        end
+
+        local yOffset = listY - self.mStatsScrollOffset
+        local itemHeight = 60
+        local spacing = 5
+        local totalContentHeight = 0
+
+        for _, commodityId in ipairs(trackedCommodities) do
+            -- Only render if visible
+            if yOffset + itemHeight >= listY and yOffset <= listY + listHeight then
+                local isSelected = (self.mSelectedStatCommodity == commodityId)
+
+                -- Item background
+                if isSelected then
+                    love.graphics.setColor(0.35, 0.55, 0.75)  -- Blue highlight
+                else
+                    love.graphics.setColor(0.28, 0.28, 0.32)
+                end
+                love.graphics.rectangle("fill", leftPanelX + 10, yOffset, leftPanelW - 20, itemHeight, 5, 5)
+
+                -- Commodity name
+                love.graphics.setColor(1, 1, 1)
+                love.graphics.setNewFont(14)
+                love.graphics.print(commodityId, leftPanelX + 20, yOffset + 8)
+
+                -- Production rate
+                local prodRate = summary.productionRate[commodityId] or 0
+                love.graphics.setColor(0.4, 0.8, 0.4)
+                love.graphics.setNewFont(12)
+                love.graphics.print(string.format("Prod: %.1f/min", prodRate), leftPanelX + 20, yOffset + 28)
+
+                -- Consumption rate
+                local consRate = summary.consumptionRate[commodityId] or 0
+                love.graphics.setColor(0.9, 0.4, 0.4)
+                love.graphics.print(string.format("Cons: %.1f/min", consRate), leftPanelX + 20, yOffset + 43)
+
+                -- Net production
+                local netProd = summary.netProduction[commodityId] or 0
+                local netColor = netProd >= 0 and {0.4, 0.8, 0.4} or {0.9, 0.4, 0.4}
+                love.graphics.setColor(netColor)
+                love.graphics.print(string.format("Net: %+.1f", netProd), leftPanelX + 180, yOffset + 35)
+            end
+
+            yOffset = yOffset + itemHeight + spacing
+            totalContentHeight = totalContentHeight + itemHeight + spacing
+        end
+
+        -- Calculate max scroll
+        self.mStatsScrollMax = math.max(0, totalContentHeight - listHeight)
+
+        -- Draw scrollbar if needed
+        if self.mStatsScrollMax > 0 then
+            local scrollbarX = leftPanelX + leftPanelW - 18
+            local scrollbarWidth = 6
+            local scrollbarHeight = listHeight * (listHeight / totalContentHeight)
+            local scrollbarY = listY + (self.mStatsScrollOffset / self.mStatsScrollMax) * (listHeight - scrollbarHeight)
+
+            love.graphics.setColor(0.5, 0.5, 0.5, 0.8)
+            love.graphics.rectangle("fill", scrollbarX, scrollbarY, scrollbarWidth, scrollbarHeight, 3, 3)
+        end
+    else
+        -- No data message
+        love.graphics.setColor(0.7, 0.7, 0.7)
+        love.graphics.setNewFont(14)
+        love.graphics.print("No production data yet.\nStart producing to see stats!", leftPanelX + 30, listY + 50)
+    end
+
+    love.graphics.setScissor()
+
+    -- RIGHT SIDE: Detailed stats for selected commodity (detail)
+    local rightPanelX = leftPanelX + leftPanelW + 20
+    local rightPanelW = screenW - rightPanelX - 20
+    local rightPanelY = panelY
+    local rightPanelH = panelH
+
+    -- Right panel background
+    love.graphics.setColor(0.15, 0.15, 0.17)
+    love.graphics.rectangle("fill", rightPanelX, rightPanelY, rightPanelW, rightPanelH, 5, 5)
+
+    if self.mSelectedStatCommodity and #trackedCommodities > 0 then
+        -- Title with commodity name
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.setNewFont(18)
+        love.graphics.print("Details: " .. self.mSelectedStatCommodity, rightPanelX + 20, rightPanelY + 15)
+
+        -- Summary cards
+        local cardY = rightPanelY + 50
+        local cardW = (rightPanelW - 60) / 3
+        local cardH = 90
+
+        local prodRate = summary.productionRate[self.mSelectedStatCommodity] or 0
+        local consRate = summary.consumptionRate[self.mSelectedStatCommodity] or 0
+        local netProd = summary.netProduction[self.mSelectedStatCommodity] or 0
+
+        -- Production rate card
+        StatsVisualization.drawStatCard(rightPanelX + 20, cardY, cardW, cardH,
+            prodRate, "Production Rate",
+            {format = "%.1f/min", valueColor = {0.4, 0.8, 0.4, 1}})
+
+        -- Consumption rate card
+        StatsVisualization.drawStatCard(rightPanelX + 30 + cardW, cardY, cardW, cardH,
+            consRate, "Consumption Rate",
+            {format = "%.1f/min", valueColor = {0.9, 0.4, 0.4, 1}})
+
+        -- Net production card
+        local netColor = netProd >= 0 and {0.4, 0.8, 0.4, 1} or {0.9, 0.4, 0.4, 1}
+        StatsVisualization.drawStatCard(rightPanelX + 40 + cardW * 2, cardY, cardW, cardH,
+            netProd, "Net Production",
+            {format = "%+.1f/min", valueColor = netColor})
+
+        -- Charts
+        local chartY = cardY + cardH + 20
+        local chartH = (rightPanelH - (chartY - rightPanelY) - 20) / 2 - 10
+
+        -- Get trend data
+        local prodTrend = self.mStats:getProductionTrend(self.mSelectedStatCommodity, 60)
+        local consTrend = self.mStats:getConsumptionTrend(self.mSelectedStatCommodity, 60)
+        local stockTrend = self.mStats:getStockpileTrend(self.mSelectedStatCommodity, 60)
+
+        -- Production vs Consumption chart
+        if #prodTrend > 0 or #consTrend > 0 then
+            StatsVisualization.drawStackedAreaChart(rightPanelX + 20, chartY, rightPanelW - 40, chartH,
+                prodTrend, consTrend,
+                {title = "Production vs Consumption (per period)"})
+        else
+            love.graphics.setColor(0.5, 0.5, 0.5)
+            love.graphics.setNewFont(14)
+            love.graphics.print("No production/consumption data yet", rightPanelX + 40, chartY + chartH/2)
+        end
+
+        -- Stockpile level chart
+        local stockChartY = chartY + chartH + 20
+        if #stockTrend > 1 then
+            StatsVisualization.drawLineChart(rightPanelX + 20, stockChartY, rightPanelW - 40, chartH,
+                stockTrend,
+                {title = "Stockpile Level Over Time", color = {0.8, 0.6, 0.2, 1}})
+        else
+            love.graphics.setColor(0.5, 0.5, 0.5)
+            love.graphics.setNewFont(14)
+            love.graphics.print("No stockpile data yet", rightPanelX + 40, stockChartY + chartH/2)
+        end
+    else
+        -- No commodity selected
+        love.graphics.setColor(0.7, 0.7, 0.7)
+        love.graphics.setNewFont(16)
+        love.graphics.print("Select a commodity from the list", rightPanelX + rightPanelW/2 - 140, rightPanelY + rightPanelH/2)
     end
 end
 

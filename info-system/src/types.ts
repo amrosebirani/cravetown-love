@@ -14,7 +14,7 @@ export interface BuildingRecipe {
   productionTime: number;
   inputs: Record<string, number>;
   outputs: Record<string, number>;
-  workers: WorkerRequirements;
+  workers?: WorkerRequirements;  // Made optional for backwards compatibility
   inputCostPrice?: Record<string, number>;
   outputSellingPrice?: Record<string, number>;
   accelerationClause?: string;
@@ -51,27 +51,45 @@ export interface WorkerTypesData {
   workerTypes: WorkerType[];
 }
 
+export interface BuildingUpgradeLevel {
+  level: number;
+  name: string;
+  description: string;
+  stations: number;  // Number of work stations (= max workers)
+  width: number;
+  height: number;
+  constructionMaterials?: Record<string, number>;  // For level 0
+  upgradeMaterials?: Record<string, number>;  // For levels > 0
+  storage: {
+    inputCapacity: number;
+    outputCapacity: number;
+  };
+}
+
 export interface BuildingType {
   id: string;
   name: string;
   category: string;
   label: string;  // 2-letter abbreviation
   color: [number, number, number];  // RGB color array [0-1, 0-1, 0-1]
-  baseWidth: number;
-  baseHeight: number;
+  description?: string;
+  workCategories?: string[];  // Categories of workers that can work here
+  workerEfficiency?: Record<string, number>;  // Efficiency multiplier per work category (0.0 to 1.0)
+  upgradeLevels: BuildingUpgradeLevel[];  // Array of upgrade levels (0, 1, 2, ...)
+
+  // Legacy fields (for backwards compatibility during migration)
+  baseWidth?: number;
+  baseHeight?: number;
   variableSize?: boolean;
   minWidth?: number;
   minHeight?: number;
   maxWidth?: number;
   maxHeight?: number;
-  description?: string;
-  workCategories?: string[];  // Categories of workers that can work here
-  workerEfficiency?: Record<string, number>;  // Efficiency multiplier per work category (0.0 to 1.0)
-  properties?: Record<string, any>;  // Building-specific properties
-  constructionMaterials?: Record<string, number>;  // Materials needed to construct
+  properties?: Record<string, any>;
+  constructionMaterials?: Record<string, number>;
   storage?: {
-    inputCapacity: number;    // Max units of input materials that can be stored
-    outputCapacity: number;   // Max units of output products that can be stored
+    inputCapacity: number;
+    outputCapacity: number;
   };
 }
 

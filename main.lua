@@ -400,16 +400,8 @@ function love.keypressed(key)
         return
     end
 
-    -- ESC to return to launcher (from prototypes and main game)
-    if key == "escape" then
-        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" or gMode == "main" then
-            ReturnToLauncher()
-            return
-        elseif gMode == "launcher" then
-            love.event.quit()
-            return
-        end
-    end
+    -- Forward keypressed to states first (they may handle escape)
+    local keyHandled = false
 
     if gMode == "main" then
         -- forward to focused modal (for name input)
@@ -417,14 +409,38 @@ function love.keypressed(key)
             for i = #gStateStack.mStates, 1, -1 do
                 local state = gStateStack.mStates[i]
                 if state.keypressed then
-                    state:keypressed(key)
+                    local handled = state:keypressed(key)
+                    if handled then
+                        keyHandled = true
+                    end
                     break
                 end
             end
         end
+    elseif gMode == "prototype2" then
+        if gPrototype2 and gPrototype2.keypressed then
+            local handled = gPrototype2:keypressed(key)
+            if handled then
+                keyHandled = true
+            end
+        end
     elseif gMode == "infosystem" then
         if gInfoSystem and gInfoSystem.keypressed then
-            gInfoSystem:keypressed(key)
+            local handled = gInfoSystem:keypressed(key)
+            if handled then
+                keyHandled = true
+            end
+        end
+    end
+
+    -- ESC to return to launcher (from prototypes and main game) - only if not handled by state
+    if key == "escape" and not keyHandled then
+        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" or gMode == "main" then
+            ReturnToLauncher()
+            return
+        elseif gMode == "launcher" then
+            love.event.quit()
+            return
         end
     end
 

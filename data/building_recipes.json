@@ -12,15 +12,6 @@
       "outputs": {
         "lumber": 20
       },
-      "workers": {
-        "required": 2,
-        "max": 3,
-        "vocations": [
-          "woodworker"
-        ],
-        "efficiencyBonus": 0.2,
-        "wages": 10
-      },
       "notes": "2 minutes. 1 tree produces 20 lumber units."
     },
     {
@@ -34,14 +25,6 @@
       },
       "outputs": {
         "bread": 8
-      },
-      "workers": {
-        "required": 1,
-        "max": 2,
-        "vocations": [
-          "baker"
-        ],
-        "efficiencyBonus": 0.2
       },
       "notes": "3 minutes. 10 wheat produces 8 bread loaves."
     },
@@ -58,14 +41,6 @@
       "outputs": {
         "meal": 10
       },
-      "workers": {
-        "required": 1,
-        "max": 3,
-        "vocations": [
-          "cook"
-        ],
-        "efficiencyBonus": 0.15
-      },
       "notes": "5 minutes. Makes 10 meals from grains and vegetables."
     },
     {
@@ -81,14 +56,6 @@
       "outputs": {
         "beer": 30
       },
-      "workers": {
-        "required": 1,
-        "max": 2,
-        "vocations": [
-          "barman"
-        ],
-        "efficiencyBonus": 0.1
-      },
       "notes": "2 hours brewing. 40 grain produces 30 beer bottles."
     },
     {
@@ -102,14 +69,6 @@
       },
       "outputs": {
         "whiskey": 20
-      },
-      "workers": {
-        "required": 1,
-        "max": 2,
-        "vocations": [
-          "barman"
-        ],
-        "efficiencyBonus": 0.1
       },
       "notes": "4 hours distilling. 30 rye produces 20 whiskey bottles."
     },
@@ -126,14 +85,6 @@
       "outputs": {
         "shoes": 5
       },
-      "workers": {
-        "required": 1,
-        "max": 3,
-        "vocations": [
-          "shoemaker"
-        ],
-        "efficiencyBonus": 0.15
-      },
       "notes": "10 minutes. Makes 5 pairs of shoes."
     },
     {
@@ -147,15 +98,6 @@
       },
       "outputs": {
         "yarn": 50
-      },
-      "workers": {
-        "required": 2,
-        "max": 4,
-        "vocations": [
-          "weaver",
-          "spinner"
-        ],
-        "efficiencyBonus": 0.12
       },
       "notes": "15 minutes. 20 cotton produces 50 yarn."
     },
@@ -172,14 +114,6 @@
       "outputs": {
         "clothing": 5
       },
-      "workers": {
-        "required": 2,
-        "max": 4,
-        "vocations": [
-          "tailor"
-        ],
-        "efficiencyBonus": 0.18
-      },
       "notes": "8 minutes. Creates 5 clothing items."
     },
     {
@@ -193,15 +127,6 @@
       },
       "outputs": {
         "bricks": 100
-      },
-      "workers": {
-        "required": 4,
-        "max": 8,
-        "vocations": [
-          "worker",
-          "mason"
-        ],
-        "efficiencyBonus": 0.1
       },
       "notes": "1 hour. 50 soil produces 100 bricks."
     },
@@ -217,14 +142,6 @@
       "outputs": {
         "wheat": 100
       },
-      "workers": {
-        "required": 1,
-        "max": 4,
-        "vocations": [
-          "farmer"
-        ],
-        "efficiencyBonus": 0.15
-      },
       "notes": "2 hours. 5 seeds produces 100 wheat."
     },
     {
@@ -238,14 +155,6 @@
       },
       "outputs": {
         "vegetable": 80
-      },
-      "workers": {
-        "required": 1,
-        "max": 4,
-        "vocations": [
-          "farmer"
-        ],
-        "efficiencyBonus": 0.15
       },
       "notes": "1.5 hours. 8 seeds produces 80 vegetables."
     },
@@ -261,14 +170,6 @@
       "outputs": {
         "fruit": 60
       },
-      "workers": {
-        "required": 1,
-        "max": 4,
-        "vocations": [
-          "farmer"
-        ],
-        "efficiencyBonus": 0.15
-      },
       "notes": "3 hours. 10 seeds produces 60 fruits."
     },
     {
@@ -282,14 +183,6 @@
       },
       "outputs": {
         "cotton": 80
-      },
-      "workers": {
-        "required": 1,
-        "max": 4,
-        "vocations": [
-          "farmer"
-        ],
-        "efficiencyBonus": 0.15
       },
       "notes": "2 hours. 10 seeds produces 80 cotton."
     },
@@ -305,14 +198,6 @@
       },
       "outputs": {
         "bed": 1
-      },
-      "workers": {
-        "required": 4,
-        "max": 6,
-        "vocations": [
-          "carpenter"
-        ],
-        "efficiencyBonus": 0.15
       },
       "notes": "30 minutes. Makes 1 bed."
     },
@@ -330,14 +215,6 @@
         "table": 1,
         "chair": 4
       },
-      "workers": {
-        "required": 4,
-        "max": 6,
-        "vocations": [
-          "carpenter"
-        ],
-        "efficiencyBonus": 0.15
-      },
       "notes": "40 minutes. Makes 1 table and 4 chairs."
     },
     {
@@ -353,14 +230,6 @@
       "outputs": {
         "wardrobe": 1
       },
-      "workers": {
-        "required": 4,
-        "max": 6,
-        "vocations": [
-          "carpenter"
-        ],
-        "efficiencyBonus": 0.15
-      },
       "notes": "1 hour. Makes 1 wardrobe."
     },
     {
@@ -375,15 +244,6 @@
       "outputs": {
         "gold_item": 5
       },
-      "workers": {
-        "required": 4,
-        "max": 6,
-        "vocations": [
-          "goldsmith",
-          "artisan"
-        ],
-        "efficiencyBonus": 0.2
-      },
       "notes": "20 minutes. 50g gold ore produces 5 jewelry pieces."
     },
     {
@@ -397,14 +257,6 @@
       },
       "outputs": {
         "currency_note": 1000
-      },
-      "workers": {
-        "required": 2,
-        "max": 4,
-        "vocations": [
-          "worker"
-        ],
-        "efficiencyBonus": 0.1
       },
       "notes": "10 minutes. 100 paper produces 1000 currency notes."
     },
@@ -421,14 +273,6 @@
       "outputs": {
         "knife": 10
       },
-      "workers": {
-        "required": 4,
-        "max": 6,
-        "vocations": [
-          "blacksmith"
-        ],
-        "efficiencyBonus": 0.15
-      },
       "notes": "15 minutes. Makes 10 knives."
     },
     {
@@ -443,14 +287,6 @@
       },
       "outputs": {
         "hammer": 8
-      },
-      "workers": {
-        "required": 2,
-        "max": 4,
-        "vocations": [
-          "blacksmith"
-        ],
-        "efficiencyBonus": 0.2
       },
       "notes": "12 minutes. Makes 8 hammers."
     },
@@ -467,14 +303,6 @@
       "outputs": {
         "shovel": 8
       },
-      "workers": {
-        "required": 2,
-        "max": 4,
-        "vocations": [
-          "blacksmith"
-        ],
-        "efficiencyBonus": 0.2
-      },
       "notes": "12 minutes. Makes 8 shovels."
     },
     {
@@ -487,14 +315,6 @@
       "outputs": {
         "gold_ore": 50
       },
-      "workers": {
-        "required": 3,
-        "max": 10,
-        "vocations": [
-          "miner"
-        ],
-        "efficiencyBonus": 0.1
-      },
       "notes": "30 minutes. Extracts 50 gold ore."
     },
     {
@@ -506,14 +326,6 @@
       "inputs": {},
       "outputs": {
         "iron_ore": 100
-      },
-      "workers": {
-        "required": 3,
-        "max": 10,
-        "vocations": [
-          "miner"
-        ],
-        "efficiencyBonus": 0.1
       },
       "notes": "20 minutes. Extracts 100 iron ore."
     },
@@ -530,14 +342,6 @@
       },
       "outputs": {
         "cake": 2
-      },
-      "workers": {
-        "required": 1,
-        "max": 3,
-        "vocations": [
-          "baker"
-        ],
-        "efficiencyBonus": 0.1
       },
       "notes": "8 minutes. Makes 2 cakes."
     }
