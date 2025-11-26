@@ -237,3 +237,29 @@ export interface FulfillmentVectorsData {
   note?: string;
   commodities: Record<string, CommodityFulfillment>;
 }
+
+// Version/Mod Management Types
+
+export interface GameVersion {
+  id: string;
+  name: string;
+  description: string;
+  author: string;
+  version: string;
+  active: boolean;
+  createdDate: string;
+  lastModified: string;
+  dataPath: string;
+  thumbnail?: string | null;
+  tags?: string[];
+  parentVersion?: string;  // For cloned versions
+}
+
+export interface VersionsManifest {
+  versions: GameVersion[];
+  activeVersion: string;
+  metadata: {
+    formatVersion: string;
+    lastUpdated: string;
+  };
+}

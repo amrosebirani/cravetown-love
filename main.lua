@@ -12,6 +12,7 @@ require("code/BuildingPlacementState")
 require("code/BuildingMenu")
 
 -- Prototype states
+require("code/VersionSelector")
 require("code/PrototypeLauncher")
 require("code/Prototype1State")
 require("code/Prototype2State")
@@ -55,9 +56,10 @@ function love.load()
     gMousePressed = nil
     gMouseReleased = nil
 
-    -- Global mode: "launcher", "main", "prototype1", "prototype2"
-    gMode = "launcher"
-    gPrototypeLauncher = PrototypeLauncher:Create()
+    -- Global mode: "version_select", "launcher", "main", "prototype1", "prototype2"
+    gMode = "version_select"
+    gVersionSelector = VersionSelector:Create()
+    gPrototypeLauncher = nil
 
     -- These will be initialized when a mode is selected
     gTown = nil
@@ -164,6 +166,11 @@ function ReturnToLauncher()
     gPrototype2 = nil
     gInfoSystem = nil
     gMode = "launcher"
+
+    -- Recreate launcher if needed
+    if not gPrototypeLauncher then
+        gPrototypeLauncher = PrototypeLauncher:Create()
+    end
 end
 
 function love.update(dt)
@@ -180,7 +187,17 @@ function love.update(dt)
         end
     end
 
-    if gMode == "launcher" then
+    if gMode == "version_select" then
+        -- Update version selector
+        local selected = gVersionSelector:Update(dt)
+        if selected then
+            print("Version selected: " .. gVersionSelector:GetSelectedVersion())
+            -- Move to prototype launcher
+            gMode = "launcher"
+            gPrototypeLauncher = PrototypeLauncher:Create()
+        end
+
+    elseif gMode == "launcher" then
         -- Update launcher
         local launched = gPrototypeLauncher:Update(dt)
         if launched then
@@ -248,7 +265,10 @@ function love.update(dt)
 end
 
 function love.draw()
-    if gMode == "launcher" then
+    if gMode == "version_select" then
+        gVersionSelector:Render()
+
+    elseif gMode == "launcher" then
         gPrototypeLauncher:Render()
 
     elseif gMode == "main" then
@@ -344,7 +364,11 @@ function love.mousereleased(x, y, button, istouch, presses)
 end
 
 function love.wheelmoved(dx, dy)
-    if gMode == "main" then
+    if gMode == "version_select" then
+        if gVersionSelector and gVersionSelector.OnMouseWheel then
+            gVersionSelector:OnMouseWheel(dx, dy)
+        end
+    elseif gMode == "main" then
         -- Handle mouse wheel for scrolling in UI elements
         -- Pass to state stack states (like InventoryDrawer)
         if gStateStack then
@@ -439,6 +463,11 @@ function love.keypressed(key)
             ReturnToLauncher()
             return
         elseif gMode == "launcher" then
+            -- Go back to version selector
+            gMode = "version_select"
+            gVersionSelector = VersionSelector:Create()
+            return
+        elseif gMode == "version_select" then
             love.event.quit()
             return
         end

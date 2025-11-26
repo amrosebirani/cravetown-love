@@ -1,0 +1,22 @@
+{
+  "versions": [
+    {
+      "id": "base",
+      "name": "Base Game",
+      "description": "Default game data with modern production buildings and mechanics",
+      "author": "Cravetown Team",
+      "version": "1.0.0",
+      "active": true,
+      "createdDate": "2025-01-26",
+      "lastModified": "2025-01-26",
+      "dataPath": "data/base",
+      "thumbnail": null,
+      "tags": ["default", "modern"]
+    }
+  ],
+  "activeVersion": "base",
+  "metadata": {
+    "formatVersion": "1.0",
+    "lastUpdated": "2025-01-26"
+  }
+}

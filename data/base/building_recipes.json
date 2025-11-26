@@ -1,0 +1,349 @@
+{
+  "recipes": [
+    {
+      "buildingType": "sawmill",
+      "name": "Saw Mill",
+      "recipeName": "Lumber Production",
+      "category": "Production",
+      "productionTime": 120,
+      "inputs": {
+        "tree": 1
+      },
+      "outputs": {
+        "lumber": 20
+      },
+      "notes": "2 minutes. 1 tree produces 20 lumber units."
+    },
+    {
+      "buildingType": "bakery",
+      "name": "Bakery",
+      "recipeName": "Bread Baking",
+      "category": "Consumable",
+      "productionTime": 180,
+      "inputs": {
+        "wheat": 10
+      },
+      "outputs": {
+        "bread": 8
+      },
+      "notes": "3 minutes. 10 wheat produces 8 bread loaves."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Meal Preparation",
+      "category": "Consumable",
+      "productionTime": 300,
+      "inputs": {
+        "grain": 5,
+        "vegetable": 5
+      },
+      "outputs": {
+        "meal": 10
+      },
+      "notes": "5 minutes. Makes 10 meals from grains and vegetables."
+    },
+    {
+      "buildingType": "bar",
+      "name": "Bar",
+      "recipeName": "Beer Brewing",
+      "category": "Consumable",
+      "productionTime": 7200,
+      "inputs": {
+        "wheat": 20,
+        "barley": 20
+      },
+      "outputs": {
+        "beer": 30
+      },
+      "notes": "2 hours brewing. 40 grain produces 30 beer bottles."
+    },
+    {
+      "buildingType": "bar",
+      "name": "Bar",
+      "recipeName": "Whiskey Distilling",
+      "category": "Consumable",
+      "productionTime": 14400,
+      "inputs": {
+        "rye": 30
+      },
+      "outputs": {
+        "whiskey": 20
+      },
+      "notes": "4 hours distilling. 30 rye produces 20 whiskey bottles."
+    },
+    {
+      "buildingType": "shoe_factory",
+      "name": "Shoe Factory",
+      "recipeName": "Shoe Manufacturing",
+      "category": "Merchandise",
+      "productionTime": 600,
+      "inputs": {
+        "rubber": 5,
+        "cloth": 10
+      },
+      "outputs": {
+        "shoes": 5
+      },
+      "notes": "10 minutes. Makes 5 pairs of shoes."
+    },
+    {
+      "buildingType": "textile_mill",
+      "name": "Textile Mill",
+      "recipeName": "Yarn Production",
+      "category": "Merchandise",
+      "productionTime": 900,
+      "inputs": {
+        "cotton": 20
+      },
+      "outputs": {
+        "yarn": 50
+      },
+      "notes": "15 minutes. 20 cotton produces 50 yarn."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Clothing Production",
+      "category": "Merchandise",
+      "productionTime": 480,
+      "inputs": {
+        "cotton": 15,
+        "thread": 10
+      },
+      "outputs": {
+        "clothing": 5
+      },
+      "notes": "8 minutes. Creates 5 clothing items."
+    },
+    {
+      "buildingType": "brickyard",
+      "name": "Brickyard",
+      "recipeName": "Brick Production",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "soil": 50
+      },
+      "outputs": {
+        "bricks": 100
+      },
+      "notes": "1 hour. 50 soil produces 100 bricks."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Wheat Farming",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "wheat_seed": 5
+      },
+      "outputs": {
+        "wheat": 100
+      },
+      "notes": "2 hours. 5 seeds produces 100 wheat."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Vegetable Farming",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "vegetable_seed": 8
+      },
+      "outputs": {
+        "vegetable": 80
+      },
+      "notes": "1.5 hours. 8 seeds produces 80 vegetables."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Fruit Farming",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {
+        "fruit_seed": 10
+      },
+      "outputs": {
+        "fruit": 60
+      },
+      "notes": "3 hours. 10 seeds produces 60 fruits."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Cotton Farming",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "cotton_seed": 10
+      },
+      "outputs": {
+        "cotton": 80
+      },
+      "notes": "2 hours. 10 seeds produces 80 cotton."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Bed Crafting",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "lumber": 40,
+        "nails": 20
+      },
+      "outputs": {
+        "bed": 1
+      },
+      "notes": "30 minutes. Makes 1 bed."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Table & Chairs Set",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "lumber": 50,
+        "nails": 30
+      },
+      "outputs": {
+        "table": 1,
+        "chair": 4
+      },
+      "notes": "40 minutes. Makes 1 table and 4 chairs."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Wardrobe Crafting",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "lumber": 80,
+        "nails": 40
+      },
+      "outputs": {
+        "wardrobe": 1
+      },
+      "notes": "1 hour. Makes 1 wardrobe."
+    },
+    {
+      "buildingType": "jewellery_shop",
+      "name": "Jewellery Shop / Goldsmith",
+      "recipeName": "Gold Item Crafting",
+      "category": "Luxury",
+      "productionTime": 1200,
+      "inputs": {
+        "gold_ore": 50
+      },
+      "outputs": {
+        "gold_item": 5
+      },
+      "notes": "20 minutes. 50g gold ore produces 5 jewelry pieces."
+    },
+    {
+      "buildingType": "central_bank",
+      "name": "Central Bank",
+      "recipeName": "Currency Printing",
+      "category": "Mint",
+      "productionTime": 600,
+      "inputs": {
+        "paper": 100
+      },
+      "outputs": {
+        "currency_note": 1000
+      },
+      "notes": "10 minutes. 100 paper produces 1000 currency notes."
+    },
+    {
+      "buildingType": "forge",
+      "name": "Forge",
+      "recipeName": "Knife Forging",
+      "category": "Production",
+      "productionTime": 900,
+      "inputs": {
+        "iron_ore": 30,
+        "wood": 10
+      },
+      "outputs": {
+        "knife": 10
+      },
+      "notes": "15 minutes. Makes 10 knives."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Hammer Forging",
+      "category": "Production",
+      "productionTime": 720,
+      "inputs": {
+        "iron_ore": 40,
+        "wood": 20
+      },
+      "outputs": {
+        "hammer": 8
+      },
+      "notes": "12 minutes. Makes 8 hammers."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Shovel Forging",
+      "category": "Production",
+      "productionTime": 720,
+      "inputs": {
+        "iron_ore": 35,
+        "wood": 20
+      },
+      "outputs": {
+        "shovel": 8
+      },
+      "notes": "12 minutes. Makes 8 shovels."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Gold Mine",
+      "recipeName": "Gold Ore Mining",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {},
+      "outputs": {
+        "gold_ore": 50
+      },
+      "notes": "30 minutes. Extracts 50 gold ore."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Iron Mine",
+      "recipeName": "Iron Ore Mining",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {},
+      "outputs": {
+        "iron_ore": 100
+      },
+      "notes": "20 minutes. Extracts 100 iron ore."
+    },
+    {
+      "buildingType": "bakery",
+      "name": "Bakery",
+      "recipeName": "Cake Making",
+      "category": "Consumable",
+      "productionTime": 480,
+      "inputs": {
+        "wheat": 8,
+        "sugar": 5,
+        "eggs": 3
+      },
+      "outputs": {
+        "cake": 2
+      },
+      "notes": "8 minutes. Makes 2 cakes."
+    }
+  ]
+}

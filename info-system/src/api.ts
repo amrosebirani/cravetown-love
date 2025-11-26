@@ -9,8 +9,20 @@ import type {
   CharacterClassesData,
   CharacterTraitsData,
   FulfillmentVectorsData,
-  EnablementRulesData
+  EnablementRulesData,
+  VersionsManifest,
+  GameVersion
 } from './types';
+
+// Active version state
+let activeVersionPath: string | null = null;
+
+/**
+ * Get the currently active version path
+ */
+function getActiveVersionPath(): string {
+  return activeVersionPath || 'base';
+}
 
 /**
  * Get the path to the data directory
@@ -38,7 +50,8 @@ export async function writeJsonFile(filePath: string, content: string): Promise<
  */
 export async function loadBuildingRecipes(): Promise<BuildingRecipesData> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/building_recipes.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/building_recipes.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
 }
@@ -48,7 +61,8 @@ export async function loadBuildingRecipes(): Promise<BuildingRecipesData> {
  */
 export async function saveBuildingRecipes(data: BuildingRecipesData): Promise<void> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/building_recipes.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/building_recipes.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }
@@ -58,7 +72,8 @@ export async function saveBuildingRecipes(data: BuildingRecipesData): Promise<vo
  */
 export async function loadCommodities(): Promise<CommoditiesData> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/commodities.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/commodities.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
 }
@@ -68,7 +83,8 @@ export async function loadCommodities(): Promise<CommoditiesData> {
  */
 export async function saveCommodities(data: CommoditiesData): Promise<void> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/commodities.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/commodities.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }
@@ -78,7 +94,8 @@ export async function saveCommodities(data: CommoditiesData): Promise<void> {
  */
 export async function loadWorkerTypes(): Promise<WorkerTypesData> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/worker_types.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/worker_types.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
 }
@@ -88,7 +105,8 @@ export async function loadWorkerTypes(): Promise<WorkerTypesData> {
  */
 export async function saveWorkerTypes(data: WorkerTypesData): Promise<void> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/worker_types.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/worker_types.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }
@@ -98,7 +116,8 @@ export async function saveWorkerTypes(data: WorkerTypesData): Promise<void> {
  */
 export async function loadBuildingTypes(): Promise<BuildingTypesData> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/building_types.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/building_types.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
 }
@@ -108,7 +127,8 @@ export async function loadBuildingTypes(): Promise<BuildingTypesData> {
  */
 export async function saveBuildingTypes(data: BuildingTypesData): Promise<void> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/building_types.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/building_types.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }
@@ -118,7 +138,8 @@ export async function saveBuildingTypes(data: BuildingTypesData): Promise<void> 
  */
 export async function loadWorkCategories(): Promise<WorkCategoriesData> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/work_categories.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/work_categories.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
 }
@@ -128,7 +149,8 @@ export async function loadWorkCategories(): Promise<WorkCategoriesData> {
  */
 export async function saveWorkCategories(data: WorkCategoriesData): Promise<void> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/work_categories.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/work_categories.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }
@@ -138,7 +160,8 @@ export async function saveWorkCategories(data: WorkCategoriesData): Promise<void
  */
 export async function loadDimensionDefinitions(): Promise<DimensionDefinitions> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/craving_system/dimension_definitions.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/dimension_definitions.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
 }
@@ -148,7 +171,8 @@ export async function loadDimensionDefinitions(): Promise<DimensionDefinitions> 
  */
 export async function saveDimensionDefinitions(data: DimensionDefinitions): Promise<void> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/craving_system/dimension_definitions.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/dimension_definitions.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }
@@ -158,7 +182,8 @@ export async function saveDimensionDefinitions(data: DimensionDefinitions): Prom
  */
 export async function loadCharacterClasses(): Promise<CharacterClassesData> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/craving_system/character_classes.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/character_classes.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
 }
@@ -168,7 +193,8 @@ export async function loadCharacterClasses(): Promise<CharacterClassesData> {
  */
 export async function saveCharacterClasses(data: CharacterClassesData): Promise<void> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/craving_system/character_classes.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/character_classes.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }
@@ -178,7 +204,8 @@ export async function saveCharacterClasses(data: CharacterClassesData): Promise<
  */
 export async function loadCharacterTraits(): Promise<CharacterTraitsData> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/craving_system/character_traits.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/character_traits.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
 }
@@ -188,7 +215,8 @@ export async function loadCharacterTraits(): Promise<CharacterTraitsData> {
  */
 export async function saveCharacterTraits(data: CharacterTraitsData): Promise<void> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/craving_system/character_traits.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/character_traits.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }
@@ -198,7 +226,8 @@ export async function saveCharacterTraits(data: CharacterTraitsData): Promise<vo
  */
 export async function loadFulfillmentVectors(): Promise<FulfillmentVectorsData> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/craving_system/fulfillment_vectors.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/fulfillment_vectors.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
 }
@@ -208,7 +237,8 @@ export async function loadFulfillmentVectors(): Promise<FulfillmentVectorsData> 
  */
 export async function saveFulfillmentVectors(data: FulfillmentVectorsData): Promise<void> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/craving_system/fulfillment_vectors.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/fulfillment_vectors.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }
@@ -218,7 +248,8 @@ export async function saveFulfillmentVectors(data: FulfillmentVectorsData): Prom
  */
 export async function loadEnablementRules(): Promise<EnablementRulesData> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/craving_system/enablement_rules.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/enablement_rules.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
 }
@@ -228,7 +259,245 @@ export async function loadEnablementRules(): Promise<EnablementRulesData> {
  */
 export async function saveEnablementRules(data: EnablementRulesData): Promise<void> {
   const dataDir = await getDataDir();
-  const filePath = `${dataDir}/craving_system/enablement_rules.json`;
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/enablement_rules.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Version Management APIs
+// =============================================================================
+
+/**
+ * Initialize the version system by loading the active version from the manifest
+ * This should be called when the app starts
+ */
+export async function initializeVersionSystem(): Promise<string> {
+  try {
+    const manifest = await loadVersionsManifest();
+    const activeVersion = manifest.activeVersion || 'base';
+    setActiveVersion(activeVersion);
+    return activeVersion;
+  } catch (error) {
+    console.warn('Failed to load versions manifest, defaulting to base:', error);
+    setActiveVersion('base');
+    return 'base';
+  }
+}
+
+/**
+ * Get the currently active version ID
+ */
+export function getActiveVersion(): string {
+  return getActiveVersionPath();
+}
+
+/**
+ * Load the versions manifest
+ */
+export async function loadVersionsManifest(): Promise<VersionsManifest> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/versions.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save the versions manifest
+ */
+export async function saveVersionsManifest(manifest: VersionsManifest): Promise<void> {
+  const dataDir = await getDataDir();
+  const filePath = `${dataDir}/versions.json`;
+  const content = JSON.stringify(manifest, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Set the active version for this session
+ */
+export function setActiveVersion(versionId: string): void {
+  activeVersionPath = versionId;
+}
+
+/**
+ * Create a new blank version
+ */
+export async function createNewVersion(
+  id: string,
+  name: string,
+  description: string,
+  author: string
+): Promise<GameVersion> {
+  const manifest = await loadVersionsManifest();
+
+  // Check if version already exists
+  if (manifest.versions.find(v => v.id === id)) {
+    throw new Error(`Version with id '${id}' already exists`);
+  }
+
+  const now = new Date().toISOString().split('T')[0];
+  const newVersion: GameVersion = {
+    id,
+    name,
+    description,
+    author,
+    version: '1.0.0',
+    active: false,
+    createdDate: now,
+    lastModified: now,
+    dataPath: `data/${id}`,
+    thumbnail: null,
+    tags: []
+  };
+
+  // Create directory structure (will be done via Tauri backend)
+  const dataDir = await getDataDir();
+  await invoke('create_version_directory', {
+    dataDir,
+    versionId: id
+  });
+
+  // Update manifest
+  manifest.versions.push(newVersion);
+  manifest.metadata.lastUpdated = now;
+  await saveVersionsManifest(manifest);
+
+  return newVersion;
+}
+
+/**
+ * Clone an existing version
+ */
+export async function cloneVersion(
+  sourceId: string,
+  newId: string,
+  newName: string,
+  newAuthor: string
+): Promise<GameVersion> {
+  const manifest = await loadVersionsManifest();
+
+  // Check if source exists
+  const sourceVersion = manifest.versions.find(v => v.id === sourceId);
+  if (!sourceVersion) {
+    throw new Error(`Source version '${sourceId}' not found`);
+  }
+
+  // Check if new version already exists
+  if (manifest.versions.find(v => v.id === newId)) {
+    throw new Error(`Version with id '${newId}' already exists`);
+  }
+
+  const now = new Date().toISOString().split('T')[0];
+  const clonedVersion: GameVersion = {
+    id: newId,
+    name: newName,
+    description: `Cloned from ${sourceVersion.name}`,
+    author: newAuthor,
+    version: '1.0.0',
+    active: false,
+    createdDate: now,
+    lastModified: now,
+    dataPath: `data/${newId}`,
+    thumbnail: null,
+    tags: [...(sourceVersion.tags || [])],
+    parentVersion: sourceId
+  };
+
+  // Clone directory (will be done via Tauri backend)
+  const dataDir = await getDataDir();
+  await invoke('clone_version_directory', {
+    dataDir,
+    sourceId,
+    targetId: newId
+  });
+
+  // Update manifest
+  manifest.versions.push(clonedVersion);
+  manifest.metadata.lastUpdated = now;
+  await saveVersionsManifest(manifest);
+
+  return clonedVersion;
+}
+
+/**
+ * Delete a version
+ */
+export async function deleteVersion(versionId: string): Promise<void> {
+  const manifest = await loadVersionsManifest();
+
+  // Prevent deleting base version
+  if (versionId === 'base') {
+    throw new Error('Cannot delete base version');
+  }
+
+  // Prevent deleting active version
+  if (manifest.activeVersion === versionId) {
+    throw new Error('Cannot delete the active version. Switch to another version first.');
+  }
+
+  // Check if version exists
+  const versionIndex = manifest.versions.findIndex(v => v.id === versionId);
+  if (versionIndex === -1) {
+    throw new Error(`Version '${versionId}' not found`);
+  }
+
+  // Delete directory (will be done via Tauri backend)
+  const dataDir = await getDataDir();
+  await invoke('delete_version_directory', {
+    dataDir,
+    versionId
+  });
+
+  // Update manifest
+  manifest.versions.splice(versionIndex, 1);
+  manifest.metadata.lastUpdated = new Date().toISOString().split('T')[0];
+  await saveVersionsManifest(manifest);
+}
+
+/**
+ * Update version metadata
+ */
+export async function updateVersionMetadata(
+  versionId: string,
+  updates: Partial<Pick<GameVersion, 'name' | 'description' | 'author' | 'tags' | 'thumbnail'>>
+): Promise<void> {
+  const manifest = await loadVersionsManifest();
+
+  const version = manifest.versions.find(v => v.id === versionId);
+  if (!version) {
+    throw new Error(`Version '${versionId}' not found`);
+  }
+
+  // Apply updates
+  Object.assign(version, updates);
+  version.lastModified = new Date().toISOString().split('T')[0];
+  manifest.metadata.lastUpdated = version.lastModified;
+
+  await saveVersionsManifest(manifest);
+}
+
+/**
+ * Set the active version in the manifest
+ */
+export async function switchActiveVersion(versionId: string): Promise<void> {
+  const manifest = await loadVersionsManifest();
+
+  // Check if version exists
+  const version = manifest.versions.find(v => v.id === versionId);
+  if (!version) {
+    throw new Error(`Version '${versionId}' not found`);
+  }
+
+  // Update active flags
+  manifest.versions.forEach(v => {
+    v.active = (v.id === versionId);
+  });
+  manifest.activeVersion = versionId;
+  manifest.metadata.lastUpdated = new Date().toISOString().split('T')[0];
+
+  await saveVersionsManifest(manifest);
+
+  // Update session state
+  setActiveVersion(versionId);
 }

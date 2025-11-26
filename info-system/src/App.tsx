@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout, Menu, Spin } from 'antd';
 import { DatabaseOutlined, AppstoreOutlined, TeamOutlined, HomeOutlined, TagsOutlined,
-         BulbOutlined, UserOutlined, SmileOutlined, GiftOutlined, ThunderboltOutlined, SwapOutlined } from '@ant-design/icons';
+         BulbOutlined, UserOutlined, SmileOutlined, GiftOutlined, ThunderboltOutlined, SwapOutlined, BranchesOutlined } from '@ant-design/icons';
 import RecipeManager from './components/RecipeManager';
 import CommodityManager from './components/CommodityManager';
 import WorkerTypeManager from './components/WorkerTypeManager';
@@ -13,22 +13,34 @@ import TraitManager from './components/TraitManager';
 import FulfillmentVectorManager from './components/FulfillmentVectorManager';
 import EnablementRulesManager from './components/EnablementRulesManager';
 import SubstitutionCalculator from './components/SubstitutionCalculator';
+import VersionManager from './components/VersionManager';
+import { initializeVersionSystem } from './api';
 import './App.css';
 
 const { Header, Content, Sider } = Layout;
 
-type TabKey = 'recipes' | 'commodities' | 'workers' | 'buildings' | 'work-categories' |
+type TabKey = 'versions' | 'recipes' | 'commodities' | 'workers' | 'buildings' | 'work-categories' |
               'dimensions' | 'character-classes' | 'traits' | 'fulfillment-vectors' | 'enablement-rules' | 'substitution-calculator';
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<TabKey>('recipes');
   const [loading, setLoading] = useState(true);
+  const [activeVersion, setActiveVersion] = useState<string>('base');
 
   useEffect(() => {
-    // Initial load delay to allow Tauri to initialize
-    setTimeout(() => {
-      setLoading(false);
-    }, 500);
+    // Initialize version system and load active version
+    const init = async () => {
+      try {
+        const versionId = await initializeVersionSystem();
+        setActiveVersion(versionId);
+      } catch (error) {
+        console.error('Failed to initialize version system:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    init();
   }, []);
 
   return (
@@ -57,6 +69,17 @@ function App() {
             onClick={({ key }) => setSelectedTab(key as TabKey)}
             style={{ height: '100%', borderRight: 0 }}
             items={[
+              {
+                type: 'group',
+                label: 'System',
+                children: [
+                  {
+                    key: 'versions',
+                    icon: <BranchesOutlined />,
+                    label: 'Version Manager',
+                  },
+                ]
+              },
               {
                 type: 'group',
                 label: 'Production System',
@@ -149,6 +172,7 @@ function App() {
               </div>
             ) : (
               <>
+                {selectedTab === 'versions' && <VersionManager />}
                 {selectedTab === 'buildings' && <BuildingTypeManager />}
                 {selectedTab === 'recipes' && <RecipeManager />}
                 {selectedTab === 'commodities' && <CommodityManager />}
