@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Form, Input, InputNumber, Button, Divider, Select } from 'antd';
 import type { BuildingRecipe } from '../types';
 import InputOutputEditor from './InputOutputEditor';
-import WorkerEditor from './WorkerEditor';
 import { loadBuildingTypes } from '../api';
 
 const BUILDING_CATEGORIES = ['Production', 'Consumable', 'Merchandise', 'Luxury', 'Mint'];
@@ -161,13 +160,6 @@ const RecipeEditor = ({ recipe, onSave, onCancel }: RecipeEditorProps) => {
           type="outputs"
         />
       </Form.Item>
-
-      <Divider>Worker Requirements</Divider>
-
-      <WorkerEditor
-        workers={editedRecipe.workers}
-        onChange={(workers) => updateRecipe({ workers })}
-      />
 
       <Divider>Additional Information (Optional)</Divider>
 

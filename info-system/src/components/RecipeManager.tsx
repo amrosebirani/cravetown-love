@@ -238,7 +238,7 @@ const RecipeManager = () => {
       Object.keys(recipe.inputs).some(input => input.toLowerCase().includes(searchLower)) ||
       Object.keys(recipe.outputs).some(output => output.toLowerCase().includes(searchLower)) ||
       recipe.notes.toLowerCase().includes(searchLower) ||
-      recipe.workers.vocations.some(vocation => vocation.toLowerCase().includes(searchLower))
+      (recipe.workers?.vocations && recipe.workers.vocations.some(vocation => vocation.toLowerCase().includes(searchLower)))
     );
   });
 
