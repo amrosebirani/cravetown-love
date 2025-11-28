@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Space, message, Popconfirm, Modal, Form, Input } from 'antd';
+import { Table, Button, Space, message, Popconfirm, Modal, Form, Input, Select, Tag } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-import type { Commodity, CommoditiesData } from '../types';
-import { loadCommodities, saveCommodities } from '../api';
+import type { Commodity, CommoditiesData, CommodityCategory, CommodityCategoriesData } from '../types';
+import { loadCommodities, saveCommodities, loadCommodityCategories } from '../api';
 
 const CommodityManager = () => {
   const [commodities, setCommodities] = useState<Commodity[]>([]);
+  const [categories, setCategories] = useState<CommodityCategory[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingCommodity, setEditingCommodity] = useState<Commodity | null>(null);
   const [editorVisible, setEditorVisible] = useState(false);
@@ -15,6 +16,7 @@ const CommodityManager = () => {
 
   useEffect(() => {
     loadCommoditiesList();
+    loadCategoriesList();
   }, []);
 
   const loadCommoditiesList = async () => {
@@ -28,6 +30,16 @@ const CommodityManager = () => {
       console.error('Failed to load commodities:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCategoriesList = async () => {
+    try {
+      const data = await loadCommodityCategories();
+      setCategories(data.categories);
+    } catch (error) {
+      messageApi.error(`Failed to load categories: ${error}`);
+      console.error('Failed to load categories:', error);
     }
   };
 
@@ -103,7 +115,18 @@ const CommodityManager = () => {
       title: 'Category',
       dataIndex: 'category',
       key: 'category',
-      width: 150,
+      width: 200,
+      render: (categoryId: string) => {
+        const category = categories.find(c => c.id === categoryId);
+        if (category) {
+          return (
+            <Tag color={category.color}>
+              {category.name}
+            </Tag>
+          );
+        }
+        return categoryId;
+      },
     },
     {
       title: 'Description',
@@ -225,7 +248,27 @@ const CommodityManager = () => {
               name="category"
               rules={[{ required: true, message: 'Category is required' }]}
             >
-              <Input />
+              <Select
+                placeholder="Select a category"
+                showSearch
+                optionFilterProp="children"
+              >
+                {categories.map(category => (
+                  <Select.Option key={category.id} value={category.id}>
+                    <Space>
+                      <div style={{
+                        width: 12,
+                        height: 12,
+                        backgroundColor: category.color,
+                        border: '1px solid #ddd',
+                        borderRadius: 2,
+                        display: 'inline-block'
+                      }} />
+                      {category.name}
+                    </Space>
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
 
             <Form.Item

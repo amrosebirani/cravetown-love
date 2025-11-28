@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core';
 import type {
   BuildingRecipesData,
   CommoditiesData,
+  CommodityCategoriesData,
   WorkerTypesData,
   BuildingTypesData,
   WorkCategoriesData,
@@ -10,6 +11,8 @@ import type {
   CharacterTraitsData,
   FulfillmentVectorsData,
   EnablementRulesData,
+  CommodityFatigueRatesData,
+  SubstitutionRulesData,
   VersionsManifest,
   GameVersion
 } from './types';
@@ -85,6 +88,28 @@ export async function saveCommodities(data: CommoditiesData): Promise<void> {
   const dataDir = await getDataDir();
   const versionPath = getActiveVersionPath();
   const filePath = `${dataDir}/${versionPath}/commodities.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load commodity categories from JSON file
+ */
+export async function loadCommodityCategories(): Promise<CommodityCategoriesData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/commodity_categories.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save commodity categories to JSON file
+ */
+export async function saveCommodityCategories(data: CommodityCategoriesData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/commodity_categories.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }
@@ -261,6 +286,50 @@ export async function saveEnablementRules(data: EnablementRulesData): Promise<vo
   const dataDir = await getDataDir();
   const versionPath = getActiveVersionPath();
   const filePath = `${dataDir}/${versionPath}/craving_system/enablement_rules.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load commodity fatigue rates from JSON file
+ */
+export async function loadCommodityFatigueRates(): Promise<CommodityFatigueRatesData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/commodity_fatigue_rates.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save commodity fatigue rates to JSON file
+ */
+export async function saveCommodityFatigueRates(data: CommodityFatigueRatesData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/commodity_fatigue_rates.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load substitution rules from JSON file
+ */
+export async function loadSubstitutionRules(): Promise<SubstitutionRulesData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/substitution_rules.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save substitution rules to JSON file
+ */
+export async function saveSubstitutionRules(data: SubstitutionRulesData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/substitution_rules.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }

@@ -3,22 +3,22 @@
     {
       "id": "farm",
       "name": "Farm",
-      "category": "production",
+      "category": "agriculture",
       "label": "Fr",
+      "description": "Grows crops and raises livestock",
       "color": [
         0.3,
         0.6,
         0.2
       ],
-      "description": "Grows crops and raises livestock",
       "workCategories": [
         "Agriculture",
         "Animal Husbandry",
         "General Labor"
       ],
       "workerEfficiency": {
-        "Agriculture": 1.0,
-        "Animal Husbandry": 1.0,
+        "Agriculture": 1,
+        "Animal Husbandry": 1,
         "General Labor": 0.3
       },
       "upgradeLevels": [
@@ -92,7 +92,7 @@
         "General Labor"
       ],
       "workerEfficiency": {
-        "Lumber Processing": 1.0,
+        "Lumber Processing": 1,
         "Forestry": 0.8,
         "General Labor": 0.5
       },
@@ -162,7 +162,7 @@
         "Baking"
       ],
       "workerEfficiency": {
-        "Baking": 1.0
+        "Baking": 1
       },
       "upgradeLevels": [
         {
@@ -232,7 +232,7 @@
         "General Labor"
       ],
       "workerEfficiency": {
-        "Food Preparation": 1.0,
+        "Food Preparation": 1,
         "Hospitality": 0.8,
         "General Labor": 0.4
       },
@@ -304,7 +304,7 @@
         "General Labor"
       ],
       "workerEfficiency": {
-        "Brewing & Distilling": 1.0,
+        "Brewing & Distilling": 1,
         "Hospitality": 0.8,
         "General Labor": 0.3
       },
@@ -375,7 +375,7 @@
         "General Labor"
       ],
       "workerEfficiency": {
-        "Footwear Manufacturing": 1.0,
+        "Footwear Manufacturing": 1,
         "General Labor": 0.5
       },
       "upgradeLevels": [
@@ -446,7 +446,7 @@
         "General Labor"
       ],
       "workerEfficiency": {
-        "Textile Weaving": 1.0,
+        "Textile Weaving": 1,
         "Spinning": 0.8,
         "General Labor": 0.5
       },
@@ -517,7 +517,7 @@
         "General Labor"
       ],
       "workerEfficiency": {
-        "Tailoring": 1.0,
+        "Tailoring": 1,
         "General Labor": 0.4
       },
       "upgradeLevels": [
@@ -587,7 +587,7 @@
         "General Labor"
       ],
       "workerEfficiency": {
-        "Brick Making": 1.0,
+        "Brick Making": 1,
         "General Labor": 0.4
       },
       "upgradeLevels": [
@@ -656,7 +656,7 @@
         "Woodworking"
       ],
       "workerEfficiency": {
-        "Woodworking": 1.0
+        "Woodworking": 1
       },
       "upgradeLevels": [
         {
@@ -724,7 +724,7 @@
         "Jewelry Crafting"
       ],
       "workerEfficiency": {
-        "Jewelry Crafting": 1.0
+        "Jewelry Crafting": 1
       },
       "upgradeLevels": [
         {
@@ -795,7 +795,7 @@
         "Banking & Finance"
       ],
       "workerEfficiency": {
-        "Banking & Finance": 1.0
+        "Banking & Finance": 1
       },
       "upgradeLevels": [
         {
@@ -867,7 +867,7 @@
         "Smelting"
       ],
       "workerEfficiency": {
-        "Metalworking": 1.0,
+        "Metalworking": 1,
         "Smelting": 0.8
       },
       "upgradeLevels": [
@@ -936,7 +936,7 @@
         "Blacksmithing"
       ],
       "workerEfficiency": {
-        "Blacksmithing": 1.0
+        "Blacksmithing": 1
       },
       "upgradeLevels": [
         {
@@ -1005,7 +1005,7 @@
         "General Labor"
       ],
       "workerEfficiency": {
-        "Mining": 1.0,
+        "Mining": 1,
         "General Labor": 0.5
       },
       "upgradeLevels": [

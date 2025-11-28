@@ -26,6 +26,19 @@ export interface BuildingRecipesData {
   recipes: BuildingRecipe[];
 }
 
+export interface CommodityCategory {
+  id: string;
+  name: string;
+  description?: string;
+  tags: string[];
+  color: string;
+}
+
+export interface CommodityCategoriesData {
+  version: string;
+  categories: CommodityCategory[];
+}
+
 export interface Commodity {
   id: string;
   name: string;
@@ -261,5 +274,44 @@ export interface VersionsManifest {
   metadata: {
     formatVersion: string;
     lastUpdated: string;
+  };
+}
+
+// Commodity Fatigue Rate Types
+
+export interface CommodityFatigueRate {
+  baseFatigueRate: number;
+  fatigueModifiers: Record<string, number>;
+}
+
+export interface CommodityFatigueRatesData {
+  version: string;
+  description: string;
+  defaultFatigueRate: number;
+  defaultRecoveryRate: number;
+  commodities: Record<string, CommodityFatigueRate>;
+  categoryDefaults: Record<string, number>;
+}
+
+// Substitution Rules Types
+
+export interface SubstituteRule {
+  commodity: string;
+  efficiency: number;
+  distance: number;
+}
+
+export interface CommoditySubstitution {
+  substitutes: SubstituteRule[];
+}
+
+export interface SubstitutionRulesData {
+  version: string;
+  description: string;
+  substitutionHierarchies: Record<string, Record<string, CommoditySubstitution>>;
+  desperationRules: {
+    enabled: boolean;
+    desperationThreshold: number;
+    desperationSubstitutes: Record<string, SubstituteRule[]>;
   };
 }

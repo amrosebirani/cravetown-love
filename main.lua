@@ -18,6 +18,11 @@ require("code/Prototype1State")
 require("code/Prototype2State")
 require("code/InfoSystemState")
 
+-- Consumption test states
+local TestCharacterV2State = require("code/consumption/TestCharacterV2State")
+local TestAllocationEngineV2State = require("code/consumption/TestAllocationEngineV2State")
+local ConsumptionPrototypeState = require("code/consumption/ConsumptionPrototypeState")
+
 -- Camera library
 Camera = require("code/Camera")
 
@@ -56,7 +61,7 @@ function love.load()
     gMousePressed = nil
     gMouseReleased = nil
 
-    -- Global mode: "version_select", "launcher", "main", "prototype1", "prototype2"
+    -- Global mode: "version_select", "launcher", "main", "prototype2", "test_character_v2", "test_allocation_v2", "test_cache"
     gMode = "version_select"
     gVersionSelector = VersionSelector:Create()
     gPrototypeLauncher = nil
@@ -67,9 +72,11 @@ function love.load()
     gStateStack = nil
     gStateMachine = nil
     gMusic = nil
-    gPrototype1 = nil
     gPrototype2 = nil
     gInfoSystem = nil
+    gTestCharacterV2 = nil
+    gTestAllocationV2 = nil
+    gTestCache = nil
 end
 
 function InitializeMainGame()
@@ -154,6 +161,28 @@ function InitializeInfoSystem()
     gMode = "infosystem"
 end
 
+function InitializeTestCharacterV2()
+    print("Initializing CharacterV2 Test...")
+    gTestCharacterV2 = TestCharacterV2State
+    gTestCharacterV2:enter()
+    gMode = "test_character_v2"
+end
+
+function InitializeTestAllocationV2()
+    print("Initializing AllocationEngineV2 Test...")
+    gTestAllocationV2 = TestAllocationEngineV2State
+    gTestAllocationV2:enter()
+    gMode = "test_allocation_v2"
+end
+
+function InitializeTestCache()
+    print("Initializing Consumption Prototype (Phase 5 Complete)...")
+    -- test_cache mode now launches the full consumption prototype UI
+    gTestCache = ConsumptionPrototypeState
+    gTestCache:enter()
+    gMode = "test_cache"
+end
+
 function ReturnToLauncher()
     print("Returning to launcher...")
     -- Clean up current mode
@@ -210,6 +239,12 @@ function love.update(dt)
                 InitializePrototype1()
             elseif selected == "prototype2" then
                 InitializePrototype2()
+            elseif selected == "test_character_v2" then
+                InitializeTestCharacterV2()
+            elseif selected == "test_allocation_v2" then
+                InitializeTestAllocationV2()
+            elseif selected == "test_cache" then
+                InitializeTestCache()
             end
         end
 
@@ -256,6 +291,21 @@ function love.update(dt)
     elseif gMode == "infosystem" then
         if gInfoSystem then
             gInfoSystem:Update(dt)
+        end
+
+    elseif gMode == "test_character_v2" then
+        if gTestCharacterV2 then
+            gTestCharacterV2:update(dt)
+        end
+
+    elseif gMode == "test_allocation_v2" then
+        if gTestAllocationV2 then
+            gTestAllocationV2:update(dt)
+        end
+
+    elseif gMode == "test_cache" then
+        if gTestCache then
+            gTestCache:update(dt)
         end
     end
 
@@ -311,6 +361,21 @@ function love.draw()
         if gInfoSystem then
             gInfoSystem:Render()
         end
+
+    elseif gMode == "test_character_v2" then
+        if gTestCharacterV2 then
+            gTestCharacterV2:draw()
+        end
+
+    elseif gMode == "test_allocation_v2" then
+        if gTestAllocationV2 then
+            gTestAllocationV2:draw()
+        end
+
+    elseif gMode == "test_cache" then
+        if gTestCache then
+            gTestCache:draw()
+        end
     end
 
     -- Render toast notification (on top of everything)
@@ -356,11 +421,25 @@ end
 function love.mousepressed(x, y, button, istouch, presses)
     -- Store mouse press for state handling
     gMousePressed = {x = x, y = y, button = button}
+
+    -- Forward to prototype1 if active
+    if gMode == "prototype1" then
+        if gPrototype1 and gPrototype1.prototype then
+            gPrototype1.prototype:MousePressed(x, y, button)
+        end
+    end
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
     -- Store mouse release for state handling
     gMouseReleased = {x = x, y = y, button = button}
+
+    -- Forward to prototype1 if active
+    if gMode == "prototype1" then
+        if gPrototype1 and gPrototype1.prototype then
+            gPrototype1.prototype:MouseReleased(x, y, button)
+        end
+    end
 end
 
 function love.wheelmoved(dx, dy)
@@ -459,7 +538,15 @@ function love.keypressed(key)
 
     -- ESC to return to launcher (from prototypes and main game) - only if not handled by state
     if key == "escape" and not keyHandled then
-        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" or gMode == "main" then
+        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" or gMode == "main" or gMode == "test_character_v2" or gMode == "test_allocation_v2" or gMode == "test_cache" then
+            -- Forward to test state first if it has keypressed
+            if gMode == "test_character_v2" and gTestCharacterV2 and gTestCharacterV2.keypressed then
+                gTestCharacterV2:keypressed(key)
+            elseif gMode == "test_allocation_v2" and gTestAllocationV2 and gTestAllocationV2.keypressed then
+                gTestAllocationV2:keypressed(key)
+            elseif gMode == "test_cache" and gTestCache and gTestCache.keypressed then
+                gTestCache:keypressed(key)
+            end
             ReturnToLauncher()
             return
         elseif gMode == "launcher" then

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Layout, Menu, Spin } from 'antd';
 import { DatabaseOutlined, AppstoreOutlined, TeamOutlined, HomeOutlined, TagsOutlined,
-         BulbOutlined, UserOutlined, SmileOutlined, GiftOutlined, ThunderboltOutlined, SwapOutlined, BranchesOutlined } from '@ant-design/icons';
+         BulbOutlined, UserOutlined, SmileOutlined, GiftOutlined, ThunderboltOutlined, SwapOutlined, BranchesOutlined, FireOutlined, NodeIndexOutlined } from '@ant-design/icons';
 import RecipeManager from './components/RecipeManager';
 import CommodityManager from './components/CommodityManager';
+import CommodityCategoryManager from './components/CommodityCategoryManager';
 import WorkerTypeManager from './components/WorkerTypeManager';
 import BuildingTypeManager from './components/BuildingTypeManager';
 import WorkCategoryManager from './components/WorkCategoryManager';
@@ -13,14 +14,17 @@ import TraitManager from './components/TraitManager';
 import FulfillmentVectorManager from './components/FulfillmentVectorManager';
 import EnablementRulesManager from './components/EnablementRulesManager';
 import SubstitutionCalculator from './components/SubstitutionCalculator';
+import CommodityFatigueManager from './components/CommodityFatigueManager';
+import SubstitutionRulesManager from './components/SubstitutionRulesManager';
 import VersionManager from './components/VersionManager';
 import { initializeVersionSystem } from './api';
 import './App.css';
 
 const { Header, Content, Sider } = Layout;
 
-type TabKey = 'versions' | 'recipes' | 'commodities' | 'workers' | 'buildings' | 'work-categories' |
-              'dimensions' | 'character-classes' | 'traits' | 'fulfillment-vectors' | 'enablement-rules' | 'substitution-calculator';
+type TabKey = 'versions' | 'recipes' | 'commodities' | 'commodity-categories' | 'workers' | 'buildings' | 'work-categories' |
+              'dimensions' | 'character-classes' | 'traits' | 'fulfillment-vectors' | 'enablement-rules' |
+              'substitution-calculator' | 'commodity-fatigue' | 'substitution-rules';
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<TabKey>('recipes');
@@ -100,6 +104,11 @@ function App() {
                     label: 'Commodities',
                   },
                   {
+                    key: 'commodity-categories',
+                    icon: <TagsOutlined />,
+                    label: 'Commodity Categories',
+                  },
+                  {
                     key: 'workers',
                     icon: <TeamOutlined />,
                     label: 'Worker Types',
@@ -141,6 +150,16 @@ function App() {
                     label: 'Enablement Rules',
                   },
                   {
+                    key: 'commodity-fatigue',
+                    icon: <FireOutlined />,
+                    label: 'Commodity Fatigue',
+                  },
+                  {
+                    key: 'substitution-rules',
+                    icon: <NodeIndexOutlined />,
+                    label: 'Substitution Rules',
+                  },
+                  {
                     key: 'substitution-calculator',
                     icon: <SwapOutlined />,
                     label: 'Substitution Calculator',
@@ -176,6 +195,7 @@ function App() {
                 {selectedTab === 'buildings' && <BuildingTypeManager />}
                 {selectedTab === 'recipes' && <RecipeManager />}
                 {selectedTab === 'commodities' && <CommodityManager />}
+                {selectedTab === 'commodity-categories' && <CommodityCategoryManager />}
                 {selectedTab === 'workers' && <WorkerTypeManager />}
                 {selectedTab === 'work-categories' && <WorkCategoryManager />}
                 {selectedTab === 'dimensions' && <DimensionManager />}
@@ -183,6 +203,8 @@ function App() {
                 {selectedTab === 'traits' && <TraitManager />}
                 {selectedTab === 'fulfillment-vectors' && <FulfillmentVectorManager />}
                 {selectedTab === 'enablement-rules' && <EnablementRulesManager />}
+                {selectedTab === 'commodity-fatigue' && <CommodityFatigueManager />}
+                {selectedTab === 'substitution-rules' && <SubstitutionRulesManager />}
                 {selectedTab === 'substitution-calculator' && <SubstitutionCalculator />}
               </>
             )}

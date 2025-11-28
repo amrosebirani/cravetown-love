@@ -14,7 +14,15 @@ function VersionSelector:Create()
         mHoveredIndex = nil,
         mSelectedVersion = nil,
         mScrollOffset = 0,
-        mMaxScroll = 0
+        mMaxScroll = 0,
+        -- Create fonts once to avoid memory leak
+        mFonts = {
+            title = love.graphics.newFont(48),
+            subtitle = love.graphics.newFont(18),
+            small = love.graphics.newFont(12),
+            normal = love.graphics.newFont(14),
+            cardTitle = love.graphics.newFont(24)
+        }
     }
 
     -- Load versions from manifest
@@ -108,16 +116,16 @@ function VersionSelector:Render()
 
     -- Title
     love.graphics.setColor(0.2, 0.2, 0.2)
-    love.graphics.setNewFont(48)
+    love.graphics.setFont(self.mFonts.title)
     local title = "Select Game Version"
-    local titleWidth = love.graphics.getFont():getWidth(title)
+    local titleWidth = self.mFonts.title:getWidth(title)
     love.graphics.print(title, (screenW - titleWidth) / 2, 50)
 
     -- Subtitle
-    love.graphics.setNewFont(18)
+    love.graphics.setFont(self.mFonts.subtitle)
     love.graphics.setColor(0.4, 0.4, 0.4)
     local subtitle = "Choose which version/mod to play"
-    local subtitleWidth = love.graphics.getFont():getWidth(subtitle)
+    local subtitleWidth = self.mFonts.subtitle:getWidth(subtitle)
     love.graphics.print(subtitle, (screenW - subtitleWidth) / 2, 110)
 
     -- Version cards
@@ -156,22 +164,22 @@ function VersionSelector:Render()
             -- Active badge
             if isActive then
                 love.graphics.setColor(0.2, 0.9, 0.2)
-                love.graphics.setNewFont(14)
+                love.graphics.setFont(self.mFonts.normal)
                 love.graphics.print("● ACTIVE", startX + cardWidth - 80, y + 10)
             end
 
             -- Version name
             love.graphics.setColor(1, 1, 1)
-            love.graphics.setNewFont(24)
+            love.graphics.setFont(self.mFonts.cardTitle)
             love.graphics.print(version.name, startX + 20, y + 15)
 
             -- Version ID and version number
-            love.graphics.setNewFont(14)
+            love.graphics.setFont(self.mFonts.normal)
             love.graphics.setColor(0.9, 0.9, 0.9)
             love.graphics.print("ID: " .. version.id .. " | v" .. (version.version or "1.0.0"), startX + 20, y + 45)
 
             -- Description
-            love.graphics.setNewFont(14)
+            love.graphics.setFont(self.mFonts.normal)
             love.graphics.setColor(0.95, 0.95, 0.95)
             local desc = version.description or "No description"
             if #desc > 60 then
@@ -180,7 +188,7 @@ function VersionSelector:Render()
             love.graphics.print(desc, startX + 20, y + 68)
 
             -- Author
-            love.graphics.setNewFont(12)
+            love.graphics.setFont(self.mFonts.small)
             love.graphics.setColor(0.85, 0.85, 0.85)
             love.graphics.print("by " .. (version.author or "Unknown"), startX + 20, y + 92)
         end
@@ -192,7 +200,7 @@ function VersionSelector:Render()
     -- Scroll indicator
     if self.mMaxScroll > 0 then
         love.graphics.setColor(0.4, 0.4, 0.4)
-        love.graphics.setNewFont(14)
+        love.graphics.setFont(self.mFonts.normal)
         love.graphics.print("Scroll with mouse wheel", screenW / 2 - 80, screenH - 40)
 
         -- Scrollbar
@@ -214,9 +222,9 @@ function VersionSelector:Render()
 
     -- Instructions
     love.graphics.setColor(0.5, 0.5, 0.5)
-    love.graphics.setNewFont(14)
+    love.graphics.setFont(self.mFonts.normal)
     local instructions = "Click a version to select and continue | ESC to quit"
-    local instrWidth = love.graphics.getFont():getWidth(instructions)
+    local instrWidth = self.mFonts.normal:getWidth(instructions)
     love.graphics.print(instructions, (screenW - instrWidth) / 2, screenH - 60)
 
     -- Reset color

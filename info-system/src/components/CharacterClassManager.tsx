@@ -73,7 +73,22 @@ const CharacterClassManager: React.FC = () => {
 
   const handleEdit = (record: CharacterClass) => {
     setEditing(record);
-    form.setFieldsValue(record);
+    // Ensure baseCravingVector.fine is properly sized (50 dimensions)
+    const baseCravingVector = {
+      coarse: record.baseCravingVector?.coarse || new Array(9).fill(0),
+      fine: record.baseCravingVector?.fine || new Array(50).fill(0),
+    };
+    // Pad or trim to exactly 50 dimensions
+    if (baseCravingVector.fine.length < 50) {
+      baseCravingVector.fine = [...baseCravingVector.fine, ...new Array(50 - baseCravingVector.fine.length).fill(0)];
+    } else if (baseCravingVector.fine.length > 50) {
+      baseCravingVector.fine = baseCravingVector.fine.slice(0, 50);
+    }
+
+    form.setFieldsValue({
+      ...record,
+      baseCravingVector,
+    });
     setIsModalVisible(true);
   };
 
@@ -97,6 +112,40 @@ const CharacterClassManager: React.FC = () => {
     try {
       const values = await form.validateFields();
       if (!data) return;
+
+      // Ensure baseCravingVector has both coarse and fine arrays
+      if (values.baseCravingVector) {
+        if (!values.baseCravingVector.coarse) {
+          // Calculate coarse from fine by aggregating
+          const fine = values.baseCravingVector.fine || new Array(50).fill(0);
+          const coarse = new Array(9).fill(0);
+
+          // Aggregate fine to coarse (biological=0-7, safety=8-12, etc.)
+          const fineToCoarseRanges = [
+            [0, 7],   // biological
+            [8, 12],  // safety
+            [13, 17], // touch
+            [18, 23], // psychological
+            [24, 28], // social_status
+            [29, 33], // social_connection
+            [34, 39], // exotic_goods
+            [40, 44], // shiny_objects
+            [45, 49]  // vice
+          ];
+
+          fineToCoarseRanges.forEach((range, coarseIdx) => {
+            let sum = 0;
+            let count = 0;
+            for (let i = range[0]; i <= range[1]; i++) {
+              sum += fine[i] || 0;
+              count++;
+            }
+            coarse[coarseIdx] = count > 0 ? sum / count : 0;
+          });
+
+          values.baseCravingVector.coarse = coarse;
+        }
+      }
 
       let newClasses: CharacterClass[];
 
