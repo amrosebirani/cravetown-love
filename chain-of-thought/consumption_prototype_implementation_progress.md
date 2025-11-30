@@ -86,15 +86,158 @@ Each task is small and testable. Update this file after completing each task.
 
 ---
 
-## Future Phases (Not Yet Detailed)
+## Phase 7: Fine Dimension Expansion
 
-- Phase 7: Fine Dimension Expansion (expand/collapse on satisfaction bars)
-- Phase 8: Edit Mode in Character Detail Modal
-- Phase 9: Analytics Views (Heatmap, Class Breakdown, Trends)
-- Phase 10: Allocation Policy Panel
-- Phase 11: Testing Tools (Trigger Riot, Force Emigration, etc.)
-- Phase 12: Save/Load State
-- Phase 13: Keyboard Shortcuts
+**Goal:** Allow users to drill down from coarse (9D) to fine (49D) satisfaction/craving views
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 30 | Add expand/collapse arrows next to each coarse satisfaction bar | PENDING | Click to expand fine dimensions |
+| 31 | Show fine dimensions (5-6 per coarse) when expanded | PENDING | Indented list under parent |
+| 32 | Display fine satisfaction values with mini-bars | PENDING | Smaller bars, same color scheme |
+| 33 | Add "Expand All" / "Collapse All" buttons | PENDING | Quick toggle for all sections |
+| 34 | Persist expansion state during session | PENDING | Remember which are expanded |
+
+---
+
+## Phase 8: Edit Mode in Character Detail Modal
+
+**Goal:** Allow direct manipulation of character state for testing/debugging
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 35 | Add "Edit Mode" toggle button in character detail modal | PENDING | Switches between view/edit |
+| 36 | Edit satisfaction values directly (click to edit, +/- buttons) | PENDING | Immediate update to character |
+| 37 | Edit current craving values | PENDING | Reset or set specific values |
+| 38 | Add/remove traits dynamically | PENDING | Recalculate baseCravings |
+| 39 | Toggle enablements on/off | PENDING | Affect commodity access |
+| 40 | Reset commodity fatigue for character | PENDING | Clear all fatigue multipliers |
+| 41 | Force character state (protesting, emigrated) | PENDING | Manual override for testing |
+| 42 | Add "Reset to Defaults" button | PENDING | Restore character to fresh state |
+
+---
+
+## Phase 9: Analytics Views
+
+**Goal:** Provide town-wide visualization and analysis tools
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 43 | Create Analytics panel/modal with tab navigation | PENDING | Heatmap, Breakdown, Trends tabs |
+| 44 | Town Heatmap: Grid of all characters colored by satisfaction | PENDING | Click to select character |
+| 45 | Town Heatmap: Filter by dimension (biological, safety, etc.) | PENDING | Dropdown to select dimension |
+| 46 | Class Breakdown: Pie/bar chart of population by class | PENDING | Poor, Working, Middle, Upper, Elite |
+| 47 | Class Breakdown: Average satisfaction per class | PENDING | Grouped bar chart |
+| 48 | Class Breakdown: Resource consumption per class | PENDING | Who's using what |
+| 49 | Trends: Satisfaction over time graph | PENDING | Line chart, last 20 cycles |
+| 50 | Trends: Population changes over time | PENDING | Births, deaths, emigrations |
+| 51 | Trends: Resource inventory levels over time | PENDING | Key commodities tracked |
+| 52 | Export analytics data to console/file | PENDING | Debug output option |
+
+---
+
+## Phase 10: Allocation Policy Panel
+
+**Goal:** Configure how resources are distributed to characters
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 53 | Create Allocation Policy modal/panel | PENDING | Accessible from left panel |
+| 54 | Policy: Priority mode selector (need-based, equality, class-based) | PENDING | Radio buttons |
+| 55 | Policy: Class priority sliders (which class gets priority) | PENDING | Weighted distribution |
+| 56 | Policy: Dimension priority weights (biological vs social, etc.) | PENDING | Which needs matter most |
+| 57 | Policy: Substitution aggressiveness slider | PENDING | How readily to substitute |
+| 58 | Policy: Fairness mode toggle (spread resources vs satisfy few) | PENDING | Already in AllocationEngineV2 |
+| 59 | Policy: Reserve threshold (keep X% inventory for emergencies) | PENDING | Don't distribute everything |
+| 60 | Show policy impact preview before applying | PENDING | Estimated satisfaction changes |
+| 61 | Save/load policy presets | PENDING | Quick switching between strategies |
+
+---
+
+## Phase 11: Testing Tools
+
+**Goal:** Manual triggers for testing edge cases and consequences
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 62 | Create Testing Tools panel in left sidebar | PENDING | Collapsible section |
+| 63 | Button: Trigger Riot (immediate) | PENDING | Force riot event |
+| 64 | Button: Trigger Mass Emigration | PENDING | Force emigration wave |
+| 65 | Button: Trigger Civil Unrest | PENDING | Force unrest state |
+| 66 | Button: Force specific character to emigrate | PENDING | Select and remove |
+| 67 | Button: Force specific character to protest | PENDING | Toggle protest state |
+| 68 | Button: Add 10 random characters | PENDING | Quick population boost |
+| 69 | Button: Remove all characters | PENDING | Clear population |
+| 70 | Button: Deplete all inventory | PENDING | Create scarcity |
+| 71 | Button: Fill inventory with basics | PENDING | Quick resource injection |
+| 72 | Button: Skip 10 cycles | PENDING | Fast-forward simulation |
+| 73 | Button: Randomize all satisfaction | PENDING | Create varied population |
+| 74 | Slider: Satisfaction decay multiplier | PENDING | Speed up/slow down decay |
+| 75 | Slider: Craving growth multiplier | PENDING | Adjust craving accumulation |
+
+---
+
+## Phase 12: Save/Load State
+
+**Goal:** Persist and restore simulation state
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 76 | Define save file format (JSON) | PENDING | All simulation state |
+| 77 | Save: Characters array with full state | PENDING | All 6 layers per character |
+| 78 | Save: Town inventory | PENDING | Current commodity amounts |
+| 79 | Save: Injection rates | PENDING | Resource flow config |
+| 80 | Save: Simulation settings (speed, cycle#, time) | PENDING | Resume exactly |
+| 81 | Save: Allocation policy settings | PENDING | If Phase 10 complete |
+| 82 | Save: Event log (last 50 events) | PENDING | Recent history |
+| 83 | Load: Parse and validate save file | PENDING | Error handling |
+| 84 | Load: Restore all state from save | PENDING | Full reconstruction |
+| 85 | Auto-save every N cycles | PENDING | Configurable interval |
+| 86 | Save slot system (3-5 slots) | PENDING | Multiple saves |
+| 87 | Quick-save/Quick-load hotkeys | PENDING | F5/F9 convention |
+| 88 | Export save to clipboard | PENDING | Share simulations |
+
+---
+
+## Phase 13: Keyboard Shortcuts
+
+**Goal:** Power-user efficiency and accessibility
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 89 | SPACE: Pause/Resume simulation | PENDING | Already implemented |
+| 90 | 1-4: Speed settings (1x, 2x, 5x, 10x) | PENDING | Number keys |
+| 91 | TAB: Cycle through views | PENDING | Already implemented |
+| 92 | ESC: Close modal / Exit to launcher | PENDING | Already implemented |
+| 93 | C: Open character creator | PENDING | Quick access |
+| 94 | R: Open resource injector | PENDING | Quick access |
+| 95 | I: Open inventory modal | PENDING | Quick access |
+| 96 | A: Open analytics (Phase 9) | PENDING | Quick access |
+| 97 | P: Open policy panel (Phase 10) | PENDING | Quick access |
+| 98 | Arrow keys: Navigate character selection | PENDING | Left/Right/Up/Down |
+| 99 | ENTER: Open detail modal for selected character | PENDING | Quick drill-down |
+| 100 | DELETE: Remove selected character | PENDING | With confirmation |
+| 101 | F5: Quick-save | PENDING | Phase 12 |
+| 102 | F9: Quick-load | PENDING | Phase 12 |
+| 103 | H: Show/hide help overlay | PENDING | Shortcut reference |
+| 104 | Create keyboard shortcut help overlay | PENDING | Modal with all shortcuts |
+
+---
+
+## Phase 14: Polish & Performance (Bonus)
+
+**Goal:** Final refinements for smooth experience
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| 105 | Add tooltips on hover for buttons | PENDING | Context help |
+| 106 | Add confirmation dialogs for destructive actions | PENDING | Delete, reset, etc. |
+| 107 | Optimize rendering for 100+ characters | PENDING | Virtualization if needed |
+| 108 | Add smooth animations for value changes | PENDING | Tweening satisfaction bars |
+| 109 | Add sound effects for events (optional) | PENDING | Riots, emigration, etc. |
+| 110 | Add notification toasts for important events | PENDING | Non-blocking alerts |
+| 111 | Theme customization (colors) | PENDING | Light/dark mode |
+| 112 | Responsive layout for different window sizes | PENDING | Min/max constraints |
 
 ---
 
