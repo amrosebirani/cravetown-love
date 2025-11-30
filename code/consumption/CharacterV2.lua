@@ -184,7 +184,9 @@ end
 function Character.GenerateBaseCravings(class, traits)
     local baseCravings = {}
 
-    print(string.format("GenerateBaseCravings called with class='%s'", tostring(class)))
+    -- Normalize class to lowercase for comparison
+    local classLower = string.lower(class or "middle")
+    print(string.format("GenerateBaseCravings called with class='%s' (normalized: '%s')", tostring(class), classLower))
 
     if not CharacterClasses or not CharacterClasses.classes then
         -- Fallback: uniform distribution
@@ -195,10 +197,10 @@ function Character.GenerateBaseCravings(class, traits)
         return baseCravings
     end
 
-    -- Find class data
+    -- Find class data (case-insensitive comparison)
     local classData = nil
     for _, c in ipairs(CharacterClasses.classes) do
-        if c.id == class then
+        if string.lower(c.id) == classLower then
             classData = c
             break
         end
@@ -221,26 +223,47 @@ function Character.GenerateBaseCravings(class, traits)
     end
 
     print(string.format("  Found class data for '%s', loading base cravings", class))
+    print(string.format("  Fine vector has %d elements", #classData.baseCravingVector.fine))
 
     -- Copy fine-grained base cravings from class
     for i = 0, 48 do
         baseCravings[i] = classData.baseCravingVector.fine[i + 1] or 0  -- Lua 1-indexed
     end
 
+    -- Debug: print first few base cravings
+    print(string.format("  Base cravings [0-4]: %.2f, %.2f, %.2f, %.2f, %.2f",
+        baseCravings[0] or 0, baseCravings[1] or 0, baseCravings[2] or 0,
+        baseCravings[3] or 0, baseCravings[4] or 0))
+
     -- Apply trait multipliers to base cravings
     if traits and #traits > 0 and CharacterTraits and CharacterTraits.traits then
+        print(string.format("  Applying %d traits: %s", #traits, table.concat(traits, ", ")))
         for _, traitId in ipairs(traits) do
+            local traitIdLower = string.lower(traitId)
+            local foundTrait = false
             for _, traitData in ipairs(CharacterTraits.traits) do
-                if traitData.id == traitId and traitData.cravingMultipliers and traitData.cravingMultipliers.fine then
+                if string.lower(traitData.id) == traitIdLower and traitData.cravingMultipliers and traitData.cravingMultipliers.fine then
+                    print(string.format("    Applying trait '%s' multipliers", traitData.id))
                     for i = 0, 48 do
                         local multiplier = traitData.cravingMultipliers.fine[i + 1] or 1.0
                         baseCravings[i] = baseCravings[i] * multiplier
                     end
+                    foundTrait = true
                     break
                 end
             end
+            if not foundTrait then
+                print(string.format("    Warning: Trait '%s' not found in CharacterTraits", traitId))
+            end
         end
+    else
+        print("  No traits to apply or CharacterTraits not loaded")
     end
+
+    -- Debug: print first few base cravings after traits
+    print(string.format("  Final cravings [0-4]: %.2f, %.2f, %.2f, %.2f, %.2f",
+        baseCravings[0] or 0, baseCravings[1] or 0, baseCravings[2] or 0,
+        baseCravings[3] or 0, baseCravings[4] or 0))
 
     return baseCravings
 end
@@ -282,12 +305,19 @@ function Character:UpdateCurrentCravings(deltaTime)
     local cycleTime = 60.0  -- 60 seconds per cycle
     local ratio = deltaTime / cycleTime
 
+    -- Max craving is relative to base craving (e.g., 50x base rate)
+    -- This represents the maximum intensity a craving can reach
+    -- Once capped, satisfaction continues to decay but craving intensity plateaus
+    local maxCravingMultiplier = 50.0
+
     for i = 0, 48 do
         local baseRate = self.baseCravings[i] or 0
+        local maxCraving = math.max(baseRate * maxCravingMultiplier, 50)  -- At least 50, or 50x base
+
         self.currentCravings[i] = self.currentCravings[i] + (baseRate * ratio)
 
-        -- Cap at reasonable max (e.g., 200)
-        self.currentCravings[i] = math.min(self.currentCravings[i], 200)
+        -- Cap at max craving for this dimension
+        self.currentCravings[i] = math.min(self.currentCravings[i], maxCraving)
     end
 end
 

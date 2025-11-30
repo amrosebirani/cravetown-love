@@ -50,6 +50,11 @@ function DataLoader.loadWorkerTypes()
     local filepath = "data/" .. DataLoader.activeVersion .. "/worker_types.json"
     print("Loading worker types from " .. filepath .. "...")
     local data = DataLoader.loadJSON(filepath)
+    if data then
+        print("  JSON loaded successfully, workerTypes count: " .. (data.workerTypes and #data.workerTypes or "nil"))
+    else
+        print("  WARNING: data is nil after JSON load")
+    end
     return data.workerTypes or {}
 end
 

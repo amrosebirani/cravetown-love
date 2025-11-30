@@ -2,6 +2,10 @@
 local lurker = require("lurker")
 local manualHotReload = true  -- Set to true for manual reload, false for automatic
 
+-- MCP Bridge for AI agent integration
+local MCPBridge = nil
+local gMCPBridge = nil
+
 require("code/StateMachine")
 require("code/StateStack")
 require("code/Building")
@@ -77,6 +81,19 @@ function love.load()
     gTestCharacterV2 = nil
     gTestAllocationV2 = nil
     gTestCache = nil
+
+    -- Initialize MCP Bridge if enabled via environment variable
+    -- Launch game with: CRAVETOWN_MCP=1 love .
+    if os.getenv("CRAVETOWN_MCP") == "1" then
+        MCPBridge = require("code.mcp.MCPBridge")
+        local mcpPort = tonumber(os.getenv("CRAVETOWN_MCP_PORT")) or 9999
+        local mcpHeadless = os.getenv("CRAVETOWN_HEADLESS") == "1"
+        gMCPBridge = MCPBridge:init({
+            port = mcpPort,
+            headless = mcpHeadless
+        })
+        print("[MCP] Bridge enabled - waiting for connections on port " .. mcpPort)
+    end
 end
 
 function InitializeMainGame()
@@ -203,6 +220,19 @@ function ReturnToLauncher()
 end
 
 function love.update(dt)
+    -- Update MCP Bridge (handle connections and messages)
+    if gMCPBridge then
+        gMCPBridge:update(dt)
+
+        -- Apply game speed modifier from MCP
+        dt = dt * gMCPBridge:getGameSpeed()
+
+        -- Skip update if paused via MCP
+        if gMCPBridge:isPaused() then
+            return
+        end
+    end
+
     -- Hot reload files (only if automatic mode)
     if not manualHotReload then
         lurker.update()
@@ -315,6 +345,11 @@ function love.update(dt)
 end
 
 function love.draw()
+    -- Skip rendering in headless mode (for faster AI testing)
+    if gMCPBridge and gMCPBridge:isHeadless() then
+        return
+    end
+
     if gMode == "version_select" then
         gVersionSelector:Render()
 
@@ -334,10 +369,22 @@ function love.draw()
                 love.graphics.print("Camera: " .. math.floor(gCamera.x) .. ", " .. math.floor(gCamera.y), 10, 30)
             end
 
-            -- Debug: show building positions
+            -- MCP status indicator
+            if gMCPBridge then
+                local mcpStatus = gMCPBridge:isConnected() and "MCP: Connected" or "MCP: Waiting..."
+                if gMCPBridge:isPaused() then
+                    mcpStatus = mcpStatus .. " [PAUSED]"
+                end
+                love.graphics.setColor(0, 0.5, 0)
+                love.graphics.print(mcpStatus, 10, 50)
+                love.graphics.setColor(0, 0, 0)
+            end
+
+            -- Debug: show building positions (offset if MCP is active)
+            local debugStartY = gMCPBridge and 70 or 50
             local buildings = gTown:GetBuildings()
             for i, b in ipairs(buildings) do
-                love.graphics.print(string.format("B%d: %.0f, %.0f", i, b.mX, b.mY), 10, 50 + (i-1)*20)
+                love.graphics.print(string.format("B%d: %.0f, %.0f", i, b.mX, b.mY), 10, debugStartY + (i-1)*20)
             end
 
             love.graphics.setColor(1, 1, 1)
@@ -427,6 +474,10 @@ function love.mousepressed(x, y, button, istouch, presses)
         if gPrototype1 and gPrototype1.prototype then
             gPrototype1.prototype:MousePressed(x, y, button)
         end
+    elseif gMode == "test_cache" then
+        if gTestCache and gTestCache.prototype then
+            gTestCache.prototype:MousePressed(x, y, button)
+        end
     end
 end
 
@@ -438,6 +489,10 @@ function love.mousereleased(x, y, button, istouch, presses)
     if gMode == "prototype1" then
         if gPrototype1 and gPrototype1.prototype then
             gPrototype1.prototype:MouseReleased(x, y, button)
+        end
+    elseif gMode == "test_cache" then
+        if gTestCache and gTestCache.prototype then
+            gTestCache.prototype:MouseReleased(x, y, button)
         end
     end
 end
@@ -470,6 +525,10 @@ function love.wheelmoved(dx, dy)
     elseif gMode == "infosystem" then
         if gInfoSystem and gInfoSystem.OnMouseWheel then
             gInfoSystem:OnMouseWheel(dx, dy)
+        end
+    elseif gMode == "test_cache" then
+        if gTestCache and gTestCache.prototype and gTestCache.prototype.OnMouseWheel then
+            gTestCache.prototype:OnMouseWheel(dx, dy)
         end
     end
 end
@@ -582,5 +641,12 @@ function love.textinput(t)
         if gInfoSystem and gInfoSystem.textinput then
             gInfoSystem:textinput(t)
         end
+    end
+end
+
+function love.quit()
+    -- Shutdown MCP Bridge cleanly
+    if gMCPBridge then
+        gMCPBridge:shutdown()
     end
 end

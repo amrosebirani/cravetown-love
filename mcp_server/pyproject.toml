@@ -1,0 +1,19 @@
+[project]
+name = "cravetown-mcp-server"
+version = "0.1.0"
+description = "MCP server for AI agents to play and test the Cravetown game"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+cravetown-mcp = "mcp_server.server:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
