@@ -181,6 +181,66 @@ function River:CheckCollision(building)
     return false
 end
 
+-- Check if a point is within a certain distance of the river
+-- Returns: isNear (boolean), distance (number or nil)
+function River:IsPointNear(x, y, minDistance)
+    minDistance = minDistance or 0
+
+    for i = 1, #self.mPoints - 1 do
+        local p = self.mPoints[i]
+        local nextPoint = self.mPoints[i + 1]
+
+        -- Check if y is between this point and next
+        local minY = math.min(p.y, nextPoint.y)
+        local maxY = math.max(p.y, nextPoint.y)
+
+        if y >= minY and y <= maxY then
+            -- Interpolate the X position of river center at this Y
+            local t = (y - p.y) / (nextPoint.y - p.y + 0.001)
+            local riverX = p.x + t * (nextPoint.x - p.x)
+            local riverWidth = p.width + t * (nextPoint.width - p.width)
+
+            -- Calculate distance from river edge
+            local distFromCenter = math.abs(x - riverX)
+            local distFromEdge = distFromCenter - (riverWidth / 2)
+
+            -- Check if point is within threshold distance of river
+            if distFromEdge < minDistance then
+                return true, math.max(0, distFromEdge)
+            end
+        end
+    end
+
+    return false, nil
+end
+
+-- Get distance from a point to the nearest river edge
+-- Returns distance (positive = outside river, negative = inside river)
+function River:GetDistanceToRiver(x, y)
+    local minDist = math.huge
+
+    for i = 1, #self.mPoints - 1 do
+        local p = self.mPoints[i]
+        local nextPoint = self.mPoints[i + 1]
+
+        local minY = math.min(p.y, nextPoint.y)
+        local maxY = math.max(p.y, nextPoint.y)
+
+        if y >= minY and y <= maxY then
+            local t = (y - p.y) / (nextPoint.y - p.y + 0.001)
+            local riverX = p.x + t * (nextPoint.x - p.x)
+            local riverWidth = p.width + t * (nextPoint.width - p.width)
+
+            local distFromCenter = math.abs(x - riverX)
+            local distFromEdge = distFromCenter - (riverWidth / 2)
+
+            minDist = math.min(minDist, distFromEdge)
+        end
+    end
+
+    return minDist
+end
+
 function River:Update(dt)
     -- Update animation time
     self.mTime = self.mTime + dt

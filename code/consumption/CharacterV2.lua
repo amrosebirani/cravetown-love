@@ -2,27 +2,28 @@
 -- Complete 6-layer character state model for consumption system
 -- Layers: Identity → Base Cravings → Current Cravings → Satisfaction → Commodity Multipliers → History
 
-Character = {}
+Character = Character or {}  -- Preserve table across hot reloads
 Character.__index = Character
 
--- Module-level data (loaded once at init)
-local ConsumptionMechanics = nil
-local FulfillmentVectors = nil
-local CharacterTraits = nil
-local CharacterClasses = nil
-local DimensionDefinitions = nil
-local CommodityFatigueRates = nil
-local EnablementRules = nil
+-- Data stored on Character table (survives hot reload)
+-- These were previously module-level locals which got reset on hot reload
+Character._ConsumptionMechanics = Character._ConsumptionMechanics or nil
+Character._FulfillmentVectors = Character._FulfillmentVectors or nil
+Character._CharacterTraits = Character._CharacterTraits or nil
+Character._CharacterClasses = Character._CharacterClasses or nil
+Character._DimensionDefinitions = Character._DimensionDefinitions or nil
+Character._CommodityFatigueRates = Character._CommodityFatigueRates or nil
+Character._EnablementRules = Character._EnablementRules or nil
 
 -- Initialize data (called once at prototype start)
 function Character.Init(mechanicsData, fulfillmentData, traitsData, classesData, dimensionsData, fatigueData, enablementData)
-    ConsumptionMechanics = mechanicsData
-    FulfillmentVectors = fulfillmentData
-    CharacterTraits = traitsData
-    CharacterClasses = classesData
-    DimensionDefinitions = dimensionsData
-    CommodityFatigueRates = fatigueData
-    EnablementRules = enablementData
+    Character._ConsumptionMechanics = mechanicsData
+    Character._FulfillmentVectors = fulfillmentData
+    Character._CharacterTraits = traitsData
+    Character._CharacterClasses = classesData
+    Character._DimensionDefinitions = dimensionsData
+    Character._CommodityFatigueRates = fatigueData
+    Character._EnablementRules = enablementData
 
     -- Build fine->coarse mapping for fast lookup
     Character.BuildDimensionMaps()
@@ -36,16 +37,16 @@ function Character.BuildDimensionMaps()
     Character.coarseToFineMap = {}
     Character.fineNames = {}
 
-    if not DimensionDefinitions then return end
+    if not Character._DimensionDefinitions then return end
 
     -- Map coarse dimension indices to names and vice versa
-    for _, coarseDim in ipairs(DimensionDefinitions.coarseDimensions) do
+    for _, coarseDim in ipairs(Character._DimensionDefinitions.coarseDimensions) do
         Character.coarseNames[coarseDim.index] = coarseDim.id
         Character.coarseNameToIndex[coarseDim.id] = coarseDim.index
     end
 
     -- Map fine dimensions to their parent coarse
-    for _, fineDim in ipairs(DimensionDefinitions.fineDimensions) do
+    for _, fineDim in ipairs(Character._DimensionDefinitions.fineDimensions) do
         Character.fineNames[fineDim.index] = fineDim.id
         -- Convert parent coarse name to index
         local parentCoarseIndex = Character.coarseNameToIndex[fineDim.parentCoarse]
@@ -80,8 +81,8 @@ function Character.BuildDimensionMaps()
 
     -- Debug output
     print("CharacterV2 dimension maps built:")
-    print("  Coarse dimensions: " .. #DimensionDefinitions.coarseDimensions)
-    print("  Fine dimensions: " .. #DimensionDefinitions.fineDimensions)
+    print("  Coarse dimensions: " .. #Character._DimensionDefinitions.coarseDimensions)
+    print("  Fine dimensions: " .. #Character._DimensionDefinitions.fineDimensions)
     print("  coarseToFineMap entries: " .. tostring(#Character.coarseToFineMap))
     for idx, range in pairs(Character.coarseToFineMap) do
         local name = Character.coarseNames[idx] or "unknown"
@@ -113,9 +114,13 @@ function Character:New(class, id)
     -- LAYER 3: Current Cravings (49D fine-grained accumulation tracker)
     -- =============================================================================
     -- Accumulates based on baseCravings, resets when satisfied
+    -- Initialize with several cycles worth of cravings so characters can consume
+    -- multiple resources per cycle from the start
     char.currentCravings = {}
+    local startingCravingMultiplier = 10  -- Start with 10 cycles worth of accumulated cravings
     for i = 0, 48 do
-        char.currentCravings[i] = 0
+        local baseRate = char.baseCravings[i] or 0
+        char.currentCravings[i] = baseRate * startingCravingMultiplier
     end
 
     -- =============================================================================
@@ -188,7 +193,7 @@ function Character.GenerateBaseCravings(class, traits)
     local classLower = string.lower(class or "middle")
     print(string.format("GenerateBaseCravings called with class='%s' (normalized: '%s')", tostring(class), classLower))
 
-    if not CharacterClasses or not CharacterClasses.classes then
+    if not Character._CharacterClasses or not Character._CharacterClasses.classes then
         -- Fallback: uniform distribution
         print("  Warning: CharacterClasses not loaded, using fallback")
         for i = 0, 48 do
@@ -199,7 +204,7 @@ function Character.GenerateBaseCravings(class, traits)
 
     -- Find class data (case-insensitive comparison)
     local classData = nil
-    for _, c in ipairs(CharacterClasses.classes) do
+    for _, c in ipairs(Character._CharacterClasses.classes) do
         if string.lower(c.id) == classLower then
             classData = c
             break
@@ -236,12 +241,12 @@ function Character.GenerateBaseCravings(class, traits)
         baseCravings[3] or 0, baseCravings[4] or 0))
 
     -- Apply trait multipliers to base cravings
-    if traits and #traits > 0 and CharacterTraits and CharacterTraits.traits then
+    if traits and #traits > 0 and Character._CharacterTraits and Character._CharacterTraits.traits then
         print(string.format("  Applying %d traits: %s", #traits, table.concat(traits, ", ")))
         for _, traitId in ipairs(traits) do
             local traitIdLower = string.lower(traitId)
             local foundTrait = false
-            for _, traitData in ipairs(CharacterTraits.traits) do
+            for _, traitData in ipairs(Character._CharacterTraits.traits) do
                 if string.lower(traitData.id) == traitIdLower and traitData.cravingMultipliers and traitData.cravingMultipliers.fine then
                     print(string.format("    Applying trait '%s' multipliers", traitData.id))
                     for i = 0, 48 do
@@ -275,11 +280,18 @@ end
 function Character.GenerateStartingSatisfaction(class)
     local satisfaction = {}
 
+    -- Convert class to lowercase for JSON lookup (JSON uses "elite", code uses "Elite")
+    local classKey = string.lower(class)
+    -- Map "working" and "poor" to "lower" class ranges (JSON only has elite/upper/middle/lower)
+    if classKey == "working" or classKey == "poor" then
+        classKey = "lower"
+    end
+
     -- Use consumption_mechanics starting ranges (coarse)
-    if ConsumptionMechanics and ConsumptionMechanics.characterGeneration and
-       ConsumptionMechanics.characterGeneration.startingSatisfactionRanges and
-       ConsumptionMechanics.characterGeneration.startingSatisfactionRanges[class] then
-        local ranges = ConsumptionMechanics.characterGeneration.startingSatisfactionRanges[class]
+    if Character._ConsumptionMechanics and Character._ConsumptionMechanics.characterGeneration and
+       Character._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges and
+       Character._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges[classKey] then
+        local ranges = Character._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges[classKey]
         for cravingType, range in pairs(ranges) do
             satisfaction[cravingType] = math.random(range[1], range[2])
         end
@@ -329,11 +341,11 @@ function Character:UpdateSatisfaction(currentCycle)
     -- Satisfaction decays naturally over time based on currentCravings
     -- Higher unfulfilled currentCravings = faster satisfaction decay
 
-    if not ConsumptionMechanics or not ConsumptionMechanics.cravingDecayRates then
+    if not Character._ConsumptionMechanics or not Character._ConsumptionMechanics.cravingDecayRates then
         return
     end
 
-    local decayRates = ConsumptionMechanics.cravingDecayRates
+    local decayRates = Character._ConsumptionMechanics.cravingDecayRates
 
     -- Decay each coarse dimension based on its unfulfilled currentCravings
     for coarseIndex = 0, 8 do
@@ -384,9 +396,9 @@ function Character:CalculateCommodityMultiplier(commodity, currentCycle)
     local baseFatigueRate = 0.12  -- default
     local traitModifier = 1.0
 
-    if CommodityFatigueRates and CommodityFatigueRates.commodities and
-       CommodityFatigueRates.commodities[commodity] then
-        local fatigueData = CommodityFatigueRates.commodities[commodity]
+    if Character._CommodityFatigueRates and Character._CommodityFatigueRates.commodities and
+       Character._CommodityFatigueRates.commodities[commodity] then
+        local fatigueData = Character._CommodityFatigueRates.commodities[commodity]
         baseFatigueRate = fatigueData.baseFatigueRate or baseFatigueRate
 
         -- Apply trait-specific modifiers
@@ -402,9 +414,9 @@ function Character:CalculateCommodityMultiplier(commodity, currentCycle)
     local effectiveFatigueRate = baseFatigueRate * traitModifier
 
     -- Check if enough time has passed for cooldown
-    local cooldownCycles = ConsumptionMechanics and
-                          ConsumptionMechanics.commodityDiminishingReturns and
-                          ConsumptionMechanics.commodityDiminishingReturns.varietyCooldownCycles or 10
+    local cooldownCycles = Character._ConsumptionMechanics and
+                          Character._ConsumptionMechanics.commodityDiminishingReturns and
+                          Character._ConsumptionMechanics.commodityDiminishingReturns.varietyCooldownCycles or 10
 
     if cyclesSinceLast > cooldownCycles then
         -- Reset fatigue
@@ -416,9 +428,9 @@ function Character:CalculateCommodityMultiplier(commodity, currentCycle)
     local multiplier = math.exp(-consecutiveCount * effectiveFatigueRate)
 
     -- Apply min threshold
-    local minMultiplier = ConsumptionMechanics and
-                         ConsumptionMechanics.commodityDiminishingReturns and
-                         ConsumptionMechanics.commodityDiminishingReturns.minMultiplier or 0.25
+    local minMultiplier = Character._ConsumptionMechanics and
+                         Character._ConsumptionMechanics.commodityDiminishingReturns and
+                         Character._ConsumptionMechanics.commodityDiminishingReturns.minMultiplier or 0.25
 
     multiplier = math.max(minMultiplier, multiplier)
 
@@ -440,9 +452,9 @@ function Character:UpdateCommodityHistory(commodity, currentCycle)
         local history = self.commodityMultipliers[commodity]
         local cyclesSinceLast = currentCycle - history.lastConsumed
 
-        local cooldownCycles = ConsumptionMechanics and
-                              ConsumptionMechanics.commodityDiminishingReturns and
-                              ConsumptionMechanics.commodityDiminishingReturns.varietyCooldownCycles or 10
+        local cooldownCycles = Character._ConsumptionMechanics and
+                              Character._ConsumptionMechanics.commodityDiminishingReturns and
+                              Character._ConsumptionMechanics.commodityDiminishingReturns.varietyCooldownCycles or 10
 
         if cyclesSinceLast <= cooldownCycles then
             -- Still in fatigue period
@@ -456,13 +468,13 @@ function Character:UpdateCommodityHistory(commodity, currentCycle)
     end
 
     -- Decay other commodities' consecutive counts over time
-    local decayCycles = ConsumptionMechanics and
-                       ConsumptionMechanics.commodityDiminishingReturns and
-                       ConsumptionMechanics.commodityDiminishingReturns.otherCommodityDecayCycles or 3
+    local decayCycles = Character._ConsumptionMechanics and
+                       Character._ConsumptionMechanics.commodityDiminishingReturns and
+                       Character._ConsumptionMechanics.commodityDiminishingReturns.otherCommodityDecayCycles or 3
 
-    local decayRate = ConsumptionMechanics and
-                     ConsumptionMechanics.commodityDiminishingReturns and
-                     ConsumptionMechanics.commodityDiminishingReturns.otherCommodityDecayRate or 1
+    local decayRate = Character._ConsumptionMechanics and
+                     Character._ConsumptionMechanics.commodityDiminishingReturns and
+                     Character._ConsumptionMechanics.commodityDiminishingReturns.otherCommodityDecayRate or 1
 
     for otherCommodity, otherHistory in pairs(self.commodityMultipliers) do
         if otherCommodity ~= commodity then
@@ -479,12 +491,12 @@ end
 -- =============================================================================
 
 function Character:FulfillCraving(commodity, quantity, currentCycle)
-    if not FulfillmentVectors or not FulfillmentVectors.commodities then
-        print("Error: FulfillmentVectors not initialized")
+    if not Character._FulfillmentVectors or not Character._FulfillmentVectors.commodities then
+        print("Error: Character._FulfillmentVectors not initialized")
         return false, 0, 1.0
     end
 
-    local commodityData = FulfillmentVectors.commodities[commodity]
+    local commodityData = Character._FulfillmentVectors.commodities[commodity]
     if not commodityData then
         print("Warning: No fulfillment data for commodity: " .. commodity)
         return false, 0, 1.0
@@ -558,9 +570,9 @@ function Character:FulfillCraving(commodity, quantity, currentCycle)
     end
 
     -- Visual feedback
-    local varietyThreshold = ConsumptionMechanics and
-                            ConsumptionMechanics.commodityDiminishingReturns and
-                            ConsumptionMechanics.commodityDiminishingReturns.varietySeekingThreshold or 0.70
+    local varietyThreshold = Character._ConsumptionMechanics and
+                            Character._ConsumptionMechanics.commodityDiminishingReturns and
+                            Character._ConsumptionMechanics.commodityDiminishingReturns.varietySeekingThreshold or 0.70
 
     if fatigueMultiplier < varietyThreshold then
         self.status = "variety_seeking"
@@ -583,13 +595,13 @@ function Character:ApplyEnablement(ruleId, currentCycle)
         return false
     end
 
-    if not EnablementRules or not EnablementRules.rules then
+    if not Character._EnablementRules or not Character._EnablementRules.rules then
         return false
     end
 
     -- Find the rule
     local rule = nil
-    for _, r in ipairs(EnablementRules.rules) do
+    for _, r in ipairs(Character._EnablementRules.rules) do
         if r.id == ruleId then
             rule = r
             break
@@ -656,11 +668,11 @@ end
 -- =============================================================================
 
 function Character:CalculatePriority(currentCycle, allocationMode)
-    if not ConsumptionMechanics or not ConsumptionMechanics.priorityCalculation then
+    if not Character._ConsumptionMechanics or not Character._ConsumptionMechanics.priorityCalculation then
         return 100
     end
 
-    local config = ConsumptionMechanics.priorityCalculation
+    local config = Character._ConsumptionMechanics.priorityCalculation
 
     -- Base class weight
     local classWeight = config.classWeights[self.class] or 1
@@ -715,32 +727,32 @@ end
 -- =============================================================================
 
 function Character.GenerateRandomName()
-    if not ConsumptionMechanics or not ConsumptionMechanics.names then
+    if not Character._ConsumptionMechanics or not Character._ConsumptionMechanics.names then
         return "Character_" .. math.random(1000, 9999)
     end
 
-    local first = ConsumptionMechanics.names.first
-    local last = ConsumptionMechanics.names.last
+    local first = Character._ConsumptionMechanics.names.first
+    local last = Character._ConsumptionMechanics.names.last
     return first[math.random(#first)] .. " " .. last[math.random(#last)]
 end
 
 function Character.GetRandomVocation()
-    if not ConsumptionMechanics or not ConsumptionMechanics.vocations then
+    if not Character._ConsumptionMechanics or not Character._ConsumptionMechanics.vocations then
         return "Worker"
     end
 
-    local vocations = ConsumptionMechanics.vocations
+    local vocations = Character._ConsumptionMechanics.vocations
     return vocations[math.random(#vocations)]
 end
 
 function Character.GetRandomTraits(count, class)
-    if not ConsumptionMechanics or not ConsumptionMechanics.characterGeneration or
-       not ConsumptionMechanics.characterGeneration.traits or
-       not ConsumptionMechanics.characterGeneration.traits.available then
+    if not Character._ConsumptionMechanics or not Character._ConsumptionMechanics.characterGeneration or
+       not Character._ConsumptionMechanics.characterGeneration.traits or
+       not Character._ConsumptionMechanics.characterGeneration.traits.available then
         return {}
     end
 
-    local availableTraits = ConsumptionMechanics.characterGeneration.traits.available
+    local availableTraits = Character._ConsumptionMechanics.characterGeneration.traits.available
     local selected = {}
     local indices = {}
 
@@ -756,11 +768,21 @@ function Character.GetRandomTraits(count, class)
 end
 
 function Character:GetAverageSatisfaction()
+    -- Only average the 9 coarse dimensions explicitly
+    local coarseKeys = {
+        "biological", "safety", "touch", "psychological",
+        "social_status", "social_connection", "exotic_goods",
+        "shiny_objects", "vice"
+    }
+
     local sum = 0
     local count = 0
-    for _, value in pairs(self.satisfaction) do
-        sum = sum + value
-        count = count + 1
+    for _, key in ipairs(coarseKeys) do
+        local value = self.satisfaction[key]
+        if value then
+            sum = sum + value
+            count = count + 1
+        end
     end
     return count > 0 and (sum / count) or 0
 end
@@ -781,12 +803,12 @@ function Character:CheckEmigration(currentCycle)
         return false
     end
 
-    if not ConsumptionMechanics or not ConsumptionMechanics.consequenceThresholds or
-       not ConsumptionMechanics.consequenceThresholds.emigration then
+    if not Character._ConsumptionMechanics or not Character._ConsumptionMechanics.consequenceThresholds or
+       not Character._ConsumptionMechanics.consequenceThresholds.emigration then
         return false
     end
 
-    local config = ConsumptionMechanics.consequenceThresholds.emigration
+    local config = Character._ConsumptionMechanics.consequenceThresholds.emigration
     if not config.enabled then
         return false
     end
@@ -846,12 +868,12 @@ function Character:UpdateProductivity()
     -- Formula: productivityMultiplier = avgSatisfaction / 50 (when < 50)
     -- When satisfaction >= 50, productivity is at full (1.0)
 
-    if not ConsumptionMechanics or not ConsumptionMechanics.consequenceThresholds or
-       not ConsumptionMechanics.consequenceThresholds.productivity then
+    if not Character._ConsumptionMechanics or not Character._ConsumptionMechanics.consequenceThresholds or
+       not Character._ConsumptionMechanics.consequenceThresholds.productivity then
         return
     end
 
-    local config = ConsumptionMechanics.consequenceThresholds.productivity
+    local config = Character._ConsumptionMechanics.consequenceThresholds.productivity
     if not config.enabled then
         return
     end
@@ -887,12 +909,12 @@ function Character:CheckProtest(currentCycle)
         return false
     end
 
-    if not ConsumptionMechanics or not ConsumptionMechanics.consequenceThresholds or
-       not ConsumptionMechanics.consequenceThresholds.protest then
+    if not Character._ConsumptionMechanics or not Character._ConsumptionMechanics.consequenceThresholds or
+       not Character._ConsumptionMechanics.consequenceThresholds.protest then
         return false
     end
 
-    local config = ConsumptionMechanics.consequenceThresholds.protest
+    local config = Character._ConsumptionMechanics.consequenceThresholds.protest
     if not config.enabled then
         return false
     end

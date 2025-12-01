@@ -368,6 +368,7 @@ function love.draw()
             if gCamera then
                 love.graphics.print("Camera: " .. math.floor(gCamera.x) .. ", " .. math.floor(gCamera.y), 10, 30)
             end
+            love.graphics.print("Press R for Resource Overlays", 10, 50)
 
             -- MCP status indicator
             if gMCPBridge then
@@ -376,12 +377,12 @@ function love.draw()
                     mcpStatus = mcpStatus .. " [PAUSED]"
                 end
                 love.graphics.setColor(0, 0.5, 0)
-                love.graphics.print(mcpStatus, 10, 50)
+                love.graphics.print(mcpStatus, 10, 70)
                 love.graphics.setColor(0, 0, 0)
             end
 
             -- Debug: show building positions (offset if MCP is active)
-            local debugStartY = gMCPBridge and 70 or 50
+            local debugStartY = gMCPBridge and 90 or 70
             local buildings = gTown:GetBuildings()
             for i, b in ipairs(buildings) do
                 love.graphics.print(string.format("B%d: %.0f, %.0f", i, b.mX, b.mY), 10, debugStartY + (i-1)*20)
@@ -392,6 +393,11 @@ function love.draw()
 
         if gStateStack then
             gStateStack:Render()
+        end
+
+        -- Render resource overlay control panel (in screen space)
+        if gTown then
+            gTown:RenderResourceOverlayPanel()
         end
 
     elseif gMode == "prototype1" then
@@ -468,6 +474,14 @@ end
 function love.mousepressed(x, y, button, istouch, presses)
     -- Store mouse press for state handling
     gMousePressed = {x = x, y = y, button = button}
+
+    -- Handle resource overlay panel click in main mode
+    if gMode == "main" and button == 1 then
+        if gTown and gTown:HandleResourceOverlayClick(x, y) then
+            -- Click was handled by overlay panel, don't propagate
+            return
+        end
+    end
 
     -- Forward to prototype1 if active
     if gMode == "prototype1" then
@@ -566,8 +580,16 @@ function love.keypressed(key)
     local keyHandled = false
 
     if gMode == "main" then
+        -- Handle resource overlay toggle (R key)
+        if key == "r" and gTown then
+            local handled = gTown:HandleResourceOverlayKey(key)
+            if handled then
+                keyHandled = true
+            end
+        end
+
         -- forward to focused modal (for name input)
-        if gStateStack then
+        if not keyHandled and gStateStack then
             for i = #gStateStack.mStates, 1, -1 do
                 local state = gStateStack.mStates[i]
                 if state.keypressed then
@@ -592,6 +614,12 @@ function love.keypressed(key)
             if handled then
                 keyHandled = true
             end
+        end
+    elseif gMode == "test_cache" then
+        -- Forward keypressed to ConsumptionPrototype
+        if gTestCache and gTestCache.KeyPressed then
+            gTestCache:KeyPressed(key)
+            keyHandled = true
         end
     end
 

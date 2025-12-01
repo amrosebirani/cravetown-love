@@ -363,6 +363,59 @@ export const FULFILLMENT_TEMPLATES: Record<string, VectorTemplate> = {
   },
 };
 
+// ============================================================================
+// NATURAL RESOURCES CONSTANTS
+// ============================================================================
+
+export const RESOURCE_CATEGORIES = ['continuous', 'discrete'] as const;
+export type ResourceCategoryType = typeof RESOURCE_CATEGORIES[number];
+
+export const DISTRIBUTION_TYPES = ['perlin_hybrid', 'regional_cluster'] as const;
+export type DistributionTypeConst = typeof DISTRIBUTION_TYPES[number];
+
+export const EFFICIENCY_FORMULAS = ['weighted_average', 'direct', 'minimum'] as const;
+export type EfficiencyFormulaType = typeof EFFICIENCY_FORMULAS[number];
+
+// Default resource IDs for reference
+export const NATURAL_RESOURCE_IDS = [
+  'ground_water',
+  'fertility',
+  'iron_ore',
+  'copper_ore',
+  'coal',
+  'gold_ore',
+  'silver_ore',
+  'stone',
+  'oil',
+  'natural_gas',
+  'clay'
+] as const;
+export type NaturalResourceId = typeof NATURAL_RESOURCE_IDS[number];
+
+// Resource value tier thresholds
+export const RESOURCE_VALUE_TIERS = {
+  none: { min: 0.0, max: 0.19, label: 'None/Trace', color: '#666666' },
+  poor: { min: 0.20, max: 0.39, label: 'Poor', color: '#CC6666' },
+  moderate: { min: 0.40, max: 0.59, label: 'Moderate', color: '#CCCC66' },
+  good: { min: 0.60, max: 0.79, label: 'Good', color: '#66CC66' },
+  excellent: { min: 0.80, max: 1.0, label: 'Excellent', color: '#66CCCC' }
+} as const;
+
+// Default colors for resources (RGB 0-1 format for Lua compatibility)
+export const RESOURCE_COLORS: Record<string, [number, number, number]> = {
+  ground_water: [0.2, 0.5, 0.9],
+  fertility: [0.3, 0.6, 0.2],
+  iron_ore: [0.6, 0.3, 0.2],
+  copper_ore: [0.8, 0.5, 0.3],
+  coal: [0.2, 0.2, 0.2],
+  gold_ore: [0.9, 0.8, 0.2],
+  silver_ore: [0.75, 0.75, 0.75],
+  stone: [0.5, 0.5, 0.5],
+  oil: [0.1, 0.1, 0.1],
+  natural_gas: [0.7, 0.9, 1.0],
+  clay: [0.8, 0.6, 0.4]
+};
+
 // Quality multiplier presets
 export const QUALITY_MULTIPLIERS = {
   basic_food: {

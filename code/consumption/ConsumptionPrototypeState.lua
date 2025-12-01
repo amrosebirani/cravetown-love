@@ -33,10 +33,15 @@ function ConsumptionPrototypeState:draw()
 end
 
 function ConsumptionPrototypeState:keypressed(key)
-    if self.prototype and self.prototype.keypressed then
-        return self.prototype:keypressed(key)
+    if self.prototype and self.prototype.KeyPressed then
+        return self.prototype:KeyPressed(key)
     end
     return false
+end
+
+-- Alias for capital K version (main.lua uses this)
+function ConsumptionPrototypeState:KeyPressed(key)
+    return self:keypressed(key)
 end
 
 return ConsumptionPrototypeState

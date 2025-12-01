@@ -22,4 +22,17 @@ export type {
   EnablementRulesData,
   CommodityFulfillment,
   FulfillmentVectorsData,
+  // Natural Resources Types
+  ResourceCategory,
+  DistributionType,
+  EfficiencyFormula,
+  PerlinDistribution,
+  ClusterDistribution,
+  RiverInfluence,
+  CollisionRules,
+  ResourceVisualization,
+  NaturalResource,
+  NaturalResourcesData,
+  ResourceRequirement,
+  PlacementConstraints,
 } from '../types';

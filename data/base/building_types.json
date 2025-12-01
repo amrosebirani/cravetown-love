@@ -21,6 +21,26 @@
         "Animal Husbandry": 1,
         "General Labor": 0.3
       },
+      "placementConstraints": {
+        "enabled": true,
+        "requiredResources": [
+          {
+            "resourceId": "fertility",
+            "weight": 0.7,
+            "minValue": 0.2,
+            "displayName": "Soil Fertility"
+          },
+          {
+            "resourceId": "ground_water",
+            "weight": 0.3,
+            "minValue": 0.1,
+            "displayName": "Ground Water"
+          }
+        ],
+        "efficiencyFormula": "weighted_average",
+        "warningThreshold": 0.4,
+        "blockingThreshold": 0.2
+      },
       "upgradeLevels": [
         {
           "level": 0,
@@ -992,7 +1012,7 @@
     {
       "id": "mine",
       "name": "Mine",
-      "category": "production",
+      "category": "extraction",
       "label": "Mi",
       "color": [
         0.4,
@@ -1007,6 +1027,21 @@
       "workerEfficiency": {
         "Mining": 1,
         "General Labor": 0.5
+      },
+      "placementConstraints": {
+        "enabled": true,
+        "requiredResources": [
+          {
+            "resourceId": "ore_any",
+            "weight": 1.0,
+            "minValue": 0.1,
+            "displayName": "Ore Deposit",
+            "anyOf": ["iron_ore", "copper_ore", "coal", "gold_ore", "silver_ore"]
+          }
+        ],
+        "efficiencyFormula": "direct",
+        "warningThreshold": 0.3,
+        "blockingThreshold": 0.1
       },
       "upgradeLevels": [
         {

@@ -72,4 +72,18 @@ function DataLoader.loadBuildingTypes()
     return data.buildingTypes or {}
 end
 
+function DataLoader.loadNaturalResources()
+    local filepath = "data/" .. DataLoader.activeVersion .. "/natural_resources.json"
+    print("Loading natural resources from " .. filepath .. "...")
+    local success, data = pcall(function()
+        return DataLoader.loadJSON(filepath)
+    end)
+    if success and data then
+        return data
+    else
+        print("  WARNING: Could not load natural resources, returning empty data")
+        return { naturalResources = {} }
+    end
+end
+
 return DataLoader

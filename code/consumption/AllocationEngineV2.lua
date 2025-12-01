@@ -14,6 +14,17 @@ local SubstitutionRules = nil
 local CharacterV2 = nil
 local CommodityCache = nil
 
+-- Class-based consumption budget (items per cycle)
+-- Wealthier classes can consume more resources to satisfy more cravings
+AllocationEngineV2.classConsumptionBudget = {
+    Elite = 10,
+    Upper = 7,
+    Middle = 5,
+    Working = 3,
+    Poor = 2,
+    Lower = 3  -- Alias for Working
+}
+
 -- Initialize data
 function AllocationEngineV2.Init(mechanicsData, fulfillmentData, substitutionData, characterV2Module, cacheModule)
     ConsumptionMechanics = mechanicsData
@@ -24,7 +35,8 @@ function AllocationEngineV2.Init(mechanicsData, fulfillmentData, substitutionDat
 end
 
 -- Allocate resources for one cycle
-function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycle, mode)
+-- policy is optional and contains: priorityMode, fairnessEnabled, classPriorities, dimensionPriorities
+function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycle, mode, policy)
     mode = mode or "standard"  -- "standard" or "fairness"
 
     local allocationLog = {
@@ -36,15 +48,22 @@ function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycl
             totalAttempts = 0,
             granted = 0,
             substituted = 0,
-            failed = 0
+            failed = 0,
+            noNeeds = 0
         },
-        shortages = {}
+        shortages = {},
+        consumptionByClass = {}
     }
 
-    -- Calculate priorities for all characters with mode
+    -- Calculate priorities for all characters
+    -- If policy is provided, use policy-based priority calculation
     for _, character in ipairs(characters) do
         if not character.hasEmigrated then
-            character:CalculatePriority(currentCycle, mode)
+            if policy then
+                character.allocationPriority = AllocationEngineV2.CalculatePriorityWithPolicy(character, currentCycle, policy)
+            else
+                character:CalculatePriority(currentCycle, mode)
+            end
         end
     end
 
@@ -59,27 +78,68 @@ function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycl
         return a.allocationPriority > b.allocationPriority
     end)
 
-    -- Allocate resources in priority order
-    for rank, character in ipairs(sortedCharacters) do
-        local allocation = AllocationEngineV2.AllocateForCharacter(
-            character, townInventory, currentCycle, rank
-        )
-        table.insert(allocationLog.allocations, allocation)
-
-        -- Update stats
-        allocationLog.stats.totalAttempts = allocationLog.stats.totalAttempts + 1
-        if allocation.status == "granted" then
-            allocationLog.stats.granted = allocationLog.stats.granted + 1
-        elseif allocation.status == "substituted" then
-            allocationLog.stats.substituted = allocationLog.stats.substituted + 1
+    -- Initialize consumption budget for each character based on class
+    -- Use policy consumptionBudgets if provided, otherwise fall back to default
+    local remainingBudget = {}
+    for _, character in ipairs(sortedCharacters) do
+        local budget
+        if policy and policy.consumptionBudgets and policy.consumptionBudgets[character.class] then
+            budget = policy.consumptionBudgets[character.class]
         else
-            allocationLog.stats.failed = allocationLog.stats.failed + 1
+            budget = AllocationEngineV2.classConsumptionBudget[character.class] or 3
+        end
+        remainingBudget[character] = budget
+        allocationLog.consumptionByClass[character.class] = allocationLog.consumptionByClass[character.class] or {budget = 0, consumed = 0}
+        allocationLog.consumptionByClass[character.class].budget = allocationLog.consumptionByClass[character.class].budget + budget
+    end
+
+    -- Sequential allocation: each character exhausts their budget before moving to next
+    -- Characters are processed in priority order (highest first)
+    -- For each character, allocate from highest craving to lowest until budget exhausted
+    for rank, character in ipairs(sortedCharacters) do
+        local budget = remainingBudget[character]
+        local allocationsForCharacter = 0
+
+        -- Keep allocating until budget exhausted or no more needs
+        while remainingBudget[character] > 0 do
+            local allocation = AllocationEngineV2.AllocateForCharacter(
+                character, townInventory, currentCycle, rank
+            )
+            table.insert(allocationLog.allocations, allocation)
+
+            -- Update stats
+            allocationLog.stats.totalAttempts = allocationLog.stats.totalAttempts + 1
+
+            if allocation.status == "granted" then
+                allocationLog.stats.granted = allocationLog.stats.granted + 1
+                remainingBudget[character] = remainingBudget[character] - 1
+                allocationLog.consumptionByClass[character.class].consumed = allocationLog.consumptionByClass[character.class].consumed + 1
+                allocationsForCharacter = allocationsForCharacter + 1
+            elseif allocation.status == "substituted" then
+                allocationLog.stats.substituted = allocationLog.stats.substituted + 1
+                remainingBudget[character] = remainingBudget[character] - 1
+                allocationLog.consumptionByClass[character.class].consumed = allocationLog.consumptionByClass[character.class].consumed + 1
+                allocationsForCharacter = allocationsForCharacter + 1
+            elseif allocation.status == "no_needs" then
+                allocationLog.stats.noNeeds = allocationLog.stats.noNeeds + 1
+                -- No more cravings to satisfy, move to next character
+                break
+            else
+                allocationLog.stats.failed = allocationLog.stats.failed + 1
+                -- Track shortages
+                if allocation.requestedCommodity then
+                    local commodity = allocation.requestedCommodity
+                    allocationLog.shortages[commodity] = (allocationLog.shortages[commodity] or 0) + 1
+                end
+                -- Failed to get this commodity, but try next craving
+                remainingBudget[character] = remainingBudget[character] - 1
+            end
         end
 
-        -- Track shortages
-        if allocation.status == "failed" and allocation.requestedCommodity then
-            local commodity = allocation.requestedCommodity
-            allocationLog.shortages[commodity] = (allocationLog.shortages[commodity] or 0) + 1
+        -- Debug: log how many allocations this character got
+        if allocationsForCharacter > 0 then
+            print(string.format("  %s (%s): %d/%d allocations",
+                character.name, character.class, allocationsForCharacter, budget))
         end
     end
 
@@ -442,6 +502,55 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
     end
 
     return bestSubstitute, bestChain
+end
+
+-- Calculate priority using policy settings
+-- policy contains: priorityMode, fairnessEnabled, classPriorities, dimensionPriorities
+function AllocationEngineV2.CalculatePriorityWithPolicy(character, currentCycle, policy)
+    local priority = 0
+
+    -- Get class weight from policy
+    local classWeight = 1
+    if policy.classPriorities and policy.classPriorities[character.class] then
+        classWeight = policy.classPriorities[character.class]
+    end
+
+    local priorityMode = policy.priorityMode or "need_based"
+
+    if priorityMode == "equality" then
+        -- Everyone gets same base priority with small random factor
+        priority = 100 + math.random(0, 10)
+
+    elseif priorityMode == "class_based" then
+        -- Pure class-based priority
+        priority = classWeight * 100
+
+    else -- need_based (default)
+        -- Use dimension priorities to weight cravings
+        local coarseCravings = character:AggregateCurrentCravingsToCoarse()
+        local weightedCraving = 0
+
+        if policy.dimensionPriorities then
+            for dimKey, dimWeight in pairs(policy.dimensionPriorities) do
+                local craving = coarseCravings[dimKey] or 0
+                weightedCraving = weightedCraving + (craving * dimWeight)
+            end
+        else
+            -- Fallback: sum all cravings
+            for _, craving in pairs(coarseCravings) do
+                weightedCraving = weightedCraving + craving
+            end
+        end
+
+        priority = classWeight * 10 + weightedCraving
+    end
+
+    -- Apply fairness penalty if enabled
+    if policy.fairnessEnabled then
+        priority = priority - (character.fairnessPenalty or 0)
+    end
+
+    return priority
 end
 
 return AllocationEngineV2

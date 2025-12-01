@@ -14,7 +14,8 @@ import type {
   CommodityFatigueRatesData,
   SubstitutionRulesData,
   VersionsManifest,
-  GameVersion
+  GameVersion,
+  NaturalResourcesData
 } from './types';
 
 // Active version state
@@ -569,4 +570,30 @@ export async function switchActiveVersion(versionId: string): Promise<void> {
 
   // Update session state
   setActiveVersion(versionId);
+}
+
+// =============================================================================
+// Natural Resources APIs
+// =============================================================================
+
+/**
+ * Load natural resources definitions from JSON file
+ */
+export async function loadNaturalResources(): Promise<NaturalResourcesData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/natural_resources.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save natural resources definitions to JSON file
+ */
+export async function saveNaturalResources(data: NaturalResourcesData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/natural_resources.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
 }

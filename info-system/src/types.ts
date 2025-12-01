@@ -89,6 +89,7 @@ export interface BuildingType {
   workCategories?: string[];  // Categories of workers that can work here
   workerEfficiency?: Record<string, number>;  // Efficiency multiplier per work category (0.0 to 1.0)
   upgradeLevels: BuildingUpgradeLevel[];  // Array of upgrade levels (0, 1, 2, ...)
+  placementConstraints?: PlacementConstraints;  // Natural resource constraints for placement
 
   // Legacy fields (for backwards compatibility during migration)
   baseWidth?: number;
@@ -314,4 +315,87 @@ export interface SubstitutionRulesData {
     desperationThreshold: number;
     desperationSubstitutes: Record<string, SubstituteRule[]>;
   };
+}
+
+// ============================================================================
+// Natural Resources Types
+// ============================================================================
+
+export type ResourceCategory = 'continuous' | 'discrete';
+export type DistributionType = 'perlin_hybrid' | 'regional_cluster';
+export type EfficiencyFormula = 'weighted_average' | 'direct' | 'minimum';
+
+export interface PerlinDistribution {
+  type: 'perlin_hybrid';
+  perlinWeight: number;
+  hotspotWeight: number;
+  frequency: number;
+  octaves: number;
+  persistence: number;
+  hotspotCount: [number, number];
+  hotspotRadius: [number, number];
+  hotspotIntensity: [number, number];
+}
+
+export interface ClusterDistribution {
+  type: 'regional_cluster';
+  depositCount: [number, number];
+  depositRadius: [number, number];
+  centerRichness: [number, number];
+  falloffExponent: number;
+  noiseVariation: number;
+}
+
+export interface RiverInfluence {
+  enabled: boolean;
+  range: number;
+  boost: number;
+}
+
+export interface CollisionRules {
+  riverDistance: number;
+  sameTypeDistance: number;
+  boundaryBuffer: number;
+}
+
+export interface ResourceVisualization {
+  color: [number, number, number];
+  opacity: number;
+  showThreshold: number;
+}
+
+export interface NaturalResource {
+  id: string;
+  name: string;
+  category: ResourceCategory;
+  description?: string;
+  distribution: PerlinDistribution | ClusterDistribution;
+  riverInfluence?: RiverInfluence;
+  collisionRules?: CollisionRules;
+  visualization: ResourceVisualization;
+}
+
+export interface NaturalResourcesData {
+  version: string;
+  naturalResources: NaturalResource[];
+}
+
+// ============================================================================
+// Building Placement Constraints Types
+// ============================================================================
+
+export interface ResourceRequirement {
+  resourceId: string;
+  weight: number;
+  minValue: number;
+  displayName: string;
+  anyOf?: string[];  // For "any ore" type requirements (e.g., mine can use any ore)
+}
+
+export interface PlacementConstraints {
+  enabled: boolean;
+  requiredResources?: ResourceRequirement[];
+  efficiencyFormula?: EfficiencyFormula;
+  warningThreshold?: number;
+  blockingThreshold?: number;
 }

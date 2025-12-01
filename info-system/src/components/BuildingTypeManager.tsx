@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Space, message, Popconfirm, Modal, Form, Input, Select, InputNumber, Row, Col, Card, Tabs, Divider, Tag } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, UpOutlined, DownOutlined } from '@ant-design/icons';
-import type { BuildingType, BuildingTypesData, BuildingUpgradeLevel } from '../types';
+import { Table, Button, Space, message, Popconfirm, Modal, Form, Input, Select, InputNumber, Row, Col, Card, Tabs, Divider, Tag, Switch } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, UpOutlined, DownOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import type { BuildingType, BuildingTypesData, BuildingUpgradeLevel, PlacementConstraints, ResourceRequirement } from '../types';
 import { loadBuildingTypes, saveBuildingTypes } from '../api';
-import { WORK_CATEGORIES } from '../constants';
+import { WORK_CATEGORIES, NATURAL_RESOURCE_IDS, EFFICIENCY_FORMULAS } from '../constants';
 import WorkerEfficiencyEditor from './WorkerEfficiencyEditor';
 
 const { TabPane } = Tabs;
@@ -11,6 +11,7 @@ const { TabPane } = Tabs;
 const BUILDING_CATEGORIES = [
   'production',
   'agriculture',
+  'extraction',
   'residential',
   'medical',
   'education',
@@ -30,6 +31,13 @@ const BuildingTypeManager = () => {
   const [selectedWorkCategories, setSelectedWorkCategories] = useState<string[]>([]);
   const [workerEfficiencies, setWorkerEfficiencies] = useState<Record<string, number>>({});
   const [upgradeLevels, setUpgradeLevels] = useState<BuildingUpgradeLevel[]>([]);
+  const [placementConstraints, setPlacementConstraints] = useState<PlacementConstraints>({
+    enabled: false,
+    requiredResources: [],
+    efficiencyFormula: 'weighted_average',
+    warningThreshold: 0.4,
+    blockingThreshold: 0.2
+  });
 
   useEffect(() => {
     loadBuildingTypesList();
@@ -100,6 +108,13 @@ const BuildingTypeManager = () => {
     setSelectedWorkCategories([]);
     setWorkerEfficiencies({});
     setUpgradeLevels([defaultLevel0]);
+    setPlacementConstraints({
+      enabled: false,
+      requiredResources: [],
+      efficiencyFormula: 'weighted_average',
+      warningThreshold: 0.4,
+      blockingThreshold: 0.2
+    });
     setEditorVisible(true);
   };
 
@@ -118,6 +133,13 @@ const BuildingTypeManager = () => {
     setSelectedWorkCategories(buildingType.workCategories || []);
     setWorkerEfficiencies(buildingType.workerEfficiency || {});
     setUpgradeLevels(buildingType.upgradeLevels || []);
+    setPlacementConstraints(buildingType.placementConstraints || {
+      enabled: false,
+      requiredResources: [],
+      efficiencyFormula: 'weighted_average',
+      warningThreshold: 0.4,
+      blockingThreshold: 0.2
+    });
     setEditorVisible(true);
   };
 
@@ -140,7 +162,8 @@ const BuildingTypeManager = () => {
         color,
         workCategories: selectedWorkCategories,
         workerEfficiency: workerEfficiencies,
-        upgradeLevels: upgradeLevels
+        upgradeLevels: upgradeLevels,
+        placementConstraints: placementConstraints.enabled ? placementConstraints : { enabled: false }
       };
 
       let updatedBuildingTypes: BuildingType[];
@@ -159,6 +182,44 @@ const BuildingTypeManager = () => {
       setSelectedWorkCategories([]);
       setWorkerEfficiencies({});
       setUpgradeLevels([]);
+      setPlacementConstraints({
+        enabled: false,
+        requiredResources: [],
+        efficiencyFormula: 'weighted_average',
+        warningThreshold: 0.4,
+        blockingThreshold: 0.2
+      });
+    });
+  };
+
+  // Placement constraint helpers
+  const handleAddResourceRequirement = () => {
+    const newRequirement: ResourceRequirement = {
+      resourceId: NATURAL_RESOURCE_IDS[0],
+      weight: 1.0,
+      minValue: 0.2,
+      displayName: 'New Resource'
+    };
+    setPlacementConstraints({
+      ...placementConstraints,
+      requiredResources: [...(placementConstraints.requiredResources || []), newRequirement]
+    });
+  };
+
+  const handleUpdateResourceRequirement = (index: number, updates: Partial<ResourceRequirement>) => {
+    const newRequirements = [...(placementConstraints.requiredResources || [])];
+    newRequirements[index] = { ...newRequirements[index], ...updates };
+    setPlacementConstraints({
+      ...placementConstraints,
+      requiredResources: newRequirements
+    });
+  };
+
+  const handleRemoveResourceRequirement = (index: number) => {
+    const newRequirements = (placementConstraints.requiredResources || []).filter((_, i) => i !== index);
+    setPlacementConstraints({
+      ...placementConstraints,
+      requiredResources: newRequirements
     });
   };
 
@@ -671,6 +732,198 @@ const BuildingTypeManager = () => {
                   No upgrade levels defined. Click "Add Upgrade Level" to start.
                 </div>
               )}
+            </TabPane>
+
+            <TabPane tab="Placement Constraints" key="constraints">
+              <div style={{ marginTop: 16 }}>
+                <Card title="Resource Constraints" size="small" style={{ marginBottom: 16 }}>
+                  <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Col span={12}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span>Enable Constraints:</span>
+                        <Switch
+                          checked={placementConstraints.enabled}
+                          onChange={(checked) => setPlacementConstraints({
+                            ...placementConstraints,
+                            enabled: checked
+                          })}
+                        />
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span>Efficiency Formula:</span>
+                        <Select
+                          value={placementConstraints.efficiencyFormula}
+                          onChange={(value) => setPlacementConstraints({
+                            ...placementConstraints,
+                            efficiencyFormula: value
+                          })}
+                          style={{ width: 150 }}
+                          disabled={!placementConstraints.enabled}
+                        >
+                          {EFFICIENCY_FORMULAS.map(f => (
+                            <Select.Option key={f} value={f}>{f.replace('_', ' ')}</Select.Option>
+                          ))}
+                        </Select>
+                      </div>
+                    </Col>
+                  </Row>
+
+                  {placementConstraints.enabled && (
+                    <>
+                      <Row gutter={16} style={{ marginBottom: 16 }}>
+                        <Col span={12}>
+                          <div>
+                            <strong>Warning Threshold:</strong>
+                            <InputNumber
+                              value={placementConstraints.warningThreshold}
+                              onChange={(value) => setPlacementConstraints({
+                                ...placementConstraints,
+                                warningThreshold: value || 0.4
+                              })}
+                              min={0}
+                              max={1}
+                              step={0.1}
+                              style={{ width: '100%' }}
+                            />
+                            <div style={{ fontSize: '11px', color: '#666' }}>
+                              Below this: show warning (yellow)
+                            </div>
+                          </div>
+                        </Col>
+                        <Col span={12}>
+                          <div>
+                            <strong>Blocking Threshold:</strong>
+                            <InputNumber
+                              value={placementConstraints.blockingThreshold}
+                              onChange={(value) => setPlacementConstraints({
+                                ...placementConstraints,
+                                blockingThreshold: value || 0.2
+                              })}
+                              min={0}
+                              max={1}
+                              step={0.1}
+                              style={{ width: '100%' }}
+                            />
+                            <div style={{ fontSize: '11px', color: '#666' }}>
+                              Below this: cannot place (red)
+                            </div>
+                          </div>
+                        </Col>
+                      </Row>
+
+                      <Divider style={{ margin: '12px 0' }}>Required Resources</Divider>
+
+                      <Button
+                        type="dashed"
+                        icon={<PlusOutlined />}
+                        onClick={handleAddResourceRequirement}
+                        style={{ width: '100%', marginBottom: 16 }}
+                      >
+                        Add Resource Requirement
+                      </Button>
+
+                      {(placementConstraints.requiredResources || []).map((req, index) => (
+                        <Card
+                          key={index}
+                          size="small"
+                          style={{ marginBottom: 8 }}
+                          extra={
+                            <Button
+                              type="link"
+                              danger
+                              icon={<MinusCircleOutlined />}
+                              onClick={() => handleRemoveResourceRequirement(index)}
+                            />
+                          }
+                        >
+                          <Row gutter={16}>
+                            <Col span={8}>
+                              <div>
+                                <strong>Resource:</strong>
+                                <Select
+                                  value={req.resourceId}
+                                  onChange={(value) => handleUpdateResourceRequirement(index, { resourceId: value })}
+                                  style={{ width: '100%' }}
+                                >
+                                  {NATURAL_RESOURCE_IDS.map(id => (
+                                    <Select.Option key={id} value={id}>{id.replace('_', ' ')}</Select.Option>
+                                  ))}
+                                  <Select.Option value="ore_any">Any Ore (special)</Select.Option>
+                                </Select>
+                              </div>
+                            </Col>
+                            <Col span={8}>
+                              <div>
+                                <strong>Display Name:</strong>
+                                <Input
+                                  value={req.displayName}
+                                  onChange={(e) => handleUpdateResourceRequirement(index, { displayName: e.target.value })}
+                                />
+                              </div>
+                            </Col>
+                            <Col span={4}>
+                              <div>
+                                <strong>Weight:</strong>
+                                <InputNumber
+                                  value={req.weight}
+                                  onChange={(value) => handleUpdateResourceRequirement(index, { weight: value || 1 })}
+                                  min={0}
+                                  max={1}
+                                  step={0.1}
+                                  style={{ width: '100%' }}
+                                />
+                              </div>
+                            </Col>
+                            <Col span={4}>
+                              <div>
+                                <strong>Min Value:</strong>
+                                <InputNumber
+                                  value={req.minValue}
+                                  onChange={(value) => handleUpdateResourceRequirement(index, { minValue: value || 0 })}
+                                  min={0}
+                                  max={1}
+                                  step={0.1}
+                                  style={{ width: '100%' }}
+                                />
+                              </div>
+                            </Col>
+                          </Row>
+                          {req.resourceId === 'ore_any' && (
+                            <div style={{ marginTop: 8 }}>
+                              <strong>Any Of:</strong>
+                              <Select
+                                mode="multiple"
+                                value={req.anyOf || []}
+                                onChange={(value) => handleUpdateResourceRequirement(index, { anyOf: value })}
+                                style={{ width: '100%' }}
+                                placeholder="Select ore types this can match"
+                              >
+                                {NATURAL_RESOURCE_IDS.filter(id => id.includes('ore') || id === 'coal').map(id => (
+                                  <Select.Option key={id} value={id}>{id.replace('_', ' ')}</Select.Option>
+                                ))}
+                              </Select>
+                            </div>
+                          )}
+                        </Card>
+                      ))}
+
+                      {(placementConstraints.requiredResources || []).length === 0 && (
+                        <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
+                          No resource requirements defined. Add resources that this building requires.
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {!placementConstraints.enabled && (
+                    <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
+                      Placement constraints are disabled. Enable to configure resource requirements.
+                    </div>
+                  )}
+                </Card>
+              </div>
             </TabPane>
           </Tabs>
         </Modal>

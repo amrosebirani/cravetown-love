@@ -16,7 +16,15 @@ function BuildingMenu:Create()
         mButtons = {},
         mScrollOffset = 0,
         mMaxScroll = 0,
-        mButtonSpacing = 5
+        mButtonSpacing = 5,
+        -- Collapse state
+        mCollapsed = false,
+        mCollapseButtonWidth = 80,
+        mCollapseButtonHeight = 24,
+        -- Animation
+        mAnimating = false,
+        mAnimProgress = 1.0,  -- 1 = fully expanded, 0 = fully collapsed
+        mAnimSpeed = 5.0  -- Animation speed
     }
 
     setmetatable(this, self)
@@ -49,9 +57,8 @@ function BuildingMenu:RecalculateLayout()
     -- Recalculate button positions based on current screen size
     local screenW = love.graphics.getWidth()
     local menuY = love.graphics.getHeight() - self.mHeight
-    local labelHeight = 25  -- Space for "Sites" label
     local currentX = self.mPadding
-    local currentY = menuY + self.mPadding + labelHeight
+    local currentY = menuY + self.mPadding
     local rowHeight = self.mButtonHeight + self.mButtonSpacing
 
     for i, button in ipairs(self.mButtons) do
@@ -101,9 +108,44 @@ function BuildingMenu:CanAffordBuilding(buildingType)
 end
 
 function BuildingMenu:Update(dt)
-    -- Handle mouse wheel scrolling (when mouse is over menu)
     local mx, my = love.mouse.getPosition()
-    local menuY = love.graphics.getHeight() - self.mHeight
+    local screenW = love.graphics.getWidth()
+    local screenH = love.graphics.getHeight()
+
+    -- Update animation
+    if self.mAnimating then
+        local targetProgress = self.mCollapsed and 0 or 1
+        local diff = targetProgress - self.mAnimProgress
+        if math.abs(diff) < 0.01 then
+            self.mAnimProgress = targetProgress
+            self.mAnimating = false
+        else
+            self.mAnimProgress = self.mAnimProgress + diff * self.mAnimSpeed * dt
+        end
+    end
+
+    -- Calculate collapse button position (center top of menu area)
+    local collapseButtonX = (screenW - self.mCollapseButtonWidth) / 2
+    local collapseButtonY = screenH - self.mCollapseButtonHeight - (self.mHeight * self.mAnimProgress)
+
+    -- Check for collapse button click
+    if gMouseReleased and gMouseReleased.button == 1 then
+        if mx >= collapseButtonX and mx <= collapseButtonX + self.mCollapseButtonWidth and
+           my >= collapseButtonY and my <= collapseButtonY + self.mCollapseButtonHeight then
+            -- Toggle collapse
+            self.mCollapsed = not self.mCollapsed
+            self.mAnimating = true
+            return true
+        end
+    end
+
+    -- Don't process button clicks when collapsed or animating
+    if self.mCollapsed or self.mAnimProgress < 0.9 then
+        return true
+    end
+
+    -- Handle mouse wheel scrolling (when mouse is over menu)
+    local menuY = screenH - self.mHeight
 
     if my >= menuY then
         -- Mouse is over menu - handle scroll
@@ -132,38 +174,75 @@ function BuildingMenu:Update(dt)
 end
 
 function BuildingMenu:Render()
-    local menuY = love.graphics.getHeight() - self.mHeight
+    local screenW = love.graphics.getWidth()
+    local screenH = love.graphics.getHeight()
+
+    -- Calculate animated menu position
+    local visibleHeight = self.mHeight * self.mAnimProgress
+    local menuY = screenH - visibleHeight
+
+    -- Calculate collapse button position
+    local collapseButtonX = (screenW - self.mCollapseButtonWidth) / 2
+    local collapseButtonY = menuY - self.mCollapseButtonHeight
+
+    -- Draw collapse/expand button (always visible)
+    local mx, my = love.mouse.getPosition()
+    local isHoveringButton = mx >= collapseButtonX and mx <= collapseButtonX + self.mCollapseButtonWidth and
+                             my >= collapseButtonY and my <= collapseButtonY + self.mCollapseButtonHeight
+
+    -- Button background
+    if isHoveringButton then
+        love.graphics.setColor(0.4, 0.4, 0.4, 0.95)
+    else
+        love.graphics.setColor(0.3, 0.3, 0.3, 0.9)
+    end
+    love.graphics.rectangle("fill", collapseButtonX, collapseButtonY, self.mCollapseButtonWidth, self.mCollapseButtonHeight, 5, 5)
+
+    -- Button border
+    love.graphics.setColor(0.5, 0.5, 0.5, 1)
+    love.graphics.rectangle("line", collapseButtonX, collapseButtonY, self.mCollapseButtonWidth, self.mCollapseButtonHeight, 5, 5)
+
+    -- Button text/arrow
+    love.graphics.setColor(1, 1, 1)
+    local buttonText = self.mCollapsed and "▲ Sites" or "▼ Sites"
+    local font = love.graphics.getFont()
+    local textWidth = font:getWidth(buttonText)
+    love.graphics.print(buttonText, collapseButtonX + (self.mCollapseButtonWidth - textWidth) / 2, collapseButtonY + 5)
+
+    -- Don't render menu content if fully collapsed
+    if self.mAnimProgress < 0.01 then
+        love.graphics.setColor(1, 1, 1)
+        return
+    end
 
     -- Draw menu background
     love.graphics.setColor(0.3, 0.3, 0.3, 0.9)
-    love.graphics.rectangle("fill", 0, menuY, love.graphics.getWidth(), self.mHeight)
-
-    -- Draw "Sites" label at the top of the menu
-    love.graphics.setColor(1, 1, 1)
-    local font = love.graphics.getFont()
-    local labelText = "Sites"
-    local labelWidth = font:getWidth(labelText)
-    love.graphics.print(labelText, 10, menuY + 5)
+    love.graphics.rectangle("fill", 0, menuY, screenW, visibleHeight)
 
     -- Scissor to clip buttons to menu area
-    love.graphics.setScissor(0, menuY, love.graphics.getWidth(), self.mHeight)
+    love.graphics.setScissor(0, menuY, screenW, visibleHeight)
 
-    -- Draw buttons
-    local mx, my = love.mouse.getPosition()
+    -- Draw buttons (offset by animation)
     local hoveredButton = nil
+    local baseMenuY = screenH - self.mHeight  -- Original menu position for button layout
+    local yOffset = menuY - baseMenuY  -- How much to offset buttons
 
     for _, button in ipairs(self.mButtons) do
+        local buttonY = button.y + yOffset
+
         -- Only draw if button is visible in menu area
-        if button.y + button.height >= menuY and button.y <= menuY + self.mHeight then
+        if buttonY + button.height >= menuY and buttonY <= menuY + visibleHeight then
             -- Check if we can afford this building
             local canAfford = self:CanAffordBuilding(button.buildingType)
 
-            -- Check if mouse is hovering
-            local isHovering = mx >= button.x and mx <= button.x + button.width and
-                              my >= button.y and my <= button.y + button.height
+            -- Check if mouse is hovering (only when fully expanded)
+            local isHovering = self.mAnimProgress > 0.9 and
+                              mx >= button.x and mx <= button.x + button.width and
+                              my >= buttonY and my <= buttonY + button.height
 
             if isHovering then
                 hoveredButton = button
+                hoveredButton.renderY = buttonY
             end
 
             -- Draw button background (improved tile UI)
@@ -176,12 +255,12 @@ function BuildingMenu:Render()
                 love.graphics.setColor(button.color[1], button.color[2], button.color[3])
             end
             -- subtle shadow
-            love.graphics.rectangle("fill", button.x + 2, button.y + 2, button.width, button.height, 8, 8)
+            love.graphics.rectangle("fill", button.x + 2, buttonY + 2, button.width, button.height, 8, 8)
             -- main tile
             love.graphics.setColor(0.15, 0.15, 0.15)
-            love.graphics.rectangle("fill", button.x, button.y, button.width, button.height, 8, 8)
+            love.graphics.rectangle("fill", button.x, buttonY, button.width, button.height, 8, 8)
             love.graphics.setColor(button.color[1], button.color[2], button.color[3])
-            love.graphics.rectangle("line", button.x, button.y, button.width, button.height, 8, 8)
+            love.graphics.rectangle("line", button.x, buttonY, button.width, button.height, 8, 8)
 
             -- Draw label (two-letter uppercase) - centered
             if not canAfford then
@@ -189,7 +268,6 @@ function BuildingMenu:Render()
             else
                 love.graphics.setColor(1, 1, 1)
             end
-            local font = love.graphics.getFont()
             local function toUpperTwo(lbl)
                 local letters = string.gsub(lbl or "", "[^A-Za-z]", "")
                 letters = string.upper(letters)
@@ -199,12 +277,12 @@ function BuildingMenu:Render()
                 return letters
             end
             local labelText = toUpperTwo(button.label)
-            local textWidth = font:getWidth(labelText)
+            local labelTextWidth = font:getWidth(labelText)
             local textHeight = font:getHeight()
             love.graphics.print(
                 labelText,
-                button.x + button.width / 2 - textWidth / 2,
-                button.y + button.height / 2 - textHeight / 2
+                button.x + button.width / 2 - labelTextWidth / 2,
+                buttonY + button.height / 2 - textHeight / 2
             )
         end
     end
@@ -239,7 +317,8 @@ function BuildingMenu:Render()
         local tooltipWidth = maxWidth + 20
         local tooltipHeight = (#tooltipLines * lineHeight) + 10
         local tooltipX = hoveredButton.x + hoveredButton.width / 2 - tooltipWidth / 2
-        local tooltipY = hoveredButton.y - tooltipHeight - 10
+        local buttonRenderY = hoveredButton.renderY or hoveredButton.y
+        local tooltipY = buttonRenderY - tooltipHeight - 10
 
         -- Keep tooltip on screen
         local screenW = love.graphics.getWidth()
