@@ -21,7 +21,8 @@ function BuildingDetailModal:Create(building)
         mScrollOffset = 0,
         mMaxScroll = 0,
         mStationButtons = {},  -- Store button positions for click detection
-        mCloseButton = nil
+        mCloseButton = nil,
+        mJustOpened = true  -- Prevent closing on the same click that opened the modal
     }
 
     setmetatable(this, self)
@@ -68,6 +69,8 @@ function BuildingDetailModal:CalculateLayout()
 end
 
 function BuildingDetailModal:Enter()
+    print("BuildingDetailModal:Enter() called for building: " .. (self.mBuilding.mName or "unknown"))
+    print("  Stations count: " .. #self.mBuilding.mStations)
 end
 
 function BuildingDetailModal:Exit()
@@ -77,7 +80,22 @@ function BuildingDetailModal:HandleInput()
     return true  -- Block input to lower states
 end
 
+function BuildingDetailModal:OnMouseWheel(dx, dy)
+    -- Handle mouse wheel scrolling
+    self.mScrollOffset = self.mScrollOffset - dy * 30
+    self.mScrollOffset = math.max(0, math.min(self.mScrollOffset, self.mMaxScroll))
+end
+
 function BuildingDetailModal:Update(dt)
+    -- Skip processing the click that opened this modal
+    if self.mJustOpened then
+        if not gMouseReleased then
+            -- Mouse released, safe to process clicks now
+            self.mJustOpened = false
+        end
+        return true
+    end
+
     if not gMouseReleased then
         return true
     end
@@ -129,7 +147,8 @@ function BuildingDetailModal:OpenRecipePicker(stationIndex)
         station.recipe = recipe
         station.state = recipe and "NO_WORKER" or "IDLE"
         station.progress = 0
-        print("Station " .. stationIndex .. " recipe set to: " .. (recipe and recipe.name or "none"))
+        local recipeName = recipe and (recipe.recipeName or recipe.name) or "none"
+        print("Station " .. stationIndex .. " recipe set to: " .. recipeName)
     end)
     gStateStack:Push(modal)
 end
@@ -213,7 +232,10 @@ function BuildingDetailModal:Render()
 
         -- Recipe name or "No Recipe"
         love.graphics.setColor(0.8, 0.8, 0.8)
-        local recipeName = station.recipe and station.recipe.name or "No Recipe"
+        local recipeName = "No Recipe"
+        if station.recipe then
+            recipeName = station.recipe.recipeName or station.recipe.name or "Unknown Recipe"
+        end
         love.graphics.print(recipeName, btn.x + 15, btn.y + 28 - self.mScrollOffset)
 
         -- State text

@@ -142,6 +142,27 @@ function Character:New(class, id)
     char.maxHistoryLength = 20
 
     -- =============================================================================
+    -- LAYER 7: Active Effects (durable goods providing ongoing satisfaction)
+    -- =============================================================================
+    -- Tracks owned durable/permanent goods that provide passive satisfaction each cycle
+    char.activeEffects = {}
+    --[[
+      Each effect entry:
+      {
+        commodityId = "bed",              -- Which commodity this effect is from
+        category = "furniture_sleep",     -- Category for slot management
+        durability = "durable",           -- "durable" or "permanent"
+        acquiredCycle = 50,               -- When it was acquired
+        durationCycles = 500,             -- Original duration (nil for permanent)
+        remainingCycles = 450,            -- Cycles left (nil for permanent)
+        effectDecayRate = 0.001,          -- How fast effectiveness decreases
+        currentEffectiveness = 0.95,      -- 1.0 to 0.0, decays over time
+        fulfillmentVector = {...},        -- Cached fine vector from commodity
+        maxOwned = 1                      -- Max allowed in this category
+      }
+    ]]
+
+    -- =============================================================================
     -- Enablement State (tracks which rules have been applied)
     -- =============================================================================
     char.appliedEnablements = {}  -- Set of enablement rule IDs that have been applied
@@ -490,7 +511,9 @@ end
 -- LAYER 3 & 4: Fulfill Craving (Consume Commodity)
 -- =============================================================================
 
-function Character:FulfillCraving(commodity, quantity, currentCycle)
+function Character:FulfillCraving(commodity, quantity, currentCycle, allocationType)
+    allocationType = allocationType or "consumed"  -- Default to consumed for backward compatibility
+
     if not Character._FulfillmentVectors or not Character._FulfillmentVectors.commodities then
         print("Error: Character._FulfillmentVectors not initialized")
         return false, 0, 1.0
@@ -561,7 +584,8 @@ function Character:FulfillCraving(commodity, quantity, currentCycle)
         commodity = commodity,
         quantity = quantity,
         cravingReduction = totalCravingReduction,
-        fatigueMultiplier = fatigueMultiplier
+        fatigueMultiplier = fatigueMultiplier,
+        allocationType = allocationType  -- "consumed" or "acquired"
     })
 
     -- Trim history to max length
@@ -954,6 +978,311 @@ function Character:CheckProtest(currentCycle)
     end
 
     return false
+end
+
+-- =============================================================================
+-- LAYER 7: Active Effects (Durable Goods System)
+-- =============================================================================
+
+-- Add an active effect from acquiring a durable/permanent commodity
+function Character:AddActiveEffect(commodityId, currentCycle)
+    if not Character._FulfillmentVectors or not Character._FulfillmentVectors.commodities then
+        print("Error: FulfillmentVectors not loaded for AddActiveEffect")
+        return false, "FulfillmentVectors not loaded"
+    end
+
+    local commodityData = Character._FulfillmentVectors.commodities[commodityId]
+    if not commodityData then
+        print("Warning: No commodity data for: " .. tostring(commodityId))
+        return false, "Commodity not found"
+    end
+
+    local durability = commodityData.durability or "consumable"
+    if durability == "consumable" then
+        print("Warning: Cannot add active effect for consumable: " .. commodityId)
+        return false, "Commodity is consumable"
+    end
+
+    local category = commodityData.category or commodityId
+    local maxOwned = commodityData.maxOwned or 1
+
+    -- Check if at max capacity for this category
+    local currentCount = self:GetActiveEffectCountByCategory(category)
+    if currentCount >= maxOwned then
+        -- Replace oldest effect in this category if at max
+        self:RemoveOldestEffectInCategory(category)
+    end
+
+    -- Get fulfillment vector
+    local fulfillmentVector = nil
+    if commodityData.fulfillmentVector and commodityData.fulfillmentVector.fine then
+        fulfillmentVector = commodityData.fulfillmentVector.fine
+    end
+
+    if not fulfillmentVector then
+        print("Warning: No fine fulfillment vector for: " .. commodityId)
+        return false, "No fulfillment vector"
+    end
+
+    -- Create the effect entry
+    local effect = {
+        commodityId = commodityId,
+        category = category,
+        durability = durability,
+        acquiredCycle = currentCycle,
+        durationCycles = commodityData.durationCycles,  -- nil for permanent
+        remainingCycles = commodityData.durationCycles, -- nil for permanent
+        effectDecayRate = commodityData.effectDecayRate or 0,
+        currentEffectiveness = 1.0,  -- Start at full effectiveness
+        fulfillmentVector = fulfillmentVector,
+        maxOwned = maxOwned
+    }
+
+    table.insert(self.activeEffects, effect)
+    print(string.format("  %s acquired %s (%s, %s cycles)",
+        self.name, commodityId, durability,
+        effect.durationCycles and tostring(effect.durationCycles) or "permanent"))
+
+    return true, effect
+end
+
+-- Update all active effects (decay effectiveness, decrement remaining cycles, remove expired)
+function Character:UpdateActiveEffects(currentCycle)
+    local expiredIndices = {}
+    local expiredEffects = {}
+
+    for i, effect in ipairs(self.activeEffects) do
+        -- Apply effectiveness decay
+        if effect.effectDecayRate and effect.effectDecayRate > 0 then
+            effect.currentEffectiveness = effect.currentEffectiveness * (1 - effect.effectDecayRate)
+            -- Clamp to minimum
+            effect.currentEffectiveness = math.max(0.1, effect.currentEffectiveness)
+        end
+
+        -- Decrement remaining cycles for durables (not permanents)
+        if effect.durability == "durable" and effect.remainingCycles then
+            effect.remainingCycles = effect.remainingCycles - 1
+
+            -- Check if expired
+            if effect.remainingCycles <= 0 then
+                table.insert(expiredIndices, i)
+                table.insert(expiredEffects, effect)
+                print(string.format("  %s's %s has worn out", self.name, effect.commodityId))
+            end
+        end
+    end
+
+    -- Remove expired effects (in reverse order to maintain indices)
+    for i = #expiredIndices, 1, -1 do
+        table.remove(self.activeEffects, expiredIndices[i])
+    end
+
+    return expiredEffects
+end
+
+-- Apply passive satisfaction from all active effects
+function Character:ApplyActiveEffectsSatisfaction(currentCycle)
+    if #self.activeEffects == 0 then
+        return
+    end
+
+    local totalCravingReduction = 0
+
+    for _, effect in ipairs(self.activeEffects) do
+        local effectiveness = effect.currentEffectiveness or 1.0
+        local fulfillmentVector = effect.fulfillmentVector
+
+        if fulfillmentVector then
+            -- Apply fulfillment vector to reduce cravings (similar to FulfillCraving but passive)
+            for fineDimId, points in pairs(fulfillmentVector) do
+                if points and points > 0 then
+                    -- Find fine dimension index
+                    local fineIndex = nil
+                    for idx, name in pairs(Character.fineNames) do
+                        if name == fineDimId then
+                            fineIndex = idx
+                            break
+                        end
+                    end
+
+                    if fineIndex then
+                        -- Apply reduced effect (passive satisfaction is gentler than active consumption)
+                        local passiveMultiplier = 0.3  -- Passive effects are 30% as strong per cycle
+                        local gain = points * effectiveness * passiveMultiplier
+                        local oldValue = self.currentCravings[fineIndex] or 0
+                        self.currentCravings[fineIndex] = math.max(0, oldValue - gain)
+                        totalCravingReduction = totalCravingReduction + gain
+                    end
+                end
+            end
+
+            -- Also boost satisfaction (coarse level) slightly
+            for fineDimId, points in pairs(fulfillmentVector) do
+                if points and points > 0 then
+                    local fineIndex = nil
+                    for idx, name in pairs(Character.fineNames) do
+                        if name == fineDimId then
+                            fineIndex = idx
+                            break
+                        end
+                    end
+
+                    if fineIndex then
+                        local coarseName = Character.fineToCoarseMap[fineIndex]
+                        if coarseName and self.satisfaction[coarseName] then
+                            local passiveBoost = points * effectiveness * 0.1  -- Small satisfaction boost
+                            self.satisfaction[coarseName] = math.min(300, self.satisfaction[coarseName] + passiveBoost)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return totalCravingReduction
+end
+
+-- Check if character has an active effect in a specific category
+function Character:HasActiveEffectForCategory(category)
+    for _, effect in ipairs(self.activeEffects) do
+        if effect.category == category then
+            return true
+        end
+    end
+    return false
+end
+
+-- Get count of active effects for a specific commodity
+function Character:GetActiveEffectCount(commodityId)
+    local count = 0
+    for _, effect in ipairs(self.activeEffects) do
+        if effect.commodityId == commodityId then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+-- Get count of active effects in a category
+function Character:GetActiveEffectCountByCategory(category)
+    local count = 0
+    for _, effect in ipairs(self.activeEffects) do
+        if effect.category == category then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+-- Remove oldest effect in a category (for replacement)
+function Character:RemoveOldestEffectInCategory(category)
+    local oldestIndex = nil
+    local oldestCycle = math.huge
+
+    for i, effect in ipairs(self.activeEffects) do
+        if effect.category == category then
+            if effect.acquiredCycle < oldestCycle then
+                oldestCycle = effect.acquiredCycle
+                oldestIndex = i
+            end
+        end
+    end
+
+    if oldestIndex then
+        local removed = self.activeEffects[oldestIndex]
+        table.remove(self.activeEffects, oldestIndex)
+        print(string.format("  %s replaced old %s", self.name, removed.commodityId))
+        return removed
+    end
+    return nil
+end
+
+-- Remove a specific active effect by index
+function Character:RemoveActiveEffect(index)
+    if index > 0 and index <= #self.activeEffects then
+        local removed = self.activeEffects[index]
+        table.remove(self.activeEffects, index)
+        return removed
+    end
+    return nil
+end
+
+-- Remove active effect by commodity ID (removes first match)
+function Character:RemoveActiveEffectByCommodity(commodityId)
+    for i, effect in ipairs(self.activeEffects) do
+        if effect.commodityId == commodityId then
+            table.remove(self.activeEffects, i)
+            return effect
+        end
+    end
+    return nil
+end
+
+-- Get active effect by commodity ID
+function Character:GetActiveEffect(commodityId)
+    for _, effect in ipairs(self.activeEffects) do
+        if effect.commodityId == commodityId then
+            return effect
+        end
+    end
+    return nil
+end
+
+-- Check if character can acquire a durable (not at max capacity)
+function Character:CanAcquireDurable(commodityId)
+    if not Character._FulfillmentVectors or not Character._FulfillmentVectors.commodities then
+        return false
+    end
+
+    local commodityData = Character._FulfillmentVectors.commodities[commodityId]
+    if not commodityData then
+        return false
+    end
+
+    local durability = commodityData.durability or "consumable"
+    if durability == "consumable" then
+        return true  -- Consumables can always be acquired
+    end
+
+    local category = commodityData.category or commodityId
+    local maxOwned = commodityData.maxOwned or 1
+
+    -- Check current count - if at max, can still acquire (will replace oldest)
+    -- Return true but indicate replacement will happen
+    local currentCount = self:GetActiveEffectCountByCategory(category)
+    return true, currentCount >= maxOwned  -- second return indicates replacement
+end
+
+-- Get total possession count
+function Character:GetPossessionCount()
+    return #self.activeEffects
+end
+
+-- Get all possessions summary for UI
+function Character:GetPossessionsSummary()
+    local summary = {
+        total = #self.activeEffects,
+        byCategory = {},
+        items = {}
+    }
+
+    for _, effect in ipairs(self.activeEffects) do
+        -- Count by category
+        summary.byCategory[effect.category] = (summary.byCategory[effect.category] or 0) + 1
+
+        -- Build item list
+        table.insert(summary.items, {
+            commodityId = effect.commodityId,
+            category = effect.category,
+            durability = effect.durability,
+            remainingCycles = effect.remainingCycles,
+            durationCycles = effect.durationCycles,
+            effectiveness = effect.currentEffectiveness,
+            acquiredCycle = effect.acquiredCycle
+        })
+    end
+
+    return summary
 end
 
 return Character

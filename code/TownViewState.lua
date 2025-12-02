@@ -58,17 +58,35 @@ function TownViewState:Update(dt)
         gCamera:move(dx, dy)
     end
 
-    -- Handle building clicks
+    -- Handle building clicks (but not when clicking on UI elements)
     if gMouseReleased and gMouseReleased.button == 1 then
-        -- Convert screen coordinates to world coordinates using the released position
-        local worldX, worldY = gCamera:toWorldCoords(gMouseReleased.x, gMouseReleased.y)
+        local screenH = love.graphics.getHeight()
+        local clickY = gMouseReleased.y
 
-        -- Check if click is on any building
-        local clickedBuilding = self:FindBuildingAtPosition(worldX, worldY)
-        if clickedBuilding then
-            -- Open building detail modal
-            local modal = BuildingDetailModal:Create(clickedBuilding)
-            gStateStack:Push(modal)
+        -- Check if click is in the game area (not on TopBar at top or BuildingMenu at bottom)
+        local topBarHeight = 45  -- Approximate TopBar height
+        local buildingMenuHeight = self.mBuildingMenu and self.mBuildingMenu.mHeight or 200
+
+        -- Only process click if not on UI (collapse button area is ~24 pixels above menu)
+        -- Account for animation state of the menu
+        local visibleMenuHeight = buildingMenuHeight
+        if self.mBuildingMenu then
+            visibleMenuHeight = buildingMenuHeight * (self.mBuildingMenu.mAnimProgress or 1.0)
+        end
+        local isInGameArea = clickY > topBarHeight and clickY < (screenH - visibleMenuHeight - 30)
+
+        if isInGameArea then
+            -- Convert screen coordinates to world coordinates using the released position
+            local worldX, worldY = gCamera:toWorldCoords(gMouseReleased.x, gMouseReleased.y)
+
+            -- Check if click is on any building
+            local clickedBuilding = self:FindBuildingAtPosition(worldX, worldY)
+            if clickedBuilding then
+                -- Open building detail modal
+                print("Opening BuildingDetailModal for: " .. clickedBuilding.mName)
+                local modal = BuildingDetailModal:Create(clickedBuilding)
+                gStateStack:Push(modal)
+            end
         end
     end
 end

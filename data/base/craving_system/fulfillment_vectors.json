@@ -1,6 +1,23 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "note": "Sample fulfillment vectors for key commodities. Expand with all 133 commodities.",
+  "durabilitySchema": {
+    "description": "Schema for durability fields on commodities",
+    "fields": {
+      "durability": "consumable | durable | permanent - how the commodity is used",
+      "durationCycles": "number - how many cycles before expiry (null for consumable/permanent)",
+      "effectDecayRate": "number - effectiveness loss per cycle (0 = no decay)",
+      "category": "string - slot category for ownership limits",
+      "maxOwned": "number - max instances character can own (default 1)"
+    },
+    "defaults": {
+      "durability": "consumable",
+      "durationCycles": null,
+      "effectDecayRate": 0,
+      "category": null,
+      "maxOwned": 1
+    }
+  },
   "commodities": {
     "wheat": {
       "id": "wheat",
@@ -236,6 +253,10 @@
         "basic"
       ],
       "durability": "durable",
+      "durationCycles": 60,
+      "effectDecayRate": 0.01,
+      "category": "clothing_everyday",
+      "maxOwned": 1,
       "qualityMultipliers": {
         "poor": 0.5,
         "basic": 1,
@@ -274,6 +295,10 @@
         "fashion"
       ],
       "durability": "durable",
+      "durationCycles": 100,
+      "effectDecayRate": 0.005,
+      "category": "clothing_formal",
+      "maxOwned": 1,
       "qualityMultipliers": {
         "good": 0.8,
         "luxury": 1,
@@ -308,7 +333,11 @@
         "comfort",
         "rest"
       ],
-      "durability": "permanent",
+      "durability": "durable",
+      "durationCycles": 500,
+      "effectDecayRate": 0.001,
+      "category": "furniture_sleep",
+      "maxOwned": 1,
       "qualityMultipliers": {
         "poor": 0.5,
         "basic": 1,
@@ -346,7 +375,10 @@
         "knowledge"
       ],
       "durability": "durable",
-      "reusableValue": 0.1,
+      "durationCycles": 200,
+      "effectDecayRate": 0.003,
+      "category": "books",
+      "maxOwned": 5,
       "qualityMultipliers": {
         "basic": 0.8,
         "good": 1,
@@ -385,6 +417,10 @@
         "gold"
       ],
       "durability": "permanent",
+      "durationCycles": null,
+      "effectDecayRate": 0,
+      "category": "jewelry",
+      "maxOwned": 3,
       "qualityMultipliers": {
         "luxury": 0.9,
         "masterwork": 1.2
@@ -485,6 +521,10 @@
         "status_display"
       ],
       "durability": "permanent",
+      "durationCycles": null,
+      "effectDecayRate": 0,
+      "category": "decoration",
+      "maxOwned": 5,
       "qualityMultipliers": {
         "good": 0.7,
         "luxury": 1,
@@ -709,6 +749,158 @@
         "masterwork": 2
       },
       "notes": "Basic grain - staple food"
+    },
+    "house": {
+      "id": "house",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          25,
+          5,
+          10,
+          5,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "safety_shelter_housing": 40,
+          "safety_shelter_weather": 30,
+          "safety_shelter_warmth": 20,
+          "touch_furniture_functional": 10,
+          "psychological_peace_relaxation": 15,
+          "psychological_peace_solitude": 10,
+          "status_reputation_display": 10
+        }
+      },
+      "tags": [
+        "housing",
+        "shelter",
+        "essential",
+        "permanent"
+      ],
+      "durability": "permanent",
+      "durationCycles": null,
+      "effectDecayRate": 0,
+      "category": "housing",
+      "maxOwned": 1,
+      "qualityMultipliers": {
+        "poor": 0.5,
+        "basic": 1,
+        "good": 1.5,
+        "luxury": 2.5,
+        "masterwork": 4
+      }
+    },
+    "chair": {
+      "id": "chair",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          10,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "touch_furniture_functional": 15,
+          "touch_sensory_luxury": 5,
+          "psychological_peace_relaxation": 5
+        }
+      },
+      "tags": [
+        "furniture",
+        "functional",
+        "comfort"
+      ],
+      "durability": "durable",
+      "durationCycles": 300,
+      "effectDecayRate": 0.002,
+      "category": "furniture_seating",
+      "maxOwned": 4,
+      "qualityMultipliers": {
+        "poor": 0.5,
+        "basic": 1,
+        "good": 1.3,
+        "luxury": 1.8
+      }
+    },
+    "table": {
+      "id": "table",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          8,
+          3,
+          0,
+          5,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "touch_furniture_functional": 12,
+          "psychological_purpose_work": 8,
+          "social_friendship_casual": 10
+        }
+      },
+      "tags": [
+        "furniture",
+        "functional"
+      ],
+      "durability": "durable",
+      "durationCycles": 400,
+      "effectDecayRate": 0.001,
+      "category": "furniture_surface",
+      "maxOwned": 2,
+      "qualityMultipliers": {
+        "poor": 0.5,
+        "basic": 1,
+        "good": 1.3,
+        "luxury": 1.7
+      }
+    },
+    "tools": {
+      "id": "tools",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "psychological_purpose_work": 20,
+          "psychological_purpose_achievement": 10
+        }
+      },
+      "tags": [
+        "tools",
+        "work",
+        "functional"
+      ],
+      "durability": "durable",
+      "durationCycles": 150,
+      "effectDecayRate": 0.005,
+      "category": "tools",
+      "maxOwned": 3,
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.4,
+        "luxury": 1.8
+      }
     }
   }
 }

@@ -509,6 +509,25 @@ function ConsumptionPrototype:Update(dt)
 
         -- Run allocation cycle
         if self.cycleTime >= self.cycleDuration then
+            -- Phase Durables: Update and apply active effects from durables/permanents
+            for _, character in ipairs(self.characters) do
+                if not character.hasEmigrated then
+                    -- 1. Update effects (decay effectiveness, remove expired)
+                    local expiredEffects = character:UpdateActiveEffects(self.cycleNumber)
+                    if expiredEffects and #expiredEffects > 0 then
+                        for _, effect in ipairs(expiredEffects) do
+                            self:LogEvent("durable_expired", character.name .. "'s " .. effect.commodityId .. " has worn out", {
+                                character = character.name,
+                                commodity = effect.commodityId,
+                                category = effect.category
+                            })
+                        end
+                    end
+                    -- 2. Apply passive satisfaction from active effects
+                    character:ApplyActiveEffectsSatisfaction(self.cycleNumber)
+                end
+            end
+
             self:RunAllocationCycle()
             self.cycleTime = self.cycleTime - self.cycleDuration
             self.cycleNumber = self.cycleNumber + 1
@@ -668,12 +687,22 @@ function ConsumptionPrototype:RunAllocationCycle()
                     commodity = alloc.requestedCommodity
                 })
             elseif alloc.status == "substituted" then
-                self:LogEvent("substitution", alloc.characterName .. ": " ..
-                    (alloc.allocatedCommodity or "?") .. " for " .. (alloc.requestedCommodity or "?"), {
-                    character = alloc.characterName,
-                    wanted = alloc.requestedCommodity,
-                    got = alloc.allocatedCommodity
-                })
+                -- Check if this is a durable acquisition
+                if alloc.allocationType == "acquired" then
+                    self:LogEvent("durable_acquired", alloc.characterName .. " acquired " .. (alloc.allocatedCommodity or "item") .. " (durable, substituted)", {
+                        character = alloc.characterName,
+                        commodity = alloc.allocatedCommodity,
+                        wanted = alloc.requestedCommodity,
+                        allocationType = alloc.allocationType
+                    })
+                else
+                    self:LogEvent("substitution", alloc.characterName .. ": " ..
+                        (alloc.allocatedCommodity or "?") .. " for " .. (alloc.requestedCommodity or "?"), {
+                        character = alloc.characterName,
+                        wanted = alloc.requestedCommodity,
+                        got = alloc.allocatedCommodity
+                    })
+                end
                 -- Track substituted commodity
                 local commodity = alloc.allocatedCommodity
                 if commodity then
@@ -684,6 +713,14 @@ function ConsumptionPrototype:RunAllocationCycle()
                 local commodity = alloc.allocatedCommodity
                 if commodity then
                     cycleConsumption[commodity] = (cycleConsumption[commodity] or 0) + 1
+                end
+                -- Log durable acquisitions as notable events
+                if alloc.allocationType == "acquired" then
+                    self:LogEvent("durable_acquired", alloc.characterName .. " acquired " .. (alloc.allocatedCommodity or "item") .. " (durable)", {
+                        character = alloc.characterName,
+                        commodity = alloc.allocatedCommodity,
+                        allocationType = alloc.allocationType
+                    })
                 end
             end
         end
@@ -1351,7 +1388,7 @@ function ConsumptionPrototype:RenderCharacterDetailModal()
     local char = self.detailCharacter
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
     local w = 900
-    local h = 650
+    local h = 750  -- Increased for Possessions section
     local x = (screenW - w) / 2
     local y = (screenH - h) / 2
 
@@ -1963,8 +2000,14 @@ function ConsumptionPrototype:RenderCharacterDetailModal()
 
             -- Status indicator and commodity
             if entry.commodity then
-                love.graphics.setColor(0.4, 0.8, 0.4)
-                love.graphics.print("*", contentX, itemY, 0, 0.8, 0.8)
+                local isAcquired = entry.allocationType == "acquired"
+                if isAcquired then
+                    love.graphics.setColor(0.6, 0.5, 0.9)  -- Purple for acquired
+                    love.graphics.print("+", contentX, itemY, 0, 0.8, 0.8)
+                else
+                    love.graphics.setColor(0.4, 0.8, 0.4)  -- Green for consumed
+                    love.graphics.print("*", contentX, itemY, 0, 0.8, 0.8)
+                end
 
                 -- Color based on effectiveness
                 if effectiveness >= 0.8 then
@@ -1974,8 +2017,9 @@ function ConsumptionPrototype:RenderCharacterDetailModal()
                 else
                     love.graphics.setColor(0.9, 0.6, 0.6)
                 end
-                love.graphics.print(string.format("Cycle %d: %s (%s)",
-                    entry.cycle or 0, entry.commodity, effectivenessStr), contentX + 15, itemY, 0, 0.75, 0.75)
+                local actionText = isAcquired and "Acquired" or "Consumed"
+                love.graphics.print(string.format("Cycle %d: %s %s (%s)",
+                    entry.cycle or 0, actionText, entry.commodity, effectivenessStr), contentX + 15, itemY, 0, 0.75, 0.75)
             else
                 love.graphics.setColor(0.8, 0.4, 0.4)
                 love.graphics.print("x", contentX, itemY, 0, 0.8, 0.8)
@@ -2032,7 +2076,157 @@ function ConsumptionPrototype:RenderCharacterDetailModal()
     scrollY = scrollY + padding
 
     -- ==========================================================================
-    -- SECTION 6: Status & Risks
+    -- SECTION 6: Possessions (Durables & Permanents)
+    -- ==========================================================================
+    love.graphics.setColor(0.7, 0.5, 0.8)
+    love.graphics.print("POSSESSIONS (Durables & Permanents)", contentX, scrollY, 0, 0.9, 0.9)
+    scrollY = scrollY + 22
+
+    local activeEffects = char.activeEffects or {}
+    if #activeEffects == 0 then
+        love.graphics.setColor(0.5, 0.5, 0.5)
+        love.graphics.print("No possessions", contentX, scrollY, 0, 0.75, 0.75)
+        scrollY = scrollY + 20
+    else
+        for i, effect in ipairs(activeEffects) do
+            local itemY = scrollY
+
+            -- Commodity name and durability badge
+            local durabilityColor = {0.7, 0.7, 0.7}
+            local durabilityBadge = ""
+            if effect.durability == "permanent" then
+                durabilityColor = {0.4, 0.8, 0.9}
+                durabilityBadge = " [PERMANENT]"
+            elseif effect.durability == "durable" then
+                durabilityColor = {0.8, 0.7, 0.4}
+                durabilityBadge = ""
+            end
+
+            love.graphics.setColor(0.9, 0.9, 0.9)
+            love.graphics.print(effect.commodityId, contentX, itemY, 0, 0.85, 0.85)
+            love.graphics.setColor(durabilityColor[1], durabilityColor[2], durabilityColor[3])
+            local nameW = love.graphics.getFont():getWidth(effect.commodityId) * 0.85
+            love.graphics.print(durabilityBadge, contentX + nameW + 5, itemY, 0, 0.7, 0.7)
+
+            -- Category
+            love.graphics.setColor(0.5, 0.6, 0.6)
+            love.graphics.print("(" .. (effect.category or "unknown") .. ")", contentX + nameW + 80, itemY, 0, 0.7, 0.7)
+            scrollY = scrollY + 16
+
+            -- Effectiveness bar
+            local effectiveness = effect.currentEffectiveness or 1.0
+            local effBarX = contentX + 20
+            local effBarW = 150
+            local effBarH = 10
+
+            love.graphics.setColor(0.55, 0.55, 0.55)
+            love.graphics.print("Effectiveness:", effBarX, scrollY, 0, 0.7, 0.7)
+
+            local barStartX = effBarX + 80
+            love.graphics.setColor(0.2, 0.2, 0.25)
+            love.graphics.rectangle("fill", barStartX, scrollY + 1, effBarW, effBarH, 2, 2)
+
+            local effFillW = effectiveness * effBarW
+            if effectiveness >= 0.8 then
+                love.graphics.setColor(0.3, 0.7, 0.3)
+            elseif effectiveness >= 0.5 then
+                love.graphics.setColor(0.7, 0.7, 0.3)
+            else
+                love.graphics.setColor(0.7, 0.4, 0.3)
+            end
+            love.graphics.rectangle("fill", barStartX, scrollY + 1, effFillW, effBarH, 2, 2)
+
+            love.graphics.setColor(0.8, 0.8, 0.8)
+            love.graphics.print(string.format("%.0f%%", effectiveness * 100), barStartX + effBarW + 8, scrollY, 0, 0.7, 0.7)
+            scrollY = scrollY + 14
+
+            -- Remaining cycles (for durables only)
+            if effect.durability == "durable" and effect.remainingCycles then
+                local remaining = effect.remainingCycles
+                local total = effect.durationCycles or remaining
+                local cycleBarX = contentX + 20
+                local cycleBarW = 150
+
+                love.graphics.setColor(0.55, 0.55, 0.55)
+                love.graphics.print("Remaining:", cycleBarX, scrollY, 0, 0.7, 0.7)
+
+                local cycleBarStartX = cycleBarX + 80
+                love.graphics.setColor(0.2, 0.2, 0.25)
+                love.graphics.rectangle("fill", cycleBarStartX, scrollY + 1, cycleBarW, effBarH, 2, 2)
+
+                local cycleFillW = (remaining / total) * cycleBarW
+                local cycleRatio = remaining / total
+                if cycleRatio >= 0.5 then
+                    love.graphics.setColor(0.3, 0.6, 0.7)
+                elseif cycleRatio >= 0.2 then
+                    love.graphics.setColor(0.7, 0.6, 0.3)
+                else
+                    love.graphics.setColor(0.7, 0.4, 0.3)
+                end
+                love.graphics.rectangle("fill", cycleBarStartX, scrollY + 1, cycleFillW, effBarH, 2, 2)
+
+                love.graphics.setColor(0.8, 0.8, 0.8)
+                love.graphics.print(string.format("%d/%d cycles", remaining, total), cycleBarStartX + cycleBarW + 8, scrollY, 0, 0.7, 0.7)
+                scrollY = scrollY + 14
+            end
+
+            -- Edit mode: Remove possession button
+            if self.detailEditMode then
+                self:RenderButton("Remove", contentX + contentW - 60, itemY, 55, 16, function()
+                    table.remove(char.activeEffects, i)
+                end, false, {0.6, 0.3, 0.3})
+            end
+
+            scrollY = scrollY + 8
+        end
+    end
+
+    -- Edit mode: Add possession dropdown
+    if self.detailEditMode then
+        scrollY = scrollY + 5
+        love.graphics.setColor(0.5, 0.6, 0.5)
+        love.graphics.print("Add Possession:", contentX, scrollY, 0, 0.75, 0.75)
+        scrollY = scrollY + 18
+
+        -- Show available durables/permanents from fulfillment vectors
+        local addX = contentX
+        local addedCount = 0
+        if self.fulfillmentVectors and self.fulfillmentVectors.commodities then
+            for commodityId, commodityData in pairs(self.fulfillmentVectors.commodities) do
+                local durability = commodityData.durability
+                if durability == "durable" or durability == "permanent" then
+                    -- Check if character can acquire this
+                    if char:CanAcquireDurable(commodityId) then
+                        if addedCount < 8 then  -- Max 8 buttons
+                            self:RenderButton("+" .. commodityId, addX, scrollY, 90, 16, function()
+                                char:AddActiveEffect(commodityId, self.cycleNumber)
+                            end, false, {0.3, 0.5, 0.4})
+                            addX = addX + 95
+                            addedCount = addedCount + 1
+
+                            if addedCount % 4 == 0 then
+                                addX = contentX
+                                scrollY = scrollY + 20
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        if addedCount == 0 then
+            love.graphics.setColor(0.5, 0.5, 0.5)
+            love.graphics.print("No available durables to add", addX, scrollY, 0, 0.7, 0.7)
+        end
+        scrollY = scrollY + 25
+    end
+
+    -- Separator
+    love.graphics.setColor(0.3, 0.3, 0.35)
+    love.graphics.line(contentX, scrollY, contentX + contentW, scrollY)
+    scrollY = scrollY + padding
+
+    -- ==========================================================================
+    -- SECTION 7: Status & Risks
     -- ==========================================================================
     love.graphics.setColor(0.8, 0.4, 0.4)
     love.graphics.print("STATUS & RISKS", contentX, scrollY, 0, 0.9, 0.9)
@@ -4686,6 +4880,25 @@ function ConsumptionPrototype:CreateSaveData()
             end
         end
 
+        -- Serialize active effects (durables/permanents)
+        charData.activeEffects = {}
+        if char.activeEffects then
+            for _, effect in ipairs(char.activeEffects) do
+                table.insert(charData.activeEffects, {
+                    commodityId = effect.commodityId,
+                    category = effect.category,
+                    durability = effect.durability,
+                    acquiredCycle = effect.acquiredCycle,
+                    durationCycles = effect.durationCycles,
+                    remainingCycles = effect.remainingCycles,
+                    effectDecayRate = effect.effectDecayRate,
+                    currentEffectiveness = effect.currentEffectiveness,
+                    maxOwned = effect.maxOwned
+                    -- Note: fulfillmentVector is not saved - will be rebuilt from commodity data on load
+                })
+            end
+        end
+
         table.insert(saveData.characters, charData)
     end
 
@@ -4952,6 +5165,32 @@ function ConsumptionPrototype:LoadSaveData(saveData)
             end
             if charData.commodityFatigue then
                 char.commodityFatigue = charData.commodityFatigue
+            end
+
+            -- Restore active effects (durables/permanents)
+            char.activeEffects = {}
+            if charData.activeEffects then
+                for _, effectData in ipairs(charData.activeEffects) do
+                    -- Rebuild fulfillment vector from commodity data
+                    local commodityData = self.fulfillmentVectors and self.fulfillmentVectors.commodities and self.fulfillmentVectors.commodities[effectData.commodityId]
+                    local fulfillmentVector = nil
+                    if commodityData and commodityData.fulfillmentVector and commodityData.fulfillmentVector.fine then
+                        fulfillmentVector = commodityData.fulfillmentVector.fine
+                    end
+
+                    table.insert(char.activeEffects, {
+                        commodityId = effectData.commodityId,
+                        category = effectData.category,
+                        durability = effectData.durability,
+                        acquiredCycle = effectData.acquiredCycle,
+                        durationCycles = effectData.durationCycles,
+                        remainingCycles = effectData.remainingCycles,
+                        effectDecayRate = effectData.effectDecayRate,
+                        currentEffectiveness = effectData.currentEffectiveness,
+                        maxOwned = effectData.maxOwned,
+                        fulfillmentVector = fulfillmentVector
+                    })
+                end
             end
 
             table.insert(self.characters, char)
@@ -5389,6 +5628,25 @@ function ConsumptionPrototype:RenderCharacterCardAt(character, x, y)
     -- Priority
     love.graphics.setColor(0.6, 0.6, 0.6)
     love.graphics.print("P:" .. math.floor(character.allocationPriority), x + 5, y + h - 18, 0, 0.55, 0.55)
+
+    -- Possessions indicator
+    local possessionCount = character.activeEffects and #character.activeEffects or 0
+    if possessionCount > 0 then
+        -- Check if any possession is degraded (<50% effectiveness)
+        local hasDegraded = false
+        for _, effect in ipairs(character.activeEffects) do
+            if effect.currentEffectiveness and effect.currentEffectiveness < 0.5 then
+                hasDegraded = true
+                break
+            end
+        end
+        if hasDegraded then
+            love.graphics.setColor(0.9, 0.6, 0.3)  -- Orange for degraded
+        else
+            love.graphics.setColor(0.6, 0.7, 0.8)  -- Blue-gray for normal
+        end
+        love.graphics.print(possessionCount .. " items", x + w - 45, y + h - 18, 0, 0.5, 0.5)
+    end
     -- Note: Click detection handled in MouseReleased with bounds checking
 end
 

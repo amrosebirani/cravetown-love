@@ -122,7 +122,7 @@ Get game event logs to understand what happened.
 | Escape | Cancel |
 | Left click | Select options |
 
-## Example Session
+## Example Session - Main Game
 
 ```python
 # Claude's thought process when playing:
@@ -156,6 +156,109 @@ await cravetown_action(action="select_grain", grain_type="wheat")
 
 # 9. Continue playing...
 ```
+
+## Consumption Prototype Mode
+
+The consumption prototype is a specialized mode for testing and balancing the game's economic/satisfaction system. This is where AI agents can help analyze game balance.
+
+### Launching Consumption Prototype
+
+From the launcher, click on "Test Cache" or navigate via MCP actions.
+
+### Example Session - Balance Analysis
+
+```python
+# Claude analyzing consumption balance:
+
+# 1. Get current state
+state = await cravetown_game_state(depth="full")
+# Shows: mode="consumption_prototype", simulation, statistics, characters
+
+# 2. Check initial stats
+stats = await cravetown_query(query_type="consumption_stats")
+# Shows: avg_satisfaction=0.75, gini_coefficient=0.12, ...
+
+# 3. Add more characters to stress test
+await cravetown_action(action="add_random_characters", count=10)
+
+# 4. Inject resources to test allocation
+await cravetown_action(action="inject_resource", commodity="bread", amount=50)
+await cravetown_action(action="inject_resource", commodity="fish", amount=30)
+
+# 5. Run some cycles
+await cravetown_action(action="skip_cycles", count=5)
+
+# 6. Check how resources were distributed
+allocation = await cravetown_query(query_type="allocation_details")
+# Shows: who got what and why
+
+# 7. Test different allocation policies
+await cravetown_action(action="apply_policy_preset", preset="rawlsian")
+await cravetown_action(action="skip_cycles", count=5)
+stats_rawlsian = await cravetown_query(query_type="consumption_stats")
+
+await cravetown_action(action="apply_policy_preset", preset="utilitarian")
+await cravetown_action(action="skip_cycles", count=5)
+stats_utilitarian = await cravetown_query(query_type="consumption_stats")
+
+# 8. Compare: rawlsian should have lower gini (more equal)
+#    utilitarian should have higher avg satisfaction
+
+# 9. Test crisis recovery
+await cravetown_action(action="trigger_riot")  # Sets all satisfaction to 0
+await cravetown_action(action="skip_cycles", count=20)
+recovery_stats = await cravetown_query(query_type="consumption_stats")
+# Analyze: How quickly does the system recover?
+
+# 10. Check individual character details
+char_id = state["characters"][0]["id"]
+details = await cravetown_query(query_type="character", character_id=char_id, depth="full")
+# Shows: all 6 layers of character model
+```
+
+### Character Model (6 Layers)
+
+Each character in the consumption prototype has:
+
+1. **Identity**: name, role
+2. **Base Cravings**: 49 fine-grained cravings in 9 categories (Food, Drink, Shelter, etc.)
+3. **Current Cravings**: Modified by consumption history
+4. **Satisfaction**: 0.0-1.0 value affecting priority
+5. **Commodity Multipliers**: Fatigue from repeated consumption
+6. **Consumption History**: What/when consumed
+
+### Balance Metrics to Watch
+
+- **avg_satisfaction**: Overall happiness (target: 0.6-0.8)
+- **gini_coefficient**: Inequality (lower = more fair, 0.0-0.3 is good)
+- **min_satisfaction**: Worst-off character (should stay above 0.3)
+- **characters_below_threshold**: Count of unhappy characters
+
+### Policy Presets
+
+| Preset | Priority | Good For |
+|--------|----------|----------|
+| equal | round_robin | Maximum fairness |
+| needs_based | highest_craving | Addressing urgent needs |
+| utilitarian | maximize total | Efficiency |
+| rawlsian | lowest_satisfaction | Helping worst-off |
+
+### Consumption Prototype Actions
+
+| Action | Description |
+|--------|-------------|
+| pause_simulation | Pause consumption cycles |
+| resume_simulation | Resume simulation |
+| set_simulation_speed | Set speed (0.5, 1.0, 2.0, 5.0) |
+| skip_cycles | Fast-forward N cycles |
+| add_character | Add a character |
+| add_random_characters | Add N random characters |
+| inject_resource | Add commodity to inventory |
+| set_allocation_policy | Configure allocation |
+| apply_policy_preset | Apply preset |
+| trigger_riot | Test crisis (satisfaction → 0) |
+| trigger_civil_unrest | Test mild crisis (−30%) |
+| set_all_satisfaction | Set everyone's satisfaction |
 
 ## Architecture
 

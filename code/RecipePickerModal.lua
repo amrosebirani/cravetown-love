@@ -18,7 +18,8 @@ function RecipePickerModal:Create(building, stationIndex, onSelect)
         mMaxScroll = 0,
         mRecipes = {},
         mRecipeButtons = {},
-        mCloseButton = nil
+        mCloseButton = nil,
+        mJustOpened = true  -- Prevent closing on the same click that opened the modal
     }
 
     setmetatable(this, self)
@@ -98,7 +99,22 @@ function RecipePickerModal:HandleInput()
     return true  -- Block input to lower states
 end
 
+function RecipePickerModal:OnMouseWheel(dx, dy)
+    -- Handle mouse wheel scrolling
+    self.mScrollOffset = self.mScrollOffset - dy * 30
+    self.mScrollOffset = math.max(0, math.min(self.mScrollOffset, self.mMaxScroll))
+end
+
 function RecipePickerModal:Update(dt)
+    -- Skip processing the click that opened this modal
+    if self.mJustOpened then
+        if not gMouseReleased then
+            -- Mouse released, safe to process clicks now
+            self.mJustOpened = false
+        end
+        return true
+    end
+
     if not gMouseReleased then
         return true
     end

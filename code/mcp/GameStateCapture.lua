@@ -29,6 +29,11 @@ function GameStateCapture:capture(params)
 
     local includeAll = self:hasInclude(include, "all")
 
+    -- Special handling for consumption prototype mode (test_cache)
+    if gMode == "test_cache" and gTestCache and gTestCache.prototype then
+        return self:captureConsumptionPrototype(params, includeAll, depth)
+    end
+
     -- Screen info
     if includeAll or self:hasInclude(include, "screen") then
         state.screen = self:captureScreen()
@@ -552,7 +557,364 @@ function GameStateCapture:query(params)
         return self:captureAvailableActions()
     end
 
+    -- Consumption prototype queries
+    if gMode == "test_cache" and gTestCache and gTestCache.prototype then
+        return self:queryConsumptionPrototype(queryType, id, params)
+    end
+
     return {error = "Unknown query type: " .. tostring(queryType)}
+end
+
+-- ============================================================================
+-- CONSUMPTION PROTOTYPE STATE CAPTURE
+-- For game balance analysis and AI observation
+-- ============================================================================
+
+function GameStateCapture:captureConsumptionPrototype(params, includeAll, depth)
+    local proto = gTestCache.prototype
+    local include = params.include or {"all"}
+
+    local state = {
+        frame = self.bridge.frameCount,
+        timestamp = love.timer.getTime(),
+        mode = "consumption_prototype",
+
+        -- Simulation state
+        simulation = {
+            cycle = proto.cycleNumber or 0,
+            cycle_time = proto.cycleTime or 0,
+            cycle_duration = proto.cycleDuration or 60,
+            is_paused = proto.isPaused,
+            speed = proto.simulationSpeed or 1.0
+        }
+    }
+
+    -- Statistics (always include - critical for balance analysis)
+    if includeAll or self:hasInclude(include, "statistics") or self:hasInclude(include, "stats") then
+        state.statistics = self:captureConsumptionStats(proto)
+    end
+
+    -- Characters
+    if includeAll or self:hasInclude(include, "characters") then
+        state.characters = self:captureConsumptionCharacters(proto, depth)
+    end
+
+    -- Inventory
+    if includeAll or self:hasInclude(include, "inventory") then
+        state.inventory = proto.townInventory or {}
+        state.inventory_total = proto:GetTotalInventoryCount()
+    end
+
+    -- Allocation policy
+    if includeAll or self:hasInclude(include, "policy") then
+        state.allocation_policy = proto.allocationPolicy
+        state.policy_presets = {}
+        if proto.policyPresets then
+            for _, preset in ipairs(proto.policyPresets) do
+                table.insert(state.policy_presets, {
+                    name = preset.name,
+                    description = preset.description
+                })
+            end
+        end
+    end
+
+    -- Historical data (for trend analysis)
+    if includeAll or self:hasInclude(include, "history") then
+        state.history = {
+            satisfaction = proto.satisfactionHistory or {},
+            population = proto.populationHistory or {},
+            max_cycles_tracked = proto.historyMaxCycles or 20
+        }
+    end
+
+    -- Event log
+    if includeAll or self:hasInclude(include, "events") then
+        state.event_log = {}
+        local maxEvents = params.max_events or 50
+        local startIdx = math.max(1, #(proto.eventLog or {}) - maxEvents + 1)
+        for i = startIdx, #(proto.eventLog or {}) do
+            table.insert(state.event_log, proto.eventLog[i])
+        end
+    end
+
+    -- UI state
+    if includeAll or self:hasInclude(include, "ui_state") then
+        state.ui_state = {
+            current_view = proto.currentView,
+            selected_character = proto.selectedCharacter and proto.selectedCharacter.name or nil,
+            modals_open = {
+                character_creator = proto.showCharacterCreator,
+                resource_injector = proto.showResourceInjector,
+                inventory = proto.showInventoryModal,
+                heatmap = proto.showHeatmapModal,
+                character_detail = proto.showCharacterDetailModal,
+                analytics = proto.showAnalyticsModal,
+                allocation_policy = proto.showAllocationPolicyModal,
+                testing_tools = proto.showTestingToolsModal,
+                save_load = proto.showSaveLoadModal
+            },
+            any_modal_open = proto:IsAnyModalOpen()
+        }
+    end
+
+    -- Available actions for this mode
+    if includeAll or self:hasInclude(include, "available_actions") then
+        state.available_actions = self:captureConsumptionActions(proto)
+    end
+
+    -- Controls reference
+    if self:hasInclude(include, "controls") then
+        state.controls = self:getConsumptionControlsReference()
+    end
+
+    -- Metrics
+    if includeAll or self:hasInclude(include, "metrics") then
+        state.metrics = {
+            fps = love.timer.getFPS(),
+            memory_kb = collectgarbage("count"),
+            character_count = #(proto.characters or {}),
+            active_character_count = proto:GetActiveCharacterCount()
+        }
+    end
+
+    return state
+end
+
+function GameStateCapture:captureConsumptionStats(proto)
+    local stats = proto.stats or {}
+    return {
+        -- Core statistics
+        total_cycles = stats.totalCycles or 0,
+        total_allocations = stats.totalAllocations or 0,
+        total_emigrations = stats.totalEmigrations or 0,
+        total_riots = stats.totalRiots or 0,
+
+        -- Population
+        total_population = stats.totalPopulation or #(proto.characters or {}),
+        active_population = stats.activePopulation or 0,
+        protesting_count = stats.protestingCount or 0,
+        emigrated_count = stats.emigratedCount or 0,
+        dissatisfied_count = stats.dissatisfiedCount or 0,
+        stressed_count = stats.stressedCount or 0,
+
+        -- Averages
+        average_satisfaction = stats.averageSatisfaction or 0,
+        productivity_multiplier = stats.productivityMultiplier or 1.0,
+
+        -- By class breakdown
+        by_class = stats.byClass or {}
+    }
+end
+
+function GameStateCapture:captureConsumptionCharacters(proto, depth)
+    local characters = {}
+
+    for i, char in ipairs(proto.characters or {}) do
+        local c = {
+            id = i,
+            name = char.name,
+            class = char.class,
+            age = char.age,
+            vocation = char.vocation,
+            traits = char.traits or {},
+
+            -- Status
+            status = char.status,
+            status_message = char.statusMessage,
+            is_protesting = char.isProtesting,
+            has_emigrated = char.hasEmigrated,
+
+            -- Key metrics
+            average_satisfaction = char:GetAverageSatisfaction(),
+            productivity = char.productivityMultiplier or 1.0,
+            allocation_success_rate = char.allocationSuccessRate or 0,
+            critical_craving_count = char:GetCriticalCravingCount()
+        }
+
+        if depth ~= "minimal" then
+            -- Satisfaction by dimension (9D coarse)
+            c.satisfaction = {}
+            if char.satisfaction then
+                for dim, value in pairs(char.satisfaction) do
+                    c.satisfaction[dim] = value
+                end
+            end
+
+            -- Coarse cravings (9D aggregated)
+            c.coarse_cravings = char:AggregateCurrentCravingsToCoarse()
+
+            -- Fairness penalty
+            c.fairness_penalty = char.fairnessPenalty or 0
+            c.consecutive_failed_allocations = char.consecutiveFailedAllocations or 0
+            c.consecutive_low_satisfaction_cycles = char.consecutiveLowSatisfactionCycles or 0
+        end
+
+        if depth == "full" then
+            -- Fine-grained cravings (49D)
+            c.current_cravings = {}
+            if char.currentCravings then
+                for idx = 0, 48 do
+                    c.current_cravings[idx] = char.currentCravings[idx] or 0
+                end
+            end
+
+            -- Base cravings
+            c.base_cravings = {}
+            if char.baseCravings then
+                for idx = 0, 48 do
+                    c.base_cravings[idx] = char.baseCravings[idx] or 0
+                end
+            end
+
+            -- Commodity multipliers (fatigue)
+            c.commodity_multipliers = {}
+            if char.commodityMultipliers then
+                for commodity, data in pairs(char.commodityMultipliers) do
+                    c.commodity_multipliers[commodity] = {
+                        multiplier = data.multiplier,
+                        consecutive_count = data.consecutiveCount,
+                        last_consumed = data.lastConsumed
+                    }
+                end
+            end
+
+            -- Consumption history
+            c.consumption_history = char.consumptionHistory or {}
+
+            -- Enablement state
+            c.enablement_state = char.enablementState or {}
+        end
+
+        table.insert(characters, c)
+    end
+
+    return characters
+end
+
+function GameStateCapture:captureConsumptionActions(proto)
+    local actions = {}
+
+    -- Simulation controls
+    if proto.isPaused then
+        table.insert(actions, {action = "resume_simulation", description = "Press SPACE to resume simulation"})
+    else
+        table.insert(actions, {action = "pause_simulation", description = "Press SPACE to pause simulation"})
+    end
+    table.insert(actions, {action = "set_simulation_speed", description = "Set speed (1x, 2x, 5x, 10x)"})
+    table.insert(actions, {action = "skip_cycles", description = "Skip N cycles instantly"})
+
+    -- Character management
+    table.insert(actions, {action = "add_character", description = "Add a character with class/traits"})
+    table.insert(actions, {action = "add_random_characters", description = "Add N random characters"})
+    table.insert(actions, {action = "clear_all_characters", description = "Remove all characters"})
+
+    -- Inventory management
+    table.insert(actions, {action = "inject_resource", description = "Add commodities to inventory"})
+    table.insert(actions, {action = "fill_basic_inventory", description = "Fill with basic goods"})
+    table.insert(actions, {action = "fill_luxury_inventory", description = "Fill with luxury goods"})
+    table.insert(actions, {action = "double_inventory", description = "Double all inventory"})
+    table.insert(actions, {action = "clear_inventory", description = "Clear all inventory"})
+
+    -- Policy changes
+    table.insert(actions, {action = "set_allocation_policy", description = "Change allocation policy settings"})
+    table.insert(actions, {action = "apply_policy_preset", description = "Apply a predefined policy preset"})
+
+    -- Testing tools
+    table.insert(actions, {action = "trigger_riot", description = "Force a riot event"})
+    table.insert(actions, {action = "trigger_civil_unrest", description = "Force civil unrest"})
+    table.insert(actions, {action = "trigger_mass_emigration", description = "Force mass emigration"})
+    table.insert(actions, {action = "trigger_random_protest", description = "Random character protests"})
+    table.insert(actions, {action = "set_all_satisfaction", description = "Set all characters to a satisfaction level"})
+    table.insert(actions, {action = "randomize_all_satisfaction", description = "Randomize all satisfaction"})
+    table.insert(actions, {action = "reset_all_cravings", description = "Reset all cravings to base"})
+    table.insert(actions, {action = "reset_all_fatigue", description = "Reset commodity fatigue"})
+
+    return actions
+end
+
+function GameStateCapture:getConsumptionControlsReference()
+    return {
+        simulation = {
+            SPACE = "Pause/Resume simulation",
+            ["1"] = "Set speed 1x",
+            ["2"] = "Set speed 2x",
+            ["3"] = "Set speed 5x",
+            ["4"] = "Set speed 10x"
+        },
+        navigation = {
+            ["Arrow keys"] = "Navigate character selection",
+            Enter = "Open character detail",
+            Escape = "Close modal / Return to launcher"
+        },
+        shortcuts = {
+            C = "Open character creator",
+            I = "Open inventory",
+            A = "Open analytics",
+            P = "Open allocation policy",
+            T = "Open testing tools",
+            S = "Open save/load",
+            H = "Toggle help overlay"
+        }
+    }
+end
+
+function GameStateCapture:queryConsumptionPrototype(queryType, id, params)
+    local proto = gTestCache.prototype
+
+    if queryType == "character" and id then
+        -- Find character by ID or name
+        for i, char in ipairs(proto.characters or {}) do
+            if i == tonumber(id) or char.name == id then
+                return self:captureConsumptionCharacters({prototype = proto, characters = {char}}, "full")[1]
+            end
+        end
+        return {error = "Character not found: " .. tostring(id)}
+    end
+
+    if queryType == "allocation_log" then
+        local limit = params.limit or 10
+        local logs = {}
+        local startIdx = math.max(1, #(proto.allocationHistory or {}) - limit + 1)
+        for i = startIdx, #(proto.allocationHistory or {}) do
+            table.insert(logs, proto.allocationHistory[i])
+        end
+        return {allocation_logs = logs, count = #logs}
+    end
+
+    if queryType == "dimension_definitions" then
+        return {dimensions = proto.dimensionDefinitions or {}}
+    end
+
+    if queryType == "character_classes" then
+        return {classes = proto.characterClasses or {}}
+    end
+
+    if queryType == "traits" then
+        return {traits = proto.characterTraits or {}}
+    end
+
+    if queryType == "fulfillment_vectors" then
+        return {vectors = proto.fulfillmentVectors or {}}
+    end
+
+    if queryType == "substitution_rules" then
+        return {rules = proto.substitutionRules or {}}
+    end
+
+    if queryType == "consumption_mechanics" then
+        return {mechanics = proto.consumptionMechanics or {}}
+    end
+
+    if queryType == "commodities" then
+        return {commodities = proto.commodities or {}}
+    end
+
+    if queryType == "available_actions" then
+        return self:captureConsumptionActions(proto)
+    end
+
+    return {error = "Unknown consumption query type: " .. tostring(queryType)}
 end
 
 return GameStateCapture

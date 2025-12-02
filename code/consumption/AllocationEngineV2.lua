@@ -146,6 +146,58 @@ function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycl
     return allocationLog
 end
 
+-- Helper: Check if a commodity is durable or permanent
+function AllocationEngineV2.IsDurable(commodityId)
+    if not FulfillmentVectors or not FulfillmentVectors.commodities then
+        return false
+    end
+    local commodityData = FulfillmentVectors.commodities[commodityId]
+    if not commodityData then
+        return false
+    end
+    local durability = commodityData.durability or "consumable"
+    return durability == "durable" or durability == "permanent"
+end
+
+-- Helper: Get commodity durability info
+function AllocationEngineV2.GetDurabilityInfo(commodityId)
+    if not FulfillmentVectors or not FulfillmentVectors.commodities then
+        return nil
+    end
+    local commodityData = FulfillmentVectors.commodities[commodityId]
+    if not commodityData then
+        return nil
+    end
+    return {
+        durability = commodityData.durability or "consumable",
+        durationCycles = commodityData.durationCycles,
+        effectDecayRate = commodityData.effectDecayRate or 0,
+        category = commodityData.category or commodityId,
+        maxOwned = commodityData.maxOwned or 1
+    }
+end
+
+-- Helper: Process commodity allocation (handles both consumables and durables)
+function AllocationEngineV2.ProcessAllocation(character, commodityId, quantity, currentCycle)
+    local durabilityInfo = AllocationEngineV2.GetDurabilityInfo(commodityId)
+
+    if durabilityInfo and (durabilityInfo.durability == "durable" or durabilityInfo.durability == "permanent") then
+        -- Durable/Permanent: Add as active effect
+        local success, effect = character:AddActiveEffect(commodityId, currentCycle)
+        if success then
+            -- Also give immediate satisfaction boost for acquiring the item
+            local immediateGain = character:FulfillCraving(commodityId, quantity, currentCycle, "acquired")
+            return true, immediateGain or 0, "acquired"
+        else
+            return false, 0, "failed_to_acquire"
+        end
+    else
+        -- Consumable: Normal craving fulfillment
+        local success, gain, multiplier = character:FulfillCraving(commodityId, quantity, currentCycle, "consumed")
+        return success, gain or 0, "consumed"
+    end
+end
+
 -- Allocate resources for a single character
 function AllocationEngineV2.AllocateForCharacter(character, townInventory, currentCycle, rank)
     local allocation = {
@@ -157,10 +209,11 @@ function AllocationEngineV2.AllocateForCharacter(character, townInventory, curre
         requestedCommodity = nil,
         allocatedCommodity = nil,
         quantity = 1,
-        status = "failed",  -- granted/substituted/failed/no_needs
+        status = "failed",  -- granted/substituted/failed/no_needs/acquired
         satisfactionGain = 0,
-        commodityMultiplier = 1.0,  -- Changed from varietyMultiplier
-        substitutionChain = {}
+        commodityMultiplier = 1.0,
+        substitutionChain = {},
+        allocationType = "consumed"  -- "consumed" or "acquired" (for durables)
     }
 
     -- Determine which craving to address (highest currentCraving with highest weight)
@@ -200,9 +253,12 @@ function AllocationEngineV2.AllocateForCharacter(character, townInventory, curre
                     CommodityCache.InvalidateCommodity(substitute)
                 end
 
-                -- Fulfill craving
-                local success, gain, multiplier = character:FulfillCraving(substitute, allocation.quantity, currentCycle)
-                allocation.satisfactionGain = gain or 0
+                -- Process allocation (handles durables vs consumables)
+                local success, gain, allocType = AllocationEngineV2.ProcessAllocation(
+                    character, substitute, allocation.quantity, currentCycle
+                )
+                allocation.satisfactionGain = gain
+                allocation.allocationType = allocType
                 character:RecordAllocationAttempt(true, currentCycle)
 
                 return allocation
@@ -222,9 +278,12 @@ function AllocationEngineV2.AllocateForCharacter(character, townInventory, curre
             CommodityCache.InvalidateCommodity(targetCommodity)
         end
 
-        -- Fulfill craving
-        local success, gain, multiplier = character:FulfillCraving(targetCommodity, allocation.quantity, currentCycle)
-        allocation.satisfactionGain = gain or 0
+        -- Process allocation (handles durables vs consumables)
+        local success, gain, allocType = AllocationEngineV2.ProcessAllocation(
+            character, targetCommodity, allocation.quantity, currentCycle
+        )
+        allocation.satisfactionGain = gain
+        allocation.allocationType = allocType
         character:RecordAllocationAttempt(true, currentCycle)
 
         return allocation
@@ -249,9 +308,12 @@ function AllocationEngineV2.AllocateForCharacter(character, townInventory, curre
             CommodityCache.InvalidateCommodity(substitute)
         end
 
-        -- Fulfill craving
-        local success, gain, multiplier = character:FulfillCraving(substitute, allocation.quantity, currentCycle)
-        allocation.satisfactionGain = gain or 0
+        -- Process allocation (handles durables vs consumables)
+        local success, gain, allocType = AllocationEngineV2.ProcessAllocation(
+            character, substitute, allocation.quantity, currentCycle
+        )
+        allocation.satisfactionGain = gain
+        allocation.allocationType = allocType
         character:RecordAllocationAttempt(true, currentCycle)
 
         return allocation
@@ -293,6 +355,13 @@ function AllocationEngineV2.SelectTargetCraving(character, townInventory, curren
             -- Check all available commodities that fulfill this fine dimension
             for commodityId, commodityData in pairs(FulfillmentVectors.commodities) do
                 if townInventory[commodityId] and townInventory[commodityId] > 0 then
+                    -- Skip durables that character already owns at max capacity
+                    if AllocationEngineV2.IsDurable(commodityId) then
+                        if not character:CanAcquireDurable(commodityId) then
+                            goto continue_commodity_select
+                        end
+                    end
+
                     local fineVector = commodityData.fulfillmentVector and commodityData.fulfillmentVector.fine
                     if fineVector and fineVector[fineName] then
                         local fulfillmentPoints = fineVector[fineName]
@@ -311,6 +380,7 @@ function AllocationEngineV2.SelectTargetCraving(character, townInventory, curren
                         end
                     end
                 end
+                ::continue_commodity_select::
             end
         end
     end
@@ -347,6 +417,13 @@ function AllocationEngineV2.GetBestCommodityForCraving(coarseCraving, character,
     for commodityId, commodityData in pairs(FulfillmentVectors.commodities) do
         -- Only consider commodities that are available in inventory
         if townInventory[commodityId] and townInventory[commodityId] > 0 then
+            -- Skip durables that character already owns at max capacity
+            if AllocationEngineV2.IsDurable(commodityId) then
+                if not character:CanAcquireDurable(commodityId) then
+                    goto continue_commodity_best
+                end
+            end
+
             checkedCount = checkedCount + 1
             local fineVector = commodityData.fulfillmentVector and commodityData.fulfillmentVector.fine
             if fineVector then
@@ -389,6 +466,7 @@ function AllocationEngineV2.GetBestCommodityForCraving(coarseCraving, character,
                 end
             end
         end
+        ::continue_commodity_best::
     end
 
     print(string.format("    Checked %d commodities, best: %s (score=%.2f)", checkedCount, tostring(bestCommodity), bestScore))
@@ -413,6 +491,13 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
 
                 -- Check availability
                 if townInventory[substituteCommodity] and townInventory[substituteCommodity] > 0 then
+                    -- Skip durables that character already owns at max capacity
+                    if AllocationEngineV2.IsDurable(substituteCommodity) then
+                        if not character:CanAcquireDurable(substituteCommodity) then
+                            goto continue_substitute_hierarchy
+                        end
+                    end
+
                     -- Check quality acceptance
                     local substData = FulfillmentVectors.commodities[substituteCommodity]
                     if substData and character:AcceptsQuality(substData.quality) then
@@ -449,6 +534,7 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
                         end
                     end
                 end
+                ::continue_substitute_hierarchy::
             end
         end
     end
@@ -474,6 +560,13 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
                         local distance = rule.distance or 0.8  -- Desperation = distant
 
                         if townInventory[substituteCommodity] and townInventory[substituteCommodity] > 0 then
+                            -- Skip durables that character already owns at max capacity
+                            if AllocationEngineV2.IsDurable(substituteCommodity) then
+                                if not character:CanAcquireDurable(substituteCommodity) then
+                                    goto continue_substitute_desperation
+                                end
+                            end
+
                             local substData = FulfillmentVectors.commodities[substituteCommodity]
                             if substData and character:AcceptsQuality(substData.quality) then
                                 local commodityMultiplier = character:CalculateCommodityMultiplier(substituteCommodity, currentCycle)
@@ -495,6 +588,7 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
                                 end
                             end
                         end
+                        ::continue_substitute_desperation::
                     end
                 end
             end

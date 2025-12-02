@@ -19,6 +19,11 @@ function ActionHandler:execute(params)
     local action = params.action
     local actionParams = params.params or params
 
+    -- Check if we're in consumption prototype mode
+    if gMode == "test_cache" and gTestCache and gTestCache.prototype then
+        return self:executeConsumptionAction(action, actionParams)
+    end
+
     local handlers = {
         -- Building actions
         place_building = function() return self:placeBuilding(actionParams) end,
@@ -53,6 +58,9 @@ function ActionHandler:execute(params)
 
         -- Character actions
         hire_character = function() return self:hireCharacter(actionParams) end,
+
+        -- Mode switching
+        launch_consumption_prototype = function() return self:launchConsumptionPrototype(actionParams) end,
     }
 
     local handler = handlers[action]
@@ -482,6 +490,291 @@ end
 -- Hire character (placeholder - depends on game implementation)
 function ActionHandler:hireCharacter(params)
     return {success = false, error = "Character hiring not yet implemented"}
+end
+
+-- Launch consumption prototype from launcher
+function ActionHandler:launchConsumptionPrototype(params)
+    if gMode == "launcher" then
+        InitializeTestCache()
+        return {success = true, mode = "test_cache"}
+    end
+    return {success = false, error = "Must be in launcher mode"}
+end
+
+-- ============================================================================
+-- CONSUMPTION PROTOTYPE ACTIONS
+-- For game balance testing and AI observation
+-- ============================================================================
+
+function ActionHandler:executeConsumptionAction(action, params)
+    local proto = gTestCache.prototype
+
+    local handlers = {
+        -- Simulation controls
+        pause_simulation = function() return self:consumptionPause(proto) end,
+        resume_simulation = function() return self:consumptionResume(proto) end,
+        toggle_simulation = function() return self:consumptionToggle(proto) end,
+        set_simulation_speed = function() return self:consumptionSetSpeed(proto, params) end,
+        skip_cycles = function() return self:consumptionSkipCycles(proto, params) end,
+
+        -- Character management
+        add_character = function() return self:consumptionAddCharacter(proto, params) end,
+        add_random_characters = function() return self:consumptionAddRandomCharacters(proto, params) end,
+        clear_all_characters = function() return self:consumptionClearCharacters(proto) end,
+        remove_character = function() return self:consumptionRemoveCharacter(proto, params) end,
+
+        -- Inventory management
+        inject_resource = function() return self:consumptionInjectResource(proto, params) end,
+        fill_basic_inventory = function() return self:consumptionFillBasic(proto) end,
+        fill_luxury_inventory = function() return self:consumptionFillLuxury(proto) end,
+        double_inventory = function() return self:consumptionDoubleInventory(proto) end,
+        clear_inventory = function() return self:consumptionClearInventory(proto) end,
+
+        -- Policy changes
+        set_allocation_policy = function() return self:consumptionSetPolicy(proto, params) end,
+        apply_policy_preset = function() return self:consumptionApplyPreset(proto, params) end,
+
+        -- Testing tools
+        trigger_riot = function() return self:consumptionTriggerRiot(proto) end,
+        trigger_civil_unrest = function() return self:consumptionTriggerUnrest(proto) end,
+        trigger_mass_emigration = function() return self:consumptionTriggerEmigration(proto, params) end,
+        trigger_random_protest = function() return self:consumptionTriggerProtest(proto) end,
+        set_all_satisfaction = function() return self:consumptionSetSatisfaction(proto, params) end,
+        randomize_all_satisfaction = function() return self:consumptionRandomizeSatisfaction(proto) end,
+        reset_all_cravings = function() return self:consumptionResetCravings(proto) end,
+        reset_all_fatigue = function() return self:consumptionResetFatigue(proto) end,
+        clear_all_protests = function() return self:consumptionClearProtests(proto) end,
+
+        -- General actions that still work
+        return_to_launcher = function() return self:returnToLauncher(params) end,
+    }
+
+    local handler = handlers[action]
+    if handler then
+        local success, result = pcall(handler)
+        if success then
+            return result
+        else
+            return {success = false, error = "Consumption action error: " .. tostring(result)}
+        end
+    end
+
+    return {success = false, error = "Unknown consumption action: " .. tostring(action)}
+end
+
+-- Simulation controls
+function ActionHandler:consumptionPause(proto)
+    proto.isPaused = true
+    return {success = true, paused = true}
+end
+
+function ActionHandler:consumptionResume(proto)
+    proto.isPaused = false
+    return {success = true, paused = false}
+end
+
+function ActionHandler:consumptionToggle(proto)
+    proto.isPaused = not proto.isPaused
+    return {success = true, paused = proto.isPaused}
+end
+
+function ActionHandler:consumptionSetSpeed(proto, params)
+    local speed = params.speed or 1.0
+    -- Valid speeds: 1, 2, 5, 10
+    local validSpeeds = {1, 2, 5, 10}
+    local found = false
+    for _, v in ipairs(validSpeeds) do
+        if v == speed then found = true break end
+    end
+    if not found then
+        speed = math.max(1, math.min(10, speed))
+    end
+    proto.simulationSpeed = speed
+    return {success = true, speed = proto.simulationSpeed}
+end
+
+function ActionHandler:consumptionSkipCycles(proto, params)
+    local count = params.count or params.cycles or 1
+    proto:SkipCycles(count)
+    return {success = true, cycles_skipped = count, new_cycle = proto.cycleNumber}
+end
+
+-- Character management
+function ActionHandler:consumptionAddCharacter(proto, params)
+    local class = params.class or "Middle"
+    local traits = params.traits or {}
+    local vocation = params.vocation
+
+    proto:AddCharacter(class, traits, vocation)
+    local char = proto.characters[#proto.characters]
+
+    return {
+        success = true,
+        character = {
+            name = char.name,
+            class = char.class,
+            age = char.age,
+            vocation = char.vocation,
+            traits = char.traits
+        },
+        total_characters = #proto.characters
+    }
+end
+
+function ActionHandler:consumptionAddRandomCharacters(proto, params)
+    local count = params.count or 1
+    proto:AddRandomCharacters(count)
+    return {success = true, added = count, total_characters = #proto.characters}
+end
+
+function ActionHandler:consumptionClearCharacters(proto)
+    proto:ClearAllCharacters()
+    return {success = true, total_characters = 0}
+end
+
+function ActionHandler:consumptionRemoveCharacter(proto, params)
+    local id = params.id or params.name
+    if not id then
+        return {success = false, error = "id or name required"}
+    end
+
+    for i, char in ipairs(proto.characters) do
+        if i == tonumber(id) or char.name == id then
+            proto:RemoveCharacter(char)
+            return {success = true, removed = char.name}
+        end
+    end
+    return {success = false, error = "Character not found: " .. tostring(id)}
+end
+
+-- Inventory management
+function ActionHandler:consumptionInjectResource(proto, params)
+    local commodity = params.commodity
+    local amount = params.amount or 100
+
+    if not commodity then
+        return {success = false, error = "commodity is required"}
+    end
+
+    proto:InjectResource(commodity, amount)
+    return {
+        success = true,
+        commodity = commodity,
+        amount_added = amount,
+        new_total = proto.townInventory[commodity] or 0
+    }
+end
+
+function ActionHandler:consumptionFillBasic(proto)
+    proto:FillBasicInventory()
+    return {success = true, inventory_type = "basic"}
+end
+
+function ActionHandler:consumptionFillLuxury(proto)
+    proto:FillLuxuryInventory()
+    return {success = true, inventory_type = "luxury"}
+end
+
+function ActionHandler:consumptionDoubleInventory(proto)
+    proto:DoubleInventory()
+    return {success = true, action = "doubled"}
+end
+
+function ActionHandler:consumptionClearInventory(proto)
+    proto:ClearInventory()
+    return {success = true, action = "cleared"}
+end
+
+-- Policy changes
+function ActionHandler:consumptionSetPolicy(proto, params)
+    -- Update policy settings
+    if params.priority_mode then
+        proto.allocationPolicy.priorityMode = params.priority_mode
+    end
+    if params.fairness_enabled ~= nil then
+        proto.allocationPolicy.fairnessEnabled = params.fairness_enabled
+    end
+    if params.class_priorities then
+        for class, priority in pairs(params.class_priorities) do
+            proto.allocationPolicy.classPriorities[class] = priority
+        end
+    end
+    if params.consumption_budgets then
+        for class, budget in pairs(params.consumption_budgets) do
+            proto.allocationPolicy.consumptionBudgets[class] = budget
+        end
+    end
+    if params.dimension_priorities then
+        for dim, priority in pairs(params.dimension_priorities) do
+            proto.allocationPolicy.dimensionPriorities[dim] = priority
+        end
+    end
+    if params.substitution_aggressiveness then
+        proto.allocationPolicy.substitutionAggressiveness = params.substitution_aggressiveness
+    end
+    if params.reserve_threshold then
+        proto.allocationPolicy.reserveThreshold = params.reserve_threshold
+    end
+
+    return {success = true, policy = proto.allocationPolicy}
+end
+
+function ActionHandler:consumptionApplyPreset(proto, params)
+    local presetName = params.preset or params.name
+    if not presetName then
+        return {success = false, error = "preset name required"}
+    end
+
+    proto:ApplyPolicyPreset(presetName)
+    return {success = true, preset = presetName, policy = proto.allocationPolicy}
+end
+
+-- Testing tools
+function ActionHandler:consumptionTriggerRiot(proto)
+    proto:TriggerRiot()
+    return {success = true, event = "riot"}
+end
+
+function ActionHandler:consumptionTriggerUnrest(proto)
+    proto:TriggerCivilUnrest()
+    return {success = true, event = "civil_unrest"}
+end
+
+function ActionHandler:consumptionTriggerEmigration(proto, params)
+    local count = params.count or 3
+    proto:TriggerMassEmigration(count)
+    return {success = true, event = "mass_emigration", count = count}
+end
+
+function ActionHandler:consumptionTriggerProtest(proto)
+    proto:TriggerRandomProtest()
+    return {success = true, event = "random_protest"}
+end
+
+function ActionHandler:consumptionSetSatisfaction(proto, params)
+    local value = params.value or 50
+    proto:SetAllSatisfaction(value)
+    return {success = true, satisfaction_set = value}
+end
+
+function ActionHandler:consumptionRandomizeSatisfaction(proto)
+    proto:RandomizeAllSatisfaction()
+    return {success = true, action = "randomized"}
+end
+
+function ActionHandler:consumptionResetCravings(proto)
+    proto:ResetAllCravings()
+    return {success = true, action = "cravings_reset"}
+end
+
+function ActionHandler:consumptionResetFatigue(proto)
+    proto:ResetAllFatigue()
+    return {success = true, action = "fatigue_reset"}
+end
+
+function ActionHandler:consumptionClearProtests(proto)
+    proto:ClearAllProtests()
+    return {success = true, action = "protests_cleared"}
 end
 
 return ActionHandler
