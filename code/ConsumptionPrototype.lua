@@ -420,6 +420,56 @@ function ConsumptionPrototype:Create()
             satisfactionRange = {min = 50, max = 75},
             startingInventory = {bread = 60, milk = 60, book = 40, candle = 30, potato = 50},
             injectionRates = {bread = 12, milk = 12, potato = 10, book = 2}
+        },
+        {
+            id = "durable_goods_test",
+            name = "Durable Goods Test",
+            description = "Test scenario for durable/permanent goods - characters start with no possessions, durables available",
+            population = {min = 10, max = 15},
+            classDistribution = {Elite = 0.20, Upper = 0.20, Middle = 0.30, Working = 0.20, Poor = 0.10},
+            ageDistribution = {min = 25, max = 55, mean = 35},
+            traitTendencies = {},
+            vocationFocus = nil,
+            satisfactionRange = {min = 30, max = 50},  -- Start moderately low to drive acquisition
+            startingInventory = {
+                -- Consumables for basic needs
+                bread = 40, milk = 40, meat = 20,
+                -- Durables to be acquired
+                bed = 8, chair = 10, table = 5,
+                simple_clothes = 12, luxury_clothes = 5,
+                book = 15, painting = 8,
+                -- Permanents
+                house = 5, gold_item = 10,
+                -- Tools
+                tools = 8
+            },
+            injectionRates = {bread = 8, milk = 8, meat = 4, bed = 1, chair = 1},
+            -- Special flags for this test scenario
+            testFlags = {
+                clearPossessions = true,  -- Ensure characters start with no activeEffects
+                logDurableEvents = true   -- Extra logging for durable acquisition/expiry
+            }
+        },
+        {
+            id = "durable_replacement_test",
+            name = "Durable Replacement Test",
+            description = "Test durable replacement when at max capacity - characters already have possessions",
+            population = {min = 6, max = 10},
+            classDistribution = {Elite = 0.30, Upper = 0.30, Middle = 0.40, Working = 0.00, Poor = 0.00},
+            ageDistribution = {min = 30, max = 50, mean = 40},
+            traitTendencies = {},
+            vocationFocus = nil,
+            satisfactionRange = {min = 40, max = 60},
+            startingInventory = {
+                bread = 30, milk = 30,
+                -- Better durables to trigger replacement
+                bed = 10, luxury_clothes = 10, gold_item = 8
+            },
+            injectionRates = {bread = 6, milk = 6, bed = 2},
+            testFlags = {
+                giveStartingPossessions = true,  -- Give characters initial durables
+                startingPossessions = {"bed", "simple_clothes"}
+            }
         }
     }
 
@@ -4300,6 +4350,37 @@ function ConsumptionPrototype:GenerateScenario(scenarioId)
     if scenario.injectionRates then
         for commodity, rate in pairs(scenario.injectionRates) do
             self.injectionRates[commodity] = rate
+        end
+    end
+
+    -- Handle test flags for special scenarios
+    if scenario.testFlags then
+        -- Clear possessions flag - ensure characters start with no activeEffects
+        if scenario.testFlags.clearPossessions then
+            for _, char in ipairs(self.characters) do
+                char.activeEffects = {}
+            end
+            print("  Test flag: Cleared all character possessions")
+        end
+
+        -- Give starting possessions flag - add initial durables to characters
+        if scenario.testFlags.giveStartingPossessions and scenario.testFlags.startingPossessions then
+            for _, char in ipairs(self.characters) do
+                for _, commodityId in ipairs(scenario.testFlags.startingPossessions) do
+                    if char:CanAcquireDurable(commodityId) then
+                        local success, effect = char:AddActiveEffect(commodityId, self.cycleNumber)
+                        if success then
+                            print(string.format("  Test flag: Gave %s to %s", commodityId, char.name))
+                        end
+                    end
+                end
+            end
+        end
+
+        -- Extra logging for durable events
+        if scenario.testFlags.logDurableEvents then
+            print("  Test flag: Enhanced durable event logging enabled")
+            self.logDurableEvents = true
         end
     end
 

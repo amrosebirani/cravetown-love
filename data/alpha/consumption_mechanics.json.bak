@@ -5,58 +5,58 @@
   "cravingDecayRates": {
     "description": "Per-cycle decay rates by class (points per 60-second cycle)",
     "biological": {
-      "elite": 2.0,
-      "upper": 2.5,
-      "middle": 3.0,
-      "lower": 3.5
+      "Elite": 2.0,
+      "Upper": 2.5,
+      "Middle": 3.0,
+      "Lower": 3.5
     },
     "touch": {
-      "elite": 1.5,
-      "upper": 2.0,
-      "middle": 2.5,
-      "lower": 3.0
+      "Elite": 1.5,
+      "Upper": 2.0,
+      "Middle": 2.5,
+      "Lower": 3.0
     },
     "psychological": {
-      "elite": 3.0,
-      "upper": 2.5,
-      "middle": 2.0,
-      "lower": 1.5
+      "Elite": 3.0,
+      "Upper": 2.5,
+      "Middle": 2.0,
+      "Lower": 1.5
     },
     "safety": {
-      "elite": 1.0,
-      "upper": 1.5,
-      "middle": 2.0,
-      "lower": 2.5
+      "Elite": 1.0,
+      "Upper": 1.5,
+      "Middle": 2.0,
+      "Lower": 2.5
     },
     "social_status": {
-      "elite": 5.0,
-      "upper": 3.0,
-      "middle": 2.0,
-      "lower": 1.0
+      "Elite": 5.0,
+      "Upper": 3.0,
+      "Middle": 2.0,
+      "Lower": 1.0
     },
     "social_connection": {
-      "elite": 2.0,
-      "upper": 2.5,
-      "middle": 3.0,
-      "lower": 2.5
+      "Elite": 2.0,
+      "Upper": 2.5,
+      "Middle": 3.0,
+      "Lower": 2.5
     },
     "exotic_goods": {
-      "elite": 4.0,
-      "upper": 2.5,
-      "middle": 1.5,
-      "lower": 0.5
+      "Elite": 4.0,
+      "Upper": 2.5,
+      "Middle": 1.5,
+      "Lower": 0.5
     },
     "shiny_objects": {
-      "elite": 3.5,
-      "upper": 2.0,
-      "middle": 1.0,
-      "lower": 0.5
+      "Elite": 3.5,
+      "Upper": 2.0,
+      "Middle": 1.0,
+      "Lower": 0.5
     },
     "vice": {
-      "elite": 2.5,
-      "upper": 2.0,
-      "middle": 1.5,
-      "lower": 1.0
+      "Elite": 2.5,
+      "Upper": 2.0,
+      "Middle": 1.5,
+      "Lower": 1.0
     }
   },
 
@@ -77,10 +77,10 @@
     "description": "How allocation priority is calculated each cycle",
     "formula": "classWeight * 100 + sum(desperation * cravingWeight)",
     "classWeights": {
-      "elite": 10,
-      "upper": 7,
-      "middle": 4,
-      "lower": 1
+      "Elite": 10,
+      "Upper": 7,
+      "Middle": 4,
+      "Lower": 1
     },
     "desperationThresholds": {
       "critical": 20,
@@ -113,16 +113,16 @@
     "emigration": {
       "enabled": true,
       "consecutiveLowSatisfactionCycles": {
-        "elite": 5,
-        "upper": 8,
-        "middle": 12,
-        "lower": 15
+        "Elite": 5,
+        "Upper": 8,
+        "Middle": 12,
+        "Lower": 15
       },
       "averageSatisfactionThreshold": {
-        "elite": 50,
-        "upper": 40,
-        "middle": 30,
-        "lower": 25
+        "Elite": 50,
+        "Upper": 40,
+        "Middle": 30,
+        "Lower": 25
       },
       "criticalCravingsRequired": 2,
       "emigrationChancePerCycle": 0.15
@@ -152,13 +152,13 @@
     "description": "Parameters for generating test characters",
     "defaultPopulation": 50,
     "classDistribution": {
-      "elite": 0.10,
-      "upper": 0.20,
-      "middle": 0.40,
-      "lower": 0.30
+      "Elite": 0.10,
+      "Upper": 0.20,
+      "Middle": 0.40,
+      "Lower": 0.30
     },
     "startingSatisfactionRanges": {
-      "elite": {
+      "Elite": {
         "biological": [60, 80],
         "touch": [50, 70],
         "psychological": [60, 80],
@@ -169,7 +169,7 @@
         "shiny_objects": [50, 70],
         "vice": [30, 50]
       },
-      "upper": {
+      "Upper": {
         "biological": [50, 70],
         "touch": [40, 60],
         "psychological": [50, 70],
@@ -180,7 +180,7 @@
         "shiny_objects": [30, 50],
         "vice": [20, 40]
       },
-      "middle": {
+      "Middle": {
         "biological": [30, 50],
         "touch": [30, 50],
         "psychological": [30, 50],
@@ -191,7 +191,7 @@
         "shiny_objects": [10, 30],
         "vice": [10, 30]
       },
-      "lower": {
+      "Lower": {
         "biological": [20, 40],
         "touch": [20, 40],
         "psychological": [20, 40],
@@ -240,11 +240,11 @@
   },
 
   "vocations": [
-    "Farmer", "Baker", "Cook", "Barman", "Carpenter", "Woodworker",
-    "Lumberjack", "Woodcutter", "Miner", "Blacksmith", "Smelter", "Metalworker",
-    "Goldsmith", "Tailor", "Weaver", "Spinner", "Shoemaker", "Mason",
-    "Glassblower", "Artisan", "Herder", "General Worker", "Doctor", "Nurse",
-    "Teacher", "Merchant", "Banker", "Philosopher"
+    "Farmer", "Baker", "Miller", "Blacksmith", "Carpenter", "Mason",
+    "Tailor", "Weaver", "Shoemaker", "Tanner", "Butcher", "Brewer",
+    "Cooper", "Potter", "Chandler", "Merchant", "Innkeeper", "Barber",
+    "Teacher", "Clerk", "Lawyer", "Doctor", "Priest", "Musician",
+    "Guard", "Soldier", "Hunter", "Fisher", "Miner", "Jeweler"
   ],
 
   "metadata": {

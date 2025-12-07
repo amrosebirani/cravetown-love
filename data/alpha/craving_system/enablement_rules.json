@@ -1,0 +1,292 @@
+{
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "owns_house",
+      "name": "Homeownership Effect",
+      "description": "Having a house increases desire for furniture and decorations",
+
+      "trigger": {
+        "type": "owns_commodity_tag",
+        "tag": "shelter",
+        "minQuantity": 1
+      },
+
+      "effect": {
+        "cravingModifier": {
+          "coarse": [0, 2, 3, 0, 1, 0, 0, 1, 0],
+          "fine": [
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 2, 2, 1,
+            1, 1, 3, 3, 2, 1,
+            0, 0, 0, 0, 0, 0, 0,
+            1, 0, 0, 1, 0, 0,
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0,
+            1, 1, 1, 1,
+            0, 0, 0, 0, 0
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "married",
+      "name": "Marriage Effect",
+      "description": "Being married increases biological, safety, and social connection needs",
+
+      "trigger": {
+        "type": "has_relationship",
+        "relationship": "spouse"
+      },
+
+      "effect": {
+        "cravingModifier": {
+          "coarse": [1, 3, 2, 1, 0, 2, 0, 0, 0],
+          "fine": [
+            1, 1, 1, 1, 0, 0, 0, 0,
+            2, 2, 3, 2, 2,
+            2, 2, 2, 2, 2, 1,
+            1, 0, 1, 1, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            2, 2, 1, 1, 2,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0, 0
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "has_children",
+      "name": "Parenthood Effect",
+      "description": "Having children dramatically increases biological and safety needs",
+
+      "trigger": {
+        "type": "has_relationship",
+        "relationship": "child"
+      },
+
+      "effect": {
+        "cravingModifier": {
+          "coarse": [2, 4, 2, 1, 0, 1, 0, 0, 0],
+          "fine": [
+            2, 2, 2, 2, 1, 1, 1, 1,
+            4, 3, 4, 3, 3,
+            2, 2, 2, 2, 2, 1,
+            1, 1, 1, 1, 1, 1, 1,
+            0, 0, 0, 0, 0, 0,
+            1, 1, 1, 1, 1,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0, 0
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "owns_precious_metals",
+      "name": "Wealth Accumulation Desire",
+      "description": "Owning gold/silver makes you want more",
+
+      "trigger": {
+        "type": "owns_commodity_tag",
+        "tag": "precious_metals",
+        "minQuantity": 1
+      },
+
+      "effect": {
+        "cravingModifier": {
+          "coarse": [0, 0, 0, 0, 0, 0, 1, 2, 0],
+          "fine": [
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            1, 1, 1, 1,
+            2, 2, 2, 1,
+            0, 0, 0, 0, 0
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "basic_needs_met",
+      "name": "Hierarchy of Needs",
+      "description": "When basic needs are met, aspirational cravings increase",
+
+      "trigger": {
+        "type": "satisfaction_above",
+        "cravingType": "biological",
+        "threshold": 80
+      },
+
+      "effect": {
+        "cravingModifier": {
+          "coarse": [0, 0, 0, 1, 0.5, 0.5, 1, 0.5, 0.5],
+          "fine": [
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            1, 1, 1, 1, 0.5, 1, 0.5,
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+            0.5, 0.5, 0.5, 0.5, 0.5,
+            1, 1, 1, 1,
+            0.5, 0.5, 0.5, 0.5,
+            0.5, 0.5, 0.5, 0.5, 0.5
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "promoted_to_upper",
+      "name": "Class Promotion to Upper",
+      "description": "Promoted to upper class changes craving profile",
+
+      "trigger": {
+        "type": "class_change",
+        "newClass": "upper"
+      },
+
+      "effect": {
+        "cravingModifier": {
+          "coarse": [-0.5, 0, 1, 2, 3, 1, 1.5, 1, 0],
+          "fine": [
+            -0.5, -0.5, -0.5, -0.5, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            1, 1.5, 1, 1, 1, 1,
+            2, 2, 2, 2, 1, 2, 1,
+            3, 2.5, 3, 3, 2, 3,
+            1, 1, 1, 1, 1,
+            1.5, 1.5, 1.5, 1.5,
+            1, 1, 1, 1,
+            0, 0, 0, 0, 0
+          ]
+        },
+        "permanent": true
+      }
+    },
+
+    {
+      "id": "promoted_to_elite",
+      "name": "Class Promotion to Elite",
+      "description": "Promoted to elite class dramatically changes cravings",
+
+      "trigger": {
+        "type": "class_change",
+        "newClass": "elite"
+      },
+
+      "effect": {
+        "cravingModifier": {
+          "coarse": [-1, 0, 1.5, 3, 4, 0, 2, 1.5, -0.5],
+          "fine": [
+            -1, -1, -1, -1, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            1.5, 2, 1, 2, 2, 1.5,
+            3, 3, 3, 3, 2, 3, 2,
+            4, 3.5, 4, 4.5, 3, 4,
+            0, 0, 0, 0, 0,
+            2, 2, 2, 2,
+            1.5, 1.5, 1.5, 1.5,
+            -0.5, -0.5, -0.5, 0, -0.5
+          ]
+        },
+        "permanent": true
+      }
+    },
+
+    {
+      "id": "owns_education",
+      "name": "Education Multiplier",
+      "description": "Having books/education increases desire for more learning",
+
+      "trigger": {
+        "type": "owns_commodity_tag",
+        "tag": "education",
+        "minQuantity": 3
+      },
+
+      "effect": {
+        "cravingModifier": {
+          "coarse": [0, 0, 0, 1.5, 0, 0.5, 0.5, 0, 0],
+          "fine": [
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0,
+            2, 1.5, 1.5, 1, 1, 1, 1,
+            0, 0, 0, 0, 0, 0,
+            0.5, 0.5, 0.5, 0.5, 0.5,
+            0.5, 0.5, 0.5, 0.5,
+            0, 0, 0, 0,
+            0, 0, 0, 0, 0
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "low_safety_stress",
+      "name": "Insecurity Effect",
+      "description": "Low safety satisfaction increases all other cravings",
+
+      "trigger": {
+        "type": "satisfaction_below",
+        "cravingType": "safety",
+        "threshold": 30
+      },
+
+      "effect": {
+        "cravingModifier": {
+          "coarse": [0.5, 0, 0.5, 1, 0.5, 1, 0, 0, 1],
+          "fine": [
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+            0, 0, 0, 0, 0,
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+            1, 1, 1, 1, 1, 1, 1,
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+            1, 1, 1, 1, 1,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            1, 1, 1, 1, 1
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "social_isolation",
+      "name": "Loneliness Effect",
+      "description": "Low social connection increases vice and reduces other needs",
+
+      "trigger": {
+        "type": "satisfaction_below",
+        "cravingType": "social_connection",
+        "threshold": 25
+      },
+
+      "effect": {
+        "cravingModifier": {
+          "coarse": [-0.5, 0, -0.5, -1, -0.5, 0, 0, 0, 2],
+          "fine": [
+            -0.5, -0.5, -0.5, -0.5, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            -0.5, -0.5, -0.5, -0.5, -0.5, -0.5,
+            -1, -1, -1, -1, -1, -1, -1,
+            -0.5, -0.5, -0.5, -0.5, -0.5, -0.5,
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            2, 2, 1.5, 1, 1
+          ]
+        }
+      }
+    }
+  ]
+}

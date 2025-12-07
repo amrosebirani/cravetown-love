@@ -1,0 +1,159 @@
+{
+  "version": "1.0.0",
+  "categories": [
+    {
+      "id": "grain",
+      "name": "Grains",
+      "description": "Wheat, rice, barley, and other grain crops",
+      "tags": ["food", "nutrition", "grain"],
+      "color": "#f4a460"
+    },
+    {
+      "id": "fruit",
+      "name": "Fruits",
+      "description": "Apples, berries, and other fruits",
+      "tags": ["food", "nutrition", "fruit"],
+      "color": "#ff6b6b"
+    },
+    {
+      "id": "vegetable",
+      "name": "Vegetables",
+      "description": "Carrots, potatoes, and other vegetables",
+      "tags": ["food", "nutrition", "vegetable"],
+      "color": "#90ee90"
+    },
+    {
+      "id": "plant",
+      "name": "Plants & Herbs",
+      "description": "Herbs, medicinal plants, and other plants",
+      "tags": ["plant", "herb", "medicine"],
+      "color": "#98d8c8"
+    },
+    {
+      "id": "animal_product",
+      "name": "Animal Products",
+      "description": "Meat, milk, eggs, and other animal products",
+      "tags": ["food", "animal", "protein"],
+      "color": "#cd5c5c"
+    },
+    {
+      "id": "processed_food",
+      "name": "Processed Foods",
+      "description": "Bread, cheese, and other processed food items",
+      "tags": ["food", "processed"],
+      "color": "#daa520"
+    },
+    {
+      "id": "textile_raw",
+      "name": "Raw Textiles",
+      "description": "Cotton, wool, and other raw textile materials",
+      "tags": ["textile", "raw_material"],
+      "color": "#e6d5b8"
+    },
+    {
+      "id": "textile",
+      "name": "Textiles",
+      "description": "Cloth, fabric, and processed textiles",
+      "tags": ["textile", "fabric"],
+      "color": "#dda0dd"
+    },
+    {
+      "id": "clothing",
+      "name": "Clothing",
+      "description": "Shirts, pants, and other clothing items",
+      "tags": ["clothing", "apparel"],
+      "color": "#9370db"
+    },
+    {
+      "id": "tools",
+      "name": "Tools",
+      "description": "Hammers, saws, and other tools",
+      "tags": ["tool", "equipment"],
+      "color": "#708090"
+    },
+    {
+      "id": "furniture",
+      "name": "Furniture",
+      "description": "Beds, chairs, tables, and other furniture",
+      "tags": ["furniture", "comfort"],
+      "color": "#8b4513"
+    },
+    {
+      "id": "raw_mineral",
+      "name": "Raw Minerals",
+      "description": "Iron ore, copper ore, and other raw minerals",
+      "tags": ["mineral", "ore", "raw_material"],
+      "color": "#696969"
+    },
+    {
+      "id": "refined_metal",
+      "name": "Refined Metals",
+      "description": "Iron bars, copper bars, and processed metals",
+      "tags": ["metal", "refined"],
+      "color": "#c0c0c0"
+    },
+    {
+      "id": "construction",
+      "name": "Construction Materials",
+      "description": "Bricks, planks, and building materials",
+      "tags": ["construction", "building"],
+      "color": "#a0522d"
+    },
+    {
+      "id": "fuel",
+      "name": "Fuel",
+      "description": "Wood, coal, and other fuel sources",
+      "tags": ["fuel", "energy"],
+      "color": "#2f4f4f"
+    },
+    {
+      "id": "dye",
+      "name": "Dyes",
+      "description": "Red dye, blue dye, and other coloring agents",
+      "tags": ["dye", "color", "crafting"],
+      "color": "#ff1493"
+    },
+    {
+      "id": "crafting",
+      "name": "Crafting Materials",
+      "description": "Leather, glue, and other crafting components",
+      "tags": ["crafting", "component"],
+      "color": "#bc8f8f"
+    },
+    {
+      "id": "luxury",
+      "name": "Luxury Goods",
+      "description": "Gold, jewelry, and luxury items",
+      "tags": ["luxury", "status", "expensive"],
+      "color": "#ffd700"
+    },
+    {
+      "id": "seed",
+      "name": "Seeds",
+      "description": "Wheat seeds, vegetable seeds, and planting materials",
+      "tags": ["seed", "agriculture", "farming"],
+      "color": "#bdb76b"
+    },
+    {
+      "id": "tree_product",
+      "name": "Tree Products",
+      "description": "Logs, bark, and products from trees",
+      "tags": ["tree", "wood", "forest"],
+      "color": "#6b8e23"
+    },
+    {
+      "id": "raw_resource",
+      "name": "Raw Resources",
+      "description": "Basic raw materials and resources",
+      "tags": ["raw", "resource", "material"],
+      "color": "#8b7355"
+    },
+    {
+      "id": "misc",
+      "name": "Miscellaneous",
+      "description": "Other items that don't fit in specific categories",
+      "tags": ["misc", "other"],
+      "color": "#999999"
+    }
+  ]
+}

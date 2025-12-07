@@ -55,6 +55,15 @@ function InputRelay:installHooks()
         return relay._originalMouseIsDown(button)
     end
 
+    -- Override mouse.getPosition to return injected position when set
+    love.mouse.getPosition = function()
+        -- If we have a recently injected mouse position, return it
+        if relay.injectedMousePos.active then
+            return relay.injectedMousePos.x, relay.injectedMousePos.y
+        end
+        return relay._originalMouseGetPosition()
+    end
+
     self.hooksInstalled = true
     print("[MCP] Input hooks installed")
 end
@@ -78,6 +87,27 @@ function InputRelay:update(dt)
     -- Remove processed releases (in reverse order to preserve indices)
     for i = #toRemove, 1, -1 do
         table.remove(self.releaseQueue, toRemove[i])
+    end
+
+    -- Clear injected mouse position after a frame if no buttons are pressed
+    if self.injectedMousePos.active then
+        local hasButtons = false
+        for _ in pairs(self.injectedMouseButtons) do
+            hasButtons = true
+            break
+        end
+        if not hasButtons then
+            -- Keep active for one more frame, then clear
+            if self.injectedMousePos.frameDelay then
+                self.injectedMousePos.frameDelay = self.injectedMousePos.frameDelay - 1
+                if self.injectedMousePos.frameDelay <= 0 then
+                    self.injectedMousePos.active = false
+                    self.injectedMousePos.frameDelay = nil
+                end
+            else
+                self.injectedMousePos.frameDelay = 2  -- Keep for 2 more frames
+            end
+        end
     end
 end
 
@@ -161,6 +191,8 @@ function InputRelay:handleMouseInput(params)
     if action == "move" then
         self.injectedMousePos.x = x
         self.injectedMousePos.y = y
+        self.injectedMousePos.active = true
+        self.injectedMousePos.frameDelay = nil  -- Reset frame delay
 
         if love.mousemoved then
             love.mousemoved(x, y, 0, 0, false)
@@ -204,6 +236,7 @@ function InputRelay:doMousePress(x, y, button)
     self.injectedMouseButtons[button] = true
     self.injectedMousePos.x = x
     self.injectedMousePos.y = y
+    self.injectedMousePos.active = true  -- Enable position override
 
     -- Set global mouse state (used by the game)
     gMousePressed = {x = x, y = y, button = button}
@@ -228,6 +261,9 @@ function InputRelay:doMouseRelease(button, x, y)
     if love.mousereleased then
         love.mousereleased(x, y, button, false, 1)
     end
+
+    -- Keep position active for a short time after release to allow hover detection
+    -- It will be cleared on next update cycle if no buttons are pressed
 end
 
 -- Simulate text input

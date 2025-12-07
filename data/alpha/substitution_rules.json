@@ -1,0 +1,484 @@
+{
+  "version": "2.0.0",
+  "description": "Substitution rules with distance values for variety-seeking boost mechanics",
+
+  "substitutionHierarchies": {
+    "grains": {
+      "wheat": {
+        "substitutes": [
+          {"commodity": "rice", "efficiency": 0.95, "distance": 0.10},
+          {"commodity": "barley", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "maize", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "oats", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "rye", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "bread", "efficiency": 1.10, "distance": 0.20}
+        ]
+      },
+      "rice": {
+        "substitutes": [
+          {"commodity": "wheat", "efficiency": 0.95, "distance": 0.10},
+          {"commodity": "barley", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "maize", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "oats", "efficiency": 0.85, "distance": 0.15}
+        ]
+      },
+      "barley": {
+        "substitutes": [
+          {"commodity": "wheat", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "rice", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "maize", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "oats", "efficiency": 0.85, "distance": 0.15}
+        ]
+      },
+      "maize": {
+        "substitutes": [
+          {"commodity": "wheat", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "rice", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "barley", "efficiency": 0.85, "distance": 0.15}
+        ]
+      },
+      "oats": {
+        "substitutes": [
+          {"commodity": "wheat", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "rice", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "barley", "efficiency": 0.85, "distance": 0.15}
+        ]
+      },
+      "rye": {
+        "substitutes": [
+          {"commodity": "wheat", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "rice", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "barley", "efficiency": 0.85, "distance": 0.15}
+        ]
+      }
+    },
+
+    "fruits": {
+      "apple": {
+        "substitutes": [
+          {"commodity": "pear", "efficiency": 0.95, "distance": 0.08},
+          {"commodity": "peach", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "orange", "efficiency": 0.85, "distance": 0.18},
+          {"commodity": "grapes", "efficiency": 0.80, "distance": 0.20},
+          {"commodity": "berries", "efficiency": 0.75, "distance": 0.25}
+        ]
+      },
+      "pear": {
+        "substitutes": [
+          {"commodity": "apple", "efficiency": 0.95, "distance": 0.08},
+          {"commodity": "peach", "efficiency": 0.90, "distance": 0.12}
+        ]
+      },
+      "peach": {
+        "substitutes": [
+          {"commodity": "apple", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "pear", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "mango", "efficiency": 0.85, "distance": 0.15}
+        ]
+      },
+      "mango": {
+        "substitutes": [
+          {"commodity": "peach", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "orange", "efficiency": 0.80, "distance": 0.20}
+        ]
+      },
+      "orange": {
+        "substitutes": [
+          {"commodity": "apple", "efficiency": 0.85, "distance": 0.18},
+          {"commodity": "grapes", "efficiency": 0.80, "distance": 0.20}
+        ]
+      },
+      "grapes": {
+        "substitutes": [
+          {"commodity": "berries", "efficiency": 0.90, "distance": 0.10},
+          {"commodity": "wine", "efficiency": 1.05, "distance": 0.25}
+        ]
+      },
+      "berries": {
+        "substitutes": [
+          {"commodity": "grapes", "efficiency": 0.90, "distance": 0.10},
+          {"commodity": "apple", "efficiency": 0.75, "distance": 0.25}
+        ]
+      }
+    },
+
+    "vegetables": {
+      "potato": {
+        "substitutes": [
+          {"commodity": "beans", "efficiency": 0.90, "distance": 0.15},
+          {"commodity": "pumpkin", "efficiency": 0.85, "distance": 0.18},
+          {"commodity": "carrot", "efficiency": 0.75, "distance": 0.25}
+        ]
+      },
+      "beans": {
+        "substitutes": [
+          {"commodity": "potato", "efficiency": 0.90, "distance": 0.15},
+          {"commodity": "meat", "efficiency": 0.70, "distance": 0.40}
+        ]
+      },
+      "carrot": {
+        "substitutes": [
+          {"commodity": "potato", "efficiency": 0.75, "distance": 0.25},
+          {"commodity": "onion", "efficiency": 0.80, "distance": 0.20}
+        ]
+      },
+      "onion": {
+        "substitutes": [
+          {"commodity": "carrot", "efficiency": 0.80, "distance": 0.20},
+          {"commodity": "cabbage", "efficiency": 0.85, "distance": 0.15}
+        ]
+      },
+      "cabbage": {
+        "substitutes": [
+          {"commodity": "lettuce", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "onion", "efficiency": 0.85, "distance": 0.15}
+        ]
+      },
+      "lettuce": {
+        "substitutes": [
+          {"commodity": "cabbage", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "tomato", "efficiency": 0.85, "distance": 0.15}
+        ]
+      },
+      "tomato": {
+        "substitutes": [
+          {"commodity": "lettuce", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "onion", "efficiency": 0.80, "distance": 0.18}
+        ]
+      },
+      "pumpkin": {
+        "substitutes": [
+          {"commodity": "potato", "efficiency": 0.85, "distance": 0.18},
+          {"commodity": "carrot", "efficiency": 0.80, "distance": 0.20}
+        ]
+      }
+    },
+
+    "protein": {
+      "meat": {
+        "substitutes": [
+          {"commodity": "eggs", "efficiency": 0.85, "distance": 0.20},
+          {"commodity": "cheese", "efficiency": 0.80, "distance": 0.25},
+          {"commodity": "beans", "efficiency": 0.70, "distance": 0.40},
+          {"commodity": "milk", "efficiency": 0.65, "distance": 0.45}
+        ]
+      },
+      "eggs": {
+        "substitutes": [
+          {"commodity": "meat", "efficiency": 0.85, "distance": 0.20},
+          {"commodity": "cheese", "efficiency": 0.80, "distance": 0.22},
+          {"commodity": "milk", "efficiency": 0.75, "distance": 0.25}
+        ]
+      },
+      "milk": {
+        "substitutes": [
+          {"commodity": "cheese", "efficiency": 0.95, "distance": 0.08},
+          {"commodity": "butter", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "eggs", "efficiency": 0.75, "distance": 0.25}
+        ]
+      },
+      "cheese": {
+        "substitutes": [
+          {"commodity": "milk", "efficiency": 0.95, "distance": 0.08},
+          {"commodity": "butter", "efficiency": 0.90, "distance": 0.10},
+          {"commodity": "eggs", "efficiency": 0.80, "distance": 0.22}
+        ]
+      },
+      "butter": {
+        "substitutes": [
+          {"commodity": "cheese", "efficiency": 0.90, "distance": 0.10},
+          {"commodity": "milk", "efficiency": 0.90, "distance": 0.12}
+        ]
+      }
+    },
+
+    "baked_goods": {
+      "bread": {
+        "substitutes": [
+          {"commodity": "pastries", "efficiency": 1.10, "distance": 0.15},
+          {"commodity": "flour", "efficiency": 0.80, "distance": 0.25},
+          {"commodity": "wheat", "efficiency": 0.70, "distance": 0.35}
+        ]
+      },
+      "pastries": {
+        "substitutes": [
+          {"commodity": "bread", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "sugar", "efficiency": 0.70, "distance": 0.35},
+          {"commodity": "honey", "efficiency": 0.75, "distance": 0.30}
+        ]
+      },
+      "flour": {
+        "substitutes": [
+          {"commodity": "bread", "efficiency": 1.15, "distance": 0.18},
+          {"commodity": "wheat", "efficiency": 0.90, "distance": 0.12}
+        ]
+      }
+    },
+
+    "alcohol": {
+      "beer": {
+        "substitutes": [
+          {"commodity": "wine", "efficiency": 1.10, "distance": 0.12},
+          {"commodity": "barley", "efficiency": 0.60, "distance": 0.40}
+        ]
+      },
+      "wine": {
+        "substitutes": [
+          {"commodity": "beer", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "grapes", "efficiency": 0.75, "distance": 0.30}
+        ]
+      }
+    },
+
+    "textiles": {
+      "cloth": {
+        "substitutes": [
+          {"commodity": "linen", "efficiency": 1.05, "distance": 0.10},
+          {"commodity": "thread", "efficiency": 0.75, "distance": 0.28}
+        ]
+      },
+      "linen": {
+        "substitutes": [
+          {"commodity": "cloth", "efficiency": 0.95, "distance": 0.10},
+          {"commodity": "silk", "efficiency": 1.20, "distance": 0.25}
+        ]
+      },
+      "silk": {
+        "substitutes": [
+          {"commodity": "linen", "efficiency": 0.85, "distance": 0.25},
+          {"commodity": "cloth", "efficiency": 0.75, "distance": 0.35}
+        ]
+      },
+      "thread": {
+        "substitutes": [
+          {"commodity": "cloth", "efficiency": 1.15, "distance": 0.20},
+          {"commodity": "cotton", "efficiency": 0.90, "distance": 0.15}
+        ]
+      }
+    },
+
+    "clothing": {
+      "simple_clothes": {
+        "substitutes": [
+          {"commodity": "work_clothes", "efficiency": 1.05, "distance": 0.12},
+          {"commodity": "cloth", "efficiency": 0.80, "distance": 0.25}
+        ]
+      },
+      "work_clothes": {
+        "substitutes": [
+          {"commodity": "simple_clothes", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "fine_clothes", "efficiency": 1.15, "distance": 0.18}
+        ]
+      },
+      "fine_clothes": {
+        "substitutes": [
+          {"commodity": "work_clothes", "efficiency": 0.80, "distance": 0.18},
+          {"commodity": "luxury_clothes", "efficiency": 1.20, "distance": 0.15}
+        ]
+      },
+      "luxury_clothes": {
+        "substitutes": [
+          {"commodity": "fine_clothes", "efficiency": 0.85, "distance": 0.15},
+          {"commodity": "gold", "efficiency": 0.90, "distance": 0.35}
+        ]
+      }
+    },
+
+    "furniture": {
+      "chair": {
+        "substitutes": [
+          {"commodity": "bench", "efficiency": 0.90, "distance": 0.10},
+          {"commodity": "table", "efficiency": 0.85, "distance": 0.20}
+        ]
+      },
+      "bench": {
+        "substitutes": [
+          {"commodity": "chair", "efficiency": 0.90, "distance": 0.10}
+        ]
+      },
+      "table": {
+        "substitutes": [
+          {"commodity": "desk", "efficiency": 1.05, "distance": 0.12},
+          {"commodity": "chair", "efficiency": 0.85, "distance": 0.20}
+        ]
+      },
+      "desk": {
+        "substitutes": [
+          {"commodity": "table", "efficiency": 0.95, "distance": 0.12},
+          {"commodity": "bookshelf", "efficiency": 0.80, "distance": 0.25}
+        ]
+      },
+      "bed": {
+        "substitutes": [
+          {"commodity": "chair", "efficiency": 0.60, "distance": 0.50}
+        ]
+      },
+      "cabinet": {
+        "substitutes": [
+          {"commodity": "wardrobe", "efficiency": 1.05, "distance": 0.08},
+          {"commodity": "bookshelf", "efficiency": 0.90, "distance": 0.15}
+        ]
+      },
+      "wardrobe": {
+        "substitutes": [
+          {"commodity": "cabinet", "efficiency": 0.95, "distance": 0.08}
+        ]
+      },
+      "bookshelf": {
+        "substitutes": [
+          {"commodity": "cabinet", "efficiency": 0.90, "distance": 0.15},
+          {"commodity": "desk", "efficiency": 0.80, "distance": 0.25}
+        ]
+      }
+    },
+
+    "luxury_goods": {
+      "gold": {
+        "substitutes": [
+          {"commodity": "silver", "efficiency": 0.90, "distance": 0.08}
+        ]
+      },
+      "silver": {
+        "substitutes": [
+          {"commodity": "gold", "efficiency": 1.10, "distance": 0.08}
+        ]
+      }
+    },
+
+    "materials": {
+      "timber": {
+        "substitutes": [
+          {"commodity": "planks", "efficiency": 1.10, "distance": 0.12},
+          {"commodity": "stone", "efficiency": 0.85, "distance": 0.30}
+        ]
+      },
+      "planks": {
+        "substitutes": [
+          {"commodity": "timber", "efficiency": 0.90, "distance": 0.12}
+        ]
+      },
+      "stone": {
+        "substitutes": [
+          {"commodity": "bricks", "efficiency": 1.05, "distance": 0.15},
+          {"commodity": "timber", "efficiency": 0.85, "distance": 0.30}
+        ]
+      },
+      "bricks": {
+        "substitutes": [
+          {"commodity": "stone", "efficiency": 0.95, "distance": 0.15},
+          {"commodity": "clay", "efficiency": 0.80, "distance": 0.25}
+        ]
+      },
+      "clay": {
+        "substitutes": [
+          {"commodity": "bricks", "efficiency": 1.15, "distance": 0.18},
+          {"commodity": "pottery", "efficiency": 1.20, "distance": 0.22}
+        ]
+      },
+      "pottery": {
+        "substitutes": [
+          {"commodity": "clay", "efficiency": 0.85, "distance": 0.22}
+        ]
+      }
+    },
+
+    "metals": {
+      "iron": {
+        "substitutes": [
+          {"commodity": "steel", "efficiency": 1.20, "distance": 0.15},
+          {"commodity": "bronze", "efficiency": 0.85, "distance": 0.25}
+        ]
+      },
+      "steel": {
+        "substitutes": [
+          {"commodity": "iron", "efficiency": 0.85, "distance": 0.15}
+        ]
+      },
+      "copper": {
+        "substitutes": [
+          {"commodity": "bronze", "efficiency": 1.10, "distance": 0.12}
+        ]
+      },
+      "bronze": {
+        "substitutes": [
+          {"commodity": "copper", "efficiency": 0.90, "distance": 0.12},
+          {"commodity": "iron", "efficiency": 0.85, "distance": 0.25}
+        ]
+      }
+    }
+  },
+
+  "desperationSubstitution": {
+    "description": "Cross-category substitution when critically low on a craving dimension",
+    "enabled": true,
+    "criticalThreshold": 20,
+    "efficiencyPenalty": 0.50,
+    "distancePenalty": 0.70,
+    "rules": {
+      "biological": {
+        "desperateSubstitutes": [
+          {"commodity": "beer", "efficiency": 0.40, "distance": 0.70},
+          {"commodity": "wine", "efficiency": 0.40, "distance": 0.70}
+        ]
+      },
+      "touch": {
+        "desperateSubstitutes": [
+          {"commodity": "simple_clothes", "efficiency": 0.50, "distance": 0.65},
+          {"commodity": "bread", "efficiency": 0.30, "distance": 0.80}
+        ]
+      },
+      "psychological": {
+        "desperateSubstitutes": [
+          {"commodity": "wine", "efficiency": 0.50, "distance": 0.60},
+          {"commodity": "beer", "efficiency": 0.45, "distance": 0.60}
+        ]
+      },
+      "safety": {
+        "desperateSubstitutes": [
+          {"commodity": "chair", "efficiency": 0.40, "distance": 0.70}
+        ]
+      },
+      "social_status": {
+        "desperateSubstitutes": [
+          {"commodity": "fine_clothes", "efficiency": 0.70, "distance": 0.45},
+          {"commodity": "wine", "efficiency": 0.60, "distance": 0.55},
+          {"commodity": "chair", "efficiency": 0.50, "distance": 0.60}
+        ]
+      },
+      "social_connection": {
+        "desperateSubstitutes": [
+          {"commodity": "beer", "efficiency": 0.70, "distance": 0.45},
+          {"commodity": "wine", "efficiency": 0.70, "distance": 0.45}
+        ]
+      },
+      "exotic_goods": {
+        "desperateSubstitutes": [
+          {"commodity": "wine", "efficiency": 0.60, "distance": 0.55}
+        ]
+      },
+      "shiny_objects": {
+        "desperateSubstitutes": [
+          {"commodity": "silver", "efficiency": 0.75, "distance": 0.40},
+          {"commodity": "fine_clothes", "efficiency": 0.50, "distance": 0.60}
+        ]
+      },
+      "vice": {
+        "desperateSubstitutes": [
+          {"commodity": "pastries", "efficiency": 0.60, "distance": 0.50},
+          {"commodity": "beer", "efficiency": 0.65, "distance": 0.48},
+          {"commodity": "wine", "efficiency": 0.65, "distance": 0.48}
+        ]
+      }
+    }
+  },
+
+  "metadata": {
+    "lastUpdated": "2025-11-27",
+    "version": "2.0.0",
+    "notes": [
+      "Substitution efficiency: 1.0 = equal satisfaction, >1.0 = better substitute, <1.0 = worse substitute",
+      "Distance: 0.0 = very close substitutes, 1.0 = very distant substitutes",
+      "Lower distance = stronger boost effect when consumed"
+    ]
+  }
+}

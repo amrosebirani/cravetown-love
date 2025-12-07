@@ -1,0 +1,79 @@
+{
+  "generation": {
+    "attractionWeight": 0.50,
+    "needsWeight": 0.25,
+    "randomWeight": 0.25,
+    "queueCapacity": 10,
+    "generationIntervalDays": 5,
+    "expiryMinDays": 10,
+    "expiryMaxDays": 20,
+    "deferPenaltyDays": 2
+  },
+  "compatibilityWeights": {
+    "craving": 0.40,
+    "housing": 0.25,
+    "job": 0.25,
+    "social": 0.10
+  },
+  "classRanges": {
+    "Elite": {
+      "ageMin": 30,
+      "ageMax": 70,
+      "wealthMin": 2000,
+      "wealthMax": 5000,
+      "familyChance": 0.40,
+      "traitCountMin": 2,
+      "traitCountMax": 3
+    },
+    "Upper": {
+      "ageMin": 25,
+      "ageMax": 65,
+      "wealthMin": 800,
+      "wealthMax": 2500,
+      "familyChance": 0.35,
+      "traitCountMin": 2,
+      "traitCountMax": 3
+    },
+    "Middle": {
+      "ageMin": 20,
+      "ageMax": 60,
+      "wealthMin": 200,
+      "wealthMax": 800,
+      "familyChance": 0.50,
+      "traitCountMin": 1,
+      "traitCountMax": 3
+    },
+    "Working": {
+      "ageMin": 18,
+      "ageMax": 55,
+      "wealthMin": 50,
+      "wealthMax": 300,
+      "familyChance": 0.45,
+      "traitCountMin": 1,
+      "traitCountMax": 2
+    },
+    "Poor": {
+      "ageMin": 16,
+      "ageMax": 50,
+      "wealthMin": 0,
+      "wealthMax": 100,
+      "familyChance": 0.30,
+      "traitCountMin": 1,
+      "traitCountMax": 2
+    }
+  },
+  "vocationsForClass": {
+    "Elite": ["Banker", "Philosopher", "Goldsmith", "Merchant"],
+    "Upper": ["Doctor", "Teacher", "Artisan", "Glassblower", "Merchant"],
+    "Middle": ["Blacksmith", "Baker", "Tailor", "Carpenter", "Mason", "Cook", "Weaver", "Shoemaker"],
+    "Working": ["Farmer", "Miner", "Lumberjack", "Herder", "Woodworker", "Spinner", "Smelter", "Hunter"],
+    "Poor": ["General Worker", "Farmer", "Herder", "Spinner"]
+  },
+  "alternateVocations": {
+    "Blacksmith": ["Metalworker", "Smelter"],
+    "Baker": ["Cook"],
+    "Farmer": ["Herder"],
+    "Merchant": ["Banker"],
+    "Carpenter": ["Woodworker"]
+  }
+}

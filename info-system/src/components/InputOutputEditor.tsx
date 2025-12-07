@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Button, Space, InputNumber, Tag, Modal, Input, List, message } from 'antd';
 import { PlusOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-import { loadCommodities } from '../api';
-import type { Commodity } from '../types';
+import { loadCommodities, loadUnits } from '../api';
+import type { Commodity, CommodityUnit } from '../types';
 
 interface InputOutputEditorProps {
   value: Record<string, number>;
@@ -13,15 +13,30 @@ interface InputOutputEditorProps {
 const InputOutputEditor = ({ value, onChange, type }: InputOutputEditorProps) => {
   const [pickerVisible, setPickerVisible] = useState(false);
   const [commodities, setCommodities] = useState<Commodity[]>([]);
+  const [commodityUnits, setCommodityUnits] = useState<Record<string, CommodityUnit>>({});
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+
+  // Load units on mount so we can display them for already-selected commodities
+  useEffect(() => {
+    loadUnitsList();
+  }, []);
 
   useEffect(() => {
     if (pickerVisible && commodities.length === 0) {
       loadCommoditiesList();
     }
   }, [pickerVisible]);
+
+  const loadUnitsList = async () => {
+    try {
+      const data = await loadUnits();
+      setCommodityUnits(data.commodityUnits || {});
+    } catch (error) {
+      console.error('Failed to load units:', error);
+    }
+  };
 
   const loadCommoditiesList = async () => {
     setLoading(true);
@@ -34,6 +49,11 @@ const InputOutputEditor = ({ value, onChange, type }: InputOutputEditorProps) =>
     } finally {
       setLoading(false);
     }
+  };
+
+  const getUnitForCommodity = (commodityId: string): string => {
+    const unitInfo = commodityUnits[commodityId];
+    return unitInfo?.unit || 'unit';
   };
 
   const handleAdd = (commodityId: string) => {
@@ -102,6 +122,9 @@ const InputOutputEditor = ({ value, onChange, type }: InputOutputEditorProps) =>
                   style={{ width: '80px' }}
                   size="small"
                 />
+                <span style={{ color: '#666', fontSize: '12px', minWidth: '40px' }}>
+                  {getUnitForCommodity(commodityId)}
+                </span>
                 <Button
                   type="text"
                   danger
@@ -176,6 +199,7 @@ const InputOutputEditor = ({ value, onChange, type }: InputOutputEditorProps) =>
                       title={
                         <Space>
                           {commodity.name}
+                          <Tag color="green">{getUnitForCommodity(commodity.id)}</Tag>
                           {value[commodity.id] && <Tag color="blue">Selected</Tag>}
                         </Space>
                       }

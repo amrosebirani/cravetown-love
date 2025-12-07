@@ -6,17 +6,33 @@
       "description": "Default game data with modern production buildings and mechanics",
       "author": "Cravetown Team",
       "version": "1.0.0",
-      "active": true,
+      "active": false,
       "createdDate": "2025-01-26",
       "lastModified": "2025-01-26",
       "dataPath": "data/base",
       "thumbnail": null,
-      "tags": ["default", "modern"]
+      "tags": [
+        "default",
+        "modern"
+      ]
+    },
+    {
+      "id": "alpha",
+      "name": "Alpha",
+      "description": "Version for Alpha Launch",
+      "author": "Amrose Birani",
+      "version": "1.0.0",
+      "active": true,
+      "createdDate": "2025-12-06",
+      "lastModified": "2025-12-06",
+      "dataPath": "data/alpha",
+      "thumbnail": null,
+      "tags": []
     }
   ],
-  "activeVersion": "base",
+  "activeVersion": "alpha",
   "metadata": {
     "formatVersion": "1.0",
-    "lastUpdated": "2025-01-26"
+    "lastUpdated": "2025-12-06"
   }
 }

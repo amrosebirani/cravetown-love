@@ -399,3 +399,87 @@ export interface PlacementConstraints {
   warningThreshold?: number;
   blockingThreshold?: number;
 }
+
+// ============================================================================
+// Time Slots Types
+// ============================================================================
+
+export interface TimeSlot {
+  id: string;
+  name: string;
+  startHour: number;
+  endHour: number;
+  description: string;
+  color: [number, number, number];  // RGB [0-1, 0-1, 0-1]
+}
+
+export interface TimeSlotsData {
+  version: string;
+  slots: TimeSlot[];
+}
+
+// ============================================================================
+// Craving Slots (Craving-to-Slot Mapping) Types
+// ============================================================================
+
+export interface CravingSlotMapping {
+  slots: string[];  // Array of slot IDs
+  frequencyPerDay: number;
+  description?: string;
+}
+
+export interface SlotModifier {
+  additionalSlots?: string[];
+  removeSlots?: string[];
+  description?: string;
+}
+
+export interface CravingSlotsData {
+  version: string;
+  description?: string;
+  mappings: Record<string, CravingSlotMapping>;  // keyed by fine dimension id
+  classModifiers: Record<string, Record<string, SlotModifier>>;  // class id -> dimension id -> modifier
+  traitModifiers: Record<string, Record<string, SlotModifier>>;  // trait id -> dimension id -> modifier
+  durableSlots?: {
+    description: string;
+    categorySlots: Record<string, string>;  // durable category -> slot id for daily application
+  };
+}
+
+// ============================================================================
+// Units System Types
+// ============================================================================
+
+export interface BaseUnitType {
+  base: string;
+  display: string[];
+  conversions?: Record<string, number>;
+}
+
+export interface PersonDayBaseline {
+  calories: number;
+  waterLiters: number;
+  sleepHours: number;
+  description?: string;
+}
+
+export interface CommodityUnit {
+  unit: string;
+  caloriesPerUnit?: number;
+  weightKg?: number;
+  volumeLiters?: number;
+  dailyNeedAmount?: number;
+  durationType?: 'consumable' | 'durable' | 'permanent';
+  durationDays?: number;
+  description?: string;
+  [key: string]: any;  // Allow additional fields
+}
+
+export interface UnitsData {
+  version: string;
+  description?: string;
+  baseUnits: Record<string, BaseUnitType>;
+  personDayBaseline: PersonDayBaseline;
+  commodityUnits: Record<string, CommodityUnit>;
+  displayFormats?: Record<string, string>;
+}

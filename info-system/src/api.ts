@@ -15,7 +15,10 @@ import type {
   SubstitutionRulesData,
   VersionsManifest,
   GameVersion,
-  NaturalResourcesData
+  NaturalResourcesData,
+  TimeSlotsData,
+  CravingSlotsData,
+  UnitsData
 } from './types';
 
 // Active version state
@@ -594,6 +597,84 @@ export async function saveNaturalResources(data: NaturalResourcesData): Promise<
   const dataDir = await getDataDir();
   const versionPath = getActiveVersionPath();
   const filePath = `${dataDir}/${versionPath}/natural_resources.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Time Slots APIs
+// =============================================================================
+
+/**
+ * Load time slots from JSON file
+ */
+export async function loadTimeSlots(): Promise<TimeSlotsData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/time_slots.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save time slots to JSON file
+ */
+export async function saveTimeSlots(data: TimeSlotsData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/time_slots.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Craving Slots APIs
+// =============================================================================
+
+/**
+ * Load craving-to-slot mappings from JSON file
+ */
+export async function loadCravingSlots(): Promise<CravingSlotsData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_slots.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save craving-to-slot mappings to JSON file
+ */
+export async function saveCravingSlots(data: CravingSlotsData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_slots.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Units System APIs
+// =============================================================================
+
+/**
+ * Load units configuration from JSON file
+ */
+export async function loadUnits(): Promise<UnitsData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/units.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save units configuration to JSON file
+ */
+export async function saveUnits(data: UnitsData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/units.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
 }

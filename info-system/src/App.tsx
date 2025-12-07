@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout, Menu, Spin } from 'antd';
 import { DatabaseOutlined, AppstoreOutlined, TeamOutlined, HomeOutlined, TagsOutlined,
-         BulbOutlined, UserOutlined, SmileOutlined, GiftOutlined, ThunderboltOutlined, SwapOutlined, BranchesOutlined, FireOutlined, NodeIndexOutlined } from '@ant-design/icons';
+         BulbOutlined, UserOutlined, SmileOutlined, GiftOutlined, ThunderboltOutlined, SwapOutlined, BranchesOutlined, FireOutlined, NodeIndexOutlined, ClockCircleOutlined, LinkOutlined, CalculatorOutlined } from '@ant-design/icons';
 import RecipeManager from './components/RecipeManager';
 import CommodityManager from './components/CommodityManager';
 import CommodityCategoryManager from './components/CommodityCategoryManager';
@@ -17,6 +17,9 @@ import SubstitutionCalculator from './components/SubstitutionCalculator';
 import CommodityFatigueManager from './components/CommodityFatigueManager';
 import SubstitutionRulesManager from './components/SubstitutionRulesManager';
 import VersionManager from './components/VersionManager';
+import TimeSlotManager from './components/TimeSlotManager';
+import CravingSlotManager from './components/CravingSlotManager';
+import UnitsManager from './components/UnitsManager';
 import { initializeVersionSystem } from './api';
 import './App.css';
 
@@ -24,7 +27,8 @@ const { Header, Content, Sider } = Layout;
 
 type TabKey = 'versions' | 'recipes' | 'commodities' | 'commodity-categories' | 'workers' | 'buildings' | 'work-categories' |
               'dimensions' | 'character-classes' | 'traits' | 'fulfillment-vectors' | 'enablement-rules' |
-              'substitution-calculator' | 'commodity-fatigue' | 'substitution-rules';
+              'substitution-calculator' | 'commodity-fatigue' | 'substitution-rules' |
+              'time-slots' | 'craving-slots' | 'units';
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<TabKey>('recipes');
@@ -122,12 +126,33 @@ function App() {
               },
               {
                 type: 'group',
+                label: 'Time System',
+                children: [
+                  {
+                    key: 'time-slots',
+                    icon: <ClockCircleOutlined />,
+                    label: 'Time Slots',
+                  },
+                  {
+                    key: 'units',
+                    icon: <CalculatorOutlined />,
+                    label: 'Units & Baselines',
+                  },
+                ]
+              },
+              {
+                type: 'group',
                 label: 'Craving System',
                 children: [
                   {
                     key: 'dimensions',
                     icon: <BulbOutlined />,
                     label: 'Craving Dimensions',
+                  },
+                  {
+                    key: 'craving-slots',
+                    icon: <LinkOutlined />,
+                    label: 'Craving-Slot Mapping',
                   },
                   {
                     key: 'character-classes',
@@ -206,6 +231,9 @@ function App() {
                 {selectedTab === 'commodity-fatigue' && <CommodityFatigueManager />}
                 {selectedTab === 'substitution-rules' && <SubstitutionRulesManager />}
                 {selectedTab === 'substitution-calculator' && <SubstitutionCalculator />}
+                {selectedTab === 'time-slots' && <TimeSlotManager />}
+                {selectedTab === 'craving-slots' && <CravingSlotManager />}
+                {selectedTab === 'units' && <UnitsManager />}
               </>
             )}
           </Content>

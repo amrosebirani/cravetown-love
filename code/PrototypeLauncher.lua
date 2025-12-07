@@ -9,6 +9,13 @@ function PrototypeLauncher:Create()
     local this = {
         mPrototypes = {
             {
+                id = "alpha",
+                name = "Alpha Prototype (Birthday Edition)",
+                description = "Play the alpha prototype - A special birthday gift for Mansi!",
+                color = {0.9, 0.4, 0.6},
+                highlight = true
+            },
+            {
                 id = "main",
                 name = "Main Game",
                 description = "Full game with geography, buildings, and town management",

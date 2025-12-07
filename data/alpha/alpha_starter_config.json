@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "description": "Starter configuration for Alpha Prototype",
+
+  "population": {
+    "initialCount": 15,
+    "classDistribution": {
+      "elite": 0.05,
+      "upper": 0.15,
+      "middle": 0.50,
+      "lower": 0.30
+    }
+  },
+
+  "starterBuildings": [
+    {
+      "typeId": "farm",
+      "x": 100,
+      "y": 100,
+      "autoAssignRecipe": true
+    },
+    {
+      "typeId": "bakery",
+      "x": 200,
+      "y": 100,
+      "autoAssignRecipe": true
+    },
+    {
+      "typeId": "sawmill",
+      "x": 300,
+      "y": 100,
+      "autoAssignRecipe": true
+    }
+  ],
+
+  "starterResources": [
+    {"commodityId": "wheat", "quantity": 50},
+    {"commodityId": "bread", "quantity": 30},
+    {"commodityId": "water", "quantity": 100},
+    {"commodityId": "beef", "quantity": 20},
+    {"commodityId": "carrot", "quantity": 25},
+    {"commodityId": "apple", "quantity": 15},
+    {"commodityId": "linen_cloth", "quantity": 10},
+    {"commodityId": "lumber", "quantity": 30}
+  ],
+
+  "starterGold": 1000,
+
+  "workerAssignment": {
+    "autoAssignLowerClasses": true,
+    "farmWorkers": 2,
+    "bakeryWorkers": 1
+  }
+}

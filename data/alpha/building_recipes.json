@@ -1,0 +1,2429 @@
+{
+  "recipes": [
+    {
+      "buildingType": "sawmill",
+      "name": "Saw Mill",
+      "recipeName": "Lumber Production",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "timber": 5
+      },
+      "outputs": {
+        "lumber": 25,
+        "sawdust": 10
+      },
+      "notes": "30 minutes. 5 timber produces 25 lumber and 10 kg sawdust."
+    },
+    {
+      "buildingType": "sawmill",
+      "name": "Saw Mill",
+      "recipeName": "Plank Sawing",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "lumber": 10
+      },
+      "outputs": {
+        "planks": 15,
+        "sawdust": 5
+      },
+      "notes": "20 minutes. 10 lumber produces 15 planks and 5 kg sawdust."
+    },
+    {
+      "buildingType": "sawmill",
+      "name": "Saw Mill",
+      "recipeName": "Firewood Splitting",
+      "category": "Production",
+      "productionTime": 900,
+      "inputs": {
+        "timber": 3
+      },
+      "outputs": {
+        "firewood": 50
+      },
+      "notes": "15 minutes. 3 timber produces 50 kg firewood."
+    },
+    {
+      "buildingType": "bakery",
+      "name": "Bakery",
+      "recipeName": "Bread Baking",
+      "category": "Consumable",
+      "productionTime": 180,
+      "inputs": {
+        "wheat": 10
+      },
+      "outputs": {
+        "bread": 8
+      },
+      "notes": "3 minutes. 10 wheat produces 8 bread loaves."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Meal Preparation",
+      "category": "Consumable",
+      "productionTime": 300,
+      "inputs": {
+        "grain": 5,
+        "vegetable": 5
+      },
+      "outputs": {
+        "meal": 10
+      },
+      "notes": "5 minutes. Makes 10 meals from grains and vegetables."
+    },
+    {
+      "buildingType": "bar",
+      "name": "Bar",
+      "recipeName": "Beer Brewing",
+      "category": "Consumable",
+      "productionTime": 7200,
+      "inputs": {
+        "wheat": 20,
+        "barley": 20
+      },
+      "outputs": {
+        "beer": 30
+      },
+      "notes": "2 hours brewing. 40 grain produces 30 beer bottles."
+    },
+    {
+      "buildingType": "bar",
+      "name": "Bar",
+      "recipeName": "Whiskey Distilling",
+      "category": "Consumable",
+      "productionTime": 14400,
+      "inputs": {
+        "rye": 30
+      },
+      "outputs": {
+        "whiskey": 20
+      },
+      "notes": "4 hours distilling. 30 rye produces 20 whiskey bottles."
+    },
+    {
+      "buildingType": "shoe_factory",
+      "name": "Shoe Factory",
+      "recipeName": "Shoe Manufacturing",
+      "category": "Merchandise",
+      "productionTime": 600,
+      "inputs": {
+        "rubber": 5,
+        "cloth": 10
+      },
+      "outputs": {
+        "shoes": 5
+      },
+      "notes": "10 minutes. Makes 5 pairs of shoes."
+    },
+    {
+      "buildingType": "textile_mill",
+      "name": "Textile Mill",
+      "recipeName": "Yarn Production",
+      "category": "Merchandise",
+      "productionTime": 900,
+      "inputs": {
+        "cotton": 20
+      },
+      "outputs": {
+        "yarn": 50
+      },
+      "notes": "15 minutes. 20 cotton produces 50 yarn."
+    },
+    {
+      "buildingType": "textile_mill",
+      "name": "Textile Mill",
+      "recipeName": "Thread Spinning",
+      "category": "Merchandise",
+      "productionTime": 600,
+      "inputs": {
+        "cotton": 15
+      },
+      "outputs": {
+        "thread": 40
+      },
+      "notes": "10 minutes. 15 cotton produces 40 thread."
+    },
+    {
+      "buildingType": "textile_mill",
+      "name": "Textile Mill",
+      "recipeName": "Cloth Weaving",
+      "category": "Merchandise",
+      "productionTime": 1200,
+      "inputs": {
+        "yarn": 30
+      },
+      "outputs": {
+        "cloth": 20
+      },
+      "notes": "20 minutes. 30 yarn produces 20 cloth."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Clothing Production",
+      "category": "Merchandise",
+      "productionTime": 480,
+      "inputs": {
+        "cotton": 15,
+        "thread": 10
+      },
+      "outputs": {
+        "clothing": 5
+      },
+      "notes": "8 minutes. Creates 5 clothing items."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Shirt Making",
+      "category": "Merchandise",
+      "productionTime": 900,
+      "inputs": {
+        "cloth": 8,
+        "thread": 5
+      },
+      "outputs": {
+        "shirt": 4
+      },
+      "notes": "15 minutes. 8 cloth and 5 thread produces 4 shirts."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Pants Making",
+      "category": "Merchandise",
+      "productionTime": 1080,
+      "inputs": {
+        "cloth": 10,
+        "thread": 6
+      },
+      "outputs": {
+        "pants": 3
+      },
+      "notes": "18 minutes. 10 cloth and 6 thread produces 3 pants."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Dress Making",
+      "category": "Merchandise",
+      "productionTime": 1500,
+      "inputs": {
+        "cloth": 15,
+        "thread": 8
+      },
+      "outputs": {
+        "dress": 2
+      },
+      "notes": "25 minutes. 15 cloth and 8 thread produces 2 dresses."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Coat Making",
+      "category": "Merchandise",
+      "productionTime": 1800,
+      "inputs": {
+        "cloth": 20,
+        "thread": 10,
+        "wool": 5
+      },
+      "outputs": {
+        "coat": 2
+      },
+      "notes": "30 minutes. 20 cloth, 10 thread, and 5 wool produces 2 coats."
+    },
+    {
+      "buildingType": "brickyard",
+      "name": "Brickyard",
+      "recipeName": "Brick Production",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "clay": 50
+      },
+      "outputs": {
+        "bricks": 100
+      },
+      "notes": "1 hour. 50 kg clay produces 100 bricks."
+    },
+    {
+      "buildingType": "brickyard",
+      "name": "Brickyard",
+      "recipeName": "Tile Production",
+      "category": "Production",
+      "productionTime": 2700,
+      "inputs": {
+        "clay": 40
+      },
+      "outputs": {
+        "tiles": 80
+      },
+      "notes": "45 minutes. 40 kg clay produces 80 tiles."
+    },
+    {
+      "buildingType": "brickyard",
+      "name": "Brickyard",
+      "recipeName": "Clay Pipe Production",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "clay": 30
+      },
+      "outputs": {
+        "clay_pipe": 20
+      },
+      "notes": "30 minutes. 30 kg clay produces 20 pipe sections."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Wheat Farming",
+      "category": "Production",
+      "productionTime": 172800,
+      "inputs": {
+        "wheat_seed": 20
+      },
+      "outputs": {
+        "wheat": 10,
+        "wheat_seed": 30
+      },
+      "notes": "2 hours. 5 seeds produces 100 wheat."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Apple Cultivation",
+      "category": "Production",
+      "productionTime": 259200,
+      "inputs": {
+        "apple_sapling": 5
+      },
+      "outputs": {
+        "apple": 150,
+        "apple_sapling": 8
+      },
+      "notes": "3 days. 5 saplings produces 150 apples and 8 new saplings."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Mango Cultivation",
+      "category": "Production",
+      "productionTime": 345600,
+      "inputs": {
+        "mango_sapling": 4
+      },
+      "outputs": {
+        "mango": 120,
+        "mango_sapling": 6
+      },
+      "notes": "4 days. 4 saplings produces 120 mangoes and 6 new saplings."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Orange Cultivation",
+      "category": "Production",
+      "productionTime": 259200,
+      "inputs": {
+        "orange_sapling": 5
+      },
+      "outputs": {
+        "orange": 180,
+        "orange_sapling": 7
+      },
+      "notes": "3 days. 5 saplings produces 180 oranges and 7 new saplings."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Grape Cultivation",
+      "category": "Production",
+      "productionTime": 172800,
+      "inputs": {
+        "grape_vine": 10
+      },
+      "outputs": {
+        "grapes": 200,
+        "grape_vine": 15
+      },
+      "notes": "2 days. 10 vines produces 200 grapes and 15 new vine cuttings."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Berry Cultivation",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {
+        "berry_bush": 12
+      },
+      "outputs": {
+        "berries": 100,
+        "berry_bush": 18
+      },
+      "notes": "1 day. 12 bushes produces 100 berries and 18 new bush seedlings."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Peach Cultivation",
+      "category": "Production",
+      "productionTime": 259200,
+      "inputs": {
+        "peach_sapling": 5
+      },
+      "outputs": {
+        "peach": 130,
+        "peach_sapling": 7
+      },
+      "notes": "3 days. 5 saplings produces 130 peaches and 7 new saplings."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Pear Cultivation",
+      "category": "Production",
+      "productionTime": 259200,
+      "inputs": {
+        "pear_sapling": 5
+      },
+      "outputs": {
+        "pear": 140,
+        "pear_sapling": 7
+      },
+      "notes": "3 days. 5 saplings produces 140 pears and 7 new saplings."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Watermelon Cultivation",
+      "category": "Production",
+      "productionTime": 129600,
+      "inputs": {
+        "watermelon_seed": 15
+      },
+      "outputs": {
+        "watermelon": 40,
+        "watermelon_seed": 25
+      },
+      "notes": "1.5 days. 15 seeds produces 40 watermelons and 25 new seeds."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Date Palm Cultivation",
+      "category": "Production",
+      "productionTime": 432000,
+      "inputs": {
+        "date_palm_sapling": 3
+      },
+      "outputs": {
+        "date": 200,
+        "date_palm_sapling": 5
+      },
+      "notes": "5 days. 3 saplings produces 200 dates and 5 new saplings."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Cotton Farming",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "cotton_seed": 10
+      },
+      "outputs": {
+        "cotton": 80,
+        "cotton_seed": 15
+      },
+      "notes": "2 hours. 10 seeds produces 80 cotton."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Maize Farming",
+      "category": "Production",
+      "productionTime": 172800,
+      "inputs": {
+        "maize_seed": 20
+      },
+      "outputs": {
+        "maize": 10,
+        "maize_seed": 30
+      },
+      "notes": "2 hours. 20 seeds produces 10 maize and 30 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Rice Farming",
+      "category": "Production",
+      "productionTime": 172800,
+      "inputs": {
+        "rice_seed": 20
+      },
+      "outputs": {
+        "rice": 10,
+        "rice_seed": 30
+      },
+      "notes": "2 hours. 20 seeds produces 10 rice and 30 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Barley Farming",
+      "category": "Production",
+      "productionTime": 172800,
+      "inputs": {
+        "barley_seeds": 20
+      },
+      "outputs": {
+        "barley": 10,
+        "barley_seeds": 30
+      },
+      "notes": "2 hours. 20 seeds produces 10 barley and 30 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Oats Farming",
+      "category": "Production",
+      "productionTime": 172800,
+      "inputs": {
+        "oats_seeds": 20
+      },
+      "outputs": {
+        "oats": 10,
+        "oats_seeds": 30
+      },
+      "notes": "2 hours. 20 seeds produces 10 oats and 30 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Rye Farming",
+      "category": "Production",
+      "productionTime": 172800,
+      "inputs": {
+        "rye_seeds": 20
+      },
+      "outputs": {
+        "rye": 10,
+        "rye_seeds": 30
+      },
+      "notes": "2 hours. 20 seeds produces 10 rye and 30 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Ragi Farming",
+      "category": "Production",
+      "productionTime": 172800,
+      "inputs": {
+        "ragi_seeds": 20
+      },
+      "outputs": {
+        "ragi": 10,
+        "ragi_seeds": 30
+      },
+      "notes": "2 hours. 20 seeds produces 10 ragi and 30 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Potato Farming",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "potato_seed": 15
+      },
+      "outputs": {
+        "potato": 120,
+        "potato_seed": 25
+      },
+      "notes": "2 hours. 15 seed potatoes produces 120 potatoes and 25 seed potatoes."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Carrot Farming",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "carrot_seed": 20
+      },
+      "outputs": {
+        "carrot": 100,
+        "carrot_seed": 30
+      },
+      "notes": "1.5 hours. 20 seeds produces 100 carrots and 30 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Onion Farming",
+      "category": "Production",
+      "productionTime": 6300,
+      "inputs": {
+        "onion_seed": 20
+      },
+      "outputs": {
+        "onion": 90,
+        "onion_seed": 30
+      },
+      "notes": "1.75 hours. 20 seeds produces 90 onions and 30 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Cabbage Farming",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "cabbage_seed": 15
+      },
+      "outputs": {
+        "cabbage": 60,
+        "cabbage_seed": 22
+      },
+      "notes": "2 hours. 15 seeds produces 60 cabbages and 22 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Tomato Farming",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "tomato_seed": 12
+      },
+      "outputs": {
+        "tomato": 80,
+        "tomato_seed": 20
+      },
+      "notes": "1.5 hours. 12 seeds produces 80 tomatoes and 20 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Lettuce Farming",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "lettuce_seed": 25
+      },
+      "outputs": {
+        "lettuce": 70,
+        "lettuce_seed": 35
+      },
+      "notes": "1 hour. 25 seeds produces 70 lettuce heads and 35 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Bean Farming",
+      "category": "Production",
+      "productionTime": 4500,
+      "inputs": {
+        "bean_seed": 20
+      },
+      "outputs": {
+        "beans": 100,
+        "bean_seed": 35
+      },
+      "notes": "1.25 hours. 20 seeds produces 100 beans and 35 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Pumpkin Farming",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {
+        "pumpkin_seed": 10
+      },
+      "outputs": {
+        "pumpkin": 30,
+        "pumpkin_seed": 20
+      },
+      "notes": "3 hours. 10 seeds produces 30 pumpkins and 20 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Broccoli Farming",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "broccoli_seed": 15
+      },
+      "outputs": {
+        "broccoli": 50,
+        "broccoli_seed": 22
+      },
+      "notes": "1.5 hours. 15 seeds produces 50 broccoli heads and 22 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Pepper Farming",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "pepper_seed": 15
+      },
+      "outputs": {
+        "pepper": 70,
+        "pepper_seed": 25
+      },
+      "notes": "1.5 hours. 15 seeds produces 70 peppers and 25 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Lentil Farming",
+      "category": "Production",
+      "productionTime": 6300,
+      "inputs": {
+        "lentil_seed": 15
+      },
+      "outputs": {
+        "lentils": 80,
+        "lentil_seed": 25
+      },
+      "notes": "1.75 hours. 15 seeds produces 80 kg lentils and 25 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Mustard Farming",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "mustard_seed": 10
+      },
+      "outputs": {
+        "mustard_seed": 60
+      },
+      "notes": "1.5 hours. 10 seeds produces 60 kg mustard seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Sesame Farming",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "sesame_seed": 10
+      },
+      "outputs": {
+        "sesame_seed": 50
+      },
+      "notes": "1.5 hours. 10 seeds produces 50 kg sesame seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Groundnut Farming",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "groundnut_seed": 15
+      },
+      "outputs": {
+        "groundnut": 100,
+        "groundnut_seed": 25
+      },
+      "notes": "2 hours. 15 seeds produces 100 kg groundnuts and 25 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Sunflower Farming",
+      "category": "Production",
+      "productionTime": 6300,
+      "inputs": {
+        "sunflower_seed": 12
+      },
+      "outputs": {
+        "sunflower_seed": 70
+      },
+      "notes": "1.75 hours. 12 seeds produces 70 kg sunflower seeds."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Coconut Cultivation",
+      "category": "Production",
+      "productionTime": 518400,
+      "inputs": {
+        "coconut_palm_sapling": 3
+      },
+      "outputs": {
+        "coconut": 100,
+        "coconut_palm_sapling": 5
+      },
+      "notes": "6 days. 3 palms produces 100 coconuts and 5 new saplings."
+    },
+    {
+      "buildingType": "orchard",
+      "name": "Orchard",
+      "recipeName": "Rubber Tree Cultivation",
+      "category": "Production",
+      "productionTime": 259200,
+      "inputs": {
+        "rubber_tree_sapling": 5
+      },
+      "outputs": {
+        "latex": 80,
+        "rubber_tree_sapling": 7
+      },
+      "notes": "3 days. 5 rubber trees produces 80L latex and 7 new saplings."
+    },
+    {
+      "buildingType": "hunting_lodge",
+      "name": "Hunting Lodge",
+      "recipeName": "Chicken Hunting",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {},
+      "outputs": {
+        "chicken": 8,
+        "feathers": 12
+      },
+      "notes": "1 hour. Hunts wild fowl, produces 8 chicken and 12 feathers."
+    },
+    {
+      "buildingType": "hunting_lodge",
+      "name": "Hunting Lodge",
+      "recipeName": "Sheep Hunting",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {},
+      "outputs": {
+        "mutton": 15,
+        "wool": 8
+      },
+      "notes": "2 hours. Hunts wild sheep, produces 15 mutton and 8 wool."
+    },
+    {
+      "buildingType": "hunting_lodge",
+      "name": "Hunting Lodge",
+      "recipeName": "Cattle Hunting",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {},
+      "outputs": {
+        "beef": 25,
+        "leather": 6
+      },
+      "notes": "3 hours. Hunts wild cattle, produces 25 beef and 6 leather."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Bed Crafting",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "lumber": 40,
+        "nails": 20
+      },
+      "outputs": {
+        "bed": 1
+      },
+      "notes": "30 minutes. Makes 1 bed."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Table & Chairs Set",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "lumber": 50,
+        "nails": 30
+      },
+      "outputs": {
+        "table": 1,
+        "chair": 4
+      },
+      "notes": "40 minutes. Makes 1 table and 4 chairs."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Wardrobe Crafting",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "lumber": 80,
+        "nails": 40
+      },
+      "outputs": {
+        "wardrobe": 1
+      },
+      "notes": "1 hour. Makes 1 wardrobe."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Cabinet Crafting",
+      "category": "Production",
+      "productionTime": 2700,
+      "inputs": {
+        "lumber": 60,
+        "nails": 30
+      },
+      "outputs": {
+        "cabinet": 1
+      },
+      "notes": "45 minutes. Makes 1 cabinet."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Bench Crafting",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "lumber": 25,
+        "nails": 15
+      },
+      "outputs": {
+        "bench": 2
+      },
+      "notes": "20 minutes. Makes 2 benches."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Bookshelf Crafting",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "lumber": 45,
+        "nails": 25
+      },
+      "outputs": {
+        "bookshelf": 1
+      },
+      "notes": "40 minutes. Makes 1 bookshelf."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Desk Crafting",
+      "category": "Production",
+      "productionTime": 2100,
+      "inputs": {
+        "lumber": 40,
+        "nails": 20
+      },
+      "outputs": {
+        "desk": 1
+      },
+      "notes": "35 minutes. Makes 1 desk."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Stool Crafting",
+      "category": "Production",
+      "productionTime": 600,
+      "inputs": {
+        "lumber": 10,
+        "nails": 8
+      },
+      "outputs": {
+        "stool": 4
+      },
+      "notes": "10 minutes. Makes 4 stools."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Shelf Crafting",
+      "category": "Production",
+      "productionTime": 900,
+      "inputs": {
+        "lumber": 15,
+        "nails": 10
+      },
+      "outputs": {
+        "shelf": 3
+      },
+      "notes": "15 minutes. Makes 3 shelves."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Cradle Crafting",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "lumber": 20,
+        "cloth": 5,
+        "nails": 12
+      },
+      "outputs": {
+        "cradle": 1
+      },
+      "notes": "30 minutes. Makes 1 cradle."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Chest Crafting",
+      "category": "Production",
+      "productionTime": 2100,
+      "inputs": {
+        "lumber": 30,
+        "iron": 5,
+        "nails": 20
+      },
+      "outputs": {
+        "chest": 1
+      },
+      "notes": "35 minutes. Makes 1 chest with lock."
+    },
+    {
+      "buildingType": "furniture_shop",
+      "name": "Furniture Shop",
+      "recipeName": "Door Crafting",
+      "category": "Production",
+      "productionTime": 1500,
+      "inputs": {
+        "lumber": 20,
+        "iron": 3,
+        "nails": 15
+      },
+      "outputs": {
+        "door": 2
+      },
+      "notes": "25 minutes. Makes 2 doors."
+    },
+    {
+      "buildingType": "jewellery_shop",
+      "name": "Jewellery Shop / Goldsmith",
+      "recipeName": "Gold Item Crafting",
+      "category": "Luxury",
+      "productionTime": 1200,
+      "inputs": {
+        "gold_ore": 50
+      },
+      "outputs": {
+        "gold_item": 5
+      },
+      "notes": "20 minutes. 50g gold ore produces 5 jewelry pieces."
+    },
+    {
+      "buildingType": "central_bank",
+      "name": "Central Bank",
+      "recipeName": "Currency Printing",
+      "category": "Mint",
+      "productionTime": 600,
+      "inputs": {
+        "paper": 100
+      },
+      "outputs": {
+        "currency_note": 1000
+      },
+      "notes": "10 minutes. 100 paper produces 1000 currency notes."
+    },
+    {
+      "buildingType": "forge",
+      "name": "Forge",
+      "recipeName": "Knife Forging",
+      "category": "Production",
+      "productionTime": 900,
+      "inputs": {
+        "iron_ore": 30,
+        "wood": 10
+      },
+      "outputs": {
+        "knife": 10
+      },
+      "notes": "15 minutes. Makes 10 knives."
+    },
+    {
+      "buildingType": "forge",
+      "name": "Forge",
+      "recipeName": "Iron Smelting",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "iron_ore": 50,
+        "coal": 20
+      },
+      "outputs": {
+        "iron": 30
+      },
+      "notes": "1 hour. 50 kg iron ore + 20 kg coal produces 30 kg refined iron."
+    },
+    {
+      "buildingType": "forge",
+      "name": "Forge",
+      "recipeName": "Copper Smelting",
+      "category": "Production",
+      "productionTime": 3000,
+      "inputs": {
+        "copper_ore": 40,
+        "coal": 15
+      },
+      "outputs": {
+        "copper": 25
+      },
+      "notes": "50 minutes. 40 kg copper ore + 15 kg coal produces 25 kg refined copper."
+    },
+    {
+      "buildingType": "forge",
+      "name": "Forge",
+      "recipeName": "Steel Production",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "iron": 30,
+        "coal": 30
+      },
+      "outputs": {
+        "steel": 20
+      },
+      "notes": "1.5 hours. 30 kg iron + 30 kg coal produces 20 kg steel."
+    },
+    {
+      "buildingType": "forge",
+      "name": "Forge",
+      "recipeName": "Gold Refining",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "gold_ore": 20,
+        "coal": 10
+      },
+      "outputs": {
+        "gold": 5
+      },
+      "notes": "2 hours. 20 kg gold ore + 10 kg coal produces 5 kg refined gold."
+    },
+    {
+      "buildingType": "forge",
+      "name": "Forge",
+      "recipeName": "Silver Refining",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "silver_ore": 25,
+        "coal": 10
+      },
+      "outputs": {
+        "silver": 12
+      },
+      "notes": "1.5 hours. 25 kg silver ore + 10 kg coal produces 12 kg refined silver."
+    },
+    {
+      "buildingType": "forge",
+      "name": "Forge",
+      "recipeName": "Bronze Alloy",
+      "category": "Production",
+      "productionTime": 2700,
+      "inputs": {
+        "copper": 20,
+        "coal": 10
+      },
+      "outputs": {
+        "bronze": 18
+      },
+      "notes": "45 minutes. 20 kg copper + 10 kg coal produces 18 kg bronze alloy."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Hammer Forging",
+      "category": "Production",
+      "productionTime": 720,
+      "inputs": {
+        "iron_ore": 40,
+        "wood": 20
+      },
+      "outputs": {
+        "hammer": 8
+      },
+      "notes": "12 minutes. Makes 8 hammers."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Shovel Forging",
+      "category": "Production",
+      "productionTime": 720,
+      "inputs": {
+        "iron_ore": 35,
+        "wood": 20
+      },
+      "outputs": {
+        "shovel": 8
+      },
+      "notes": "12 minutes. Makes 8 shovels."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Mine",
+      "recipeName": "Iron Ore Mining",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {},
+      "outputs": {
+        "iron_ore": 50
+      },
+      "notes": "2 hours. Extracts 50 kg iron ore."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Mine",
+      "recipeName": "Copper Ore Mining",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {},
+      "outputs": {
+        "copper_ore": 40
+      },
+      "notes": "2 hours. Extracts 40 kg copper ore."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Mine",
+      "recipeName": "Gold Ore Mining",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {},
+      "outputs": {
+        "gold_ore": 5
+      },
+      "notes": "3 hours. Extracts 5 kg gold ore. Precious and rare."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Mine",
+      "recipeName": "Silver Ore Mining",
+      "category": "Production",
+      "productionTime": 9000,
+      "inputs": {},
+      "outputs": {
+        "silver_ore": 10
+      },
+      "notes": "2.5 hours. Extracts 10 kg silver ore."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Mine",
+      "recipeName": "Coal Mining",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {},
+      "outputs": {
+        "coal": 100
+      },
+      "notes": "1.5 hours. Extracts 100 kg coal."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Mine",
+      "recipeName": "Stone Quarrying",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {},
+      "outputs": {
+        "stone": 150
+      },
+      "notes": "1 hour. Quarries 150 kg stone."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Mine",
+      "recipeName": "Marble Quarrying",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {},
+      "outputs": {
+        "marble": 30
+      },
+      "notes": "3 hours. Carefully quarries 30 kg marble."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Mine",
+      "recipeName": "Clay Extraction",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {},
+      "outputs": {
+        "clay": 80
+      },
+      "notes": "1 hour. Extracts 80 kg clay."
+    },
+    {
+      "buildingType": "mine",
+      "name": "Mine",
+      "recipeName": "Sand Extraction",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {},
+      "outputs": {
+        "sand": 120
+      },
+      "notes": "1 hour. Extracts 120 kg sand."
+    },
+    {
+      "buildingType": "bakery",
+      "name": "Bakery",
+      "recipeName": "Cake Making",
+      "category": "Consumable",
+      "productionTime": 480,
+      "inputs": {
+        "wheat": 8,
+        "sugar": 5,
+        "eggs": 3
+      },
+      "outputs": {
+        "cake": 2
+      },
+      "notes": "8 minutes. Makes 2 cakes."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Sugarcane Farming",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {
+        "sugarcane_cutting": 10
+      },
+      "outputs": {
+        "sugar_cane": 80,
+        "sugarcane_cutting": 15
+      },
+      "notes": "3 hours. 10 cuttings produces 80 kg sugarcane and 15 new cuttings."
+    },
+    {
+      "buildingType": "sugar_mill",
+      "name": "Sugar Mill",
+      "recipeName": "Sugar Refining",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "sugar_cane": 50
+      },
+      "outputs": {
+        "sugar": 10,
+        "molasses": 5
+      },
+      "notes": "1 hour. 50 kg sugarcane produces 10 kg sugar and 5 L molasses."
+    },
+    {
+      "buildingType": "distillery",
+      "name": "Distillery",
+      "recipeName": "Rum Distilling",
+      "category": "Production",
+      "productionTime": 14400,
+      "inputs": {
+        "molasses": 20
+      },
+      "outputs": {
+        "rum": 15
+      },
+      "notes": "4 hours. 20 L molasses produces 15 bottles of rum."
+    },
+    {
+      "buildingType": "confectionery",
+      "name": "Confectionery",
+      "recipeName": "Candy Making",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "sugar": 5
+      },
+      "outputs": {
+        "candy": 20
+      },
+      "notes": "30 minutes. 5 kg sugar produces 20 pieces of candy."
+    },
+    {
+      "buildingType": "logging_camp",
+      "name": "Logging Camp",
+      "recipeName": "Tree Felling",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {},
+      "outputs": {
+        "tree": 4
+      },
+      "notes": "1 hour. Fells 4 trees from the forest."
+    },
+    {
+      "buildingType": "logging_camp",
+      "name": "Logging Camp",
+      "recipeName": "Timber Cutting",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "tree": 1
+      },
+      "outputs": {
+        "timber": 6
+      },
+      "notes": "30 minutes. Cuts 1 tree into 6 timber logs."
+    },
+    {
+      "buildingType": "logging_camp",
+      "name": "Logging Camp",
+      "recipeName": "Firewood Preparation",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "tree": 1
+      },
+      "outputs": {
+        "firewood": 80
+      },
+      "notes": "20 minutes. Chops 1 tree directly into 80 kg firewood."
+    },
+    {
+      "buildingType": "charcoal_kiln",
+      "name": "Charcoal Kiln",
+      "recipeName": "Charcoal Burning",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "firewood": 100
+      },
+      "outputs": {
+        "charcoal": 40
+      },
+      "notes": "2 hours. 100 kg firewood produces 40 kg charcoal through slow burning."
+    },
+    {
+      "buildingType": "charcoal_kiln",
+      "name": "Charcoal Kiln",
+      "recipeName": "Charcoal from Timber",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {
+        "timber": 5
+      },
+      "outputs": {
+        "charcoal": 60
+      },
+      "notes": "3 hours. 5 timber produces 60 kg charcoal directly."
+    },
+    {
+      "buildingType": "cooperage",
+      "name": "Cooperage",
+      "recipeName": "Barrel Making",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "planks": 20,
+        "iron": 5
+      },
+      "outputs": {
+        "barrel": 4
+      },
+      "notes": "40 minutes. 20 planks and 5 iron produces 4 barrels."
+    },
+    {
+      "buildingType": "cooperage",
+      "name": "Cooperage",
+      "recipeName": "Crate Making",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "planks": 12,
+        "nails": 20
+      },
+      "outputs": {
+        "crate": 6
+      },
+      "notes": "20 minutes. 12 planks and 20 nails produces 6 crates."
+    },
+    {
+      "buildingType": "clay_pit",
+      "name": "Clay Pit",
+      "recipeName": "Clay Extraction",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {},
+      "outputs": {
+        "clay": 100
+      },
+      "notes": "1 hour. Extracts 100 kg clay from the deposit."
+    },
+    {
+      "buildingType": "pottery_workshop",
+      "name": "Pottery Workshop",
+      "recipeName": "Pottery Making",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "clay": 20
+      },
+      "outputs": {
+        "pottery": 8
+      },
+      "notes": "30 minutes. 20 kg clay produces 8 pottery pieces."
+    },
+    {
+      "buildingType": "pottery_workshop",
+      "name": "Pottery Workshop",
+      "recipeName": "Ceramics Production",
+      "category": "Production",
+      "productionTime": 1500,
+      "inputs": {
+        "clay": 15
+      },
+      "outputs": {
+        "ceramics": 12
+      },
+      "notes": "25 minutes. 15 kg clay produces 12 ceramic items."
+    },
+    {
+      "buildingType": "pottery_workshop",
+      "name": "Pottery Workshop",
+      "recipeName": "Terracotta Crafting",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "clay": 25
+      },
+      "outputs": {
+        "terracotta": 5
+      },
+      "notes": "40 minutes. 25 kg clay produces 5 decorative terracotta pieces."
+    },
+    {
+      "buildingType": "pottery_workshop",
+      "name": "Pottery Workshop",
+      "recipeName": "Fine Pottery Making",
+      "category": "Luxury",
+      "productionTime": 3600,
+      "inputs": {
+        "clay": 30,
+        "blue_dye": 2
+      },
+      "outputs": {
+        "pottery": 6,
+        "terracotta": 2
+      },
+      "notes": "1 hour. Creates decorated pottery and terracotta using dye."
+    },
+    {
+      "buildingType": "glassworks",
+      "name": "Glassworks",
+      "recipeName": "Glass Making",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "sand": 50,
+        "coal": 20
+      },
+      "outputs": {
+        "glass": 30
+      },
+      "notes": "1 hour. 50 kg sand + 20 kg coal produces 30 kg glass."
+    },
+    {
+      "buildingType": "glassworks",
+      "name": "Glassworks",
+      "recipeName": "Window Pane Production",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "glass": 15
+      },
+      "outputs": {
+        "window_pane": 10
+      },
+      "notes": "30 minutes. 15 kg glass produces 10 window panes."
+    },
+    {
+      "buildingType": "glassworks",
+      "name": "Glassworks",
+      "recipeName": "Bottle Production",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "glass": 10
+      },
+      "outputs": {
+        "bottle": 20
+      },
+      "notes": "20 minutes. 10 kg glass produces 20 bottles."
+    },
+    {
+      "buildingType": "glassworks",
+      "name": "Glassworks",
+      "recipeName": "Glassware Production",
+      "category": "Production",
+      "productionTime": 1500,
+      "inputs": {
+        "glass": 12
+      },
+      "outputs": {
+        "glassware": 8
+      },
+      "notes": "25 minutes. 12 kg glass produces 8 glassware items."
+    },
+    {
+      "buildingType": "glassworks",
+      "name": "Glassworks",
+      "recipeName": "Mirror Making",
+      "category": "Luxury",
+      "productionTime": 2700,
+      "inputs": {
+        "glass": 10,
+        "silver": 5
+      },
+      "outputs": {
+        "mirror": 4
+      },
+      "notes": "45 minutes. 10 kg glass + 5 kg silver produces 4 mirrors."
+    },
+    {
+      "buildingType": "stonecutters",
+      "name": "Stonecutters",
+      "recipeName": "Stone Cutting",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "stone": 100
+      },
+      "outputs": {
+        "cut_stone": 40
+      },
+      "notes": "30 minutes. 100 kg raw stone produces 40 cut stone blocks."
+    },
+    {
+      "buildingType": "stonecutters",
+      "name": "Stonecutters",
+      "recipeName": "Column Carving",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "stone": 200
+      },
+      "outputs": {
+        "column": 2
+      },
+      "notes": "1.5 hours. 200 kg stone produces 2 architectural columns."
+    },
+    {
+      "buildingType": "stonecutters",
+      "name": "Stonecutters",
+      "recipeName": "Marble Sculpting",
+      "category": "Luxury",
+      "productionTime": 10800,
+      "inputs": {
+        "marble": 100
+      },
+      "outputs": {
+        "statue": 1
+      },
+      "notes": "3 hours. 100 kg marble produces 1 decorative statue."
+    },
+    {
+      "buildingType": "stonecutters",
+      "name": "Stonecutters",
+      "recipeName": "Gravestone Carving",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "stone": 50
+      },
+      "outputs": {
+        "gravestone": 2
+      },
+      "notes": "40 minutes. 50 kg stone produces 2 gravestones."
+    },
+    {
+      "buildingType": "stonecutters",
+      "name": "Stonecutters",
+      "recipeName": "Marble Column Carving",
+      "category": "Luxury",
+      "productionTime": 7200,
+      "inputs": {
+        "marble": 150
+      },
+      "outputs": {
+        "column": 2
+      },
+      "notes": "2 hours. 150 kg marble produces 2 decorative marble columns."
+    },
+    {
+      "buildingType": "dairy_farm",
+      "name": "Dairy Farm",
+      "recipeName": "Milk Production",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {},
+      "outputs": {
+        "milk": 50
+      },
+      "notes": "1 hour. Produces 50 liters of fresh milk."
+    },
+    {
+      "buildingType": "dairy",
+      "name": "Dairy",
+      "recipeName": "Butter Churning",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "milk": 20
+      },
+      "outputs": {
+        "butter": 3,
+        "buttermilk": 15
+      },
+      "notes": "30 minutes. 20L milk produces 3 kg butter and 15L buttermilk."
+    },
+    {
+      "buildingType": "dairy",
+      "name": "Dairy",
+      "recipeName": "Ghee Making",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "butter": 5
+      },
+      "outputs": {
+        "ghee": 4
+      },
+      "notes": "40 minutes. 5 kg butter produces 4 kg ghee."
+    },
+    {
+      "buildingType": "dairy",
+      "name": "Dairy",
+      "recipeName": "Curd Making",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "milk": 15
+      },
+      "outputs": {
+        "curd": 14
+      },
+      "notes": "2 hours. 15L milk produces 14L curd."
+    },
+    {
+      "buildingType": "dairy",
+      "name": "Dairy",
+      "recipeName": "Paneer Making",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "milk": 25
+      },
+      "outputs": {
+        "paneer": 4
+      },
+      "notes": "1 hour. 25L milk produces 4 kg paneer."
+    },
+    {
+      "buildingType": "dairy",
+      "name": "Dairy",
+      "recipeName": "Cream Separation",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "milk": 20
+      },
+      "outputs": {
+        "cream": 4,
+        "milk": 15
+      },
+      "notes": "20 minutes. 20L milk produces 4L cream and 15L skimmed milk."
+    },
+    {
+      "buildingType": "dairy",
+      "name": "Dairy",
+      "recipeName": "Cheese Making",
+      "category": "Production",
+      "productionTime": 14400,
+      "inputs": {
+        "milk": 40
+      },
+      "outputs": {
+        "cheese": 5
+      },
+      "notes": "4 hours. 40L milk produces 5 kg cheese."
+    },
+    {
+      "buildingType": "flour_mill",
+      "name": "Flour Mill",
+      "recipeName": "Wheat Milling",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "wheat": 50
+      },
+      "outputs": {
+        "flour": 45
+      },
+      "notes": "30 minutes. 50 kg wheat produces 45 kg flour."
+    },
+    {
+      "buildingType": "flour_mill",
+      "name": "Flour Mill",
+      "recipeName": "Rice Milling",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "rice": 50
+      },
+      "outputs": {
+        "rice_flour": 45
+      },
+      "notes": "30 minutes. 50 kg rice produces 45 kg rice flour."
+    },
+    {
+      "buildingType": "flour_mill",
+      "name": "Flour Mill",
+      "recipeName": "Maize Milling",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "maize": 50
+      },
+      "outputs": {
+        "cornmeal": 45
+      },
+      "notes": "30 minutes. 50 kg maize produces 45 kg cornmeal."
+    },
+    {
+      "buildingType": "flour_mill",
+      "name": "Flour Mill",
+      "recipeName": "Lentil Milling",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "lentils": 40
+      },
+      "outputs": {
+        "lentil_flour": 35
+      },
+      "notes": "30 minutes. 40 kg lentils produces 35 kg lentil flour."
+    },
+    {
+      "buildingType": "oil_press",
+      "name": "Oil Press",
+      "recipeName": "Mustard Oil Pressing",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "mustard_seed": 30
+      },
+      "outputs": {
+        "oil": 10
+      },
+      "notes": "40 minutes. 30 kg mustard seeds produces 10L oil."
+    },
+    {
+      "buildingType": "oil_press",
+      "name": "Oil Press",
+      "recipeName": "Sesame Oil Pressing",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "sesame_seed": 25
+      },
+      "outputs": {
+        "oil": 10
+      },
+      "notes": "40 minutes. 25 kg sesame seeds produces 10L oil."
+    },
+    {
+      "buildingType": "oil_press",
+      "name": "Oil Press",
+      "recipeName": "Groundnut Oil Pressing",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "groundnut": 30
+      },
+      "outputs": {
+        "oil": 12
+      },
+      "notes": "40 minutes. 30 kg groundnuts produces 12L oil."
+    },
+    {
+      "buildingType": "oil_press",
+      "name": "Oil Press",
+      "recipeName": "Coconut Oil Pressing",
+      "category": "Production",
+      "productionTime": 3000,
+      "inputs": {
+        "coconut": 20
+      },
+      "outputs": {
+        "oil": 8
+      },
+      "notes": "50 minutes. 20 coconuts produces 8L oil."
+    },
+    {
+      "buildingType": "oil_press",
+      "name": "Oil Press",
+      "recipeName": "Sunflower Oil Pressing",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "sunflower_seed": 35
+      },
+      "outputs": {
+        "oil": 12
+      },
+      "notes": "40 minutes. 35 kg sunflower seeds produces 12L oil."
+    },
+    {
+      "buildingType": "winery",
+      "name": "Winery",
+      "recipeName": "Wine Making",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {
+        "grapes": 100
+      },
+      "outputs": {
+        "wine": 30
+      },
+      "notes": "1 day. 100 kg grapes produces 30 bottles of wine."
+    },
+    {
+      "buildingType": "winery",
+      "name": "Winery",
+      "recipeName": "Cider Making",
+      "category": "Production",
+      "productionTime": 43200,
+      "inputs": {
+        "apple": 80
+      },
+      "outputs": {
+        "cider": 40
+      },
+      "notes": "12 hours. 80 apples produces 40 bottles of cider."
+    },
+    {
+      "buildingType": "winery",
+      "name": "Winery",
+      "recipeName": "Fruit Juice Pressing",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "orange": 30
+      },
+      "outputs": {
+        "fruit_juice": 15
+      },
+      "notes": "30 minutes. 30 oranges produces 15L juice."
+    },
+    {
+      "buildingType": "preservery",
+      "name": "Preservery",
+      "recipeName": "Berry Jam Making",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "berries": 20,
+        "sugar": 10
+      },
+      "outputs": {
+        "jam": 8
+      },
+      "notes": "1 hour. 20 kg berries + 10 kg sugar produces 8 kg jam."
+    },
+    {
+      "buildingType": "preservery",
+      "name": "Preservery",
+      "recipeName": "Mango Jam Making",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "mango": 25,
+        "sugar": 10
+      },
+      "outputs": {
+        "jam": 10
+      },
+      "notes": "1 hour. 25 mangoes + 10 kg sugar produces 10 kg jam."
+    },
+    {
+      "buildingType": "preservery",
+      "name": "Preservery",
+      "recipeName": "Vegetable Pickling",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "carrot": 15,
+        "onion": 10,
+        "salt": 2
+      },
+      "outputs": {
+        "pickles": 12
+      },
+      "notes": "2 hours. Vegetables + salt produces 12 kg pickles."
+    },
+    {
+      "buildingType": "preservery",
+      "name": "Preservery",
+      "recipeName": "Mango Pickle Making",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {
+        "mango": 20,
+        "oil": 5,
+        "spices": 2
+      },
+      "outputs": {
+        "pickles": 15
+      },
+      "notes": "3 hours. 20 mangoes + oil + spices produces 15 kg pickle."
+    },
+    {
+      "buildingType": "preservery",
+      "name": "Preservery",
+      "recipeName": "Fruit Drying",
+      "category": "Production",
+      "productionTime": 14400,
+      "inputs": {
+        "grapes": 30
+      },
+      "outputs": {
+        "dried_fruit": 8
+      },
+      "notes": "4 hours. 30 kg grapes produces 8 kg dried fruit (raisins)."
+    },
+    {
+      "buildingType": "preservery",
+      "name": "Preservery",
+      "recipeName": "Date Drying",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {
+        "date": 40
+      },
+      "outputs": {
+        "dried_fruit": 12
+      },
+      "notes": "3 hours. 40 dates produces 12 kg dried dates."
+    },
+    {
+      "buildingType": "preservery",
+      "name": "Preservery",
+      "recipeName": "Tomato Sauce Making",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "tomato": 30,
+        "salt": 1
+      },
+      "outputs": {
+        "tomato_sauce": 10
+      },
+      "notes": "40 minutes. 30 tomatoes produces 10L tomato sauce."
+    },
+    {
+      "buildingType": "tandoor",
+      "name": "Tandoor",
+      "recipeName": "Roti Making",
+      "category": "Production",
+      "productionTime": 600,
+      "inputs": {
+        "flour": 5
+      },
+      "outputs": {
+        "roti": 20
+      },
+      "notes": "10 minutes. 5 kg flour produces 20 rotis."
+    },
+    {
+      "buildingType": "tandoor",
+      "name": "Tandoor",
+      "recipeName": "Paratha Making",
+      "category": "Production",
+      "productionTime": 900,
+      "inputs": {
+        "flour": 5,
+        "ghee": 1
+      },
+      "outputs": {
+        "paratha": 12
+      },
+      "notes": "15 minutes. 5 kg flour + 1 kg ghee produces 12 parathas."
+    },
+    {
+      "buildingType": "tandoor",
+      "name": "Tandoor",
+      "recipeName": "Naan Making",
+      "category": "Production",
+      "productionTime": 900,
+      "inputs": {
+        "flour": 5,
+        "curd": 2
+      },
+      "outputs": {
+        "naan": 15
+      },
+      "notes": "15 minutes. 5 kg flour + 2L curd produces 15 naans."
+    },
+    {
+      "buildingType": "tandoor",
+      "name": "Tandoor",
+      "recipeName": "Puri Making",
+      "category": "Production",
+      "productionTime": 600,
+      "inputs": {
+        "flour": 4,
+        "oil": 2
+      },
+      "outputs": {
+        "puri": 25
+      },
+      "notes": "10 minutes. 4 kg flour + 2L oil produces 25 puris."
+    },
+    {
+      "buildingType": "tandoor",
+      "name": "Tandoor",
+      "recipeName": "Tortilla Making",
+      "category": "Production",
+      "productionTime": 600,
+      "inputs": {
+        "cornmeal": 5
+      },
+      "outputs": {
+        "tortilla": 20
+      },
+      "notes": "10 minutes. 5 kg cornmeal produces 20 tortillas."
+    },
+    {
+      "buildingType": "sweet_shop",
+      "name": "Sweet Shop",
+      "recipeName": "Ladoo Making",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "flour": 3,
+        "ghee": 2,
+        "sugar": 2
+      },
+      "outputs": {
+        "ladoo": 20
+      },
+      "notes": "30 minutes. Flour + ghee + sugar produces 20 ladoos."
+    },
+    {
+      "buildingType": "sweet_shop",
+      "name": "Sweet Shop",
+      "recipeName": "Jalebi Making",
+      "category": "Production",
+      "productionTime": 1500,
+      "inputs": {
+        "flour": 2,
+        "sugar": 3,
+        "oil": 2
+      },
+      "outputs": {
+        "jalebi": 25
+      },
+      "notes": "25 minutes. Flour + sugar + oil produces 25 jalebis."
+    },
+    {
+      "buildingType": "sweet_shop",
+      "name": "Sweet Shop",
+      "recipeName": "Halwa Making",
+      "category": "Production",
+      "productionTime": 2100,
+      "inputs": {
+        "flour": 3,
+        "ghee": 2,
+        "sugar": 3
+      },
+      "outputs": {
+        "halwa": 10
+      },
+      "notes": "35 minutes. Flour + ghee + sugar produces 10 servings halwa."
+    },
+    {
+      "buildingType": "street_food_kitchen",
+      "name": "Street Food Kitchen",
+      "recipeName": "Samosa Making",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "flour": 3,
+        "potato": 10,
+        "oil": 2,
+        "spices": 1
+      },
+      "outputs": {
+        "samosa": 20
+      },
+      "notes": "30 minutes. Flour + potato + oil + spices produces 20 samosas."
+    },
+    {
+      "buildingType": "street_food_kitchen",
+      "name": "Street Food Kitchen",
+      "recipeName": "Kachori Making",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "flour": 3,
+        "lentils": 5,
+        "oil": 2,
+        "spices": 1
+      },
+      "outputs": {
+        "kachori": 18
+      },
+      "notes": "30 minutes. Flour + lentils + oil + spices produces 18 kachoris."
+    },
+    {
+      "buildingType": "street_food_kitchen",
+      "name": "Street Food Kitchen",
+      "recipeName": "Pakora Making",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "lentil_flour": 3,
+        "onion": 5,
+        "oil": 2
+      },
+      "outputs": {
+        "pakora": 30
+      },
+      "notes": "20 minutes. Lentil flour + onion + oil produces 30 pakoras."
+    },
+    {
+      "buildingType": "street_food_kitchen",
+      "name": "Street Food Kitchen",
+      "recipeName": "Vada Making",
+      "category": "Production",
+      "productionTime": 1500,
+      "inputs": {
+        "lentils": 5,
+        "oil": 2,
+        "spices": 1
+      },
+      "outputs": {
+        "vada": 20
+      },
+      "notes": "25 minutes. Lentils + oil + spices produces 20 vadas."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Idli Making",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {
+        "rice": 5,
+        "lentils": 2
+      },
+      "outputs": {
+        "idli": 30
+      },
+      "notes": "3 hours (includes fermentation). Rice + lentils produces 30 idlis."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Dosa Making",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {
+        "rice": 5,
+        "lentils": 2,
+        "oil": 1
+      },
+      "outputs": {
+        "dosa": 20
+      },
+      "notes": "3 hours (includes fermentation). Rice + lentils produces 20 dosas."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Dal Cooking",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "lentils": 5,
+        "ghee": 1,
+        "spices": 1
+      },
+      "outputs": {
+        "dal": 10
+      },
+      "notes": "30 minutes. 5 kg lentils + ghee + spices produces 10 servings dal."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Biryani Cooking",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "rice": 5,
+        "chicken": 5,
+        "ghee": 2,
+        "spices": 2
+      },
+      "outputs": {
+        "biryani": 10
+      },
+      "notes": "1 hour. Rice + chicken + ghee + spices produces 10 servings biryani."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Khichdi Cooking",
+      "category": "Production",
+      "productionTime": 1500,
+      "inputs": {
+        "rice": 4,
+        "lentils": 3,
+        "ghee": 1
+      },
+      "outputs": {
+        "khichdi": 12
+      },
+      "notes": "25 minutes. Rice + lentils + ghee produces 12 servings khichdi."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Pulao Cooking",
+      "category": "Production",
+      "productionTime": 2100,
+      "inputs": {
+        "rice": 5,
+        "carrot": 5,
+        "beans": 5,
+        "ghee": 1
+      },
+      "outputs": {
+        "pulao": 10
+      },
+      "notes": "35 minutes. Rice + vegetables + ghee produces 10 servings pulao."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Porridge Cooking",
+      "category": "Production",
+      "productionTime": 900,
+      "inputs": {
+        "oats": 3,
+        "milk": 5
+      },
+      "outputs": {
+        "porridge": 10
+      },
+      "notes": "15 minutes. 3 kg oats + 5L milk produces 10 servings porridge."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Vegetable Soup",
+      "category": "Production",
+      "productionTime": 1500,
+      "inputs": {
+        "carrot": 5,
+        "tomato": 5,
+        "onion": 3
+      },
+      "outputs": {
+        "vegetable_soup": 12
+      },
+      "notes": "25 minutes. Vegetables produces 12 servings soup."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Salad Preparation",
+      "category": "Production",
+      "productionTime": 600,
+      "inputs": {
+        "lettuce": 5,
+        "tomato": 5,
+        "onion": 3
+      },
+      "outputs": {
+        "salad": 15
+      },
+      "notes": "10 minutes. Fresh vegetables produces 15 servings salad."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Stew Cooking",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "beef": 5,
+        "potato": 10,
+        "carrot": 5,
+        "onion": 5
+      },
+      "outputs": {
+        "stew": 10
+      },
+      "notes": "1 hour. Meat + vegetables produces 10 servings stew."
+    },
+    {
+      "buildingType": "bakery",
+      "name": "Bakery",
+      "recipeName": "Noodle Making",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "flour": 5
+      },
+      "outputs": {
+        "noodles": 4
+      },
+      "notes": "30 minutes. 5 kg flour produces 4 kg noodles."
+    },
+    {
+      "buildingType": "bakery",
+      "name": "Bakery",
+      "recipeName": "Pie Baking",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "flour": 3,
+        "butter": 1,
+        "apple": 10
+      },
+      "outputs": {
+        "pie": 4
+      },
+      "notes": "40 minutes. Flour + butter + apples produces 4 pies."
+    },
+    {
+      "buildingType": "rubber_processing",
+      "name": "Rubber Processing",
+      "recipeName": "Rubber Vulcanization",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "latex": 30
+      },
+      "outputs": {
+        "rubber": 20
+      },
+      "notes": "1 hour. 30L latex produces 20 kg vulcanized rubber."
+    }
+  ]
+}

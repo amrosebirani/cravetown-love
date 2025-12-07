@@ -21,6 +21,7 @@ require("code/PrototypeLauncher")
 require("code/Prototype1State")
 require("code/Prototype2State")
 require("code/InfoSystemState")
+require("code/AlphaPrototypeState")
 
 -- Consumption test states
 local TestCharacterV2State = require("code/consumption/TestCharacterV2State")
@@ -65,7 +66,7 @@ function love.load()
     gMousePressed = nil
     gMouseReleased = nil
 
-    -- Global mode: "version_select", "launcher", "main", "prototype2", "test_character_v2", "test_allocation_v2", "test_cache"
+    -- Global mode: "version_select", "launcher", "main", "prototype2", "test_character_v2", "test_allocation_v2", "test_cache", "alpha"
     gMode = "version_select"
     gVersionSelector = VersionSelector:Create()
     gPrototypeLauncher = nil
@@ -78,6 +79,7 @@ function love.load()
     gMusic = nil
     gPrototype2 = nil
     gInfoSystem = nil
+    gAlphaPrototype = nil
     gTestCharacterV2 = nil
     gTestAllocationV2 = nil
     gTestCache = nil
@@ -178,6 +180,13 @@ function InitializeInfoSystem()
     gMode = "infosystem"
 end
 
+function InitializeAlphaPrototype()
+    print("Initializing Alpha Prototype (Birthday Edition)...")
+    gAlphaPrototype = AlphaPrototypeState:Create()
+    gAlphaPrototype:Enter()
+    gMode = "alpha"
+end
+
 function InitializeTestCharacterV2()
     print("Initializing CharacterV2 Test...")
     gTestCharacterV2 = TestCharacterV2State
@@ -211,6 +220,7 @@ function ReturnToLauncher()
     gPrototype1 = nil
     gPrototype2 = nil
     gInfoSystem = nil
+    gAlphaPrototype = nil
     gMode = "launcher"
 
     -- Recreate launcher if needed
@@ -261,7 +271,9 @@ function love.update(dt)
         local launched = gPrototypeLauncher:Update(dt)
         if launched then
             local selected = gPrototypeLauncher:GetSelectedPrototype()
-            if selected == "main" then
+            if selected == "alpha" then
+                InitializeAlphaPrototype()
+            elseif selected == "main" then
                 InitializeMainGame()
             elseif selected == "infosystem" then
                 InitializeInfoSystem()
@@ -321,6 +333,11 @@ function love.update(dt)
     elseif gMode == "infosystem" then
         if gInfoSystem then
             gInfoSystem:Update(dt)
+        end
+
+    elseif gMode == "alpha" then
+        if gAlphaPrototype then
+            gAlphaPrototype:Update(dt)
         end
 
     elseif gMode == "test_character_v2" then
@@ -415,6 +432,11 @@ function love.draw()
             gInfoSystem:Render()
         end
 
+    elseif gMode == "alpha" then
+        if gAlphaPrototype then
+            gAlphaPrototype:Render()
+        end
+
     elseif gMode == "test_character_v2" then
         if gTestCharacterV2 then
             gTestCharacterV2:draw()
@@ -488,6 +510,10 @@ function love.mousepressed(x, y, button, istouch, presses)
         if gPrototype1 and gPrototype1.prototype then
             gPrototype1.prototype:MousePressed(x, y, button)
         end
+    elseif gMode == "alpha" then
+        if gAlphaPrototype and gAlphaPrototype.mousepressed then
+            gAlphaPrototype:mousepressed(x, y, button)
+        end
     elseif gMode == "test_cache" then
         if gTestCache and gTestCache.prototype then
             gTestCache.prototype:MousePressed(x, y, button)
@@ -540,9 +566,21 @@ function love.wheelmoved(dx, dy)
         if gInfoSystem and gInfoSystem.OnMouseWheel then
             gInfoSystem:OnMouseWheel(dx, dy)
         end
+    elseif gMode == "alpha" then
+        if gAlphaPrototype and gAlphaPrototype.wheelmoved then
+            gAlphaPrototype:wheelmoved(dx, dy)
+        end
     elseif gMode == "test_cache" then
         if gTestCache and gTestCache.prototype and gTestCache.prototype.OnMouseWheel then
             gTestCache.prototype:OnMouseWheel(dx, dy)
+        end
+    end
+end
+
+function love.mousemoved(x, y, dx, dy)
+    if gMode == "alpha" then
+        if gAlphaPrototype and gAlphaPrototype.mousemoved then
+            gAlphaPrototype:mousemoved(x, y, dx, dy)
         end
     end
 end
@@ -615,6 +653,13 @@ function love.keypressed(key)
                 keyHandled = true
             end
         end
+    elseif gMode == "alpha" then
+        if gAlphaPrototype and gAlphaPrototype.keypressed then
+            local handled = gAlphaPrototype:keypressed(key)
+            if handled then
+                keyHandled = true
+            end
+        end
     elseif gMode == "test_cache" then
         -- Forward keypressed to ConsumptionPrototype
         if gTestCache and gTestCache.KeyPressed then
@@ -625,7 +670,7 @@ function love.keypressed(key)
 
     -- ESC to return to launcher (from prototypes and main game) - only if not handled by state
     if key == "escape" and not keyHandled then
-        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" or gMode == "main" or gMode == "test_character_v2" or gMode == "test_allocation_v2" or gMode == "test_cache" then
+        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" or gMode == "main" or gMode == "alpha" or gMode == "test_character_v2" or gMode == "test_allocation_v2" or gMode == "test_cache" then
             -- Forward to test state first if it has keypressed
             if gMode == "test_character_v2" and gTestCharacterV2 and gTestCharacterV2.keypressed then
                 gTestCharacterV2:keypressed(key)
@@ -668,6 +713,10 @@ function love.textinput(t)
     elseif gMode == "infosystem" then
         if gInfoSystem and gInfoSystem.textinput then
             gInfoSystem:textinput(t)
+        end
+    elseif gMode == "alpha" then
+        if gAlphaPrototype and gAlphaPrototype.textinput then
+            gAlphaPrototype:textinput(t)
         end
     end
 end

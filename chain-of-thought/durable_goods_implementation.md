@@ -464,4 +464,6 @@ Update LoadCommodities to also load from fulfillment_vectors.json:
 | 2025-12-02 | Phase 4 | Complete | Integrated active effects into update loop with expiry and acquisition logging |
 | 2025-12-02 | Phase 5 | Complete | Added save/load support for activeEffects |
 | 2025-12-02 | Phase 6 | Complete | Added Possessions section to character detail modal, possession count on cards, updated history display |
+| 2025-12-03 | Phase 7 | Complete | Added test scenarios (durable_goods_test, durable_replacement_test) with testFlags handling. Verified balance (30% passive multiplier ensures durables don't replace consumables) |
+| 2025-12-03 | Phase 8 | Complete | Added Commodities tab to InfoSystem with tab switching, commodity list view with durability indicators, full detail view with editable durability fields (type, duration, decay rate, category, maxOwned), save functionality |
 

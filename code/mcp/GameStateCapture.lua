@@ -751,19 +751,19 @@ function GameStateCapture:captureConsumptionCharacters(proto, depth)
         end
 
         if depth == "full" then
-            -- Fine-grained cravings (49D)
+            -- Fine-grained cravings (49D) - stored as object with string keys for JSON compatibility
             c.current_cravings = {}
             if char.currentCravings then
                 for idx = 0, 48 do
-                    c.current_cravings[idx] = char.currentCravings[idx] or 0
+                    c.current_cravings[tostring(idx)] = char.currentCravings[idx] or 0
                 end
             end
 
-            -- Base cravings
+            -- Base cravings - stored as object with string keys for JSON compatibility
             c.base_cravings = {}
             if char.baseCravings then
                 for idx = 0, 48 do
-                    c.base_cravings[idx] = char.baseCravings[idx] or 0
+                    c.base_cravings[tostring(idx)] = char.baseCravings[idx] or 0
                 end
             end
 

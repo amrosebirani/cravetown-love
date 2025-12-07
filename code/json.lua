@@ -65,32 +65,61 @@ local function encode_table(val, stack)
 
   stack[val] = true
 
-  if rawget(val, 1) ~= nil or next(val) == nil then
-    -- Treat as array -- check keys are valid and it is not sparse
-    local n = 0
-    for k in pairs(val) do
-      if type(k) ~= "number" then
-        error("invalid table: mixed or invalid key types")
-      end
-      n = n + 1
-    end
-    if n ~= #val then
-      error("invalid table: sparse array")
-    end
-    -- Encode
-    for i, v in ipairs(val) do
-      table.insert(res, encode(v, stack))
-    end
+  -- Check if table has any keys
+  local firstKey = next(val)
+  if firstKey == nil then
+    -- Empty table - treat as empty array
     stack[val] = nil
-    return "[" .. table.concat(res, ",") .. "]"
+    return "[]"
+  end
 
-  else
-    -- Treat as an object
-    for k, v in pairs(val) do
-      if type(k) ~= "string" then
-        error("invalid table: mixed or invalid key types")
+  -- Check if all keys are numeric (could be 0-indexed or 1-indexed array)
+  local allNumeric = true
+  local hasZero = false
+  local minKey, maxKey = math.huge, -math.huge
+  local count = 0
+  for k in pairs(val) do
+    if type(k) ~= "number" then
+      allNumeric = false
+      break
+    end
+    if k == 0 then hasZero = true end
+    minKey = math.min(minKey, k)
+    maxKey = math.max(maxKey, k)
+    count = count + 1
+  end
+
+  if allNumeric then
+    -- Check if it's a proper sequence (1-indexed or 0-indexed)
+    local expectedCount = maxKey - minKey + 1
+    if count == expectedCount and (minKey == 0 or minKey == 1) then
+      -- It's a proper array (either 0-indexed or 1-indexed)
+      -- Convert to JSON array
+      for i = minKey, maxKey do
+        table.insert(res, encode(val[i], stack))
       end
-      table.insert(res, encode(k, stack) .. ":" .. encode(v, stack))
+      stack[val] = nil
+      return "[" .. table.concat(res, ",") .. "]"
+    else
+      -- Sparse numeric array - convert to object with string keys
+      for k, v in pairs(val) do
+        table.insert(res, encode(tostring(k), stack) .. ":" .. encode(v, stack))
+      end
+      stack[val] = nil
+      return "{" .. table.concat(res, ",") .. "}"
+    end
+  else
+    -- Treat as an object - convert all keys to strings
+    for k, v in pairs(val) do
+      local keyStr
+      if type(k) == "string" then
+        keyStr = k
+      elseif type(k) == "number" then
+        keyStr = tostring(k)
+      else
+        error("invalid table: unsupported key type: " .. type(k))
+      end
+      table.insert(res, encode(keyStr, stack) .. ":" .. encode(v, stack))
     end
     stack[val] = nil
     return "{" .. table.concat(res, ",") .. "}"

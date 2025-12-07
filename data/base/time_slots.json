@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "slots": [
+    {
+      "id": "early_morning",
+      "name": "Early Morning",
+      "startHour": 5,
+      "endHour": 8,
+      "description": "Wake up, breakfast preparation",
+      "color": [0.9, 0.7, 0.4]
+    },
+    {
+      "id": "morning",
+      "name": "Morning",
+      "startHour": 8,
+      "endHour": 12,
+      "description": "Work, morning activities",
+      "color": [1.0, 0.9, 0.5]
+    },
+    {
+      "id": "afternoon",
+      "name": "Afternoon",
+      "startHour": 12,
+      "endHour": 17,
+      "description": "Lunch, afternoon work, social",
+      "color": [1.0, 0.8, 0.4]
+    },
+    {
+      "id": "evening",
+      "name": "Evening",
+      "startHour": 17,
+      "endHour": 21,
+      "description": "Dinner, entertainment, family",
+      "color": [0.9, 0.5, 0.3]
+    },
+    {
+      "id": "night",
+      "name": "Night",
+      "startHour": 21,
+      "endHour": 24,
+      "description": "Relaxation, preparation for sleep",
+      "color": [0.3, 0.3, 0.6]
+    },
+    {
+      "id": "late_night",
+      "name": "Late Night",
+      "startHour": 0,
+      "endHour": 5,
+      "description": "Sleep, rest",
+      "color": [0.2, 0.2, 0.4]
+    }
+  ]
+}
