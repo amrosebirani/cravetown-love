@@ -1,0 +1,5380 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2025-12-11T20:16:55.981Z",
+  "sourceDataHashes": {
+    "fulfillmentVectors": "52639449",
+    "dimensionDefinitions": "61bb9d81",
+    "substitutionRules": "47e9c27e"
+  },
+  "byCoarseDimension": {
+    "biological": {
+      "available": [
+        {
+          "id": "eggs",
+          "value": 35.5
+        },
+        {
+          "id": "khichdi",
+          "value": 31
+        },
+        {
+          "id": "cheese",
+          "value": 30
+        },
+        {
+          "id": "pastries",
+          "value": 30
+        },
+        {
+          "id": "dosa",
+          "value": 29.5
+        },
+        {
+          "id": "vada",
+          "value": 28
+        },
+        {
+          "id": "date",
+          "value": 27.5
+        },
+        {
+          "id": "kachori",
+          "value": 27.5
+        },
+        {
+          "id": "pakora",
+          "value": 27
+        },
+        {
+          "id": "biryani",
+          "value": 27
+        },
+        {
+          "id": "chicken",
+          "value": 25
+        },
+        {
+          "id": "samosa",
+          "value": 25
+        },
+        {
+          "id": "ghee",
+          "value": 24
+        },
+        {
+          "id": "rice_flour",
+          "value": 23
+        },
+        {
+          "id": "ragi",
+          "value": 22.5
+        },
+        {
+          "id": "ladoo",
+          "value": 22.5
+        },
+        {
+          "id": "meat",
+          "value": 22
+        },
+        {
+          "id": "beans",
+          "value": 22
+        },
+        {
+          "id": "mutton",
+          "value": 22
+        },
+        {
+          "id": "beef",
+          "value": 22
+        },
+        {
+          "id": "paratha",
+          "value": 22
+        },
+        {
+          "id": "mango",
+          "value": 21.5
+        },
+        {
+          "id": "stew",
+          "value": 21.5
+        },
+        {
+          "id": "lettuce",
+          "value": 21
+        },
+        {
+          "id": "cornmeal",
+          "value": 21
+        },
+        {
+          "id": "dal",
+          "value": 20.5
+        },
+        {
+          "id": "vegetable",
+          "value": 20
+        },
+        {
+          "id": "potato",
+          "value": 20
+        },
+        {
+          "id": "carrot",
+          "value": 20
+        },
+        {
+          "id": "cabbage",
+          "value": 20
+        },
+        {
+          "id": "tomato",
+          "value": 20
+        },
+        {
+          "id": "pumpkin",
+          "value": 20
+        },
+        {
+          "id": "broccoli",
+          "value": 20
+        },
+        {
+          "id": "pepper",
+          "value": 20
+        },
+        {
+          "id": "pie",
+          "value": 19
+        },
+        {
+          "id": "noodles",
+          "value": 18.5
+        },
+        {
+          "id": "cake",
+          "value": 18
+        },
+        {
+          "id": "grapes",
+          "value": 18
+        },
+        {
+          "id": "berries",
+          "value": 18
+        },
+        {
+          "id": "peach",
+          "value": 18
+        },
+        {
+          "id": "pear",
+          "value": 18
+        },
+        {
+          "id": "onion",
+          "value": 18
+        },
+        {
+          "id": "watermelon",
+          "value": 18
+        },
+        {
+          "id": "idli",
+          "value": 18
+        },
+        {
+          "id": "halwa",
+          "value": 18
+        },
+        {
+          "id": "dried_fruit",
+          "value": 18
+        },
+        {
+          "id": "medicine",
+          "value": 17.5
+        },
+        {
+          "id": "groundnut",
+          "value": 17.5
+        },
+        {
+          "id": "bread",
+          "value": 17
+        },
+        {
+          "id": "orange",
+          "value": 17
+        },
+        {
+          "id": "flour",
+          "value": 17
+        },
+        {
+          "id": "preserved_food",
+          "value": 17
+        },
+        {
+          "id": "meal",
+          "value": 17
+        },
+        {
+          "id": "candy",
+          "value": 17
+        },
+        {
+          "id": "buttermilk",
+          "value": 17
+        },
+        {
+          "id": "naan",
+          "value": 17
+        },
+        {
+          "id": "tomato_sauce",
+          "value": 17
+        },
+        {
+          "id": "rice",
+          "value": 16.5
+        },
+        {
+          "id": "fruit_juice",
+          "value": 16.5
+        },
+        {
+          "id": "coconut",
+          "value": 16
+        },
+        {
+          "id": "pulao",
+          "value": 16
+        },
+        {
+          "id": "jalebi",
+          "value": 16
+        },
+        {
+          "id": "rye",
+          "value": 15.5
+        },
+        {
+          "id": "porridge",
+          "value": 15.5
+        },
+        {
+          "id": "tortilla",
+          "value": 15.5
+        },
+        {
+          "id": "roti",
+          "value": 15.5
+        },
+        {
+          "id": "bed",
+          "value": 15
+        },
+        {
+          "id": "butter",
+          "value": 15
+        },
+        {
+          "id": "pickles",
+          "value": 15
+        },
+        {
+          "id": "vegetable_soup",
+          "value": 15
+        },
+        {
+          "id": "oats",
+          "value": 14.5
+        },
+        {
+          "id": "honey",
+          "value": 14.5
+        },
+        {
+          "id": "paneer",
+          "value": 14.5
+        },
+        {
+          "id": "jam",
+          "value": 14.5
+        },
+        {
+          "id": "barley",
+          "value": 14
+        },
+        {
+          "id": "salad",
+          "value": 14
+        },
+        {
+          "id": "wheat",
+          "value": 13.5
+        },
+        {
+          "id": "maize",
+          "value": 13.5
+        },
+        {
+          "id": "lentils",
+          "value": 13.5
+        },
+        {
+          "id": "puri",
+          "value": 13.5
+        },
+        {
+          "id": "apple",
+          "value": 13
+        },
+        {
+          "id": "curd",
+          "value": 13
+        },
+        {
+          "id": "cream",
+          "value": 13
+        },
+        {
+          "id": "milk",
+          "value": 12.5
+        },
+        {
+          "id": "soap",
+          "value": 10
+        },
+        {
+          "id": "flowers",
+          "value": 10
+        },
+        {
+          "id": "cider",
+          "value": 10
+        },
+        {
+          "id": "beer",
+          "value": 9
+        },
+        {
+          "id": "tonic",
+          "value": 7.5
+        },
+        {
+          "id": "healing_salve",
+          "value": 5.5
+        },
+        {
+          "id": "lentil_flour",
+          "value": 5.5
+        },
+        {
+          "id": "sugar",
+          "value": 5
+        },
+        {
+          "id": "fine_clothes",
+          "value": 5
+        },
+        {
+          "id": "shoes",
+          "value": 5
+        },
+        {
+          "id": "boots",
+          "value": 5
+        },
+        {
+          "id": "pottery",
+          "value": 5
+        },
+        {
+          "id": "ceramics",
+          "value": 5
+        },
+        {
+          "id": "formal_attire",
+          "value": 5
+        },
+        {
+          "id": "ceremonial_robes",
+          "value": 5
+        },
+        {
+          "id": "medicinal_herbs",
+          "value": 4.5
+        },
+        {
+          "id": "molasses",
+          "value": 4
+        },
+        {
+          "id": "wine",
+          "value": 3
+        },
+        {
+          "id": "gloves",
+          "value": 3
+        },
+        {
+          "id": "winter_coat",
+          "value": 2.5
+        },
+        {
+          "id": "uniform",
+          "value": 2.5
+        },
+        {
+          "id": "needle",
+          "value": 2
+        },
+        {
+          "id": "beeswax_candle",
+          "value": 2
+        },
+        {
+          "id": "work_clothes",
+          "value": 0.5
+        }
+      ],
+      "sortedByValue": [
+        "eggs",
+        "khichdi",
+        "cheese",
+        "pastries",
+        "dosa",
+        "vada",
+        "date",
+        "kachori",
+        "pakora",
+        "biryani",
+        "chicken",
+        "samosa",
+        "ghee",
+        "rice_flour",
+        "ragi",
+        "ladoo",
+        "meat",
+        "beans",
+        "mutton",
+        "beef",
+        "paratha",
+        "mango",
+        "stew",
+        "lettuce",
+        "cornmeal",
+        "dal",
+        "vegetable",
+        "potato",
+        "carrot",
+        "cabbage",
+        "tomato",
+        "pumpkin",
+        "broccoli",
+        "pepper",
+        "pie",
+        "noodles",
+        "cake",
+        "grapes",
+        "berries",
+        "peach",
+        "pear",
+        "onion",
+        "watermelon",
+        "idli",
+        "halwa",
+        "dried_fruit",
+        "medicine",
+        "groundnut",
+        "bread",
+        "orange",
+        "flour",
+        "preserved_food",
+        "meal",
+        "candy",
+        "buttermilk",
+        "naan",
+        "tomato_sauce",
+        "rice",
+        "fruit_juice",
+        "coconut",
+        "pulao",
+        "jalebi",
+        "rye",
+        "porridge",
+        "tortilla",
+        "roti",
+        "bed",
+        "butter",
+        "pickles",
+        "vegetable_soup",
+        "oats",
+        "honey",
+        "paneer",
+        "jam",
+        "barley",
+        "salad",
+        "wheat",
+        "maize",
+        "lentils",
+        "puri",
+        "apple",
+        "curd",
+        "cream",
+        "milk",
+        "soap",
+        "flowers",
+        "cider",
+        "beer",
+        "tonic",
+        "healing_salve",
+        "lentil_flour",
+        "sugar",
+        "fine_clothes",
+        "shoes",
+        "boots",
+        "pottery",
+        "ceramics",
+        "formal_attire",
+        "ceremonial_robes",
+        "medicinal_herbs",
+        "molasses",
+        "wine",
+        "gloves",
+        "winter_coat",
+        "uniform",
+        "needle",
+        "beeswax_candle",
+        "work_clothes"
+      ]
+    },
+    "safety": {
+      "available": [
+        {
+          "id": "beeswax_candle",
+          "value": 15
+        },
+        {
+          "id": "door",
+          "value": 10
+        },
+        {
+          "id": "candle",
+          "value": 10
+        },
+        {
+          "id": "scythe",
+          "value": 6
+        },
+        {
+          "id": "firewood",
+          "value": 5.5
+        },
+        {
+          "id": "simple_clothes",
+          "value": 5
+        },
+        {
+          "id": "boots",
+          "value": 5
+        },
+        {
+          "id": "axe",
+          "value": 5
+        },
+        {
+          "id": "coal",
+          "value": 5
+        },
+        {
+          "id": "glass",
+          "value": 5
+        },
+        {
+          "id": "charcoal",
+          "value": 5
+        },
+        {
+          "id": "coat",
+          "value": 5
+        },
+        {
+          "id": "knife",
+          "value": 5
+        },
+        {
+          "id": "rum",
+          "value": 5
+        },
+        {
+          "id": "wool_gloves",
+          "value": 5
+        },
+        {
+          "id": "winter_coat",
+          "value": 4.5
+        },
+        {
+          "id": "shoes",
+          "value": 4.5
+        },
+        {
+          "id": "wool_hat",
+          "value": 4.5
+        },
+        {
+          "id": "bed",
+          "value": 3
+        },
+        {
+          "id": "lamp_oil",
+          "value": 3
+        },
+        {
+          "id": "leather",
+          "value": 2
+        },
+        {
+          "id": "cloth",
+          "value": 2
+        },
+        {
+          "id": "gloves",
+          "value": 2
+        }
+      ],
+      "sortedByValue": [
+        "beeswax_candle",
+        "door",
+        "candle",
+        "scythe",
+        "firewood",
+        "simple_clothes",
+        "boots",
+        "axe",
+        "coal",
+        "glass",
+        "charcoal",
+        "coat",
+        "knife",
+        "rum",
+        "wool_gloves",
+        "winter_coat",
+        "shoes",
+        "wool_hat",
+        "bed",
+        "lamp_oil",
+        "leather",
+        "cloth",
+        "gloves"
+      ]
+    },
+    "touch": {
+      "available": [
+        {
+          "id": "luxury_clothes",
+          "value": 27.5
+        },
+        {
+          "id": "bed",
+          "value": 22
+        },
+        {
+          "id": "chair",
+          "value": 20
+        },
+        {
+          "id": "cradle",
+          "value": 20
+        },
+        {
+          "id": "chest",
+          "value": 20
+        },
+        {
+          "id": "wardrobe",
+          "value": 18
+        },
+        {
+          "id": "shoes",
+          "value": 17
+        },
+        {
+          "id": "boots",
+          "value": 16
+        },
+        {
+          "id": "dyed_linen",
+          "value": 14.5
+        },
+        {
+          "id": "ceremonial_robes",
+          "value": 14
+        },
+        {
+          "id": "dress",
+          "value": 12.5
+        },
+        {
+          "id": "silk",
+          "value": 12
+        },
+        {
+          "id": "table",
+          "value": 10
+        },
+        {
+          "id": "fine_clothes",
+          "value": 10
+        },
+        {
+          "id": "embroidered_linen",
+          "value": 10
+        },
+        {
+          "id": "formal_attire",
+          "value": 10
+        },
+        {
+          "id": "simple_clothes",
+          "value": 9.5
+        },
+        {
+          "id": "blue_cloth",
+          "value": 9.5
+        },
+        {
+          "id": "terracotta",
+          "value": 9
+        },
+        {
+          "id": "figurine",
+          "value": 8.5
+        },
+        {
+          "id": "shelf",
+          "value": 8
+        },
+        {
+          "id": "red_cloth",
+          "value": 7.5
+        },
+        {
+          "id": "cloth",
+          "value": 7
+        },
+        {
+          "id": "purple_cloth",
+          "value": 7
+        },
+        {
+          "id": "cabinet",
+          "value": 6.5
+        },
+        {
+          "id": "tapestry",
+          "value": 6.5
+        },
+        {
+          "id": "work_clothes",
+          "value": 6
+        },
+        {
+          "id": "uniform",
+          "value": 5.5
+        },
+        {
+          "id": "painting",
+          "value": 5
+        },
+        {
+          "id": "mango",
+          "value": 5
+        },
+        {
+          "id": "leather",
+          "value": 5
+        },
+        {
+          "id": "bench",
+          "value": 5
+        },
+        {
+          "id": "bookshelf",
+          "value": 5
+        },
+        {
+          "id": "desk",
+          "value": 5
+        },
+        {
+          "id": "beeswax_candle",
+          "value": 5
+        },
+        {
+          "id": "pants",
+          "value": 5
+        },
+        {
+          "id": "yellow_cloth",
+          "value": 5
+        },
+        {
+          "id": "black_cloth",
+          "value": 5
+        },
+        {
+          "id": "portrait",
+          "value": 5
+        },
+        {
+          "id": "cake",
+          "value": 4.5
+        },
+        {
+          "id": "pottery",
+          "value": 4.5
+        },
+        {
+          "id": "gold_item",
+          "value": 4
+        },
+        {
+          "id": "soap",
+          "value": 4
+        },
+        {
+          "id": "orange",
+          "value": 4
+        },
+        {
+          "id": "grapes",
+          "value": 4
+        },
+        {
+          "id": "berries",
+          "value": 4
+        },
+        {
+          "id": "peach",
+          "value": 4
+        },
+        {
+          "id": "pear",
+          "value": 4
+        },
+        {
+          "id": "sculpture",
+          "value": 4
+        },
+        {
+          "id": "shirt",
+          "value": 3.5
+        },
+        {
+          "id": "mirror",
+          "value": 3.5
+        },
+        {
+          "id": "bread",
+          "value": 3
+        },
+        {
+          "id": "beer",
+          "value": 3
+        },
+        {
+          "id": "wine",
+          "value": 3
+        },
+        {
+          "id": "flowers",
+          "value": 3
+        },
+        {
+          "id": "mutton",
+          "value": 3
+        },
+        {
+          "id": "pastries",
+          "value": 3
+        },
+        {
+          "id": "preserved_food",
+          "value": 3
+        },
+        {
+          "id": "hat",
+          "value": 3
+        },
+        {
+          "id": "planks",
+          "value": 3
+        },
+        {
+          "id": "meal",
+          "value": 3
+        },
+        {
+          "id": "candy",
+          "value": 3
+        },
+        {
+          "id": "noodles",
+          "value": 3
+        },
+        {
+          "id": "tomato_sauce",
+          "value": 3
+        },
+        {
+          "id": "orange_cloth",
+          "value": 3
+        },
+        {
+          "id": "gold_necklace",
+          "value": 3
+        },
+        {
+          "id": "green_cloth",
+          "value": 2.5
+        },
+        {
+          "id": "gold_ring",
+          "value": 2.5
+        },
+        {
+          "id": "meat",
+          "value": 2
+        },
+        {
+          "id": "ceramics",
+          "value": 2
+        },
+        {
+          "id": "jalebi",
+          "value": 2
+        },
+        {
+          "id": "pickles",
+          "value": 2
+        },
+        {
+          "id": "glassware",
+          "value": 2
+        },
+        {
+          "id": "whiskey",
+          "value": 1.5
+        },
+        {
+          "id": "statue",
+          "value": 1.5
+        },
+        {
+          "id": "gloves",
+          "value": 1.5
+        },
+        {
+          "id": "wool_hat",
+          "value": 1.5
+        },
+        {
+          "id": "apple",
+          "value": 1
+        },
+        {
+          "id": "linen",
+          "value": 1
+        },
+        {
+          "id": "watermelon",
+          "value": 0.5
+        },
+        {
+          "id": "cream",
+          "value": 0.5
+        }
+      ],
+      "sortedByValue": [
+        "luxury_clothes",
+        "bed",
+        "chair",
+        "cradle",
+        "chest",
+        "wardrobe",
+        "shoes",
+        "boots",
+        "dyed_linen",
+        "ceremonial_robes",
+        "dress",
+        "silk",
+        "table",
+        "fine_clothes",
+        "embroidered_linen",
+        "formal_attire",
+        "simple_clothes",
+        "blue_cloth",
+        "terracotta",
+        "figurine",
+        "shelf",
+        "red_cloth",
+        "cloth",
+        "purple_cloth",
+        "cabinet",
+        "tapestry",
+        "work_clothes",
+        "uniform",
+        "painting",
+        "mango",
+        "leather",
+        "bench",
+        "bookshelf",
+        "desk",
+        "beeswax_candle",
+        "pants",
+        "yellow_cloth",
+        "black_cloth",
+        "portrait",
+        "cake",
+        "pottery",
+        "gold_item",
+        "soap",
+        "orange",
+        "grapes",
+        "berries",
+        "peach",
+        "pear",
+        "sculpture",
+        "shirt",
+        "mirror",
+        "bread",
+        "beer",
+        "wine",
+        "flowers",
+        "mutton",
+        "pastries",
+        "preserved_food",
+        "hat",
+        "planks",
+        "meal",
+        "candy",
+        "noodles",
+        "tomato_sauce",
+        "orange_cloth",
+        "gold_necklace",
+        "green_cloth",
+        "gold_ring",
+        "meat",
+        "ceramics",
+        "jalebi",
+        "pickles",
+        "glassware",
+        "whiskey",
+        "statue",
+        "gloves",
+        "wool_hat",
+        "apple",
+        "linen",
+        "watermelon",
+        "cream"
+      ]
+    },
+    "psychological": {
+      "available": [
+        {
+          "id": "book",
+          "value": 35
+        },
+        {
+          "id": "manuscript",
+          "value": 19.5
+        },
+        {
+          "id": "paper",
+          "value": 18
+        },
+        {
+          "id": "table",
+          "value": 10.5
+        },
+        {
+          "id": "beer",
+          "value": 10
+        },
+        {
+          "id": "desk",
+          "value": 10
+        },
+        {
+          "id": "bookshelf",
+          "value": 9.5
+        },
+        {
+          "id": "flowers",
+          "value": 9
+        },
+        {
+          "id": "fine_paper",
+          "value": 7.5
+        },
+        {
+          "id": "portrait",
+          "value": 7.5
+        },
+        {
+          "id": "ink",
+          "value": 7
+        },
+        {
+          "id": "wine",
+          "value": 5.5
+        },
+        {
+          "id": "painting",
+          "value": 5.5
+        },
+        {
+          "id": "door",
+          "value": 5
+        },
+        {
+          "id": "mirror",
+          "value": 5
+        },
+        {
+          "id": "ceremonial_robes",
+          "value": 5
+        },
+        {
+          "id": "sculpture",
+          "value": 4.5
+        },
+        {
+          "id": "whiskey",
+          "value": 4.5
+        },
+        {
+          "id": "glass",
+          "value": 4
+        },
+        {
+          "id": "luxury_clothes",
+          "value": 3
+        },
+        {
+          "id": "mango",
+          "value": 3
+        },
+        {
+          "id": "terracotta",
+          "value": 3
+        },
+        {
+          "id": "tapestry",
+          "value": 3
+        },
+        {
+          "id": "biryani",
+          "value": 2.5
+        },
+        {
+          "id": "statue",
+          "value": 1.5
+        }
+      ],
+      "sortedByValue": [
+        "book",
+        "manuscript",
+        "paper",
+        "table",
+        "beer",
+        "desk",
+        "bookshelf",
+        "flowers",
+        "fine_paper",
+        "portrait",
+        "ink",
+        "wine",
+        "painting",
+        "door",
+        "mirror",
+        "ceremonial_robes",
+        "sculpture",
+        "whiskey",
+        "glass",
+        "luxury_clothes",
+        "mango",
+        "terracotta",
+        "tapestry",
+        "biryani",
+        "statue"
+      ]
+    },
+    "social_status": {
+      "available": [
+        {
+          "id": "luxury_clothes",
+          "value": 30.5
+        },
+        {
+          "id": "gold_item",
+          "value": 20.5
+        },
+        {
+          "id": "painting",
+          "value": 15
+        },
+        {
+          "id": "silver",
+          "value": 10.5
+        },
+        {
+          "id": "coat",
+          "value": 10.5
+        },
+        {
+          "id": "statue",
+          "value": 10.5
+        },
+        {
+          "id": "embroidered_linen",
+          "value": 10
+        },
+        {
+          "id": "gemstone_jewelry",
+          "value": 10
+        },
+        {
+          "id": "sculpture",
+          "value": 9.5
+        },
+        {
+          "id": "formal_attire",
+          "value": 9.5
+        },
+        {
+          "id": "gold_necklace",
+          "value": 9.5
+        },
+        {
+          "id": "crown",
+          "value": 9.5
+        },
+        {
+          "id": "tapestry",
+          "value": 9.5
+        },
+        {
+          "id": "gold",
+          "value": 8.5
+        },
+        {
+          "id": "silver_necklace",
+          "value": 8.5
+        },
+        {
+          "id": "wine",
+          "value": 8
+        },
+        {
+          "id": "bronze_sculpture",
+          "value": 7
+        },
+        {
+          "id": "book",
+          "value": 6.5
+        },
+        {
+          "id": "gold_ring",
+          "value": 6.5
+        },
+        {
+          "id": "silver_ring",
+          "value": 6
+        },
+        {
+          "id": "gemstone",
+          "value": 5.5
+        },
+        {
+          "id": "glassware",
+          "value": 5.5
+        },
+        {
+          "id": "winter_coat",
+          "value": 4.5
+        },
+        {
+          "id": "dress",
+          "value": 4.5
+        },
+        {
+          "id": "terracotta",
+          "value": 4.5
+        },
+        {
+          "id": "glass",
+          "value": 4
+        },
+        {
+          "id": "cabinet",
+          "value": 3
+        },
+        {
+          "id": "dyed_linen",
+          "value": 3
+        },
+        {
+          "id": "ceremonial_robes",
+          "value": 3
+        },
+        {
+          "id": "manuscript",
+          "value": 2.5
+        },
+        {
+          "id": "bed",
+          "value": 2
+        },
+        {
+          "id": "wool_gloves",
+          "value": 2
+        },
+        {
+          "id": "wool_hat",
+          "value": 2
+        },
+        {
+          "id": "portrait",
+          "value": 2
+        },
+        {
+          "id": "figurine",
+          "value": 2
+        },
+        {
+          "id": "cake",
+          "value": 1
+        },
+        {
+          "id": "bench",
+          "value": 1
+        },
+        {
+          "id": "pants",
+          "value": 1
+        },
+        {
+          "id": "mirror",
+          "value": 1
+        }
+      ],
+      "sortedByValue": [
+        "luxury_clothes",
+        "gold_item",
+        "painting",
+        "silver",
+        "coat",
+        "statue",
+        "embroidered_linen",
+        "gemstone_jewelry",
+        "sculpture",
+        "formal_attire",
+        "gold_necklace",
+        "crown",
+        "tapestry",
+        "gold",
+        "silver_necklace",
+        "wine",
+        "bronze_sculpture",
+        "book",
+        "gold_ring",
+        "silver_ring",
+        "gemstone",
+        "glassware",
+        "winter_coat",
+        "dress",
+        "terracotta",
+        "glass",
+        "cabinet",
+        "dyed_linen",
+        "ceremonial_robes",
+        "manuscript",
+        "bed",
+        "wool_gloves",
+        "wool_hat",
+        "portrait",
+        "figurine",
+        "cake",
+        "bench",
+        "pants",
+        "mirror"
+      ]
+    },
+    "social_connection": {
+      "available": [
+        {
+          "id": "wine",
+          "value": 8
+        },
+        {
+          "id": "beer",
+          "value": 5
+        },
+        {
+          "id": "table",
+          "value": 4.5
+        },
+        {
+          "id": "luxury_clothes",
+          "value": 3
+        }
+      ],
+      "sortedByValue": [
+        "wine",
+        "beer",
+        "table",
+        "luxury_clothes"
+      ]
+    },
+    "exotic_goods": {
+      "available": [
+        {
+          "id": "painting",
+          "value": 8
+        },
+        {
+          "id": "wine",
+          "value": 5.5
+        },
+        {
+          "id": "luxury_clothes",
+          "value": 5
+        },
+        {
+          "id": "gold_item",
+          "value": 5
+        },
+        {
+          "id": "crown",
+          "value": 5
+        },
+        {
+          "id": "bronze_sculpture",
+          "value": 5
+        },
+        {
+          "id": "embroidered_linen",
+          "value": 4
+        },
+        {
+          "id": "book",
+          "value": 3
+        },
+        {
+          "id": "ceramics",
+          "value": 2
+        },
+        {
+          "id": "dyed_linen",
+          "value": 2
+        },
+        {
+          "id": "figurine",
+          "value": 1.5
+        }
+      ],
+      "sortedByValue": [
+        "painting",
+        "wine",
+        "luxury_clothes",
+        "gold_item",
+        "crown",
+        "bronze_sculpture",
+        "embroidered_linen",
+        "book",
+        "ceramics",
+        "dyed_linen",
+        "figurine"
+      ]
+    },
+    "shiny_objects": {
+      "available": [
+        {
+          "id": "painting",
+          "value": 14.5
+        },
+        {
+          "id": "silver",
+          "value": 13.5
+        },
+        {
+          "id": "silver_necklace",
+          "value": 12.5
+        },
+        {
+          "id": "gold_item",
+          "value": 10.5
+        },
+        {
+          "id": "gold",
+          "value": 10
+        },
+        {
+          "id": "gemstone_jewelry",
+          "value": 10
+        },
+        {
+          "id": "gold_necklace",
+          "value": 9
+        },
+        {
+          "id": "silver_ring",
+          "value": 7
+        },
+        {
+          "id": "statue",
+          "value": 5
+        },
+        {
+          "id": "gemstone",
+          "value": 5
+        },
+        {
+          "id": "crown",
+          "value": 5
+        },
+        {
+          "id": "tapestry",
+          "value": 5
+        },
+        {
+          "id": "bronze_sculpture",
+          "value": 5
+        },
+        {
+          "id": "sculpture",
+          "value": 4.5
+        },
+        {
+          "id": "terracotta",
+          "value": 4.5
+        },
+        {
+          "id": "gold_ring",
+          "value": 4
+        },
+        {
+          "id": "pottery",
+          "value": 1
+        }
+      ],
+      "sortedByValue": [
+        "painting",
+        "silver",
+        "silver_necklace",
+        "gold_item",
+        "gold",
+        "gemstone_jewelry",
+        "gold_necklace",
+        "silver_ring",
+        "statue",
+        "gemstone",
+        "crown",
+        "tapestry",
+        "bronze_sculpture",
+        "sculpture",
+        "terracotta",
+        "gold_ring",
+        "pottery"
+      ]
+    },
+    "vice": {
+      "available": [
+        {
+          "id": "beer",
+          "value": 20
+        },
+        {
+          "id": "halwa",
+          "value": 20
+        },
+        {
+          "id": "cake",
+          "value": 15
+        },
+        {
+          "id": "jalebi",
+          "value": 15
+        },
+        {
+          "id": "wine",
+          "value": 14
+        },
+        {
+          "id": "whiskey",
+          "value": 13.5
+        },
+        {
+          "id": "rum",
+          "value": 10
+        },
+        {
+          "id": "ladoo",
+          "value": 8
+        },
+        {
+          "id": "jam",
+          "value": 7
+        },
+        {
+          "id": "sugar",
+          "value": 6
+        },
+        {
+          "id": "date",
+          "value": 5
+        },
+        {
+          "id": "mango",
+          "value": 4.5
+        },
+        {
+          "id": "pastries",
+          "value": 3.5
+        },
+        {
+          "id": "fruit_juice",
+          "value": 3.5
+        },
+        {
+          "id": "honey",
+          "value": 3
+        },
+        {
+          "id": "naan",
+          "value": 3
+        },
+        {
+          "id": "samosa",
+          "value": 3
+        },
+        {
+          "id": "kachori",
+          "value": 2
+        }
+      ],
+      "sortedByValue": [
+        "beer",
+        "halwa",
+        "cake",
+        "jalebi",
+        "wine",
+        "whiskey",
+        "rum",
+        "ladoo",
+        "jam",
+        "sugar",
+        "date",
+        "mango",
+        "pastries",
+        "fruit_juice",
+        "honey",
+        "naan",
+        "samosa",
+        "kachori"
+      ]
+    },
+    "utility": {
+      "available": [
+        {
+          "id": "hammer",
+          "value": 5.5
+        },
+        {
+          "id": "pickaxe",
+          "value": 5
+        },
+        {
+          "id": "scythe",
+          "value": 5
+        },
+        {
+          "id": "knife",
+          "value": 5
+        },
+        {
+          "id": "shovel",
+          "value": 4
+        },
+        {
+          "id": "hoe",
+          "value": 4
+        },
+        {
+          "id": "nails",
+          "value": 3.5
+        },
+        {
+          "id": "saw",
+          "value": 2.5
+        },
+        {
+          "id": "mirror",
+          "value": 2.5
+        },
+        {
+          "id": "needle",
+          "value": 1.5
+        }
+      ],
+      "sortedByValue": [
+        "hammer",
+        "pickaxe",
+        "scythe",
+        "knife",
+        "shovel",
+        "hoe",
+        "nails",
+        "saw",
+        "mirror",
+        "needle"
+      ]
+    }
+  },
+  "byFineDimension": {
+    "biological_nutrition_grain": {
+      "available": [
+        {
+          "id": "bread",
+          "value": 15
+        },
+        {
+          "id": "flour",
+          "value": 15
+        },
+        {
+          "id": "pastries",
+          "value": 15
+        },
+        {
+          "id": "preserved_food",
+          "value": 15
+        },
+        {
+          "id": "meal",
+          "value": 15
+        },
+        {
+          "id": "candy",
+          "value": 15
+        },
+        {
+          "id": "rice_flour",
+          "value": 15
+        },
+        {
+          "id": "cornmeal",
+          "value": 15
+        },
+        {
+          "id": "noodles",
+          "value": 15
+        },
+        {
+          "id": "tomato_sauce",
+          "value": 15
+        },
+        {
+          "id": "wheat",
+          "value": 12
+        },
+        {
+          "id": "maize",
+          "value": 12
+        },
+        {
+          "id": "rice",
+          "value": 12
+        },
+        {
+          "id": "barley",
+          "value": 12
+        },
+        {
+          "id": "oats",
+          "value": 12
+        },
+        {
+          "id": "rye",
+          "value": 12
+        },
+        {
+          "id": "ragi",
+          "value": 12
+        },
+        {
+          "id": "lentils",
+          "value": 12
+        },
+        {
+          "id": "porridge",
+          "value": 12
+        },
+        {
+          "id": "tortilla",
+          "value": 12
+        },
+        {
+          "id": "roti",
+          "value": 12
+        },
+        {
+          "id": "naan",
+          "value": 12
+        },
+        {
+          "id": "puri",
+          "value": 12
+        },
+        {
+          "id": "dal",
+          "value": 12
+        },
+        {
+          "id": "khichdi",
+          "value": 12
+        },
+        {
+          "id": "pulao",
+          "value": 12
+        },
+        {
+          "id": "fruit_juice",
+          "value": 12
+        },
+        {
+          "id": "pie",
+          "value": 12
+        },
+        {
+          "id": "vada",
+          "value": 10.5
+        },
+        {
+          "id": "cake",
+          "value": 10
+        },
+        {
+          "id": "pakora",
+          "value": 10
+        },
+        {
+          "id": "biryani",
+          "value": 10
+        },
+        {
+          "id": "samosa",
+          "value": 7.5
+        },
+        {
+          "id": "vegetable_soup",
+          "value": 7.5
+        },
+        {
+          "id": "dosa",
+          "value": 6.5
+        },
+        {
+          "id": "stew",
+          "value": 6.5
+        },
+        {
+          "id": "groundnut",
+          "value": 5.5
+        },
+        {
+          "id": "ladoo",
+          "value": 5.5
+        },
+        {
+          "id": "halwa",
+          "value": 5.5
+        },
+        {
+          "id": "jam",
+          "value": 5.5
+        },
+        {
+          "id": "sugar",
+          "value": 5
+        },
+        {
+          "id": "paratha",
+          "value": 5
+        },
+        {
+          "id": "kachori",
+          "value": 5
+        },
+        {
+          "id": "idli",
+          "value": 5
+        },
+        {
+          "id": "cider",
+          "value": 5
+        },
+        {
+          "id": "dried_fruit",
+          "value": 5
+        },
+        {
+          "id": "jalebi",
+          "value": 4.5
+        },
+        {
+          "id": "beer",
+          "value": 4
+        },
+        {
+          "id": "molasses",
+          "value": 4
+        },
+        {
+          "id": "ghee",
+          "value": 4
+        },
+        {
+          "id": "lentil_flour",
+          "value": 3.5
+        },
+        {
+          "id": "pickles",
+          "value": 3.5
+        },
+        {
+          "id": "coconut",
+          "value": 3
+        },
+        {
+          "id": "curd",
+          "value": 3
+        },
+        {
+          "id": "cream",
+          "value": 3
+        },
+        {
+          "id": "meat",
+          "value": 2
+        },
+        {
+          "id": "milk",
+          "value": 2
+        },
+        {
+          "id": "chicken",
+          "value": 2
+        },
+        {
+          "id": "mutton",
+          "value": 2
+        },
+        {
+          "id": "beef",
+          "value": 2
+        },
+        {
+          "id": "eggs",
+          "value": 1
+        }
+      ],
+      "sortedByValue": [
+        "bread",
+        "flour",
+        "pastries",
+        "preserved_food",
+        "meal",
+        "candy",
+        "rice_flour",
+        "cornmeal",
+        "noodles",
+        "tomato_sauce",
+        "wheat",
+        "maize",
+        "rice",
+        "barley",
+        "oats",
+        "rye",
+        "ragi",
+        "lentils",
+        "porridge",
+        "tortilla",
+        "roti",
+        "naan",
+        "puri",
+        "dal",
+        "khichdi",
+        "pulao",
+        "fruit_juice",
+        "pie",
+        "vada",
+        "cake",
+        "pakora",
+        "biryani",
+        "samosa",
+        "vegetable_soup",
+        "dosa",
+        "stew",
+        "groundnut",
+        "ladoo",
+        "halwa",
+        "jam",
+        "sugar",
+        "paratha",
+        "kachori",
+        "idli",
+        "cider",
+        "dried_fruit",
+        "jalebi",
+        "beer",
+        "molasses",
+        "ghee",
+        "lentil_flour",
+        "pickles",
+        "coconut",
+        "curd",
+        "cream",
+        "meat",
+        "milk",
+        "chicken",
+        "mutton",
+        "beef",
+        "eggs"
+      ]
+    },
+    "biological_nutrition_protein": {
+      "available": [
+        {
+          "id": "meat",
+          "value": 20
+        },
+        {
+          "id": "chicken",
+          "value": 20
+        },
+        {
+          "id": "mutton",
+          "value": 20
+        },
+        {
+          "id": "beef",
+          "value": 20
+        },
+        {
+          "id": "cheese",
+          "value": 20
+        },
+        {
+          "id": "eggs",
+          "value": 16.5
+        },
+        {
+          "id": "buttermilk",
+          "value": 10
+        },
+        {
+          "id": "biryani",
+          "value": 10
+        },
+        {
+          "id": "paneer",
+          "value": 7
+        },
+        {
+          "id": "milk",
+          "value": 6.5
+        },
+        {
+          "id": "curd",
+          "value": 6
+        },
+        {
+          "id": "vada",
+          "value": 5.5
+        },
+        {
+          "id": "paratha",
+          "value": 5
+        },
+        {
+          "id": "ghee",
+          "value": 4
+        },
+        {
+          "id": "ladoo",
+          "value": 4
+        },
+        {
+          "id": "groundnut",
+          "value": 3.5
+        },
+        {
+          "id": "khichdi",
+          "value": 3.5
+        },
+        {
+          "id": "dried_fruit",
+          "value": 3.5
+        },
+        {
+          "id": "ragi",
+          "value": 3
+        },
+        {
+          "id": "coconut",
+          "value": 3
+        },
+        {
+          "id": "idli",
+          "value": 3
+        },
+        {
+          "id": "dosa",
+          "value": 3
+        },
+        {
+          "id": "dal",
+          "value": 3
+        },
+        {
+          "id": "stew",
+          "value": 3
+        },
+        {
+          "id": "bread",
+          "value": 2
+        },
+        {
+          "id": "beans",
+          "value": 2
+        },
+        {
+          "id": "flour",
+          "value": 2
+        },
+        {
+          "id": "pastries",
+          "value": 2
+        },
+        {
+          "id": "preserved_food",
+          "value": 2
+        },
+        {
+          "id": "meal",
+          "value": 2
+        },
+        {
+          "id": "candy",
+          "value": 2
+        },
+        {
+          "id": "rice_flour",
+          "value": 2
+        },
+        {
+          "id": "cornmeal",
+          "value": 2
+        },
+        {
+          "id": "lentil_flour",
+          "value": 2
+        },
+        {
+          "id": "noodles",
+          "value": 2
+        },
+        {
+          "id": "pulao",
+          "value": 2
+        },
+        {
+          "id": "jalebi",
+          "value": 2
+        },
+        {
+          "id": "pickles",
+          "value": 2
+        },
+        {
+          "id": "tomato_sauce",
+          "value": 2
+        },
+        {
+          "id": "pie",
+          "value": 2
+        },
+        {
+          "id": "wheat",
+          "value": 1
+        },
+        {
+          "id": "maize",
+          "value": 1
+        },
+        {
+          "id": "rice",
+          "value": 1
+        },
+        {
+          "id": "barley",
+          "value": 1
+        },
+        {
+          "id": "oats",
+          "value": 1
+        },
+        {
+          "id": "rye",
+          "value": 1
+        },
+        {
+          "id": "lentils",
+          "value": 1
+        },
+        {
+          "id": "porridge",
+          "value": 1
+        },
+        {
+          "id": "tortilla",
+          "value": 1
+        },
+        {
+          "id": "roti",
+          "value": 1
+        },
+        {
+          "id": "naan",
+          "value": 1
+        },
+        {
+          "id": "puri",
+          "value": 1
+        },
+        {
+          "id": "samosa",
+          "value": 1
+        },
+        {
+          "id": "kachori",
+          "value": 1
+        },
+        {
+          "id": "pakora",
+          "value": 1
+        },
+        {
+          "id": "vegetable_soup",
+          "value": 1
+        },
+        {
+          "id": "salad",
+          "value": 1
+        },
+        {
+          "id": "fruit_juice",
+          "value": 0.5
+        }
+      ],
+      "sortedByValue": [
+        "meat",
+        "chicken",
+        "mutton",
+        "beef",
+        "cheese",
+        "eggs",
+        "buttermilk",
+        "biryani",
+        "paneer",
+        "milk",
+        "curd",
+        "vada",
+        "paratha",
+        "ghee",
+        "ladoo",
+        "groundnut",
+        "khichdi",
+        "dried_fruit",
+        "ragi",
+        "coconut",
+        "idli",
+        "dosa",
+        "dal",
+        "stew",
+        "bread",
+        "beans",
+        "flour",
+        "pastries",
+        "preserved_food",
+        "meal",
+        "candy",
+        "rice_flour",
+        "cornmeal",
+        "lentil_flour",
+        "noodles",
+        "pulao",
+        "jalebi",
+        "pickles",
+        "tomato_sauce",
+        "pie",
+        "wheat",
+        "maize",
+        "rice",
+        "barley",
+        "oats",
+        "rye",
+        "lentils",
+        "porridge",
+        "tortilla",
+        "roti",
+        "naan",
+        "puri",
+        "samosa",
+        "kachori",
+        "pakora",
+        "vegetable_soup",
+        "salad",
+        "fruit_juice"
+      ]
+    },
+    "biological_nutrition_produce": {
+      "available": [
+        {
+          "id": "vegetable",
+          "value": 15
+        },
+        {
+          "id": "potato",
+          "value": 15
+        },
+        {
+          "id": "carrot",
+          "value": 15
+        },
+        {
+          "id": "onion",
+          "value": 15
+        },
+        {
+          "id": "cabbage",
+          "value": 15
+        },
+        {
+          "id": "tomato",
+          "value": 15
+        },
+        {
+          "id": "lettuce",
+          "value": 15
+        },
+        {
+          "id": "beans",
+          "value": 15
+        },
+        {
+          "id": "pumpkin",
+          "value": 15
+        },
+        {
+          "id": "broccoli",
+          "value": 15
+        },
+        {
+          "id": "pepper",
+          "value": 15
+        },
+        {
+          "id": "mango",
+          "value": 12
+        },
+        {
+          "id": "orange",
+          "value": 12
+        },
+        {
+          "id": "grapes",
+          "value": 12
+        },
+        {
+          "id": "berries",
+          "value": 12
+        },
+        {
+          "id": "peach",
+          "value": 12
+        },
+        {
+          "id": "pear",
+          "value": 12
+        },
+        {
+          "id": "watermelon",
+          "value": 12
+        },
+        {
+          "id": "date",
+          "value": 10
+        },
+        {
+          "id": "apple",
+          "value": 9.5
+        },
+        {
+          "id": "samosa",
+          "value": 6.5
+        },
+        {
+          "id": "jam",
+          "value": 5.5
+        },
+        {
+          "id": "salad",
+          "value": 5.5
+        },
+        {
+          "id": "stew",
+          "value": 5.5
+        },
+        {
+          "id": "honey",
+          "value": 5
+        },
+        {
+          "id": "biryani",
+          "value": 5
+        },
+        {
+          "id": "vegetable_soup",
+          "value": 5
+        },
+        {
+          "id": "paratha",
+          "value": 4.5
+        },
+        {
+          "id": "pickles",
+          "value": 4.5
+        },
+        {
+          "id": "cake",
+          "value": 3
+        },
+        {
+          "id": "dosa",
+          "value": 3
+        },
+        {
+          "id": "dal",
+          "value": 3
+        },
+        {
+          "id": "khichdi",
+          "value": 3
+        },
+        {
+          "id": "ladoo",
+          "value": 3
+        },
+        {
+          "id": "pie",
+          "value": 3
+        }
+      ],
+      "sortedByValue": [
+        "vegetable",
+        "potato",
+        "carrot",
+        "onion",
+        "cabbage",
+        "tomato",
+        "lettuce",
+        "beans",
+        "pumpkin",
+        "broccoli",
+        "pepper",
+        "mango",
+        "orange",
+        "grapes",
+        "berries",
+        "peach",
+        "pear",
+        "watermelon",
+        "date",
+        "apple",
+        "samosa",
+        "jam",
+        "salad",
+        "stew",
+        "honey",
+        "biryani",
+        "vegetable_soup",
+        "paratha",
+        "pickles",
+        "cake",
+        "dosa",
+        "dal",
+        "khichdi",
+        "ladoo",
+        "pie"
+      ]
+    },
+    "biological_hydration": {
+      "available": [
+        {
+          "id": "beer",
+          "value": 5
+        },
+        {
+          "id": "mango",
+          "value": 5
+        },
+        {
+          "id": "orange",
+          "value": 5
+        },
+        {
+          "id": "grapes",
+          "value": 5
+        },
+        {
+          "id": "berries",
+          "value": 5
+        },
+        {
+          "id": "peach",
+          "value": 5
+        },
+        {
+          "id": "pear",
+          "value": 5
+        },
+        {
+          "id": "pottery",
+          "value": 5
+        },
+        {
+          "id": "watermelon",
+          "value": 5
+        },
+        {
+          "id": "salad",
+          "value": 5
+        },
+        {
+          "id": "vegetable",
+          "value": 3
+        },
+        {
+          "id": "wine",
+          "value": 3
+        },
+        {
+          "id": "potato",
+          "value": 3
+        },
+        {
+          "id": "carrot",
+          "value": 3
+        },
+        {
+          "id": "onion",
+          "value": 3
+        },
+        {
+          "id": "cabbage",
+          "value": 3
+        },
+        {
+          "id": "tomato",
+          "value": 3
+        },
+        {
+          "id": "lettuce",
+          "value": 3
+        },
+        {
+          "id": "beans",
+          "value": 3
+        },
+        {
+          "id": "pumpkin",
+          "value": 3
+        },
+        {
+          "id": "broccoli",
+          "value": 3
+        },
+        {
+          "id": "pepper",
+          "value": 3
+        },
+        {
+          "id": "apple",
+          "value": 2.5
+        }
+      ],
+      "sortedByValue": [
+        "beer",
+        "mango",
+        "orange",
+        "grapes",
+        "berries",
+        "peach",
+        "pear",
+        "pottery",
+        "watermelon",
+        "salad",
+        "vegetable",
+        "wine",
+        "potato",
+        "carrot",
+        "onion",
+        "cabbage",
+        "tomato",
+        "lettuce",
+        "beans",
+        "pumpkin",
+        "broccoli",
+        "pepper",
+        "apple"
+      ]
+    },
+    "biological_health_medicine": {
+      "available": [
+        {
+          "id": "medicine",
+          "value": 17.5
+        },
+        {
+          "id": "tonic",
+          "value": 7.5
+        },
+        {
+          "id": "healing_salve",
+          "value": 5.5
+        },
+        {
+          "id": "medicinal_herbs",
+          "value": 4.5
+        },
+        {
+          "id": "ghee",
+          "value": 4
+        },
+        {
+          "id": "honey",
+          "value": 2.5
+        },
+        {
+          "id": "date",
+          "value": 2.5
+        },
+        {
+          "id": "needle",
+          "value": 2
+        },
+        {
+          "id": "apple",
+          "value": 1
+        }
+      ],
+      "sortedByValue": [
+        "medicine",
+        "tonic",
+        "healing_salve",
+        "medicinal_herbs",
+        "ghee",
+        "honey",
+        "date",
+        "needle",
+        "apple"
+      ]
+    },
+    "biological_health_hygiene": {
+      "available": [
+        {
+          "id": "soap",
+          "value": 10
+        },
+        {
+          "id": "fine_clothes",
+          "value": 5
+        },
+        {
+          "id": "shoes",
+          "value": 5
+        },
+        {
+          "id": "boots",
+          "value": 5
+        },
+        {
+          "id": "ceramics",
+          "value": 5
+        },
+        {
+          "id": "formal_attire",
+          "value": 5
+        },
+        {
+          "id": "ceremonial_robes",
+          "value": 5
+        },
+        {
+          "id": "gloves",
+          "value": 3
+        },
+        {
+          "id": "winter_coat",
+          "value": 2.5
+        },
+        {
+          "id": "uniform",
+          "value": 2.5
+        },
+        {
+          "id": "vegetable",
+          "value": 2
+        },
+        {
+          "id": "potato",
+          "value": 2
+        },
+        {
+          "id": "carrot",
+          "value": 2
+        },
+        {
+          "id": "cabbage",
+          "value": 2
+        },
+        {
+          "id": "tomato",
+          "value": 2
+        },
+        {
+          "id": "beans",
+          "value": 2
+        },
+        {
+          "id": "pumpkin",
+          "value": 2
+        },
+        {
+          "id": "beeswax_candle",
+          "value": 2
+        },
+        {
+          "id": "broccoli",
+          "value": 2
+        },
+        {
+          "id": "pepper",
+          "value": 2
+        },
+        {
+          "id": "grapes",
+          "value": 1
+        },
+        {
+          "id": "berries",
+          "value": 1
+        },
+        {
+          "id": "peach",
+          "value": 1
+        },
+        {
+          "id": "pear",
+          "value": 1
+        },
+        {
+          "id": "watermelon",
+          "value": 1
+        },
+        {
+          "id": "work_clothes",
+          "value": 0.5
+        }
+      ],
+      "sortedByValue": [
+        "soap",
+        "fine_clothes",
+        "shoes",
+        "boots",
+        "ceramics",
+        "formal_attire",
+        "ceremonial_robes",
+        "gloves",
+        "winter_coat",
+        "uniform",
+        "vegetable",
+        "potato",
+        "carrot",
+        "cabbage",
+        "tomato",
+        "beans",
+        "pumpkin",
+        "beeswax_candle",
+        "broccoli",
+        "pepper",
+        "grapes",
+        "berries",
+        "peach",
+        "pear",
+        "watermelon",
+        "work_clothes"
+      ]
+    },
+    "biological_energy_rest": {
+      "available": [
+        {
+          "id": "bed",
+          "value": 15
+        }
+      ],
+      "sortedByValue": [
+        "bed"
+      ]
+    },
+    "biological_energy_stimulation": {
+      "available": [
+        {
+          "id": "date",
+          "value": 10.5
+        },
+        {
+          "id": "rice_flour",
+          "value": 6
+        },
+        {
+          "id": "pastries",
+          "value": 5
+        },
+        {
+          "id": "coconut",
+          "value": 5
+        },
+        {
+          "id": "cider",
+          "value": 5
+        },
+        {
+          "id": "ragi",
+          "value": 4
+        },
+        {
+          "id": "cornmeal",
+          "value": 4
+        },
+        {
+          "id": "paratha",
+          "value": 4
+        },
+        {
+          "id": "fruit_juice",
+          "value": 4
+        },
+        {
+          "id": "rice",
+          "value": 3.5
+        },
+        {
+          "id": "honey",
+          "value": 3.5
+        },
+        {
+          "id": "jam",
+          "value": 3.5
+        },
+        {
+          "id": "dosa",
+          "value": 3
+        },
+        {
+          "id": "ladoo",
+          "value": 3
+        },
+        {
+          "id": "rye",
+          "value": 2.5
+        },
+        {
+          "id": "mango",
+          "value": 2.5
+        },
+        {
+          "id": "porridge",
+          "value": 2.5
+        },
+        {
+          "id": "tortilla",
+          "value": 2.5
+        },
+        {
+          "id": "roti",
+          "value": 2.5
+        },
+        {
+          "id": "samosa",
+          "value": 2.5
+        },
+        {
+          "id": "kachori",
+          "value": 2.5
+        },
+        {
+          "id": "vada",
+          "value": 2.5
+        },
+        {
+          "id": "idli",
+          "value": 2.5
+        },
+        {
+          "id": "dal",
+          "value": 2.5
+        },
+        {
+          "id": "khichdi",
+          "value": 2.5
+        },
+        {
+          "id": "jalebi",
+          "value": 2.5
+        },
+        {
+          "id": "halwa",
+          "value": 2.5
+        },
+        {
+          "id": "salad",
+          "value": 2.5
+        },
+        {
+          "id": "groundnut",
+          "value": 2
+        },
+        {
+          "id": "ghee",
+          "value": 2
+        },
+        {
+          "id": "biryani",
+          "value": 2
+        },
+        {
+          "id": "pulao",
+          "value": 2
+        },
+        {
+          "id": "pie",
+          "value": 2
+        },
+        {
+          "id": "stew",
+          "value": 2
+        },
+        {
+          "id": "oats",
+          "value": 1.5
+        },
+        {
+          "id": "noodles",
+          "value": 1.5
+        },
+        {
+          "id": "pakora",
+          "value": 1.5
+        },
+        {
+          "id": "vegetable_soup",
+          "value": 1.5
+        },
+        {
+          "id": "barley",
+          "value": 1
+        },
+        {
+          "id": "eggs",
+          "value": 1
+        },
+        {
+          "id": "curd",
+          "value": 1
+        },
+        {
+          "id": "wheat",
+          "value": 0.5
+        },
+        {
+          "id": "maize",
+          "value": 0.5
+        },
+        {
+          "id": "lentils",
+          "value": 0.5
+        },
+        {
+          "id": "naan",
+          "value": 0.5
+        },
+        {
+          "id": "puri",
+          "value": 0.5
+        }
+      ],
+      "sortedByValue": [
+        "date",
+        "rice_flour",
+        "pastries",
+        "coconut",
+        "cider",
+        "ragi",
+        "cornmeal",
+        "paratha",
+        "fruit_juice",
+        "rice",
+        "honey",
+        "jam",
+        "dosa",
+        "ladoo",
+        "rye",
+        "mango",
+        "porridge",
+        "tortilla",
+        "roti",
+        "samosa",
+        "kachori",
+        "vada",
+        "idli",
+        "dal",
+        "khichdi",
+        "jalebi",
+        "halwa",
+        "salad",
+        "groundnut",
+        "ghee",
+        "biryani",
+        "pulao",
+        "pie",
+        "stew",
+        "oats",
+        "noodles",
+        "pakora",
+        "vegetable_soup",
+        "barley",
+        "eggs",
+        "curd",
+        "wheat",
+        "maize",
+        "lentils",
+        "naan",
+        "puri"
+      ]
+    },
+    "safety_security_law": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "safety_security_defense": {
+      "available": [
+        {
+          "id": "door",
+          "value": 10
+        },
+        {
+          "id": "scythe",
+          "value": 6
+        },
+        {
+          "id": "axe",
+          "value": 5
+        },
+        {
+          "id": "knife",
+          "value": 5
+        }
+      ],
+      "sortedByValue": [
+        "door",
+        "scythe",
+        "axe",
+        "knife"
+      ]
+    },
+    "safety_shelter_housing": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "safety_shelter_warmth": {
+      "available": [
+        {
+          "id": "firewood",
+          "value": 5.5
+        },
+        {
+          "id": "simple_clothes",
+          "value": 5
+        },
+        {
+          "id": "boots",
+          "value": 5
+        },
+        {
+          "id": "coal",
+          "value": 5
+        },
+        {
+          "id": "beeswax_candle",
+          "value": 5
+        },
+        {
+          "id": "charcoal",
+          "value": 5
+        },
+        {
+          "id": "coat",
+          "value": 5
+        },
+        {
+          "id": "rum",
+          "value": 5
+        },
+        {
+          "id": "wool_gloves",
+          "value": 5
+        },
+        {
+          "id": "winter_coat",
+          "value": 4.5
+        },
+        {
+          "id": "shoes",
+          "value": 4.5
+        },
+        {
+          "id": "wool_hat",
+          "value": 4.5
+        },
+        {
+          "id": "bed",
+          "value": 3
+        },
+        {
+          "id": "leather",
+          "value": 2
+        },
+        {
+          "id": "cloth",
+          "value": 2
+        },
+        {
+          "id": "gloves",
+          "value": 2
+        }
+      ],
+      "sortedByValue": [
+        "firewood",
+        "simple_clothes",
+        "boots",
+        "coal",
+        "beeswax_candle",
+        "charcoal",
+        "coat",
+        "rum",
+        "wool_gloves",
+        "winter_coat",
+        "shoes",
+        "wool_hat",
+        "bed",
+        "leather",
+        "cloth",
+        "gloves"
+      ]
+    },
+    "safety_fire_protection": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "touch_clothing_everyday": {
+      "available": [
+        {
+          "id": "fine_clothes",
+          "value": 10
+        },
+        {
+          "id": "simple_clothes",
+          "value": 9.5
+        },
+        {
+          "id": "uniform",
+          "value": 5.5
+        },
+        {
+          "id": "luxury_clothes",
+          "value": 5
+        },
+        {
+          "id": "pants",
+          "value": 5
+        },
+        {
+          "id": "shoes",
+          "value": 4.5
+        },
+        {
+          "id": "boots",
+          "value": 4
+        },
+        {
+          "id": "shirt",
+          "value": 3.5
+        },
+        {
+          "id": "hat",
+          "value": 3
+        },
+        {
+          "id": "work_clothes",
+          "value": 1.5
+        },
+        {
+          "id": "gloves",
+          "value": 1.5
+        }
+      ],
+      "sortedByValue": [
+        "fine_clothes",
+        "simple_clothes",
+        "uniform",
+        "luxury_clothes",
+        "pants",
+        "shoes",
+        "boots",
+        "shirt",
+        "hat",
+        "work_clothes",
+        "gloves"
+      ]
+    },
+    "touch_clothing_formal": {
+      "available": [
+        {
+          "id": "luxury_clothes",
+          "value": 16
+        },
+        {
+          "id": "dress",
+          "value": 10
+        },
+        {
+          "id": "formal_attire",
+          "value": 10
+        },
+        {
+          "id": "ceremonial_robes",
+          "value": 10
+        },
+        {
+          "id": "work_clothes",
+          "value": 4.5
+        }
+      ],
+      "sortedByValue": [
+        "luxury_clothes",
+        "dress",
+        "formal_attire",
+        "ceremonial_robes",
+        "work_clothes"
+      ]
+    },
+    "touch_furniture_functional": {
+      "available": [
+        {
+          "id": "chair",
+          "value": 15
+        },
+        {
+          "id": "bed",
+          "value": 10
+        },
+        {
+          "id": "table",
+          "value": 10
+        },
+        {
+          "id": "cabinet",
+          "value": 6.5
+        },
+        {
+          "id": "bench",
+          "value": 5
+        },
+        {
+          "id": "bookshelf",
+          "value": 5
+        },
+        {
+          "id": "desk",
+          "value": 5
+        },
+        {
+          "id": "wardrobe",
+          "value": 4.5
+        },
+        {
+          "id": "shelf",
+          "value": 4
+        },
+        {
+          "id": "planks",
+          "value": 3
+        }
+      ],
+      "sortedByValue": [
+        "chair",
+        "bed",
+        "table",
+        "cabinet",
+        "bench",
+        "bookshelf",
+        "desk",
+        "wardrobe",
+        "shelf",
+        "planks"
+      ]
+    },
+    "touch_furniture_decorative": {
+      "available": [
+        {
+          "id": "dyed_linen",
+          "value": 5
+        },
+        {
+          "id": "figurine",
+          "value": 4
+        },
+        {
+          "id": "pottery",
+          "value": 1
+        }
+      ],
+      "sortedByValue": [
+        "dyed_linen",
+        "figurine",
+        "pottery"
+      ]
+    },
+    "touch_textiles_bedding": {
+      "available": [
+        {
+          "id": "bed",
+          "value": 10
+        },
+        {
+          "id": "dyed_linen",
+          "value": 9.5
+        },
+        {
+          "id": "silk",
+          "value": 7
+        },
+        {
+          "id": "blue_cloth",
+          "value": 5
+        },
+        {
+          "id": "embroidered_linen",
+          "value": 5
+        },
+        {
+          "id": "cloth",
+          "value": 4
+        },
+        {
+          "id": "red_cloth",
+          "value": 4
+        },
+        {
+          "id": "orange_cloth",
+          "value": 3
+        },
+        {
+          "id": "leather",
+          "value": 2.5
+        },
+        {
+          "id": "green_cloth",
+          "value": 2.5
+        },
+        {
+          "id": "purple_cloth",
+          "value": 2
+        },
+        {
+          "id": "linen",
+          "value": 0.5
+        }
+      ],
+      "sortedByValue": [
+        "bed",
+        "dyed_linen",
+        "silk",
+        "blue_cloth",
+        "embroidered_linen",
+        "cloth",
+        "red_cloth",
+        "orange_cloth",
+        "leather",
+        "green_cloth",
+        "purple_cloth",
+        "linen"
+      ]
+    },
+    "touch_sensory_luxury": {
+      "available": [
+        {
+          "id": "terracotta",
+          "value": 9
+        },
+        {
+          "id": "luxury_clothes",
+          "value": 6.5
+        },
+        {
+          "id": "tapestry",
+          "value": 6.5
+        },
+        {
+          "id": "painting",
+          "value": 5
+        },
+        {
+          "id": "chair",
+          "value": 5
+        },
+        {
+          "id": "mango",
+          "value": 5
+        },
+        {
+          "id": "silk",
+          "value": 5
+        },
+        {
+          "id": "beeswax_candle",
+          "value": 5
+        },
+        {
+          "id": "yellow_cloth",
+          "value": 5
+        },
+        {
+          "id": "purple_cloth",
+          "value": 5
+        },
+        {
+          "id": "black_cloth",
+          "value": 5
+        },
+        {
+          "id": "embroidered_linen",
+          "value": 5
+        },
+        {
+          "id": "portrait",
+          "value": 5
+        },
+        {
+          "id": "cake",
+          "value": 4.5
+        },
+        {
+          "id": "blue_cloth",
+          "value": 4.5
+        },
+        {
+          "id": "figurine",
+          "value": 4.5
+        },
+        {
+          "id": "gold_item",
+          "value": 4
+        },
+        {
+          "id": "soap",
+          "value": 4
+        },
+        {
+          "id": "orange",
+          "value": 4
+        },
+        {
+          "id": "grapes",
+          "value": 4
+        },
+        {
+          "id": "berries",
+          "value": 4
+        },
+        {
+          "id": "peach",
+          "value": 4
+        },
+        {
+          "id": "pear",
+          "value": 4
+        },
+        {
+          "id": "sculpture",
+          "value": 4
+        },
+        {
+          "id": "ceremonial_robes",
+          "value": 4
+        },
+        {
+          "id": "pottery",
+          "value": 3.5
+        },
+        {
+          "id": "mirror",
+          "value": 3.5
+        },
+        {
+          "id": "red_cloth",
+          "value": 3.5
+        },
+        {
+          "id": "bread",
+          "value": 3
+        },
+        {
+          "id": "beer",
+          "value": 3
+        },
+        {
+          "id": "wine",
+          "value": 3
+        },
+        {
+          "id": "flowers",
+          "value": 3
+        },
+        {
+          "id": "mutton",
+          "value": 3
+        },
+        {
+          "id": "pastries",
+          "value": 3
+        },
+        {
+          "id": "preserved_food",
+          "value": 3
+        },
+        {
+          "id": "cloth",
+          "value": 3
+        },
+        {
+          "id": "meal",
+          "value": 3
+        },
+        {
+          "id": "candy",
+          "value": 3
+        },
+        {
+          "id": "noodles",
+          "value": 3
+        },
+        {
+          "id": "tomato_sauce",
+          "value": 3
+        },
+        {
+          "id": "gold_necklace",
+          "value": 3
+        },
+        {
+          "id": "leather",
+          "value": 2.5
+        },
+        {
+          "id": "dress",
+          "value": 2.5
+        },
+        {
+          "id": "gold_ring",
+          "value": 2.5
+        },
+        {
+          "id": "meat",
+          "value": 2
+        },
+        {
+          "id": "bed",
+          "value": 2
+        },
+        {
+          "id": "shoes",
+          "value": 2
+        },
+        {
+          "id": "boots",
+          "value": 2
+        },
+        {
+          "id": "ceramics",
+          "value": 2
+        },
+        {
+          "id": "jalebi",
+          "value": 2
+        },
+        {
+          "id": "pickles",
+          "value": 2
+        },
+        {
+          "id": "glassware",
+          "value": 2
+        },
+        {
+          "id": "whiskey",
+          "value": 1.5
+        },
+        {
+          "id": "statue",
+          "value": 1.5
+        },
+        {
+          "id": "wool_hat",
+          "value": 1.5
+        },
+        {
+          "id": "apple",
+          "value": 1
+        },
+        {
+          "id": "linen",
+          "value": 0.5
+        },
+        {
+          "id": "watermelon",
+          "value": 0.5
+        },
+        {
+          "id": "cream",
+          "value": 0.5
+        }
+      ],
+      "sortedByValue": [
+        "terracotta",
+        "luxury_clothes",
+        "tapestry",
+        "painting",
+        "chair",
+        "mango",
+        "silk",
+        "beeswax_candle",
+        "yellow_cloth",
+        "purple_cloth",
+        "black_cloth",
+        "embroidered_linen",
+        "portrait",
+        "cake",
+        "blue_cloth",
+        "figurine",
+        "gold_item",
+        "soap",
+        "orange",
+        "grapes",
+        "berries",
+        "peach",
+        "pear",
+        "sculpture",
+        "ceremonial_robes",
+        "pottery",
+        "mirror",
+        "red_cloth",
+        "bread",
+        "beer",
+        "wine",
+        "flowers",
+        "mutton",
+        "pastries",
+        "preserved_food",
+        "cloth",
+        "meal",
+        "candy",
+        "noodles",
+        "tomato_sauce",
+        "gold_necklace",
+        "leather",
+        "dress",
+        "gold_ring",
+        "meat",
+        "bed",
+        "shoes",
+        "boots",
+        "ceramics",
+        "jalebi",
+        "pickles",
+        "glassware",
+        "whiskey",
+        "statue",
+        "wool_hat",
+        "apple",
+        "linen",
+        "watermelon",
+        "cream"
+      ]
+    },
+    "psychological_education_books": {
+      "available": [
+        {
+          "id": "book",
+          "value": 20
+        },
+        {
+          "id": "manuscript",
+          "value": 5.5
+        },
+        {
+          "id": "bookshelf",
+          "value": 5
+        },
+        {
+          "id": "desk",
+          "value": 5
+        },
+        {
+          "id": "paper",
+          "value": 3
+        },
+        {
+          "id": "ink",
+          "value": 3
+        },
+        {
+          "id": "table",
+          "value": 2.5
+        }
+      ],
+      "sortedByValue": [
+        "book",
+        "manuscript",
+        "bookshelf",
+        "desk",
+        "paper",
+        "ink",
+        "table"
+      ]
+    },
+    "psychological_education_formal": {
+      "available": [
+        {
+          "id": "fine_paper",
+          "value": 5
+        },
+        {
+          "id": "desk",
+          "value": 5
+        },
+        {
+          "id": "ink",
+          "value": 4
+        },
+        {
+          "id": "manuscript",
+          "value": 4
+        },
+        {
+          "id": "paper",
+          "value": 3
+        }
+      ],
+      "sortedByValue": [
+        "fine_paper",
+        "desk",
+        "ink",
+        "manuscript",
+        "paper"
+      ]
+    },
+    "psychological_entertainment_arts": {
+      "available": [
+        {
+          "id": "book",
+          "value": 10
+        },
+        {
+          "id": "painting",
+          "value": 5.5
+        },
+        {
+          "id": "ceremonial_robes",
+          "value": 5
+        },
+        {
+          "id": "manuscript",
+          "value": 3.5
+        },
+        {
+          "id": "luxury_clothes",
+          "value": 3
+        },
+        {
+          "id": "paper",
+          "value": 3
+        },
+        {
+          "id": "portrait",
+          "value": 2.5
+        },
+        {
+          "id": "bookshelf",
+          "value": 2
+        }
+      ],
+      "sortedByValue": [
+        "book",
+        "painting",
+        "ceremonial_robes",
+        "manuscript",
+        "luxury_clothes",
+        "paper",
+        "portrait",
+        "bookshelf"
+      ]
+    },
+    "psychological_entertainment_games": {
+      "available": [
+        {
+          "id": "beer",
+          "value": 5
+        },
+        {
+          "id": "terracotta",
+          "value": 3
+        },
+        {
+          "id": "tapestry",
+          "value": 3
+        },
+        {
+          "id": "mirror",
+          "value": 2.5
+        },
+        {
+          "id": "portrait",
+          "value": 2.5
+        },
+        {
+          "id": "sculpture",
+          "value": 2
+        },
+        {
+          "id": "statue",
+          "value": 1.5
+        }
+      ],
+      "sortedByValue": [
+        "beer",
+        "terracotta",
+        "tapestry",
+        "mirror",
+        "portrait",
+        "sculpture",
+        "statue"
+      ]
+    },
+    "psychological_purpose_work": {
+      "available": [
+        {
+          "id": "table",
+          "value": 8
+        },
+        {
+          "id": "book",
+          "value": 5
+        },
+        {
+          "id": "paper",
+          "value": 3
+        },
+        {
+          "id": "fine_paper",
+          "value": 2.5
+        },
+        {
+          "id": "manuscript",
+          "value": 2.5
+        }
+      ],
+      "sortedByValue": [
+        "table",
+        "book",
+        "paper",
+        "fine_paper",
+        "manuscript"
+      ]
+    },
+    "psychological_purpose_religion": {
+      "available": [
+        {
+          "id": "flowers",
+          "value": 4.5
+        },
+        {
+          "id": "paper",
+          "value": 3
+        },
+        {
+          "id": "sculpture",
+          "value": 2.5
+        },
+        {
+          "id": "portrait",
+          "value": 2.5
+        }
+      ],
+      "sortedByValue": [
+        "flowers",
+        "paper",
+        "sculpture",
+        "portrait"
+      ]
+    },
+    "psychological_purpose_civic": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "status_reputation_display": {
+      "available": [
+        {
+          "id": "luxury_clothes",
+          "value": 15
+        },
+        {
+          "id": "painting",
+          "value": 15
+        },
+        {
+          "id": "gold_item",
+          "value": 14.5
+        },
+        {
+          "id": "wine",
+          "value": 8
+        },
+        {
+          "id": "sculpture",
+          "value": 6
+        },
+        {
+          "id": "silver",
+          "value": 5.5
+        },
+        {
+          "id": "coat",
+          "value": 5.5
+        },
+        {
+          "id": "statue",
+          "value": 5.5
+        },
+        {
+          "id": "formal_attire",
+          "value": 5
+        },
+        {
+          "id": "gold_necklace",
+          "value": 5
+        },
+        {
+          "id": "gemstone_jewelry",
+          "value": 5
+        },
+        {
+          "id": "crown",
+          "value": 5
+        },
+        {
+          "id": "tapestry",
+          "value": 5
+        },
+        {
+          "id": "gold",
+          "value": 4.5
+        },
+        {
+          "id": "embroidered_linen",
+          "value": 4.5
+        },
+        {
+          "id": "silver_necklace",
+          "value": 4.5
+        },
+        {
+          "id": "glass",
+          "value": 4
+        },
+        {
+          "id": "gold_ring",
+          "value": 3.5
+        },
+        {
+          "id": "book",
+          "value": 3
+        },
+        {
+          "id": "cabinet",
+          "value": 3
+        },
+        {
+          "id": "ceremonial_robes",
+          "value": 3
+        },
+        {
+          "id": "gemstone",
+          "value": 3
+        },
+        {
+          "id": "silver_ring",
+          "value": 3
+        },
+        {
+          "id": "glassware",
+          "value": 3
+        },
+        {
+          "id": "portrait",
+          "value": 2
+        },
+        {
+          "id": "bronze_sculpture",
+          "value": 2
+        },
+        {
+          "id": "figurine",
+          "value": 2
+        },
+        {
+          "id": "cake",
+          "value": 1
+        }
+      ],
+      "sortedByValue": [
+        "luxury_clothes",
+        "painting",
+        "gold_item",
+        "wine",
+        "sculpture",
+        "silver",
+        "coat",
+        "statue",
+        "formal_attire",
+        "gold_necklace",
+        "gemstone_jewelry",
+        "crown",
+        "tapestry",
+        "gold",
+        "embroidered_linen",
+        "silver_necklace",
+        "glass",
+        "gold_ring",
+        "book",
+        "cabinet",
+        "ceremonial_robes",
+        "gemstone",
+        "silver_ring",
+        "glassware",
+        "portrait",
+        "bronze_sculpture",
+        "figurine",
+        "cake"
+      ]
+    },
+    "status_reputation_title": {
+      "available": [
+        {
+          "id": "book",
+          "value": 3.5
+        }
+      ],
+      "sortedByValue": [
+        "book"
+      ]
+    },
+    "status_wealth_precious": {
+      "available": [
+        {
+          "id": "gold_item",
+          "value": 6
+        },
+        {
+          "id": "silver",
+          "value": 5
+        },
+        {
+          "id": "statue",
+          "value": 5
+        },
+        {
+          "id": "gemstone_jewelry",
+          "value": 5
+        },
+        {
+          "id": "bronze_sculpture",
+          "value": 5
+        },
+        {
+          "id": "terracotta",
+          "value": 4.5
+        },
+        {
+          "id": "gold_necklace",
+          "value": 4.5
+        },
+        {
+          "id": "crown",
+          "value": 4.5
+        },
+        {
+          "id": "tapestry",
+          "value": 4.5
+        },
+        {
+          "id": "gold",
+          "value": 4
+        },
+        {
+          "id": "silver_necklace",
+          "value": 4
+        },
+        {
+          "id": "sculpture",
+          "value": 3.5
+        },
+        {
+          "id": "silver_ring",
+          "value": 3
+        },
+        {
+          "id": "gold_ring",
+          "value": 3
+        },
+        {
+          "id": "manuscript",
+          "value": 2.5
+        },
+        {
+          "id": "gemstone",
+          "value": 2.5
+        },
+        {
+          "id": "glassware",
+          "value": 2.5
+        },
+        {
+          "id": "bed",
+          "value": 2
+        },
+        {
+          "id": "bench",
+          "value": 1
+        },
+        {
+          "id": "mirror",
+          "value": 1
+        }
+      ],
+      "sortedByValue": [
+        "gold_item",
+        "silver",
+        "statue",
+        "gemstone_jewelry",
+        "bronze_sculpture",
+        "terracotta",
+        "gold_necklace",
+        "crown",
+        "tapestry",
+        "gold",
+        "silver_necklace",
+        "sculpture",
+        "silver_ring",
+        "gold_ring",
+        "manuscript",
+        "gemstone",
+        "glassware",
+        "bed",
+        "bench",
+        "mirror"
+      ]
+    },
+    "status_wealth_property": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "status_service_servants": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "status_fashion_luxury": {
+      "available": [
+        {
+          "id": "luxury_clothes",
+          "value": 15.5
+        },
+        {
+          "id": "embroidered_linen",
+          "value": 5.5
+        },
+        {
+          "id": "coat",
+          "value": 5
+        },
+        {
+          "id": "winter_coat",
+          "value": 4.5
+        },
+        {
+          "id": "dress",
+          "value": 4.5
+        },
+        {
+          "id": "formal_attire",
+          "value": 4.5
+        },
+        {
+          "id": "dyed_linen",
+          "value": 3
+        },
+        {
+          "id": "wool_gloves",
+          "value": 2
+        },
+        {
+          "id": "wool_hat",
+          "value": 2
+        },
+        {
+          "id": "pants",
+          "value": 1
+        }
+      ],
+      "sortedByValue": [
+        "luxury_clothes",
+        "embroidered_linen",
+        "coat",
+        "winter_coat",
+        "dress",
+        "formal_attire",
+        "dyed_linen",
+        "wool_gloves",
+        "wool_hat",
+        "pants"
+      ]
+    },
+    "social_friendship_casual": {
+      "available": [
+        {
+          "id": "beer",
+          "value": 5
+        },
+        {
+          "id": "table",
+          "value": 4.5
+        },
+        {
+          "id": "luxury_clothes",
+          "value": 3
+        }
+      ],
+      "sortedByValue": [
+        "beer",
+        "table",
+        "luxury_clothes"
+      ]
+    },
+    "social_friendship_intimate": {
+      "available": [
+        {
+          "id": "wine",
+          "value": 8
+        }
+      ],
+      "sortedByValue": [
+        "wine"
+      ]
+    },
+    "social_community_church": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "social_community_civic": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "social_family_bonds": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "exotic_food_spices": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "exotic_food_imports": {
+      "available": [
+        {
+          "id": "wine",
+          "value": 5.5
+        }
+      ],
+      "sortedByValue": [
+        "wine"
+      ]
+    },
+    "exotic_items_textiles": {
+      "available": [
+        {
+          "id": "luxury_clothes",
+          "value": 5
+        }
+      ],
+      "sortedByValue": [
+        "luxury_clothes"
+      ]
+    },
+    "exotic_items_novelty": {
+      "available": [
+        {
+          "id": "painting",
+          "value": 8
+        },
+        {
+          "id": "gold_item",
+          "value": 5
+        },
+        {
+          "id": "crown",
+          "value": 5
+        },
+        {
+          "id": "bronze_sculpture",
+          "value": 5
+        },
+        {
+          "id": "embroidered_linen",
+          "value": 4
+        },
+        {
+          "id": "book",
+          "value": 3
+        },
+        {
+          "id": "ceramics",
+          "value": 2
+        },
+        {
+          "id": "dyed_linen",
+          "value": 2
+        },
+        {
+          "id": "figurine",
+          "value": 1.5
+        }
+      ],
+      "sortedByValue": [
+        "painting",
+        "gold_item",
+        "crown",
+        "bronze_sculpture",
+        "embroidered_linen",
+        "book",
+        "ceramics",
+        "dyed_linen",
+        "figurine"
+      ]
+    },
+    "shiny_precious_gold": {
+      "available": [
+        {
+          "id": "gold_item",
+          "value": 10.5
+        },
+        {
+          "id": "gold",
+          "value": 10
+        },
+        {
+          "id": "gold_necklace",
+          "value": 5
+        },
+        {
+          "id": "gold_ring",
+          "value": 2
+        }
+      ],
+      "sortedByValue": [
+        "gold_item",
+        "gold",
+        "gold_necklace",
+        "gold_ring"
+      ]
+    },
+    "shiny_precious_silver": {
+      "available": [
+        {
+          "id": "silver",
+          "value": 10.5
+        },
+        {
+          "id": "silver_necklace",
+          "value": 5
+        },
+        {
+          "id": "silver_ring",
+          "value": 3
+        }
+      ],
+      "sortedByValue": [
+        "silver",
+        "silver_necklace",
+        "silver_ring"
+      ]
+    },
+    "shiny_precious_gems": {
+      "available": [
+        {
+          "id": "gemstone_jewelry",
+          "value": 10
+        },
+        {
+          "id": "silver_necklace",
+          "value": 7.5
+        },
+        {
+          "id": "gemstone",
+          "value": 5
+        },
+        {
+          "id": "crown",
+          "value": 5
+        },
+        {
+          "id": "silver_ring",
+          "value": 4
+        },
+        {
+          "id": "gold_necklace",
+          "value": 4
+        },
+        {
+          "id": "silver",
+          "value": 3
+        },
+        {
+          "id": "gold_ring",
+          "value": 2
+        }
+      ],
+      "sortedByValue": [
+        "gemstone_jewelry",
+        "silver_necklace",
+        "gemstone",
+        "crown",
+        "silver_ring",
+        "gold_necklace",
+        "silver",
+        "gold_ring"
+      ]
+    },
+    "shiny_decorative_art": {
+      "available": [
+        {
+          "id": "painting",
+          "value": 14.5
+        },
+        {
+          "id": "statue",
+          "value": 5
+        },
+        {
+          "id": "tapestry",
+          "value": 5
+        },
+        {
+          "id": "bronze_sculpture",
+          "value": 5
+        },
+        {
+          "id": "sculpture",
+          "value": 4.5
+        },
+        {
+          "id": "terracotta",
+          "value": 4.5
+        },
+        {
+          "id": "pottery",
+          "value": 1
+        }
+      ],
+      "sortedByValue": [
+        "painting",
+        "statue",
+        "tapestry",
+        "bronze_sculpture",
+        "sculpture",
+        "terracotta",
+        "pottery"
+      ]
+    },
+    "vice_alcohol_beer": {
+      "available": [
+        {
+          "id": "beer",
+          "value": 20
+        }
+      ],
+      "sortedByValue": [
+        "beer"
+      ]
+    },
+    "vice_alcohol_spirits": {
+      "available": [
+        {
+          "id": "wine",
+          "value": 14
+        },
+        {
+          "id": "whiskey",
+          "value": 13.5
+        },
+        {
+          "id": "rum",
+          "value": 10
+        }
+      ],
+      "sortedByValue": [
+        "wine",
+        "whiskey",
+        "rum"
+      ]
+    },
+    "vice_gambling": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "vice_indulgence_sweets": {
+      "available": [
+        {
+          "id": "cake",
+          "value": 15
+        },
+        {
+          "id": "jalebi",
+          "value": 10
+        },
+        {
+          "id": "halwa",
+          "value": 10
+        },
+        {
+          "id": "date",
+          "value": 5
+        },
+        {
+          "id": "jam",
+          "value": 5
+        },
+        {
+          "id": "ladoo",
+          "value": 3.5
+        },
+        {
+          "id": "fruit_juice",
+          "value": 3.5
+        },
+        {
+          "id": "sugar",
+          "value": 3
+        },
+        {
+          "id": "honey",
+          "value": 3
+        },
+        {
+          "id": "mango",
+          "value": 2.5
+        },
+        {
+          "id": "pastries",
+          "value": 2.5
+        }
+      ],
+      "sortedByValue": [
+        "cake",
+        "jalebi",
+        "halwa",
+        "date",
+        "jam",
+        "ladoo",
+        "fruit_juice",
+        "sugar",
+        "honey",
+        "mango",
+        "pastries"
+      ]
+    },
+    "vice_indulgence_excess": {
+      "available": [
+        {
+          "id": "halwa",
+          "value": 10
+        },
+        {
+          "id": "jalebi",
+          "value": 5
+        },
+        {
+          "id": "ladoo",
+          "value": 4.5
+        },
+        {
+          "id": "sugar",
+          "value": 3
+        },
+        {
+          "id": "naan",
+          "value": 3
+        },
+        {
+          "id": "samosa",
+          "value": 3
+        },
+        {
+          "id": "mango",
+          "value": 2
+        },
+        {
+          "id": "kachori",
+          "value": 2
+        },
+        {
+          "id": "jam",
+          "value": 2
+        },
+        {
+          "id": "pastries",
+          "value": 1
+        }
+      ],
+      "sortedByValue": [
+        "halwa",
+        "jalebi",
+        "ladoo",
+        "sugar",
+        "naan",
+        "samosa",
+        "mango",
+        "kachori",
+        "jam",
+        "pastries"
+      ]
+    },
+    "safety_shelter_housing_basic": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "safety_shelter_housing_good": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "safety_shelter_housing_luxury": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "safety_shelter_housing_prestige": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "safety_shelter_weather": {
+      "available": [],
+      "sortedByValue": []
+    },
+    "psychological_detstress_relax": {
+      "available": [
+        {
+          "id": "wine",
+          "value": 5.5
+        },
+        {
+          "id": "beer",
+          "value": 5
+        },
+        {
+          "id": "door",
+          "value": 5
+        },
+        {
+          "id": "flowers",
+          "value": 4.5
+        },
+        {
+          "id": "whiskey",
+          "value": 4.5
+        },
+        {
+          "id": "manuscript",
+          "value": 4
+        },
+        {
+          "id": "glass",
+          "value": 4
+        },
+        {
+          "id": "mango",
+          "value": 3
+        },
+        {
+          "id": "paper",
+          "value": 3
+        },
+        {
+          "id": "bookshelf",
+          "value": 2.5
+        },
+        {
+          "id": "mirror",
+          "value": 2.5
+        },
+        {
+          "id": "biryani",
+          "value": 2.5
+        }
+      ],
+      "sortedByValue": [
+        "wine",
+        "beer",
+        "door",
+        "flowers",
+        "whiskey",
+        "manuscript",
+        "glass",
+        "mango",
+        "paper",
+        "bookshelf",
+        "mirror",
+        "biryani"
+      ]
+    },
+    "safety_shelter_lighting": {
+      "available": [
+        {
+          "id": "candle",
+          "value": 10
+        },
+        {
+          "id": "beeswax_candle",
+          "value": 10
+        },
+        {
+          "id": "glass",
+          "value": 5
+        },
+        {
+          "id": "lamp_oil",
+          "value": 3
+        }
+      ],
+      "sortedByValue": [
+        "candle",
+        "beeswax_candle",
+        "glass",
+        "lamp_oil"
+      ]
+    },
+    "biological_nutrition_fat": {
+      "available": [
+        {
+          "id": "eggs",
+          "value": 17
+        },
+        {
+          "id": "butter",
+          "value": 15
+        },
+        {
+          "id": "cheese",
+          "value": 10
+        },
+        {
+          "id": "ghee",
+          "value": 10
+        },
+        {
+          "id": "cream",
+          "value": 10
+        },
+        {
+          "id": "pakora",
+          "value": 10
+        },
+        {
+          "id": "halwa",
+          "value": 10
+        },
+        {
+          "id": "pastries",
+          "value": 8
+        },
+        {
+          "id": "paneer",
+          "value": 7.5
+        },
+        {
+          "id": "samosa",
+          "value": 7.5
+        },
+        {
+          "id": "kachori",
+          "value": 7.5
+        },
+        {
+          "id": "buttermilk",
+          "value": 7
+        },
+        {
+          "id": "jalebi",
+          "value": 7
+        },
+        {
+          "id": "cake",
+          "value": 5
+        },
+        {
+          "id": "groundnut",
+          "value": 5
+        },
+        {
+          "id": "coconut",
+          "value": 5
+        },
+        {
+          "id": "vada",
+          "value": 5
+        },
+        {
+          "id": "date",
+          "value": 4.5
+        },
+        {
+          "id": "dried_fruit",
+          "value": 4.5
+        },
+        {
+          "id": "milk",
+          "value": 4
+        },
+        {
+          "id": "paratha",
+          "value": 3.5
+        },
+        {
+          "id": "naan",
+          "value": 3.5
+        },
+        {
+          "id": "chicken",
+          "value": 3
+        },
+        {
+          "id": "curd",
+          "value": 3
+        },
+        {
+          "id": "ladoo",
+          "value": 3
+        },
+        {
+          "id": "khichdi",
+          "value": 1.5
+        }
+      ],
+      "sortedByValue": [
+        "eggs",
+        "butter",
+        "cheese",
+        "ghee",
+        "cream",
+        "pakora",
+        "halwa",
+        "pastries",
+        "paneer",
+        "samosa",
+        "kachori",
+        "buttermilk",
+        "jalebi",
+        "cake",
+        "groundnut",
+        "coconut",
+        "vada",
+        "date",
+        "dried_fruit",
+        "milk",
+        "paratha",
+        "naan",
+        "chicken",
+        "curd",
+        "ladoo",
+        "khichdi"
+      ]
+    },
+    "touch_furniture_storage": {
+      "available": [
+        {
+          "id": "chest",
+          "value": 20
+        },
+        {
+          "id": "wardrobe",
+          "value": 13.5
+        },
+        {
+          "id": "shelf",
+          "value": 4
+        }
+      ],
+      "sortedByValue": [
+        "chest",
+        "wardrobe",
+        "shelf"
+      ]
+    },
+    "touch_child_comfort": {
+      "available": [
+        {
+          "id": "cradle",
+          "value": 20
+        }
+      ],
+      "sortedByValue": [
+        "cradle"
+      ]
+    },
+    "biological_taste_spicy": {
+      "available": [
+        {
+          "id": "kachori",
+          "value": 10
+        },
+        {
+          "id": "dosa",
+          "value": 7
+        },
+        {
+          "id": "pickles",
+          "value": 5
+        },
+        {
+          "id": "pakora",
+          "value": 4.5
+        },
+        {
+          "id": "idli",
+          "value": 3.5
+        }
+      ],
+      "sortedByValue": [
+        "kachori",
+        "dosa",
+        "pickles",
+        "pakora",
+        "idli"
+      ]
+    },
+    "biological_taste_crunchy": {
+      "available": [
+        {
+          "id": "dosa",
+          "value": 7
+        },
+        {
+          "id": "vada",
+          "value": 4.5
+        },
+        {
+          "id": "lettuce",
+          "value": 3
+        },
+        {
+          "id": "groundnut",
+          "value": 1.5
+        },
+        {
+          "id": "kachori",
+          "value": 1.5
+        }
+      ],
+      "sortedByValue": [
+        "dosa",
+        "vada",
+        "lettuce",
+        "groundnut",
+        "kachori"
+      ]
+    },
+    "biological_taste_wholesome": {
+      "available": [
+        {
+          "id": "khichdi",
+          "value": 8.5
+        },
+        {
+          "id": "dried_fruit",
+          "value": 5
+        },
+        {
+          "id": "stew",
+          "value": 4.5
+        },
+        {
+          "id": "idli",
+          "value": 4
+        },
+        {
+          "id": "ladoo",
+          "value": 4
+        },
+        {
+          "id": "honey",
+          "value": 3.5
+        },
+        {
+          "id": "ragi",
+          "value": 3.5
+        },
+        {
+          "id": "mango",
+          "value": 2
+        }
+      ],
+      "sortedByValue": [
+        "khichdi",
+        "dried_fruit",
+        "stew",
+        "idli",
+        "ladoo",
+        "honey",
+        "ragi",
+        "mango"
+      ]
+    },
+    "biological_fragrance_exotic": {
+      "available": [
+        {
+          "id": "flowers",
+          "value": 10
+        }
+      ],
+      "sortedByValue": [
+        "flowers"
+      ]
+    },
+    "utility_essential_tools": {
+      "available": [
+        {
+          "id": "hammer",
+          "value": 5.5
+        },
+        {
+          "id": "pickaxe",
+          "value": 5
+        },
+        {
+          "id": "scythe",
+          "value": 5
+        },
+        {
+          "id": "knife",
+          "value": 5
+        },
+        {
+          "id": "shovel",
+          "value": 4
+        },
+        {
+          "id": "hoe",
+          "value": 4
+        },
+        {
+          "id": "nails",
+          "value": 3.5
+        },
+        {
+          "id": "saw",
+          "value": 2.5
+        },
+        {
+          "id": "mirror",
+          "value": 2.5
+        },
+        {
+          "id": "needle",
+          "value": 1.5
+        }
+      ],
+      "sortedByValue": [
+        "hammer",
+        "pickaxe",
+        "scythe",
+        "knife",
+        "shovel",
+        "hoe",
+        "nails",
+        "saw",
+        "mirror",
+        "needle"
+      ]
+    },
+    "touch_foot_care": {
+      "available": [
+        {
+          "id": "shoes",
+          "value": 10.5
+        },
+        {
+          "id": "boots",
+          "value": 10
+        }
+      ],
+      "sortedByValue": [
+        "shoes",
+        "boots"
+      ]
+    }
+  },
+  "substitutionGroups": {
+    "grains": {
+      "members": [
+        "wheat",
+        "rice",
+        "barley",
+        "maize",
+        "oats",
+        "rye"
+      ],
+      "available": [
+        "wheat",
+        "rice",
+        "barley",
+        "maize",
+        "oats",
+        "rye"
+      ]
+    },
+    "fruits": {
+      "members": [
+        "apple",
+        "pear",
+        "peach",
+        "mango",
+        "orange",
+        "grapes",
+        "berries"
+      ],
+      "available": [
+        "apple",
+        "pear",
+        "peach",
+        "mango",
+        "orange",
+        "grapes",
+        "berries"
+      ]
+    },
+    "vegetables": {
+      "members": [
+        "potato",
+        "beans",
+        "carrot",
+        "onion",
+        "cabbage",
+        "lettuce",
+        "tomato",
+        "pumpkin"
+      ],
+      "available": [
+        "potato",
+        "beans",
+        "carrot",
+        "onion",
+        "cabbage",
+        "lettuce",
+        "tomato",
+        "pumpkin"
+      ]
+    },
+    "protein": {
+      "members": [
+        "meat",
+        "eggs",
+        "milk",
+        "cheese",
+        "butter"
+      ],
+      "available": [
+        "meat",
+        "eggs",
+        "milk",
+        "cheese",
+        "butter"
+      ]
+    },
+    "baked_goods": {
+      "members": [
+        "bread",
+        "pastries",
+        "flour"
+      ],
+      "available": [
+        "bread",
+        "pastries",
+        "flour"
+      ]
+    },
+    "alcohol": {
+      "members": [
+        "beer",
+        "wine"
+      ],
+      "available": [
+        "beer",
+        "wine"
+      ]
+    },
+    "textiles": {
+      "members": [
+        "cloth",
+        "linen",
+        "silk",
+        "thread"
+      ],
+      "available": [
+        "cloth",
+        "linen",
+        "silk",
+        "thread"
+      ]
+    },
+    "clothing": {
+      "members": [
+        "simple_clothes",
+        "work_clothes",
+        "fine_clothes",
+        "luxury_clothes"
+      ],
+      "available": [
+        "simple_clothes",
+        "work_clothes",
+        "fine_clothes",
+        "luxury_clothes"
+      ]
+    },
+    "furniture": {
+      "members": [
+        "chair",
+        "bench",
+        "table",
+        "desk",
+        "bed",
+        "cabinet",
+        "wardrobe",
+        "bookshelf"
+      ],
+      "available": [
+        "chair",
+        "bench",
+        "table",
+        "desk",
+        "bed",
+        "cabinet",
+        "wardrobe",
+        "bookshelf"
+      ]
+    },
+    "luxury_goods": {
+      "members": [
+        "gold",
+        "silver"
+      ],
+      "available": [
+        "gold",
+        "silver"
+      ]
+    },
+    "materials": {
+      "members": [
+        "timber",
+        "planks",
+        "stone",
+        "bricks",
+        "clay",
+        "pottery"
+      ],
+      "available": [
+        "timber",
+        "planks",
+        "stone",
+        "bricks",
+        "clay",
+        "pottery"
+      ]
+    },
+    "metals": {
+      "members": [
+        "iron",
+        "steel",
+        "copper",
+        "bronze"
+      ],
+      "available": [
+        "iron",
+        "steel",
+        "copper",
+        "bronze"
+      ]
+    }
+  },
+  "metadata": {
+    "coarseCacheCount": 10,
+    "fineCacheCount": 66,
+    "substitutionGroupCount": 12,
+    "totalCommodities": 294
+  }
+}
