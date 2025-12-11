@@ -482,7 +482,8 @@ Examples:
 - `durability` - consumable/durable/permanent
 - `qualityMultipliers` - How quality affects fulfillment
   - `poor`, `basic`, `good`, `luxury`, `masterwork`
-- `reusableValue` - For durable goods, how many uses
+- `durationCycles` - How many cycles before expiry (null for consumable/permanent)
+- `effectDecayRate` - Effectiveness loss per cycle (0 = no decay)
 - `notes` - Design notes
 
 **Example:**

@@ -18,7 +18,21 @@ import type {
   NaturalResourcesData,
   TimeSlotsData,
   CravingSlotsData,
-  UnitsData
+  UnitsData,
+  StartingLocationsData,
+  QualityTiersData,
+  // Phase 7 types
+  LandConfig,
+  ClassThresholds,
+  EconomicSystemConfig,
+  ImmigrationConfigData,
+  RelationshipTypesData,
+  FulfillmentVectorsDataV2,
+  // Pre-computed cache types
+  PreComputedCommodityCache,
+  CommodityCacheEntry,
+  DimensionCache,
+  SubstitutionGroupCache
 } from './types';
 
 // Active version state
@@ -105,6 +119,28 @@ export async function loadCommodityCategories(): Promise<CommodityCategoriesData
   const filePath = `${dataDir}/${versionPath}/commodity_categories.json`;
   const content = await readJsonFile(filePath);
   return JSON.parse(content);
+}
+
+/**
+ * Load quality tiers from JSON file
+ */
+export async function loadQualityTiers(): Promise<QualityTiersData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/quality_tiers.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save quality tiers to JSON file
+ */
+export async function saveQualityTiers(data: QualityTiersData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/quality_tiers.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
 }
 
 /**
@@ -677,4 +713,459 @@ export async function saveUnits(data: UnitsData): Promise<void> {
   const filePath = `${dataDir}/${versionPath}/units.json`;
   const content = JSON.stringify(data, null, 2);
   await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Starting Locations APIs
+// =============================================================================
+
+/**
+ * Load starting locations from JSON file
+ */
+export async function loadStartingLocations(): Promise<StartingLocationsData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/starting_locations.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save starting locations to JSON file
+ */
+export async function saveStartingLocations(data: StartingLocationsData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/starting_locations.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Phase 7: Land System APIs
+// =============================================================================
+
+/**
+ * Load land configuration from JSON file
+ */
+export async function loadLandConfig(): Promise<LandConfig> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/land_config.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save land configuration to JSON file
+ */
+export async function saveLandConfig(data: LandConfig): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/land_config.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Phase 7: Class Thresholds APIs
+// =============================================================================
+
+/**
+ * Load class thresholds from JSON file (emergent class system)
+ */
+export async function loadClassThresholds(): Promise<ClassThresholds> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/class_thresholds.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save class thresholds to JSON file
+ */
+export async function saveClassThresholds(data: ClassThresholds): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/class_thresholds.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Phase 7: Economic System APIs
+// =============================================================================
+
+/**
+ * Load economic system configuration from JSON file
+ */
+export async function loadEconomicSystemConfig(): Promise<EconomicSystemConfig> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/economic_systems.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save economic system configuration to JSON file
+ */
+export async function saveEconomicSystemConfig(data: EconomicSystemConfig): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/economic_systems.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Phase 7: Immigration Config APIs
+// =============================================================================
+
+/**
+ * Load immigration configuration from JSON file
+ */
+export async function loadImmigrationConfig(): Promise<ImmigrationConfigData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/immigration_config.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save immigration configuration to JSON file
+ */
+export async function saveImmigrationConfig(data: ImmigrationConfigData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/immigration_config.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Phase 7: Relationship Types APIs
+// =============================================================================
+
+/**
+ * Load relationship types from JSON file
+ */
+export async function loadRelationshipTypes(): Promise<RelationshipTypesData> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/relationship_types.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save relationship types to JSON file
+ */
+export async function saveRelationshipTypes(data: RelationshipTypesData): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/relationship_types.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Phase 7: Extended Fulfillment Vectors (with Buildings)
+// =============================================================================
+
+/**
+ * Load fulfillment vectors with building support
+ */
+export async function loadFulfillmentVectorsV2(): Promise<FulfillmentVectorsDataV2> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/fulfillment_vectors.json`;
+  const content = await readJsonFile(filePath);
+  return JSON.parse(content);
+}
+
+/**
+ * Save fulfillment vectors with building support
+ */
+export async function saveFulfillmentVectorsV2(data: FulfillmentVectorsDataV2): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/fulfillment_vectors.json`;
+  const content = JSON.stringify(data, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+// =============================================================================
+// Pre-Computed Commodity Cache APIs
+// =============================================================================
+
+/**
+ * Simple hash function for change detection
+ */
+function simpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(16);
+}
+
+/**
+ * Generate pre-computed commodity cache from source data
+ * This mirrors the logic in CommodityCache.lua but runs in the info-system
+ */
+export async function generateCommodityCache(): Promise<PreComputedCommodityCache> {
+  // Load all required data
+  const [fulfillmentData, dimensionData, substitutionData] = await Promise.all([
+    loadFulfillmentVectors(),
+    loadDimensionDefinitions(),
+    loadSubstitutionRules()
+  ]);
+
+  // Build fine dimension name to index map
+  const fineNameToIndex: Record<string, number> = {};
+  const fineIndexToName: Record<number, string> = {};
+  for (const fineDim of dimensionData.fineDimensions) {
+    fineNameToIndex[fineDim.id] = fineDim.index;
+    fineIndexToName[fineDim.index] = fineDim.id;
+  }
+
+  // Build coarse dimension name to index map
+  const coarseNameToIndex: Record<string, number> = {};
+  const coarseIndexToName: Record<number, string> = {};
+  for (const coarseDim of dimensionData.coarseDimensions) {
+    coarseNameToIndex[coarseDim.id] = coarseDim.index;
+    coarseIndexToName[coarseDim.index] = coarseDim.id;
+  }
+
+  // Build fine to coarse mapping
+  const fineToCoarseMap: Record<number, number> = {};
+  for (const fineDim of dimensionData.fineDimensions) {
+    const coarseIndex = coarseNameToIndex[fineDim.parentCoarse];
+    if (coarseIndex !== undefined) {
+      fineToCoarseMap[fineDim.index] = coarseIndex;
+    }
+  }
+
+  // Build coarse to fine range mapping
+  const coarseToFineRange: Record<number, { start: number; finish: number }> = {};
+  for (let coarseIdx = 0; coarseIdx < dimensionData.coarseDimensions.length; coarseIdx++) {
+    let fineStart: number | null = null;
+    let fineEnd: number | null = null;
+
+    for (const fineDim of dimensionData.fineDimensions) {
+      if (fineToCoarseMap[fineDim.index] === coarseIdx) {
+        if (fineStart === null || fineDim.index < fineStart) {
+          fineStart = fineDim.index;
+        }
+        if (fineEnd === null || fineDim.index > fineEnd) {
+          fineEnd = fineDim.index;
+        }
+      }
+    }
+
+    if (fineStart !== null && fineEnd !== null) {
+      coarseToFineRange[coarseIdx] = { start: fineStart, finish: fineEnd };
+    }
+  }
+
+  // Initialize cache structures
+  const byCoarseDimension: Record<string, DimensionCache> = {};
+  const byFineDimension: Record<string, DimensionCache> = {};
+  const substitutionGroups: Record<string, SubstitutionGroupCache> = {};
+
+  // Initialize coarse dimension caches
+  for (const coarseDim of dimensionData.coarseDimensions) {
+    byCoarseDimension[coarseDim.id] = {
+      available: [],
+      sortedByValue: []
+    };
+  }
+
+  // Initialize fine dimension caches
+  for (const fineDim of dimensionData.fineDimensions) {
+    byFineDimension[fineDim.id] = {
+      available: [],
+      sortedByValue: []
+    };
+  }
+
+  // Initialize substitution groups
+  if (substitutionData.substitutionHierarchies) {
+    for (const category of Object.keys(substitutionData.substitutionHierarchies)) {
+      const commodities = substitutionData.substitutionHierarchies[category];
+      substitutionGroups[category] = {
+        members: Object.keys(commodities),
+        available: Object.keys(commodities) // All are available in pre-computed cache
+      };
+    }
+  }
+
+  // Process each commodity with fulfillment vectors
+  let totalCommodities = 0;
+  for (const [commodityId, commodityData] of Object.entries(fulfillmentData.commodities)) {
+    totalCommodities++;
+    const fineVector = commodityData.fulfillmentVector?.fine;
+
+    if (!fineVector) continue;
+
+    // Add to fine dimension caches
+    for (const [fineName, points] of Object.entries(fineVector)) {
+      if (points > 0 && byFineDimension[fineName]) {
+        byFineDimension[fineName].available.push({
+          id: commodityId,
+          value: points
+        });
+      }
+    }
+
+    // Aggregate to coarse dimension caches
+    const coarseValues: Record<string, number> = {};
+    for (const [fineName, points] of Object.entries(fineVector)) {
+      if (points > 0) {
+        const fineIndex = fineNameToIndex[fineName];
+        if (fineIndex !== undefined) {
+          const coarseIndex = fineToCoarseMap[fineIndex];
+          if (coarseIndex !== undefined) {
+            const coarseName = coarseIndexToName[coarseIndex];
+            if (coarseName) {
+              coarseValues[coarseName] = (coarseValues[coarseName] || 0) + points;
+            }
+          }
+        }
+      }
+    }
+
+    for (const [coarseName, totalPoints] of Object.entries(coarseValues)) {
+      if (byCoarseDimension[coarseName]) {
+        byCoarseDimension[coarseName].available.push({
+          id: commodityId,
+          value: totalPoints
+        });
+      }
+    }
+  }
+
+  // Sort all caches by value (descending) and extract IDs
+  for (const cache of Object.values(byFineDimension)) {
+    cache.available.sort((a, b) => b.value - a.value);
+    cache.sortedByValue = cache.available.map(entry => entry.id);
+  }
+
+  for (const cache of Object.values(byCoarseDimension)) {
+    cache.available.sort((a, b) => b.value - a.value);
+    cache.sortedByValue = cache.available.map(entry => entry.id);
+  }
+
+  // Generate hashes for change detection
+  const fulfillmentHash = simpleHash(JSON.stringify(fulfillmentData));
+  const dimensionHash = simpleHash(JSON.stringify(dimensionData));
+  const substitutionHash = simpleHash(JSON.stringify(substitutionData));
+
+  const cache: PreComputedCommodityCache = {
+    version: '1.0.0',
+    generatedAt: new Date().toISOString(),
+    sourceDataHashes: {
+      fulfillmentVectors: fulfillmentHash,
+      dimensionDefinitions: dimensionHash,
+      substitutionRules: substitutionHash
+    },
+    byCoarseDimension,
+    byFineDimension,
+    substitutionGroups,
+    metadata: {
+      coarseCacheCount: Object.keys(byCoarseDimension).length,
+      fineCacheCount: Object.keys(byFineDimension).length,
+      substitutionGroupCount: Object.keys(substitutionGroups).length,
+      totalCommodities
+    }
+  };
+
+  return cache;
+}
+
+/**
+ * Save pre-computed commodity cache to JSON file
+ */
+export async function saveCommodityCache(cache: PreComputedCommodityCache): Promise<void> {
+  const dataDir = await getDataDir();
+  const versionPath = getActiveVersionPath();
+  const filePath = `${dataDir}/${versionPath}/craving_system/commodity_cache.json`;
+  const content = JSON.stringify(cache, null, 2);
+  await writeJsonFile(filePath, content);
+}
+
+/**
+ * Load pre-computed commodity cache from JSON file
+ */
+export async function loadCommodityCache(): Promise<PreComputedCommodityCache | null> {
+  try {
+    const dataDir = await getDataDir();
+    const versionPath = getActiveVersionPath();
+    const filePath = `${dataDir}/${versionPath}/craving_system/commodity_cache.json`;
+    const content = await readJsonFile(filePath);
+    return JSON.parse(content);
+  } catch {
+    return null; // Cache doesn't exist yet
+  }
+}
+
+/**
+ * Generate and save the commodity cache
+ * Returns the generated cache and time taken
+ */
+export async function generateAndSaveCommodityCache(): Promise<{
+  cache: PreComputedCommodityCache;
+  generationTimeMs: number;
+}> {
+  const startTime = performance.now();
+  const cache = await generateCommodityCache();
+  await saveCommodityCache(cache);
+  const endTime = performance.now();
+
+  return {
+    cache,
+    generationTimeMs: endTime - startTime
+  };
+}
+
+/**
+ * Check if cache needs regeneration by comparing source data hashes
+ */
+export async function cacheNeedsRegeneration(): Promise<{
+  needsRegeneration: boolean;
+  reason?: string;
+}> {
+  const existingCache = await loadCommodityCache();
+
+  if (!existingCache) {
+    return { needsRegeneration: true, reason: 'Cache does not exist' };
+  }
+
+  // Load current source data and compare hashes
+  const [fulfillmentData, dimensionData, substitutionData] = await Promise.all([
+    loadFulfillmentVectors(),
+    loadDimensionDefinitions(),
+    loadSubstitutionRules()
+  ]);
+
+  const currentFulfillmentHash = simpleHash(JSON.stringify(fulfillmentData));
+  const currentDimensionHash = simpleHash(JSON.stringify(dimensionData));
+  const currentSubstitutionHash = simpleHash(JSON.stringify(substitutionData));
+
+  if (existingCache.sourceDataHashes.fulfillmentVectors !== currentFulfillmentHash) {
+    return { needsRegeneration: true, reason: 'Fulfillment vectors have changed' };
+  }
+  if (existingCache.sourceDataHashes.dimensionDefinitions !== currentDimensionHash) {
+    return { needsRegeneration: true, reason: 'Dimension definitions have changed' };
+  }
+  if (existingCache.sourceDataHashes.substitutionRules !== currentSubstitutionHash) {
+    return { needsRegeneration: true, reason: 'Substitution rules have changed' };
+  }
+
+  return { needsRegeneration: false };
 }

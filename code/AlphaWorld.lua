@@ -14,13 +14,23 @@ local NaturalResources = require("code.NaturalResources")
 local ImmigrationSystem = require("code.ImmigrationSystem")
 local River = require("code.River")
 local Forest = require("code.Forest")
+local Mountain = require("code.Mountain")
 local ProductionStats = require("code.ProductionStats")
+
+-- Ownership & Housing Systems
+local LandSystem = require("code.LandSystem")
+local OwnershipManager = require("code.OwnershipManager")
+local EconomicsSystem = require("code.EconomicsSystem")
+local HousingSystem = require("code.HousingSystem")
 
 AlphaWorld = {}
 AlphaWorld.__index = AlphaWorld
 
-function AlphaWorld:Create()
+function AlphaWorld:Create(terrainConfig)
     local world = setmetatable({}, AlphaWorld)
+
+    -- Store terrain config for later use
+    world.terrainConfig = terrainConfig
 
     -- Load all game data
     world:LoadData()
@@ -33,7 +43,8 @@ function AlphaWorld:Create()
         world.characterClasses,
         world.dimensionDefinitions,
         world.commodityFatigueRates,
-        world.enablementRules
+        world.enablementRules,
+        world.classThresholds  -- Phase 3: for emergent class calculation
     )
     CommodityCache.Init(world.fulfillmentVectors, world.dimensionDefinitions, world.substitutionRules, CharacterV3)
     AllocationEngineV2.Init(world.consumptionMechanics, world.fulfillmentVectors, world.substitutionRules, CharacterV3, CommodityCache)
@@ -94,6 +105,10 @@ function AlphaWorld:Create()
         unemployedCount = 0
     }
 
+    -- Production statistics tracking
+    world.productionStats = ProductionStats.new()
+    world.productionStatsTick = 0
+
     -- Event log
     world.eventLog = {}
     world.maxEvents = 100
@@ -120,30 +135,71 @@ function AlphaWorld:Create()
         seed = os.time()
     })
 
-    -- Create river (flows through the world)
-    -- River uses centered coordinates where (0,0) is world center
-    -- So startY=-worldHeight/2 is top, endY=+worldHeight/2 is bottom
-    -- centerX=0 means river flows through the center (offset by curviness)
+    -- Create river based on terrain config
     local halfW = world.worldWidth / 2
     local halfH = world.worldHeight / 2
-    world.river = River:Create({
-        startY = -halfH - 50,         -- Start above visible area
-        endY = halfH + 50,            -- End below visible area
-        centerX = halfW * 0.5,        -- Offset to the right side of world
-        baseWidth = 80,               -- Slightly wider river for larger world
-        curviness = 120,              -- More curviness for visual interest
-        widthVariation = 0.3
-    })
+    local tc = terrainConfig or {}  -- terrain config shorthand
 
-    -- Create forest (avoids river) - more regions for larger world
+    -- Determine if river should be created
+    local riverEnabled = tc.riverEnabled
+    if riverEnabled == nil then riverEnabled = true end  -- Default: enable river
+
+    if riverEnabled then
+        -- Determine river position
+        local riverCenterX
+        local riverPosition = tc.riverPosition or "center"
+        if riverPosition == "east" then
+            riverCenterX = halfW * 0.7
+        elseif riverPosition == "west" then
+            riverCenterX = -halfW * 0.3
+        else  -- "center" or default
+            riverCenterX = halfW * 0.5
+        end
+
+        local riverWidth = tc.riverWidth or 80
+
+        world.river = River:Create({
+            startY = -halfH - 50,
+            endY = halfH + 50,
+            centerX = riverCenterX,
+            baseWidth = riverWidth,
+            curviness = 120,
+            widthVariation = 0.3
+        })
+    else
+        world.river = nil
+    end
+
+    -- Create forest (avoids river) - density based on terrain config
+    local forestDensity = tc.forestDensity or 0.2  -- Default 20% density
+    local numRegions = math.floor(forestDensity * 40)  -- Scale regions by density
+    if numRegions < 4 then numRegions = 4 end
+
     world.forest = Forest:Create({
         minX = 0,
         minY = 0,
         maxX = world.worldWidth,
         maxY = world.worldHeight,
         river = world.river,
-        numRegions = 16               -- More forest regions for larger world
+        numRegions = numRegions
     })
+
+    -- Create mountains if enabled in terrain config
+    world.mountains = nil
+    if tc.mountainsEnabled and tc.mountainPositions and #tc.mountainPositions > 0 then
+        world.mountains = Mountain.CreateTerrain({
+            minX = 0,
+            minY = 0,
+            maxX = world.worldWidth,
+            maxY = world.worldHeight,
+            positions = tc.mountainPositions
+        })
+        print("[AlphaWorld] Created mountains: " .. world.mountains:GetRangeCount() .. " ranges")
+    end
+
+    -- Store ground and water colors from terrain config
+    world.groundColor = tc.groundColor or {0.4, 0.5, 0.3}
+    world.waterColor = tc.waterColor or {0.2, 0.4, 0.7}
 
     -- Now set the river reference and generate resources
     world.naturalResources.mRiver = world.river
@@ -152,7 +208,66 @@ function AlphaWorld:Create()
     -- Post-process resources to mask out water and forest areas
     world:MaskResourcesInBlockedAreas()
 
+    -- ==========================================================================
+    -- OWNERSHIP & HOUSING SYSTEMS
+    -- ==========================================================================
+
+    -- Land System - manages plot grid and ownership
+    world.landSystem = LandSystem:Create({
+        worldWidth = world.worldWidth,
+        worldHeight = world.worldHeight
+    })
+
+    -- Mark blocked terrain in land system (water, mountains)
+    world:InitializeLandTerrain()
+
+    -- Ownership Manager - tracks building/land ownership
+    world.ownershipManager = OwnershipManager:Create(world.landSystem, nil)
+
+    -- Economics System - per-character finances and emergent class
+    world.economicsSystem = EconomicsSystem:Create(world.ownershipManager)
+
+    -- Housing System - housing assignment and satisfaction
+    world.housingSystem = HousingSystem:Create(nil, world.economicsSystem, nil)
+
     return world
+end
+
+-- Initialize land terrain based on water, mountains, and forests
+function AlphaWorld:InitializeLandTerrain()
+    if not self.landSystem then return end
+
+    local gridColumns = self.landSystem.gridColumns
+    local gridRows = self.landSystem.gridRows
+    local plotWidth = self.landSystem.plotWidth
+    local plotHeight = self.landSystem.plotHeight
+
+    for gx = 0, gridColumns - 1 do
+        for gy = 0, gridRows - 1 do
+            local plotId = self.landSystem:GetPlotId(gx, gy)
+            local worldX = gx * plotWidth + plotWidth / 2
+            local worldY = gy * plotHeight + plotHeight / 2
+
+            -- Check if plot is in water
+            if self:IsPositionInWater(worldX, worldY) then
+                self.landSystem:SetPlotTerrain(plotId, "water", true)
+            -- Check if plot is in mountains
+            elseif self.mountains and self.mountains:CheckRectCollision(
+                gx * plotWidth, gy * plotHeight, plotWidth, plotHeight
+            ) then
+                self.landSystem:SetPlotTerrain(plotId, "mountain", true)
+            -- Check if plot is in forest
+            elseif self.forest and self.forest:CheckRectCollision(
+                gx * plotWidth, gy * plotHeight, plotWidth, plotHeight
+            ) then
+                self.landSystem:SetPlotTerrain(plotId, "forest", false)
+                -- Set natural resources for forest plots
+                self.landSystem:SetPlotResources(plotId, {"timber"})
+            end
+        end
+    end
+
+    print("[AlphaWorld] Initialized land terrain for " .. gridColumns * gridRows .. " plots")
 end
 
 -- Mask out resources in areas covered by water or forest
@@ -210,6 +325,11 @@ function AlphaWorld:LoadData()
     self.commodityFatigueRates = DataLoader.loadCommodityFatigueRates()
     self.enablementRules = DataLoader.loadEnablementRules()
     self.substitutionRules = DataLoader.loadSubstitutionRules()
+
+    -- Economics data (Phase 3)
+    self.classThresholds = DataLoader.loadClassThresholds()
+    self.economicSystemsConfig = DataLoader.loadEconomicSystems()
+    self.landConfig = DataLoader.loadLandConfig()
 
     -- Production data
     self.buildingTypes = DataLoader.loadBuildingTypes() or {}
@@ -386,6 +506,206 @@ function AlphaWorld:OnDayChange(dayNumber)
 
     -- Run free agency - citizens seek best workplaces daily
     self:RunFreeAgency()
+
+    -- Apply housing satisfaction (once per day)
+    self:ApplyHousingSatisfaction(dayNumber)
+
+    -- Process economic updates
+    self:ProcessDailyEconomics(dayNumber)
+end
+
+-- Apply housing fulfillment to all citizens once per day
+function AlphaWorld:ApplyHousingSatisfaction(dayNumber)
+    if not self.housingSystem then
+        return
+    end
+
+    local homelessCount = 0
+    local housedCount = 0
+
+    for _, citizen in ipairs(self.citizens) do
+        local result = self.housingSystem:ApplyHousingFulfillment(citizen.id, citizen, dayNumber)
+
+        if result.applied then
+            housedCount = housedCount + 1
+            -- Apply the housing fulfillment to the citizen's satisfaction
+            -- The fulfillment vector is already calculated and filtered by enabled dimensions
+            if result.fulfillment and citizen.ApplyHousingFulfillment then
+                citizen:ApplyHousingFulfillment(result.fulfillment, result.crowdingModifier)
+            end
+        else
+            homelessCount = homelessCount + 1
+            -- Apply homeless penalty
+            if result.penalty and citizen.ApplyHomelessPenalty then
+                citizen:ApplyHomelessPenalty(result.penalty)
+            end
+        end
+    end
+
+    -- Update housing stats
+    self.stats.homelessCount = homelessCount
+    self.stats.housedCount = housedCount
+
+    if homelessCount > 0 then
+        self:LogEvent("housing", homelessCount .. " homeless citizens suffering", {
+            severity = "warning"
+        })
+    end
+end
+
+-- Process daily economic activities
+function AlphaWorld:ProcessDailyEconomics(dayNumber)
+    -- Start new economic cycle
+    if self.economicsSystem then
+        self.economicsSystem:StartNewCycle()
+    end
+
+    -- Process daily wage payments for all working citizens
+    self:ProcessWagePayments(dayNumber)
+
+    -- Process rent payments every 15 days (rent cycle)
+    local rentCycleInterval = 15
+    if self.housingSystem and dayNumber % rentCycleInterval == 0 then
+        -- Use enhanced rent processing with eviction handling
+        local rentResults = self.housingSystem:ProcessRentWithEviction(dayNumber)
+        if #rentResults.collected > 0 then
+            self:LogEvent("economics", #rentResults.collected .. " rent payments processed (" ..
+                math.floor(rentResults.totalCollected) .. " gold)", {})
+        end
+        if #rentResults.overdue > 0 then
+            self:LogEvent("economics", #rentResults.overdue .. " citizens behind on rent", {
+                severity = "warning"
+            })
+        end
+        if #rentResults.evicted > 0 then
+            self:LogEvent("housing", #rentResults.evicted .. " citizens evicted for non-payment", {
+                severity = "critical"
+            })
+        end
+    end
+
+    -- Process relocation queue daily (homeless citizens seeking housing)
+    if self.housingSystem then
+        local relocated = self.housingSystem:ProcessRelocationQueue(dayNumber)
+        if #relocated > 0 then
+            self:LogEvent("housing", #relocated .. " citizens found new housing", {})
+        end
+
+        -- Check for citizens wanting to relocate (class changes, upgrades)
+        local relocationDesires = self.housingSystem:CheckRelocationDesires(dayNumber)
+        if #relocationDesires > 0 then
+            self:LogEvent("housing", #relocationDesires .. " citizens seeking better housing", {})
+        end
+    end
+
+    -- Recalculate emergent classes every 15 days (same as rent cycle)
+    if self.economicsSystem and dayNumber % rentCycleInterval == 0 then
+        for _, citizen in ipairs(self.citizens) do
+            local newClass = self.economicsSystem:GetClass(citizen.id, dayNumber)
+            -- Update citizen's class if it changed
+            if newClass ~= citizen.class then
+                local oldClass = citizen.class
+                citizen.class = newClass
+                self:LogEvent("class_change", citizen.name .. " is now " .. newClass, {
+                    from = oldClass,
+                    to = newClass
+                })
+            end
+        end
+    end
+end
+
+-- Process wage payments for all employed citizens
+function AlphaWorld:ProcessWagePayments(dayNumber)
+    if not self.economicsSystem then
+        return
+    end
+
+    local totalWagesPaid = 0
+    local workersPaid = 0
+
+    for _, citizen in ipairs(self.citizens) do
+        -- Check if citizen has a workplace
+        if citizen.workplace then
+            -- Get the citizen's wage rate
+            local wageRate = self:GetCitizenWageRate(citizen)
+
+            if wageRate > 0 then
+                -- Determine who pays the wage: building owner or town treasury
+                local buildingOwnerId = nil
+                if self.ownershipManager then
+                    buildingOwnerId = self.ownershipManager:GetBuildingOwner(citizen.workplace.id)
+                end
+
+                if buildingOwnerId and buildingOwnerId ~= "town" then
+                    -- Building is privately owned - owner pays wage from their funds
+                    local ownerCanPay, _ = self.economicsSystem:SpendGold(
+                        buildingOwnerId,
+                        wageRate,
+                        "wage_" .. citizen.id
+                    )
+
+                    if ownerCanPay then
+                        -- Owner paid, worker receives wage
+                        self.economicsSystem:AddGold(citizen.id, wageRate, "wage_" .. citizen.workplace.id)
+                        totalWagesPaid = totalWagesPaid + wageRate
+                        workersPaid = workersPaid + 1
+                    else
+                        -- Owner can't afford wages - TODO: handle this (worker might leave)
+                        -- For now, town pays as subsidy
+                        if self.gold >= wageRate then
+                            self.gold = self.gold - wageRate
+                            self.economicsSystem:AddGold(citizen.id, wageRate, "wage_subsidy_" .. citizen.workplace.id)
+                            totalWagesPaid = totalWagesPaid + wageRate
+                            workersPaid = workersPaid + 1
+                        end
+                    end
+                else
+                    -- Town-owned building or no owner - town pays wages
+                    if self.gold >= wageRate then
+                        self.gold = self.gold - wageRate
+                        self.economicsSystem:AddGold(citizen.id, wageRate, "wage_" .. (citizen.workplace.id or "town"))
+                        totalWagesPaid = totalWagesPaid + wageRate
+                        workersPaid = workersPaid + 1
+                    end
+                end
+            end
+        end
+    end
+
+    -- Update stats
+    self.stats.dailyWagesPaid = totalWagesPaid
+
+    -- Log if significant wages paid
+    if workersPaid > 0 and dayNumber % 5 == 0 then
+        self:LogEvent("economics", string.format("%d workers paid %d gold in wages", workersPaid, totalWagesPaid), {})
+    end
+end
+
+-- Get wage rate for a citizen based on their vocation
+function AlphaWorld:GetCitizenWageRate(citizen)
+    -- Look up worker type by vocation
+    local vocation = citizen.vocation or "General Worker"
+
+    -- Try to find in loaded worker types
+    if self.workerTypes then
+        for _, wt in ipairs(self.workerTypes) do
+            if wt.name == vocation or wt.id == vocation then
+                return wt.minimumWage or 10
+            end
+        end
+    end
+
+    -- Default wage based on class if no vocation match
+    local classWages = {
+        Elite = 25,
+        Upper = 18,
+        Middle = 12,
+        Working = 8,
+        Poor = 5
+    }
+
+    return classWages[citizen.class] or 10
 end
 
 -- Backward compatibility getters
@@ -453,7 +773,8 @@ end
 -- CITIZEN MANAGEMENT
 -- =============================================================================
 
-function AlphaWorld:AddCitizen(class, name, traits)
+function AlphaWorld:AddCitizen(class, name, traits, options)
+    options = options or {}
     local defaultClass = DataLoader.getDefaultClassId()
     local citizen = CharacterV3:New(class or defaultClass, "citizen_" .. self.nextCitizenId)
     self.nextCitizenId = self.nextCitizenId + 1
@@ -509,6 +830,17 @@ function AlphaWorld:AddCitizen(class, name, traits)
     -- Work assignment
     citizen.workplace = nil
     citizen.workStation = nil
+
+    -- Vocation from options
+    if options.vocation then
+        citizen.vocation = options.vocation
+    end
+
+    -- Initialize in economics system with starting wealth
+    local startingWealth = options.startingWealth or 0
+    if self.economicsSystem then
+        self.economicsSystem:InitializeCharacter(citizen.id, startingWealth)
+    end
 
     table.insert(self.citizens, citizen)
     self.stats.totalPopulation = #self.citizens
@@ -566,7 +898,8 @@ end
 -- BUILDING MANAGEMENT
 -- =============================================================================
 
-function AlphaWorld:AddBuilding(buildingTypeId, x, y)
+function AlphaWorld:AddBuilding(buildingTypeId, x, y, options)
+    options = options or {}
     local buildingType = self.buildingTypesById[buildingTypeId]
     if not buildingType then
         print("Unknown building type: " .. tostring(buildingTypeId))
@@ -619,6 +952,33 @@ function AlphaWorld:AddBuilding(buildingTypeId, x, y)
     self.nextBuildingId = self.nextBuildingId + 1
     table.insert(self.buildings, building)
 
+    -- Register building ownership
+    local ownerId = options.ownerId or OwnershipManager.TOWN_OWNER_ID
+    local purchasePrice = options.purchasePrice or (buildingType.constructionCost and buildingType.constructionCost.gold) or 0
+    if self.ownershipManager then
+        self.ownershipManager:RegisterBuilding(building.id, ownerId, purchasePrice, self.timeManager:GetDay())
+    end
+
+    -- Register housing building if it has housingConfig
+    if buildingType.housingConfig and self.housingSystem then
+        self.housingSystem:RegisterHousingBuilding(building.id, buildingTypeId)
+
+        -- Assign initial occupants if provided
+        if options.initialOccupants then
+            for _, occupantId in ipairs(options.initialOccupants) do
+                self.housingSystem:AssignHousing(occupantId, building.id)
+            end
+        end
+    end
+
+    -- Register building on land plots
+    if self.landSystem then
+        local plots = self.landSystem:GetPlotsForBuilding(x, y, 60, 60)
+        for _, plot in ipairs(plots) do
+            self.landSystem:AddBuildingToPlot(plot.id, building.id)
+        end
+    end
+
     self:LogEvent("construction", building.name .. " built", {type = buildingTypeId})
 
     return building
@@ -667,12 +1027,14 @@ end
 -- =============================================================================
 
 function AlphaWorld:RunFreeAgency()
+    print("[FreeAgency] Running for " .. #self.citizens .. " citizens")
     -- Run for all citizens - both unemployed seeking jobs and employed considering better options
     for _, citizen in ipairs(self.citizens) do
         -- Unemployed citizens always seek work
         if not citizen.workplace then
             local bestBuilding = self:FindBestBuildingForCitizen(citizen)
             if bestBuilding then
+                print("[FreeAgency] " .. citizen.name .. " (" .. (citizen.vocation or "?") .. ") -> " .. bestBuilding.name)
                 self:AssignWorkerToBuilding(citizen, bestBuilding)
                 self:LogEvent("employment", citizen.name .. " started working at " .. bestBuilding.name, {})
             end
@@ -699,6 +1061,7 @@ end
 function AlphaWorld:FindBestBuildingForCitizen(citizen, excludeCurrent)
     local bestBuilding = nil
     local bestScore = -math.huge
+    local debugVocation = citizen.vocation or "?"
 
     for _, building in ipairs(self.buildings) do
         -- Skip current workplace if requested
@@ -726,12 +1089,22 @@ function AlphaWorld:FindBestBuildingForCitizen(citizen, excludeCurrent)
 
         -- Check if citizen is qualified for this building type
         local buildingType = self.buildingTypesById[building.typeId]
-        if not self:IsCitizenQualifiedForBuilding(citizen, buildingType) then
+        local qualified = self:IsCitizenQualifiedForBuilding(citizen, buildingType)
+        if not qualified then
+            -- Debug: Print why Shoemaker was rejected
+            if debugVocation == "Shoemaker" then
+                print("[FindBest] " .. debugVocation .. " NOT qualified for " .. building.name .. " (" .. (building.typeId or "?") .. ")")
+            end
             goto continue
         end
 
         -- Calculate job satisfaction score
         local score = self:CalculateJobSatisfaction(citizen, building)
+
+        -- Debug: Print qualified buildings for Shoemaker
+        if debugVocation == "Shoemaker" then
+            print("[FindBest] " .. debugVocation .. " qualified for " .. building.name .. " score=" .. score)
+        end
 
         if score > bestScore then
             bestScore = score
@@ -759,7 +1132,23 @@ function AlphaWorld:IsCitizenQualifiedForBuilding(citizen, buildingType)
     -- Look up work categories from the vocationWorkCategories lookup table
     local citizenCategories = self.vocationWorkCategories[citizenVocation]
         or self.vocationWorkCategories[citizenVocation:lower()]
-        or {"General Labor"}  -- Default fallback
+
+    -- DEBUG: Log when falling back to General Labor
+    if not citizenCategories then
+        print("[DEBUG] Vocation lookup FAILED for: '" .. citizenVocation .. "'")
+        print("[DEBUG] Available vocations in lookup:")
+        local count = 0
+        for k, v in pairs(self.vocationWorkCategories) do
+            if count < 10 then
+                print("  - '" .. k .. "' -> " .. table.concat(v, ", "))
+            end
+            count = count + 1
+        end
+        if count > 10 then
+            print("  ... and " .. (count - 10) .. " more")
+        end
+        citizenCategories = {"General Labor"}
+    end
 
     -- Check for overlap between citizen's work categories and building's requirements
     for _, citizenCat in ipairs(citizenCategories) do
@@ -977,6 +1366,11 @@ function AlphaWorld:ValidateBuildingPlacement(buildingType, x, y, width, height)
         table.insert(errors, "Cannot build on trees")
     end
 
+    -- Check collision with mountains
+    if self.mountains and self.mountains:CheckRectCollision(x, y, width, height) then
+        table.insert(errors, "Cannot build on mountains")
+    end
+
     -- Check collision with existing buildings
     for _, building in ipairs(self.buildings) do
         local bw = 60
@@ -1092,14 +1486,22 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
                     if station.progress >= 1 then
                         station.progress = 0
 
-                        -- Consume inputs
+                        -- Consume inputs and record stats
                         for _, input in ipairs(station.recipe.inputs or {}) do
                             self:RemoveFromInventory(input.commodityId, input.quantity)
+                            -- Record consumption in production stats
+                            if self.productionStats then
+                                self.productionStats:recordConsumption(input.commodityId, input.quantity)
+                            end
                         end
 
-                        -- Produce outputs
+                        -- Produce outputs and record stats
                         for _, output in ipairs(station.recipe.outputs or {}) do
                             self:AddToInventory(output.commodityId, output.quantity)
+                            -- Record production in production stats
+                            if self.productionStats then
+                                self.productionStats:recordProduction(output.commodityId, output.quantity, building.id)
+                            end
                         end
 
                         self:LogEvent("production", building.name .. " produced " .. station.recipe.name, {})
@@ -1210,6 +1612,27 @@ function AlphaWorld:Update(dt)
     if self.isPaused then return end
 
     self.gameTime = self.gameTime + dt
+
+    -- Update production stats tick
+    if self.productionStats then
+        self.productionStatsTick = self.productionStatsTick + 1
+        self.productionStats:updateTick(self.productionStatsTick)
+
+        -- Record worker utilization
+        local totalWorkers = #self.citizens
+        local activeWorkers = 0
+        for _, citizen in ipairs(self.citizens) do
+            if citizen.workplace then
+                activeWorkers = activeWorkers + 1
+            end
+        end
+        self.productionStats:recordWorkerStats(totalWorkers, activeWorkers)
+
+        -- Record stockpile levels
+        for commodityId, quantity in pairs(self.inventory) do
+            self.productionStats:recordStockpile(commodityId, quantity)
+        end
+    end
 
     -- Update production
     self:UpdateProduction(dt)
@@ -1350,6 +1773,73 @@ function AlphaWorld:LogEvent(eventType, message, details)
 end
 
 -- =============================================================================
+-- PRODUCTION STATS ACCESS
+-- =============================================================================
+
+function AlphaWorld:GetProductionStats()
+    return self.productionStats
+end
+
+function AlphaWorld:GetProductionMetrics()
+    if self.productionStats then
+        return self.productionStats:getMetricsSummary()
+    end
+    return nil
+end
+
+function AlphaWorld:GetBuildingEfficiencies()
+    -- Calculate efficiency for each building based on worker count and production state
+    local efficiencies = {}
+
+    for _, building in ipairs(self.buildings) do
+        local totalStations = #building.stations
+        local activeStations = 0
+        local producingStations = 0
+
+        for _, station in ipairs(building.stations) do
+            if station.recipe then
+                activeStations = activeStations + 1
+                if station.state == "PRODUCING" then
+                    producingStations = producingStations + 1
+                end
+            end
+        end
+
+        local workerCount = #(building.workers or {})
+        local maxWorkers = building.maxWorkers or totalStations
+
+        -- Calculate efficiency as percentage
+        local efficiency = 0
+        if activeStations > 0 then
+            efficiency = (producingStations / activeStations) * 100
+        end
+
+        -- Worker utilization
+        local workerUtil = maxWorkers > 0 and (workerCount / maxWorkers) * 100 or 0
+
+        table.insert(efficiencies, {
+            id = building.id,
+            name = building.name,
+            typeId = building.typeId,
+            efficiency = efficiency,
+            workerUtilization = workerUtil,
+            workerCount = workerCount,
+            maxWorkers = maxWorkers,
+            activeStations = activeStations,
+            producingStations = producingStations,
+            totalStations = totalStations
+        })
+    end
+
+    -- Sort by efficiency descending
+    table.sort(efficiencies, function(a, b)
+        return a.efficiency > b.efficiency
+    end)
+
+    return efficiencies
+end
+
+-- =============================================================================
 -- SAVE/LOAD
 -- =============================================================================
 
@@ -1414,11 +1904,108 @@ function AlphaWorld:LoadFromSaveData(saveData)
     -- Restore stats history
     self.statsHistory = saveData.statsHistory or {}
 
+    -- Restore ownership & housing systems
+    if saveData.landSystemData and self.landSystem then
+        self.landSystem:Deserialize(saveData.landSystemData)
+    end
+    if saveData.ownershipData and self.ownershipManager then
+        self.ownershipManager:Deserialize(saveData.ownershipData)
+    end
+    if saveData.economicsData and self.economicsSystem then
+        self.economicsSystem:Deserialize(saveData.economicsData)
+    end
+    if saveData.housingData and self.housingSystem then
+        self.housingSystem:Deserialize(saveData.housingData)
+    end
+
     -- Update stats
     self:UpdateStats()
 
     -- Log the load
     self:LogEvent("info", "Game loaded: " .. self.townName, {})
+end
+
+-- Serialize world state for saving
+function AlphaWorld:Serialize()
+    local saveData = {
+        townName = self.townName,
+        gold = self.gold,
+        gameConfig = self.gameConfig,
+
+        timeState = {
+            currentHour = self.timeManager.currentHour,
+            dayNumber = self.timeManager.dayNumber,
+            currentSlotIndex = self.timeManager.currentSlotIndex,
+            isPaused = self.isPaused,
+            currentSpeed = self.timeManager.currentSpeed
+        },
+
+        inventory = self.inventory,
+        buildings = {},
+        citizens = {},
+        eventLog = self.eventLog,
+        statsHistory = self.statsHistory
+    }
+
+    -- Serialize buildings
+    for _, building in ipairs(self.buildings) do
+        local workerIds = {}
+        for _, worker in ipairs(building.workers or {}) do
+            table.insert(workerIds, worker.id)
+        end
+
+        table.insert(saveData.buildings, {
+            id = building.id,
+            typeId = building.typeId,
+            x = building.x,
+            y = building.y,
+            name = building.name,
+            workers = workerIds,
+            stations = building.stations,
+            isPaused = building.isPaused,
+            priority = building.priority
+        })
+    end
+
+    -- Serialize citizens
+    for _, citizen in ipairs(self.citizens) do
+        table.insert(saveData.citizens, {
+            id = citizen.id,
+            name = citizen.name,
+            class = citizen.class,
+            age = citizen.age,
+            vocation = citizen.vocation,
+            wealth = citizen.wealth,
+            traits = citizen.traits,
+            x = citizen.x,
+            y = citizen.y,
+            possessions = citizen.possessions,
+            cravings = citizen.cravings,
+            fatigueState = citizen.fatigueState,
+            workplaceId = citizen.workplace and citizen.workplace.id or nil
+        })
+    end
+
+    -- Serialize immigration queue
+    if self.immigrationSystem and self.immigrationSystem.queue then
+        saveData.immigrationQueue = self.immigrationSystem.queue
+    end
+
+    -- Serialize ownership & housing systems
+    if self.landSystem then
+        saveData.landSystemData = self.landSystem:Serialize()
+    end
+    if self.ownershipManager then
+        saveData.ownershipData = self.ownershipManager:Serialize()
+    end
+    if self.economicsSystem then
+        saveData.economicsData = self.economicsSystem:Serialize()
+    end
+    if self.housingSystem then
+        saveData.housingData = self.housingSystem:Serialize()
+    end
+
+    return saveData
 end
 
 function AlphaWorld:CreateBuildingFromData(data)

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { Card, Table, Button, Modal, Form, Input, InputNumber, Select, Space, message, Popconfirm, Tag, Row, Col } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ThunderboltOutlined } from '@ant-design/icons';
-import type { FulfillmentVectorsData, CommodityFulfillment, DimensionDefinitions, CommoditiesData } from '../types';
-import { loadFulfillmentVectors, saveFulfillmentVectors, loadDimensionDefinitions, loadCommodities } from '../api';
+import { useState, useEffect, useMemo } from 'react';
+import { Card, Table, Button, Modal, Form, Input, InputNumber, Select, Space, message, Popconfirm, Tag, Row, Col, Statistic, Tooltip } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, ThunderboltOutlined, LeftOutlined, RightOutlined, DatabaseOutlined, SyncOutlined } from '@ant-design/icons';
+import type { FulfillmentVectorsData, CommodityFulfillment, DimensionDefinitions, CommoditiesData, PreComputedCommodityCache } from '../types';
+import { loadFulfillmentVectors, saveFulfillmentVectors, loadDimensionDefinitions, loadCommodities, generateAndSaveCommodityCache, loadCommodityCache, cacheNeedsRegeneration } from '../api';
 import VectorEditor from './VectorEditor';
 import VectorVisualization from './VectorVisualization';
 import VectorHeatmap from './VectorHeatmap';
@@ -23,6 +23,18 @@ const FulfillmentVectorManager: React.FC = () => {
   const [isQuickFillVisible, setIsQuickFillVisible] = useState(false);
   const [form] = Form.useForm();
 
+  // Cache state
+  const [cacheInfo, setCacheInfo] = useState<PreComputedCommodityCache | null>(null);
+  const [cacheStatus, setCacheStatus] = useState<{ needsRegeneration: boolean; reason?: string } | null>(null);
+  const [generatingCache, setGeneratingCache] = useState(false);
+  const [isCacheModalVisible, setIsCacheModalVisible] = useState(false);
+
+  // Separate state for fulfillment vector since form.setFieldsValue doesn't work reliably
+  const [currentFulfillmentVector, setCurrentFulfillmentVector] = useState<{
+    coarse: number[];
+    fine: Record<string, number>;
+  }>({ coarse: new Array(9).fill(0), fine: {} });
+
   useEffect(() => {
     loadData();
   }, []);
@@ -38,11 +50,43 @@ const FulfillmentVectorManager: React.FC = () => {
       setData(fulfillmentData);
       setDimensions(dimensionsData);
       setCommodities(commoditiesData);
+
+      // Load cache info
+      loadCacheInfo();
     } catch (error) {
       message.error('Failed to load fulfillment vectors');
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCacheInfo = async () => {
+    try {
+      const [cache, status] = await Promise.all([
+        loadCommodityCache(),
+        cacheNeedsRegeneration()
+      ]);
+      setCacheInfo(cache);
+      setCacheStatus(status);
+    } catch (error) {
+      console.error('Failed to load cache info:', error);
+    }
+  };
+
+  const handleGenerateCache = async () => {
+    setGeneratingCache(true);
+    try {
+      const result = await generateAndSaveCommodityCache();
+      setCacheInfo(result.cache);
+      setCacheStatus({ needsRegeneration: false });
+      message.success(`Cache generated in ${result.generationTimeMs.toFixed(2)}ms`);
+      setIsCacheModalVisible(true);
+    } catch (error) {
+      message.error('Failed to generate cache');
+      console.error(error);
+    } finally {
+      setGeneratingCache(false);
     }
   };
 
@@ -75,6 +119,8 @@ const FulfillmentVectorManager: React.FC = () => {
         luxury: 2.0,
         masterwork: 3.0,
       },
+      durationCycles: null,
+      effectDecayRate: 0,
     });
     setIsModalVisible(true);
   };
@@ -86,6 +132,8 @@ const FulfillmentVectorManager: React.FC = () => {
       ...record,
       tags: record.tags.join(', '),
     });
+    // Initialize the fulfillment vector state
+    setCurrentFulfillmentVector(record.fulfillmentVector || { coarse: new Array(9).fill(0), fine: {} });
     setIsModalVisible(true);
   };
 
@@ -108,7 +156,7 @@ const FulfillmentVectorManager: React.FC = () => {
     saveData(newData);
   };
 
-  const handleModalOk = async () => {
+  const handleModalOk = async (closeAfterSave: boolean = false) => {
     try {
       const values = await form.validateFields();
       if (!data) return;
@@ -124,13 +172,21 @@ const FulfillmentVectorManager: React.FC = () => {
         ? values.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t)
         : values.tags;
 
+      // Use the state-tracked fulfillment vector instead of form
+      const fulfillmentVector = {
+        coarse: currentFulfillmentVector.coarse,
+        fine: currentFulfillmentVector.fine
+      };
+      console.log('handleModalOk - fulfillmentVector from state:', fulfillmentVector);
+
       const newCommodityData: CommodityFulfillment = {
         id: commodityId,
-        fulfillmentVector: values.fulfillmentVector,
+        fulfillmentVector,
         tags,
         durability: values.durability,
         qualityMultipliers: values.qualityMultipliers,
-        reusableValue: values.reusableValue,
+        durationCycles: values.durationCycles,
+        effectDecayRate: values.effectDecayRate,
         notes: values.notes,
       };
 
@@ -143,8 +199,12 @@ const FulfillmentVectorManager: React.FC = () => {
       };
 
       await saveData(newData);
-      setIsModalVisible(false);
-      form.resetFields();
+
+      // Only close if explicitly requested
+      if (closeAfterSave) {
+        setIsModalVisible(false);
+        form.resetFields();
+      }
     } catch (error) {
       console.error('Validation failed:', error);
     }
@@ -178,12 +238,99 @@ const FulfillmentVectorManager: React.FC = () => {
     saveData(newData);
   };
 
-  // Convert data to table format
-  const tableData = data ? Object.entries(data.commodities).map(([id, commodity]) => ({
-    key: id,
-    id,
+  // Convert data to table format and create sorted list for navigation
+  const tableData = data ? Object.entries(data.commodities).map(([commodityId, commodity]) => ({
+    key: commodityId,
     ...commodity,
+    id: commodityId,  // Ensure id matches the key (in case commodity.id differs)
   })) : [];
+
+  // Sorted list of commodity IDs for navigation
+  const sortedCommodityIds = useMemo(() => {
+    return Object.keys(data?.commodities || {}).sort((a, b) => a.localeCompare(b));
+  }, [data]);
+
+  // Get current index and navigate to prev/next
+  const getCurrentIndex = (commodityId: string) => {
+    return sortedCommodityIds.indexOf(commodityId);
+  };
+
+  const navigateToCommodity = (commodityId: string, mode: 'view' | 'edit') => {
+    if (!data) return;
+    const record = data.commodities[commodityId];
+    if (!record) return;
+
+    if (mode === 'view') {
+      setViewing({ id: commodityId, data: record });
+    } else {
+      setEditingId(commodityId);
+      const { id: _recordId, ...restRecord } = record;
+      form.setFieldsValue({
+        id: commodityId,
+        ...restRecord,
+        tags: record.tags.join(', '),
+      });
+      // Initialize the fulfillment vector state
+      setCurrentFulfillmentVector(record.fulfillmentVector || { coarse: new Array(9).fill(0), fine: {} });
+    }
+  };
+
+  const handlePrevious = (currentId: string, mode: 'view' | 'edit') => {
+    const currentIndex = getCurrentIndex(currentId);
+    if (currentIndex > 0) {
+      navigateToCommodity(sortedCommodityIds[currentIndex - 1], mode);
+    }
+  };
+
+  const handleNext = (currentId: string, mode: 'view' | 'edit') => {
+    const currentIndex = getCurrentIndex(currentId);
+    if (currentIndex < sortedCommodityIds.length - 1) {
+      navigateToCommodity(sortedCommodityIds[currentIndex + 1], mode);
+    }
+  };
+
+  const switchToEdit = () => {
+    if (!viewing || !data) return;
+    const record = data.commodities[viewing.id];
+    if (!record) return;
+
+    setIsViewModalVisible(false);
+    setEditingId(viewing.id);
+    const { id: _recordId, ...restRecord } = record;
+    form.setFieldsValue({
+      id: viewing.id,
+      ...restRecord,
+      tags: record.tags.join(', '),
+    });
+    // Initialize the fulfillment vector state
+    setCurrentFulfillmentVector(record.fulfillmentVector || { coarse: new Array(9).fill(0), fine: {} });
+    setIsModalVisible(true);
+  };
+
+  const switchToView = async () => {
+    if (!editingId || !data) return;
+
+    // Build the current form data to show in view
+    const values = form.getFieldsValue();
+    const tags = typeof values.tags === 'string'
+      ? values.tags.split(',').map((t: string) => t.trim()).filter((t: string) => t)
+      : values.tags || [];
+
+    const currentFormData = {
+      id: editingId,
+      fulfillmentVector: currentFulfillmentVector,
+      tags,
+      durability: values.durability,
+      qualityMultipliers: values.qualityMultipliers,
+      durationCycles: values.durationCycles,
+      effectDecayRate: values.effectDecayRate,
+      notes: values.notes,
+    };
+
+    setIsModalVisible(false);
+    setViewing({ id: editingId, data: currentFormData });
+    setIsViewModalVisible(true);
+  };
 
   // Table columns
   const columns = [
@@ -223,8 +370,8 @@ const FulfillmentVectorManager: React.FC = () => {
       width: 150,
       align: 'center' as const,
       render: (_: any, record: any) => {
-        const fineCount = Object.keys(record.fulfillmentVector.fine || {}).length;
-        const coarseCount = record.fulfillmentVector.coarse.filter((v: number) => v > 0).length;
+        const fineCount = Object.keys(record.fulfillmentVector?.fine || {}).length;
+        const coarseCount = (record.fulfillmentVector?.coarse || []).filter((v: number) => v > 0).length;
         return (
           <Space>
             <Tag color="blue">Fine: {fineCount}</Tag>
@@ -281,6 +428,31 @@ const FulfillmentVectorManager: React.FC = () => {
     return result;
   };
 
+  // Calculate coarse values from fine values array
+  const calculateCoarseFromFine = (fineArray: number[]): number[] => {
+    if (!dimensions) return new Array(9).fill(0);
+
+    // Map coarse dimension names to indices (order matters)
+    const coarseOrder = dimensions.coarseDimensions.map(c => c.id);
+    const coarseTotals: Record<string, number> = {};
+
+    // Initialize all coarse dimensions to 0
+    coarseOrder.forEach(id => {
+      coarseTotals[id] = 0;
+    });
+
+    // Sum up fine values into their parent coarse dimensions
+    dimensions.fineDimensions.forEach((dim, index) => {
+      const value = fineArray[index] || 0;
+      if (value > 0 && coarseTotals.hasOwnProperty(dim.parentCoarse)) {
+        coarseTotals[dim.parentCoarse] += value;
+      }
+    });
+
+    // Return as array in correct order
+    return coarseOrder.map(id => coarseTotals[id] || 0);
+  };
+
   if (!data || !dimensions || !commodities) {
     return <div>Loading...</div>;
   }
@@ -297,6 +469,23 @@ const FulfillmentVectorManager: React.FC = () => {
         }
         extra={
           <Space>
+            <Tooltip title={
+              cacheStatus?.needsRegeneration
+                ? `Cache outdated: ${cacheStatus.reason}`
+                : cacheInfo
+                  ? `Last generated: ${new Date(cacheInfo.generatedAt).toLocaleString()}`
+                  : 'No cache generated yet'
+            }>
+              <Button
+                icon={generatingCache ? <SyncOutlined spin /> : <DatabaseOutlined />}
+                onClick={handleGenerateCache}
+                loading={generatingCache}
+                type={cacheStatus?.needsRegeneration ? 'primary' : 'default'}
+                danger={cacheStatus?.needsRegeneration}
+              >
+                {cacheStatus?.needsRegeneration ? 'Regenerate Cache' : 'Generate Cache'}
+              </Button>
+            </Tooltip>
             <Button
               icon={<ThunderboltOutlined />}
               onClick={() => setIsQuickFillVisible(true)}
@@ -329,14 +518,58 @@ const FulfillmentVectorManager: React.FC = () => {
 
       {/* Edit/Add Modal */}
       <Modal
-        title={editingId ? `Edit Fulfillment Vector: ${editingId}` : 'Add Fulfillment Vector'}
+        title={
+          <Space>
+            {editingId && (
+              <Button
+                icon={<LeftOutlined />}
+                disabled={getCurrentIndex(editingId) <= 0}
+                onClick={() => handlePrevious(editingId, 'edit')}
+              >
+                Prev
+              </Button>
+            )}
+            <span>{editingId ? `Edit Fulfillment Vector: ${editingId}` : 'Add Fulfillment Vector'}</span>
+            {editingId && (
+              <>
+                <Tag color="blue">{getCurrentIndex(editingId) + 1} / {sortedCommodityIds.length}</Tag>
+                <Button
+                  icon={<RightOutlined />}
+                  disabled={getCurrentIndex(editingId) >= sortedCommodityIds.length - 1}
+                  onClick={() => handleNext(editingId, 'edit')}
+                >
+                  Next
+                </Button>
+              </>
+            )}
+          </Space>
+        }
         open={isModalVisible}
-        onOk={handleModalOk}
+        onOk={() => handleModalOk(false)}
         onCancel={() => {
           setIsModalVisible(false);
           form.resetFields();
         }}
         width={1200}
+        footer={[
+          <Button key="cancel" onClick={() => {
+            setIsModalVisible(false);
+            form.resetFields();
+          }}>
+            Cancel
+          </Button>,
+          editingId && (
+            <Button key="view" icon={<EyeOutlined />} onClick={switchToView}>
+              View
+            </Button>
+          ),
+          <Button key="save" type="primary" onClick={() => handleModalOk(false)}>
+            Save
+          </Button>,
+          <Button key="saveClose" onClick={() => handleModalOk(true)}>
+            Save & Close
+          </Button>,
+        ]}
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -381,12 +614,22 @@ const FulfillmentVectorManager: React.FC = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={12}>
+            <Col span={6}>
               <Form.Item
-                name="reusableValue"
-                label="Reusable Value (if durable/permanent)"
+                name="durationCycles"
+                label="Duration (cycles)"
+                help="Cycles before expiry (leave empty for permanent)"
               >
-                <InputNumber min={0} max={100} style={{ width: '100%' }} />
+                <InputNumber min={1} max={10000} style={{ width: '100%' }} placeholder="null = permanent" />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item
+                name="effectDecayRate"
+                label="Effect Decay Rate"
+                help="Effectiveness loss per cycle (0 = no decay)"
+              >
+                <InputNumber min={0} max={1} step={0.001} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
           </Row>
@@ -430,19 +673,23 @@ const FulfillmentVectorManager: React.FC = () => {
 
           <Form.Item
             shouldUpdate={(prevValues, currentValues) =>
-              prevValues.fulfillmentVector?.fine !== currentValues.fulfillmentVector?.fine
+              prevValues.fulfillmentVector?.fine !== currentValues.fulfillmentVector?.fine ||
+              prevValues.id !== currentValues.id
             }
           >
             {() => (
               <VectorEditor
+                key={`vector-editor-${editingId || 'new'}`}
                 dimensions={dimensions.fineDimensions}
-                values={fineObjectToArray(form.getFieldValue(['fulfillmentVector', 'fine']) || {})}
+                values={fineObjectToArray(currentFulfillmentVector.fine || {})}
                 onChange={(values) => {
-                  form.setFieldsValue({
-                    fulfillmentVector: {
-                      coarse: new Array(9).fill(0),
-                      fine: fineArrayToObject(values),
-                    }
+                  const fineObj = fineArrayToObject(values);
+                  const coarseArr = calculateCoarseFromFine(values);
+                  console.log('VectorEditor onChange - fine object:', fineObj);
+                  console.log('VectorEditor onChange - coarse array:', coarseArr);
+                  setCurrentFulfillmentVector({
+                    coarse: coarseArr,
+                    fine: fineObj,
                   });
                 }}
                 min={0}
@@ -459,12 +706,40 @@ const FulfillmentVectorManager: React.FC = () => {
 
       {/* View Modal */}
       <Modal
-        title={`View Fulfillment Vector: ${viewing?.id}`}
+        title={
+          <Space>
+            {viewing && (
+              <Button
+                icon={<LeftOutlined />}
+                disabled={getCurrentIndex(viewing.id) <= 0}
+                onClick={() => handlePrevious(viewing.id, 'view')}
+              >
+                Prev
+              </Button>
+            )}
+            <span>View Fulfillment Vector: {viewing?.id}</span>
+            {viewing && (
+              <>
+                <Tag color="blue">{getCurrentIndex(viewing.id) + 1} / {sortedCommodityIds.length}</Tag>
+                <Button
+                  icon={<RightOutlined />}
+                  disabled={getCurrentIndex(viewing.id) >= sortedCommodityIds.length - 1}
+                  onClick={() => handleNext(viewing.id, 'view')}
+                >
+                  Next
+                </Button>
+              </>
+            )}
+          </Space>
+        }
         open={isViewModalVisible}
         onCancel={() => setIsViewModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setIsViewModalVisible(false)}>
             Close
+          </Button>,
+          <Button key="edit" type="primary" icon={<EditOutlined />} onClick={switchToEdit}>
+            Edit
           </Button>
         ]}
         width={1400}
@@ -491,10 +766,17 @@ const FulfillmentVectorManager: React.FC = () => {
                     <Tag key={tag} color="green">{tag}</Tag>
                   ))}
                 </Col>
-                {viewing.data.reusableValue && (
-                  <Col span={12}>
-                    <strong>Reusable Value:</strong> {viewing.data.reusableValue}
-                  </Col>
+                {(viewing.data.durability === 'durable' || viewing.data.durability === 'permanent') && (
+                  <>
+                    <Col span={12}>
+                      <strong>Duration:</strong>{' '}
+                      {viewing.data.durationCycles ? `${viewing.data.durationCycles} cycles` : 'Permanent'}
+                    </Col>
+                    <Col span={12}>
+                      <strong>Effect Decay Rate:</strong>{' '}
+                      {viewing.data.effectDecayRate ? `${(viewing.data.effectDecayRate * 100).toFixed(2)}% per cycle` : 'No decay'}
+                    </Col>
+                  </>
                 )}
                 <Col span={24}>
                   <strong>Quality Multipliers:</strong>
@@ -516,14 +798,13 @@ const FulfillmentVectorManager: React.FC = () => {
 
             <VectorVisualization
               dimensions={dimensions.coarseDimensions}
-              values={viewing.data.fulfillmentVector.coarse}
+              values={viewing.data.fulfillmentVector?.coarse || new Array(9).fill(0)}
               title="Coarse Fulfillment Profile (9D)"
-              maxValue={20}
             />
 
             <VectorHeatmap
               dimensions={dimensions.fineDimensions}
-              values={fineObjectToArray(viewing.data.fulfillmentVector.fine)}
+              values={fineObjectToArray(viewing.data.fulfillmentVector?.fine || {})}
               title="Fine Fulfillment Vector (50D)"
               maxValue={20}
               colorScheme="green"
@@ -542,6 +823,68 @@ const FulfillmentVectorManager: React.FC = () => {
           onApply={handleQuickFillApply}
         />
       )}
+
+      {/* Cache Info Modal */}
+      <Modal
+        title={<Space><DatabaseOutlined /> Commodity Cache Generated</Space>}
+        open={isCacheModalVisible}
+        onCancel={() => setIsCacheModalVisible(false)}
+        footer={[
+          <Button key="close" type="primary" onClick={() => setIsCacheModalVisible(false)}>
+            Close
+          </Button>
+        ]}
+        width={600}
+      >
+        {cacheInfo && (
+          <Space direction="vertical" style={{ width: '100%' }} size="large">
+            <Card size="small" title="Cache Statistics">
+              <Row gutter={[16, 16]}>
+                <Col span={8}>
+                  <Statistic title="Coarse Caches" value={cacheInfo.metadata.coarseCacheCount} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Fine Caches" value={cacheInfo.metadata.fineCacheCount} />
+                </Col>
+                <Col span={8}>
+                  <Statistic title="Substitution Groups" value={cacheInfo.metadata.substitutionGroupCount} />
+                </Col>
+                <Col span={12}>
+                  <Statistic title="Total Commodities" value={cacheInfo.metadata.totalCommodities} />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="Generated At"
+                    value={new Date(cacheInfo.generatedAt).toLocaleString()}
+                    valueStyle={{ fontSize: '14px' }}
+                  />
+                </Col>
+              </Row>
+            </Card>
+
+            <Card size="small" title="Source Data Hashes">
+              <p><strong>Fulfillment Vectors:</strong> {cacheInfo.sourceDataHashes.fulfillmentVectors}</p>
+              <p><strong>Dimension Definitions:</strong> {cacheInfo.sourceDataHashes.dimensionDefinitions}</p>
+              <p><strong>Substitution Rules:</strong> {cacheInfo.sourceDataHashes.substitutionRules}</p>
+            </Card>
+
+            <Card size="small" title="Usage Info" style={{ background: '#f6ffed', borderColor: '#b7eb8f' }}>
+              <p>
+                The pre-computed cache is saved to <code>craving_system/commodity_cache.json</code>.
+                The game will automatically load this cache on startup, reducing initialization time.
+              </p>
+              <p>
+                <strong>Note:</strong> You should regenerate the cache whenever you modify:
+              </p>
+              <ul style={{ marginBottom: 0 }}>
+                <li>Fulfillment vectors (this manager)</li>
+                <li>Dimension definitions</li>
+                <li>Substitution rules</li>
+              </ul>
+            </Card>
+          </Space>
+        )}
+      </Modal>
     </div>
   );
 };

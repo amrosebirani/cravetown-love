@@ -14,9 +14,10 @@ CharacterV3._CharacterClasses = CharacterV3._CharacterClasses or nil
 CharacterV3._DimensionDefinitions = CharacterV3._DimensionDefinitions or nil
 CharacterV3._CommodityFatigueRates = CharacterV3._CommodityFatigueRates or nil
 CharacterV3._EnablementRules = CharacterV3._EnablementRules or nil
+CharacterV3._ClassThresholds = CharacterV3._ClassThresholds or nil  -- For emergent class calculation
 
 -- Initialize data (called once at prototype start)
-function CharacterV3.Init(mechanicsData, fulfillmentData, traitsData, classesData, dimensionsData, fatigueData, enablementData)
+function CharacterV3.Init(mechanicsData, fulfillmentData, traitsData, classesData, dimensionsData, fatigueData, enablementData, classThresholdsData)
     CharacterV3._ConsumptionMechanics = mechanicsData
     CharacterV3._FulfillmentVectors = fulfillmentData
     CharacterV3._CharacterTraits = traitsData
@@ -24,12 +25,19 @@ function CharacterV3.Init(mechanicsData, fulfillmentData, traitsData, classesDat
     CharacterV3._DimensionDefinitions = dimensionsData
     CharacterV3._CommodityFatigueRates = fatigueData
     CharacterV3._EnablementRules = enablementData
+    CharacterV3._ClassThresholds = classThresholdsData
 
     -- Build fine->coarse mapping for fast lookup
     CharacterV3.BuildDimensionMaps()
 
     -- Build craving ID to index map for slot-based system
     CharacterV3.BuildCravingIdToIndexMap()
+end
+
+-- Separate method to set class thresholds (can be called after Init)
+function CharacterV3.SetClassThresholds(thresholdsData)
+    CharacterV3._ClassThresholds = thresholdsData
+    print("[CharacterV3] Class thresholds loaded")
 end
 
 -- Build mapping from fine dimension index to coarse dimension
@@ -48,16 +56,31 @@ function CharacterV3.BuildDimensionMaps()
         CharacterV3.coarseNameToIndex[coarseDim.id] = coarseDim.index
     end
 
-    -- Map fine dimensions to their parent coarse
+    -- Map fine dimensions to their parent coarse and store aggregation weights
+    CharacterV3.fineAggregationWeights = {}  -- fineIndex -> aggregationWeight
+    CharacterV3.coarseWeightSums = {}  -- coarseIndex -> sum of weights for normalization
+
     for _, fineDim in ipairs(CharacterV3._DimensionDefinitions.fineDimensions) do
         CharacterV3.fineNames[fineDim.index] = fineDim.id
+        -- Store aggregation weight (default to 1.0 if not specified)
+        CharacterV3.fineAggregationWeights[fineDim.index] = fineDim.aggregationWeight or 1.0
+
         -- Convert parent coarse name to index
         local parentCoarseIndex = CharacterV3.coarseNameToIndex[fineDim.parentCoarse]
         if parentCoarseIndex then
             CharacterV3.fineToCoarseMap[fineDim.index] = parentCoarseIndex
+            -- Accumulate weight sums for each coarse dimension
+            CharacterV3.coarseWeightSums[parentCoarseIndex] = (CharacterV3.coarseWeightSums[parentCoarseIndex] or 0) + (fineDim.aggregationWeight or 1.0)
         else
             print("Warning: Unknown parent coarse '" .. tostring(fineDim.parentCoarse) .. "' for fine dimension " .. tostring(fineDim.index))
         end
+    end
+
+    -- Debug output for aggregation weights
+    print("  Aggregation weight sums per coarse dimension:")
+    for coarseIdx, weightSum in pairs(CharacterV3.coarseWeightSums) do
+        local name = CharacterV3.coarseNames[coarseIdx] or "unknown"
+        print(string.format("    [%d] %s: weight sum = %.3f", coarseIdx, name, weightSum))
     end
 
     -- Get dimension counts from loaded data
@@ -260,6 +283,38 @@ function CharacterV3:New(class, id)
     char.status = "idle"  -- idle/happy/stressed/leaving/variety_seeking
     char.statusMessage = ""
 
+    -- =============================================================================
+    -- ECONOMICS & OWNERSHIP (Phase 3 additions)
+    -- =============================================================================
+    -- Note: Main economics tracking is in EconomicsSystem.lua
+    -- These fields are for quick reference and backward compatibility
+    char.emergentClass = nil  -- Calculated from economics, not assigned
+    char.lastClassCalculation = 0  -- Cycle number when class was last calculated
+
+    -- Housing reference (managed by HousingSystem)
+    char.housingId = nil  -- Building ID where character lives
+    char.householdId = nil  -- Household group ID (for families)
+
+    -- Employment (managed by workplace assignment)
+    char.employment = {
+        employerId = nil,  -- Owner ID of workplace
+        workplaceId = nil,  -- Building ID (redundant with workplace for clarity)
+        wageRate = 0,  -- Per-cycle wage
+    }
+
+    -- Relationships with other characters
+    char.relationships = {}
+    --[[
+        Format: {
+            [targetId] = {
+                type = "spouse"|"parent"|"child"|"sibling"|"employer"|"employee"|
+                       "landlord"|"tenant"|"colleague"|"neighbour"|"friend"|"rival",
+                since = cycle,
+                metadata = {}
+            }
+        }
+    ]]
+
     return char
 end
 
@@ -407,12 +462,14 @@ function CharacterV3.ComputeCoarseSatisfaction(char)
 
             for fineIdx = 0, CharacterV3.GetFineMaxIndex() do
                 if CharacterV3.fineToCoarseMap[fineIdx] == coarseIdx then
-                    local weight = 1.0  -- Could use aggregationWeight from dimension_definitions
+                    -- Use aggregationWeight from dimension definitions
+                    local weight = CharacterV3.fineAggregationWeights[fineIdx] or 1.0
                     total = total + (char.satisfactionFine[fineIdx] or 50) * weight
                     totalWeight = totalWeight + weight
                 end
             end
 
+            -- Normalize by dividing by sum of weights
             char.satisfaction[coarseName] = totalWeight > 0 and (total / totalWeight) or 50
         end
     end
@@ -507,6 +564,9 @@ function CharacterV3:UpdateSatisfaction(currentCycle)
 
     local decayRates = CharacterV3._ConsumptionMechanics.cravingDecayRates
 
+    -- Phase 5: Use emergent class for decay rates (not initial/template class)
+    local effectiveClass = self:GetEffectiveClass()
+
     -- Decay each fine dimension based on its unfulfilled currentCravings
     for fineIdx = 0, CharacterV3.GetFineMaxIndex() do
         local currentCraving = self.currentCravings[fineIdx] or 0
@@ -515,10 +575,10 @@ function CharacterV3:UpdateSatisfaction(currentCycle)
         local coarseIdx = CharacterV3.fineToCoarseMap[fineIdx]
         local coarseName = coarseIdx and CharacterV3.coarseNames[coarseIdx] or nil
 
-        -- Base decay from coarse dimension settings
+        -- Base decay from coarse dimension settings using emergent class
         local baseDecay = 1.0
-        if coarseName and decayRates[coarseName] and decayRates[coarseName][self.class] then
-            baseDecay = decayRates[coarseName][self.class]
+        if coarseName and decayRates[coarseName] and decayRates[coarseName][effectiveClass] then
+            baseDecay = decayRates[coarseName][effectiveClass]
         end
 
         -- Decay accelerates with unfulfilled cravings
@@ -833,13 +893,15 @@ function CharacterV3:AggregateCurrentCravingsToCoarse()
             for fineIndex = 0, CharacterV3.GetFineMaxIndex() do
                 -- Fixed: compare coarseIndex (number) to fineToCoarseMap (number), not to coarseName (string)
                 if CharacterV3.fineToCoarseMap[fineIndex] == coarseIndex then
-                    local weight = 1.0  -- Could use aggregationWeight from dimension_definitions
+                    -- Use aggregationWeight from dimension definitions
+                    local weight = CharacterV3.fineAggregationWeights[fineIndex] or 1.0
                     total = total + (self.currentCravings[fineIndex] or 0) * weight
                     totalWeight = totalWeight + weight
                     count = count + 1
                 end
             end
 
+            -- Normalize by dividing by sum of weights
             coarseCravings[coarseName] = totalWeight > 0 and (total / totalWeight) or 0
         end
     end
@@ -858,8 +920,8 @@ function CharacterV3:CalculatePriority(currentCycle, allocationMode)
 
     local config = CharacterV3._ConsumptionMechanics.priorityCalculation
 
-    -- Base class weight
-    local classWeight = config.classWeights[self.class] or 1
+    -- Phase 5: Priority is based purely on desperation (unfulfilled cravings)
+    -- Class is NOT used for priority - only for quality acceptance and consumption budgets
 
     -- Aggregate current cravings to coarse for priority calculation
     local coarseCravings = self:AggregateCurrentCravingsToCoarse()
@@ -886,8 +948,8 @@ function CharacterV3:CalculatePriority(currentCycle, allocationMode)
         desperationScore = desperationScore + (desperationMultiplier * cravingWeight)
     end
 
-    -- Calculate base priority
-    local basePriority = classWeight * 100 + desperationScore
+    -- Priority is purely based on desperation (no class weight)
+    local basePriority = desperationScore
 
     -- Apply fairness penalty if in fairness mode
     local finalPriority = basePriority
@@ -900,9 +962,57 @@ function CharacterV3:CalculatePriority(currentCycle, allocationMode)
 end
 
 -- Check if character accepts a given quality level
+-- Phase 5: Class-based quality acceptance from behavior templates
+-- Uses emergent class for quality acceptance (not initial/template class)
+-- TODO: Define quality tiers properly at commodity level, production level, and inventory level
 function CharacterV3:AcceptsQuality(quality)
-    -- For now, all characters accept all qualities
-    -- TODO: Implement class-based quality acceptance (e.g., elite prefers luxury)
+    if not quality then
+        return true  -- No quality specified = accept
+    end
+
+    -- Phase 5: Use emergent class for quality acceptance
+    local effectiveClass = self:GetEffectiveClass()
+
+    -- Find class data for this character's emergent class
+    local classData = nil
+    if CharacterV3._CharacterClasses and CharacterV3._CharacterClasses.classes then
+        local classLower = string.lower(effectiveClass or "middle")
+        for _, c in ipairs(CharacterV3._CharacterClasses.classes) do
+            if string.lower(c.id) == classLower then
+                classData = c
+                break
+            end
+        end
+    end
+
+    -- If no class data found, accept all qualities
+    if not classData then
+        return true
+    end
+
+    local qualityLower = string.lower(quality)
+
+    -- Check rejected qualities first
+    if classData.rejectedQualityTiers then
+        for _, rejectedTier in ipairs(classData.rejectedQualityTiers) do
+            if string.lower(rejectedTier) == qualityLower then
+                return false  -- Quality is explicitly rejected
+            end
+        end
+    end
+
+    -- Check accepted qualities
+    if classData.acceptedQualityTiers and #classData.acceptedQualityTiers > 0 then
+        for _, acceptedTier in ipairs(classData.acceptedQualityTiers) do
+            if string.lower(acceptedTier) == qualityLower then
+                return true  -- Quality is explicitly accepted
+            end
+        end
+        -- Has accepted list but quality not in it = reject
+        return false
+    end
+
+    -- No accepted list = accept all (except rejected)
     return true
 end
 
@@ -1444,6 +1554,275 @@ function CharacterV3:GetPossessionsSummary()
     end
 
     return summary
+end
+
+-- =============================================================================
+-- EMERGENT CLASS SYSTEM (Phase 3)
+-- =============================================================================
+
+-- Calculate emergent class based on net worth and capital ratio
+-- Uses loaded _ClassThresholds data
+function CharacterV3:CalculateEmergentClass(netWorth, capitalRatio, currentCycle)
+    -- Get thresholds from loaded data or use defaults
+    local thresholds = CharacterV3._ClassThresholds or {}
+    local netWorthThresholds = thresholds.netWorthThresholds or {
+        elite = { min = 10000 },
+        upper = { min = 3000 },
+        middle = { min = 500 }
+    }
+    local capitalRatioThresholds = thresholds.capitalRatioThresholds or {
+        elite = 0.8,
+        upper = 0.5,
+        middle = 0.2
+    }
+
+    local newClass = "lower"  -- Default
+
+    -- Check thresholds from highest to lowest
+    if netWorth >= (netWorthThresholds.elite and netWorthThresholds.elite.min or 10000) and
+       capitalRatio >= (capitalRatioThresholds.elite or 0.8) then
+        newClass = "elite"
+    elseif netWorth >= (netWorthThresholds.upper and netWorthThresholds.upper.min or 3000) and
+           capitalRatio >= (capitalRatioThresholds.upper or 0.5) then
+        newClass = "upper"
+    elseif netWorth >= (netWorthThresholds.middle and netWorthThresholds.middle.min or 500) and
+           capitalRatio >= (capitalRatioThresholds.middle or 0.2) then
+        newClass = "middle"
+    end
+
+    -- Check for class change
+    local oldClass = self.emergentClass or self.class
+
+    if newClass ~= oldClass then
+        self:OnClassChange(oldClass, newClass, currentCycle)
+    end
+
+    self.emergentClass = newClass
+    self.lastClassCalculation = currentCycle or 0
+
+    return newClass
+end
+
+-- Called when emergent class changes
+function CharacterV3:OnClassChange(oldClass, newClass, currentCycle)
+    print(string.format("[CharacterV3] %s class changed: %s -> %s",
+        self.name, oldClass or "none", newClass))
+
+    -- Update base cravings based on new class template
+    -- This adjusts what the character desires based on their new social position
+    local newBaseCravings = CharacterV3.GenerateBaseCravings(newClass, self.traits)
+
+    -- Blend old and new cravings (gradual transition, not instant)
+    local blendFactor = 0.3  -- 30% new cravings per calculation
+    for i = 0, CharacterV3.GetFineMaxIndex() do
+        local oldValue = self.baseCravings[i] or 0
+        local newValue = newBaseCravings[i] or 0
+        self.baseCravings[i] = oldValue * (1 - blendFactor) + newValue * blendFactor
+    end
+
+    -- Update the display class (for backward compatibility)
+    self.class = newClass
+
+    -- Housing preference may change - signal to HousingSystem
+    -- (HousingSystem checks this via ShouldSeekBetterHousing)
+end
+
+-- Get the current effective class (emergent if calculated, else assigned)
+function CharacterV3:GetEffectiveClass()
+    return self.emergentClass or self.class or "middle"
+end
+
+-- =============================================================================
+-- RELATIONSHIP MANAGEMENT (Phase 3)
+-- =============================================================================
+
+-- Add a relationship with another character
+function CharacterV3:AddRelationship(targetId, relationType, currentCycle, metadata)
+    if not targetId or not relationType then
+        return false
+    end
+
+    self.relationships[targetId] = {
+        type = relationType,
+        since = currentCycle or 0,
+        metadata = metadata or {}
+    }
+
+    return true
+end
+
+-- Remove a relationship
+function CharacterV3:RemoveRelationship(targetId)
+    if self.relationships[targetId] then
+        self.relationships[targetId] = nil
+        return true
+    end
+    return false
+end
+
+-- Get relationship with a specific character
+function CharacterV3:GetRelationship(targetId)
+    return self.relationships[targetId]
+end
+
+-- Get all relationships of a specific type
+function CharacterV3:GetRelationshipsByType(relationType)
+    local result = {}
+    for targetId, rel in pairs(self.relationships) do
+        if rel.type == relationType then
+            result[targetId] = rel
+        end
+    end
+    return result
+end
+
+-- Check if character has a specific relationship type
+function CharacterV3:HasRelationshipType(relationType)
+    for _, rel in pairs(self.relationships) do
+        if rel.type == relationType then
+            return true
+        end
+    end
+    return false
+end
+
+-- Get all relationship target IDs
+function CharacterV3:GetAllRelationshipIds()
+    local ids = {}
+    for targetId, _ in pairs(self.relationships) do
+        table.insert(ids, targetId)
+    end
+    return ids
+end
+
+-- Update colleague relationships based on workplace
+function CharacterV3:UpdateColleagueRelationships(coworkerIds, currentCycle)
+    -- Remove old colleague relationships
+    local toRemove = {}
+    for targetId, rel in pairs(self.relationships) do
+        if rel.type == "colleague" then
+            local stillCoworker = false
+            for _, coworkerId in ipairs(coworkerIds or {}) do
+                if coworkerId == targetId then
+                    stillCoworker = true
+                    break
+                end
+            end
+            if not stillCoworker then
+                table.insert(toRemove, targetId)
+            end
+        end
+    end
+
+    for _, targetId in ipairs(toRemove) do
+        self:RemoveRelationship(targetId)
+    end
+
+    -- Add new colleague relationships
+    for _, coworkerId in ipairs(coworkerIds or {}) do
+        if coworkerId ~= self.id and not self.relationships[coworkerId] then
+            self:AddRelationship(coworkerId, "colleague", currentCycle)
+        end
+    end
+end
+
+-- =============================================================================
+-- HOUSING INTEGRATION (Phase 3)
+-- =============================================================================
+
+-- Set housing assignment (called by HousingSystem)
+function CharacterV3:SetHousing(buildingId, currentCycle)
+    local oldHousingId = self.housingId
+    self.housingId = buildingId
+
+    -- Log if changed
+    if oldHousingId ~= buildingId then
+        print(string.format("[CharacterV3] %s moved to housing %s",
+            self.name, buildingId or "homeless"))
+    end
+end
+
+-- Check if character is housed
+function CharacterV3:IsHoused()
+    return self.housingId ~= nil
+end
+
+-- Get housing satisfaction modifier (for craving system integration)
+function CharacterV3:GetHousingSatisfactionModifier()
+    if not self.housingId then
+        return 0.5  -- Penalty for being homeless
+    end
+    return 1.0  -- Normal satisfaction when housed
+end
+
+-- Apply housing fulfillment to satisfaction (called daily by AlphaWorld)
+function CharacterV3:ApplyHousingFulfillment(fulfillmentVector, crowdingModifier)
+    if not fulfillmentVector then return end
+
+    crowdingModifier = crowdingModifier or 1.0
+
+    -- Apply each dimension's fulfillment to the character's fine satisfaction
+    for dimensionId, value in pairs(fulfillmentVector) do
+        -- Find the dimension index
+        local fineIndex = nil
+        if dimensionDefinitionsRef and dimensionDefinitionsRef.fineDimensions then
+            for _, dim in ipairs(dimensionDefinitionsRef.fineDimensions) do
+                if dim.id == dimensionId then
+                    fineIndex = dim.index
+                    break
+                end
+            end
+        end
+
+        if fineIndex then
+            -- Apply fulfillment to fine satisfaction
+            -- Housing provides baseline satisfaction, doesn't fully fulfill
+            local currentValue = self.fineSatisfaction[fineIndex] or 0
+            local fulfillmentAmount = value * crowdingModifier * 0.01  -- Scale to 0-1 range
+            local newValue = math.min(1.0, currentValue + fulfillmentAmount)
+            self.fineSatisfaction[fineIndex] = newValue
+        end
+    end
+
+    -- Track that housing fulfillment was applied this cycle
+    self.lastHousingFulfillmentCycle = CharacterV3.currentGlobalSlot
+end
+
+-- Apply penalty for being homeless
+function CharacterV3:ApplyHomelessPenalty(penaltyAmount)
+    penaltyAmount = penaltyAmount or -50
+
+    -- Apply penalty to shelter-related dimensions
+    local shelterDimensions = {
+        "safety_shelter_housing_basic",
+        "safety_shelter_weather",
+        "safety_shelter_warmth"
+    }
+
+    for _, dimensionId in ipairs(shelterDimensions) do
+        -- Find the dimension index
+        local fineIndex = nil
+        if dimensionDefinitionsRef and dimensionDefinitionsRef.fineDimensions then
+            for _, dim in ipairs(dimensionDefinitionsRef.fineDimensions) do
+                if dim.id == dimensionId then
+                    fineIndex = dim.index
+                    break
+                end
+            end
+        end
+
+        if fineIndex then
+            -- Reduce satisfaction for shelter-related dimensions
+            local currentValue = self.fineSatisfaction[fineIndex] or 0.5
+            local penaltyFraction = penaltyAmount * 0.01  -- Convert to 0-1 scale
+            local newValue = math.max(0, currentValue + penaltyFraction)
+            self.fineSatisfaction[fineIndex] = newValue
+        end
+    end
+
+    -- Mark as homeless for UI purposes
+    self.isHomeless = true
+    self.lastHomelessPenaltyCycle = CharacterV3.currentGlobalSlot
 end
 
 return CharacterV3

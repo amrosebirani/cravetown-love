@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, Slider, InputNumber, Row, Col, Typography, Space, Button, Collapse, Badge } from 'antd';
+import { CloseCircleOutlined } from '@ant-design/icons';
 import type { FineDimension } from '../types';
 
 const { Text, Title } = Typography;
@@ -30,15 +31,17 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
 }) => {
   const [localValues, setLocalValues] = useState<number[]>(values);
 
-  useEffect(() => {
-    setLocalValues(values);
-  }, [values]);
+  // No useEffect sync - we manage our own state
+  // The key prop on VectorEditor handles commodity switches by remounting
 
   const handleChange = (index: number, value: number | null) => {
-    if (value === null) return;
+    // Treat null as 0 (when user clears the input)
+    const actualValue = value ?? 0;
+    console.log('handleChange called:', { index, value, actualValue });
 
     const newValues = [...localValues];
-    newValues[index] = value;
+    newValues[index] = actualValue;
+    console.log('Setting localValues:', newValues[index], 'at index', index);
     setLocalValues(newValues);
     onChange(newValues);
   };
@@ -108,7 +111,7 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
             {dim.tags.join(', ')}
           </Text>
         </Col>
-        <Col span={12}>
+        <Col span={10}>
           <Slider
             min={min}
             max={max}
@@ -131,6 +134,26 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
             onChange={(val) => handleChange(index, val)}
             style={{ width: '100%' }}
           />
+        </Col>
+        <Col span={2}>
+          <button
+            type="button"
+            disabled={value === 0}
+            style={{
+              background: value === 0 ? '#ccc' : '#ff4d4f',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '4px 8px',
+              cursor: value === 0 ? 'not-allowed' : 'pointer',
+            }}
+            onClick={() => {
+              console.log('Native button clicked for index:', index);
+              handleChange(index, 0);
+            }}
+          >
+            ×
+          </button>
         </Col>
       </Row>
     );
@@ -193,10 +216,13 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
                   </Space>
                 }
                 key={parentId}
+                forceRender={true}
               >
-                {group.dimensions.map((dim, idx) =>
-                  renderSlider(dim, group.indices[idx])
-                )}
+                <div onClick={(e) => e.stopPropagation()}>
+                  {group.dimensions.map((dim, idx) =>
+                    renderSlider(dim, group.indices[idx])
+                  )}
+                </div>
               </Panel>
             );
           })}

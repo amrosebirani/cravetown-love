@@ -4,20 +4,14 @@
       "id": "wheat",
       "name": "Wheat",
       "category": "grain",
-      "icon": "Wt",
-      "stackSize": 5000,
-      "baseValue": 1,
-      "isRaw": true,
+      "quality": "basic",
       "description": "Basic grain crop - grown on farms"
     },
     {
       "id": "maize",
       "name": "Maize",
       "category": "grain",
-      "icon": "Mz",
-      "stackSize": 5000,
-      "baseValue": 1,
-      "isRaw": true,
+      "quality": "good",
       "description": "Corn grain - grown on farms"
     },
     {
@@ -28,7 +22,8 @@
       "stackSize": 5000,
       "baseValue": 2,
       "isRaw": true,
-      "description": "Staple grain - grown on farms"
+      "description": "Staple grain - grown on farms",
+      "quality": "basic"
     },
     {
       "id": "barley",
@@ -38,7 +33,8 @@
       "stackSize": 4000,
       "baseValue": 1,
       "isRaw": true,
-      "description": "Brewing grain - grown on farms"
+      "description": "Brewing grain - grown on farms",
+      "quality": "basic"
     },
     {
       "id": "oats",
@@ -48,7 +44,8 @@
       "stackSize": 4000,
       "baseValue": 1,
       "isRaw": true,
-      "description": "Hearty grain - grown on farms"
+      "description": "Hearty grain - grown on farms",
+      "quality": "basic"
     },
     {
       "id": "rye",
@@ -58,106 +55,43 @@
       "stackSize": 4000,
       "baseValue": 1,
       "isRaw": true,
-      "description": "Hardy grain - grown on farms"
+      "description": "Hardy grain - grown on farms",
+      "quality": "basic"
     },
     {
       "id": "apple",
       "name": "Apple",
       "category": "fruit",
-      "icon": "Ap",
-      "stackSize": 1000,
-      "baseValue": 3,
-      "isRaw": true,
-      "perishable": true,
+      "quality": "good",
       "description": "Crisp fruit"
     },
     {
       "id": "mango",
       "name": "Mango",
       "category": "fruit",
-      "icon": "Mn",
-      "stackSize": 800,
-      "baseValue": 5,
-      "isRaw": true,
-      "perishable": true,
+      "quality": "luxury",
       "description": "Tropical fruit"
     },
     {
       "id": "orange",
       "name": "Orange",
       "category": "fruit",
-      "icon": "Or",
-      "stackSize": 1000,
-      "baseValue": 4,
-      "isRaw": true,
-      "perishable": true,
+      "quality": "good",
       "description": "Citrus fruit"
     },
     {
       "id": "grapes",
       "name": "Grapes",
       "category": "fruit",
-      "icon": "Gr",
-      "stackSize": 1200,
-      "baseValue": 6,
-      "isRaw": true,
-      "perishable": true,
+      "quality": "luxury",
       "description": "Wine grapes"
     },
     {
       "id": "berries",
       "name": "Berries",
       "category": "fruit",
-      "icon": "Br",
-      "stackSize": 800,
-      "baseValue": 8,
-      "isRaw": true,
-      "perishable": true,
+      "quality": "good",
       "description": "Mixed berries"
-    },
-    {
-      "id": "health_berry",
-      "name": "Health Berry",
-      "category": "fruit",
-      "icon": "HB",
-      "stackSize": 200,
-      "baseValue": 25,
-      "isRaw": true,
-      "perishable": true,
-      "description": "Rare berry that boosts health"
-    },
-    {
-      "id": "taste_berry",
-      "name": "Taste Berry",
-      "category": "fruit",
-      "icon": "TB",
-      "stackSize": 200,
-      "baseValue": 20,
-      "isRaw": true,
-      "perishable": true,
-      "description": "Rare berry that enhances flavors"
-    },
-    {
-      "id": "happy_berry",
-      "name": "Happy Berry",
-      "category": "fruit",
-      "icon": "HPB",
-      "stackSize": 200,
-      "baseValue": 22,
-      "isRaw": true,
-      "perishable": true,
-      "description": "Rare berry that lifts spirits"
-    },
-    {
-      "id": "power_berry",
-      "name": "Power Berry",
-      "category": "fruit",
-      "icon": "PB",
-      "stackSize": 200,
-      "baseValue": 30,
-      "isRaw": true,
-      "perishable": true,
-      "description": "Rare berry that increases strength"
     },
     {
       "id": "peach",
@@ -168,7 +102,8 @@
       "baseValue": 5,
       "isRaw": true,
       "perishable": true,
-      "description": "Stone fruit"
+      "description": "Stone fruit",
+      "quality": "basic"
     },
     {
       "id": "pear",
@@ -179,7 +114,8 @@
       "baseValue": 4,
       "isRaw": true,
       "perishable": true,
-      "description": "Sweet fruit"
+      "description": "Sweet fruit",
+      "quality": "basic"
     },
     {
       "id": "potato",
@@ -189,7 +125,8 @@
       "stackSize": 3000,
       "baseValue": 1,
       "isRaw": true,
-      "description": "Root vegetable"
+      "description": "Root vegetable",
+      "quality": "basic"
     },
     {
       "id": "carrot",
@@ -199,7 +136,8 @@
       "stackSize": 2000,
       "baseValue": 2,
       "isRaw": true,
-      "description": "Orange root"
+      "description": "Orange root",
+      "quality": "basic"
     },
     {
       "id": "onion",
@@ -209,7 +147,8 @@
       "stackSize": 2000,
       "baseValue": 2,
       "isRaw": true,
-      "description": "Aromatic bulb"
+      "description": "Aromatic bulb",
+      "quality": "basic"
     },
     {
       "id": "cabbage",
@@ -220,28 +159,21 @@
       "baseValue": 2,
       "isRaw": true,
       "perishable": true,
-      "description": "Leafy vegetable"
+      "description": "Leafy vegetable",
+      "quality": "basic"
     },
     {
       "id": "tomato",
       "name": "Tomato",
       "category": "vegetable",
-      "icon": "To",
-      "stackSize": 1000,
-      "baseValue": 3,
-      "isRaw": true,
-      "perishable": true,
+      "quality": "good",
       "description": "Red vegetable"
     },
     {
       "id": "lettuce",
       "name": "Lettuce",
       "category": "vegetable",
-      "icon": "Le",
-      "stackSize": 800,
-      "baseValue": 2,
-      "isRaw": true,
-      "perishable": true,
+      "quality": "good",
       "description": "Salad greens"
     },
     {
@@ -252,7 +184,8 @@
       "stackSize": 3000,
       "baseValue": 2,
       "isRaw": true,
-      "description": "Legumes"
+      "description": "Legumes",
+      "quality": "basic"
     },
     {
       "id": "pumpkin",
@@ -262,17 +195,14 @@
       "stackSize": 500,
       "baseValue": 4,
       "isRaw": true,
-      "description": "Large squash"
+      "description": "Large squash",
+      "quality": "basic"
     },
     {
       "id": "flowers",
       "name": "Flowers",
       "category": "plant",
-      "icon": "Fw",
-      "stackSize": 1000,
-      "baseValue": 6,
-      "isRaw": true,
-      "perishable": true,
+      "quality": "good",
       "description": "Colorful blooms for dyes and perfume"
     },
     {
@@ -283,26 +213,21 @@
       "stackSize": 1200,
       "baseValue": 8,
       "isRaw": true,
-      "description": "Blue dye plant"
+      "description": "Blue dye plant",
+      "quality": "basic"
     },
     {
       "id": "sugar_cane",
       "name": "Sugar Cane",
       "category": "plant",
-      "icon": "SC",
-      "stackSize": 2000,
-      "baseValue": 3,
-      "isRaw": true,
+      "quality": "good",
       "description": "Sweet plant for sugar production"
     },
     {
       "id": "wool",
       "name": "Wool",
       "category": "animal_product",
-      "icon": "Wo",
-      "stackSize": 1000,
-      "baseValue": 5,
-      "isRaw": true,
+      "quality": "good",
       "description": "Sheep fiber"
     },
     {
@@ -314,7 +239,8 @@
       "baseValue": 3,
       "perishable": true,
       "isRaw": true,
-      "description": "Fresh dairy"
+      "description": "Fresh dairy",
+      "quality": "basic"
     },
     {
       "id": "eggs",
@@ -325,7 +251,8 @@
       "baseValue": 4,
       "perishable": true,
       "isRaw": true,
-      "description": "Chicken eggs"
+      "description": "Chicken eggs",
+      "quality": "basic"
     },
     {
       "id": "meat",
@@ -336,28 +263,21 @@
       "baseValue": 8,
       "perishable": true,
       "isRaw": true,
-      "description": "Animal protein"
+      "description": "Animal protein",
+      "quality": "basic"
     },
     {
       "id": "leather",
       "name": "Leather",
       "category": "animal_product",
-      "icon": "Le",
-      "stackSize": 400,
-      "baseValue": 15,
-      "isRaw": true,
+      "quality": "good",
       "description": "Tanned hide"
     },
     {
       "id": "cheese",
       "name": "Cheese",
       "category": "animal_product",
-      "icon": "Ch",
-      "stackSize": 300,
-      "baseValue": 12,
-      "dependencies": [
-        "milk"
-      ],
+      "quality": "luxury",
       "description": "Aged dairy"
     },
     {
@@ -371,7 +291,8 @@
         "milk"
       ],
       "perishable": true,
-      "description": "Dairy fat"
+      "description": "Dairy fat",
+      "quality": "basic"
     },
     {
       "id": "bread",
@@ -384,7 +305,8 @@
         "wheat"
       ],
       "perishable": true,
-      "description": "Baked wheat"
+      "description": "Baked wheat",
+      "quality": "basic"
     },
     {
       "id": "flour",
@@ -396,40 +318,28 @@
       "dependencies": [
         "wheat"
       ],
-      "description": "Ground grain"
+      "description": "Ground grain",
+      "quality": "basic"
     },
     {
       "id": "sugar",
       "name": "Sugar",
       "category": "processed_food",
-      "icon": "Su",
-      "stackSize": 2000,
-      "baseValue": 10,
-      "dependencies": [
-        "sugar_cane"
-      ],
+      "quality": "good",
       "description": "Refined sweetener"
     },
     {
       "id": "honey",
       "name": "Honey",
       "category": "processed_food",
-      "icon": "Ho",
-      "stackSize": 500,
-      "baseValue": 15,
-      "isRaw": true,
+      "quality": "good",
       "description": "Bee product"
     },
     {
       "id": "wine",
       "name": "Wine",
       "category": "processed_food",
-      "icon": "Wn",
-      "stackSize": 300,
-      "baseValue": 25,
-      "dependencies": [
-        "grapes"
-      ],
+      "quality": "luxury",
       "description": "Fermented grapes"
     },
     {
@@ -442,19 +352,14 @@
       "dependencies": [
         "barley"
       ],
-      "description": "Brewed barley"
+      "description": "Brewed barley",
+      "quality": "basic"
     },
     {
       "id": "pastries",
       "name": "Pastries",
       "category": "processed_food",
-      "icon": "Pa",
-      "stackSize": 400,
-      "baseValue": 12,
-      "dependencies": [
-        "wheat"
-      ],
-      "perishable": true,
+      "quality": "good",
       "description": "Baked sweets"
     },
     {
@@ -464,66 +369,42 @@
       "icon": "PF",
       "stackSize": 800,
       "baseValue": 10,
-      "description": "Canned goods"
+      "description": "Canned goods",
+      "quality": "basic"
     },
     {
       "id": "red_dye",
       "name": "Red Dye",
       "category": "dye",
-      "icon": "RD",
-      "stackSize": 500,
-      "baseValue": 12,
-      "dependencies": [
-        "berries"
-      ],
+      "quality": "good",
       "description": "Red coloring from berries"
     },
     {
       "id": "blue_dye",
       "name": "Blue Dye",
       "category": "dye",
-      "icon": "BD",
-      "stackSize": 500,
-      "baseValue": 15,
-      "dependencies": [
-        "indigo"
-      ],
+      "quality": "good",
       "description": "Blue coloring from indigo"
     },
     {
       "id": "yellow_dye",
       "name": "Yellow Dye",
       "category": "dye",
-      "icon": "YD",
-      "stackSize": 500,
-      "baseValue": 14,
-      "dependencies": [
-        "flowers"
-      ],
+      "quality": "good",
       "description": "Yellow coloring from flowers"
     },
     {
       "id": "black_dye",
       "name": "Black Dye",
       "category": "dye",
-      "icon": "BkD",
-      "stackSize": 500,
-      "baseValue": 10,
-      "dependencies": [
-        "charcoal"
-      ],
+      "quality": "good",
       "description": "Black coloring from charcoal"
     },
     {
       "id": "paper",
       "name": "Paper",
       "category": "crafting",
-      "icon": "Pp",
-      "stackSize": 1000,
-      "baseValue": 8,
-      "dependencies": [
-        "wood"
-      ],
+      "quality": "luxury",
       "description": "Writing material from pulp"
     },
     {
@@ -534,7 +415,8 @@
       "stackSize": 2000,
       "baseValue": 3,
       "isRaw": true,
-      "description": "Plant fiber"
+      "description": "Plant fiber",
+      "quality": "basic"
     },
     {
       "id": "flax",
@@ -544,7 +426,8 @@
       "stackSize": 1500,
       "baseValue": 4,
       "isRaw": true,
-      "description": "Linen source"
+      "description": "Linen source",
+      "quality": "basic"
     },
     {
       "id": "thread",
@@ -556,31 +439,21 @@
       "dependencies": [
         "cotton"
       ],
-      "description": "Spun fiber"
+      "description": "Spun fiber",
+      "quality": "basic"
     },
     {
       "id": "cloth",
       "name": "Cloth",
       "category": "textile",
-      "icon": "Cl",
-      "stackSize": 1000,
-      "baseValue": 15,
-      "dependencies": [
-        "cotton",
-        "thread"
-      ],
+      "quality": "good",
       "description": "Woven fabric"
     },
     {
       "id": "linen",
       "name": "Linen",
       "category": "textile",
-      "icon": "Li",
-      "stackSize": 500,
-      "baseValue": 20,
-      "dependencies": [
-        "flax"
-      ],
+      "quality": "luxury",
       "description": "Fine fabric"
     },
     {
@@ -591,7 +464,8 @@
       "stackSize": 200,
       "baseValue": 100,
       "isRaw": true,
-      "description": "Luxury fabric from silkworms"
+      "description": "Luxury fabric from silkworms",
+      "quality": "luxury"
     },
     {
       "id": "simple_clothes",
@@ -604,7 +478,8 @@
         "cloth",
         "thread"
       ],
-      "description": "Basic garments"
+      "description": "Basic garments",
+      "quality": "good"
     },
     {
       "id": "work_clothes",
@@ -617,7 +492,8 @@
         "cloth",
         "thread"
       ],
-      "description": "Durable workwear"
+      "description": "Durable workwear",
+      "quality": "good"
     },
     {
       "id": "fine_clothes",
@@ -630,7 +506,8 @@
         "linen",
         "thread"
       ],
-      "description": "Quality garments"
+      "description": "Quality garments",
+      "quality": "luxury"
     },
     {
       "id": "luxury_clothes",
@@ -643,7 +520,8 @@
         "silk",
         "thread"
       ],
-      "description": "Silk garments"
+      "description": "Silk garments",
+      "quality": "luxury"
     },
     {
       "id": "winter_coat",
@@ -656,7 +534,8 @@
         "wool",
         "thread"
       ],
-      "description": "Warm outerwear"
+      "description": "Warm outerwear",
+      "quality": "luxury"
     },
     {
       "id": "shoes",
@@ -669,7 +548,8 @@
         "leather",
         "thread"
       ],
-      "description": "Leather footwear"
+      "description": "Leather footwear",
+      "quality": "good"
     },
     {
       "id": "boots",
@@ -682,7 +562,8 @@
         "leather",
         "thread"
       ],
-      "description": "Work boots"
+      "description": "Work boots",
+      "quality": "luxury"
     },
     {
       "id": "hat",
@@ -695,7 +576,8 @@
         "cloth",
         "thread"
       ],
-      "description": "Head covering"
+      "description": "Head covering",
+      "quality": "basic"
     },
     {
       "id": "axe",
@@ -708,7 +590,8 @@
         "ore",
         "wood"
       ],
-      "description": "Chopping tool"
+      "description": "Chopping tool",
+      "quality": "good"
     },
     {
       "id": "hammer",
@@ -721,7 +604,8 @@
         "ore",
         "wood"
       ],
-      "description": "Striking tool"
+      "description": "Striking tool",
+      "quality": "good"
     },
     {
       "id": "saw",
@@ -734,7 +618,8 @@
         "ore",
         "wood"
       ],
-      "description": "Cutting tool"
+      "description": "Cutting tool",
+      "quality": "good"
     },
     {
       "id": "pickaxe",
@@ -747,7 +632,8 @@
         "ore",
         "wood"
       ],
-      "description": "Mining tool"
+      "description": "Mining tool",
+      "quality": "luxury"
     },
     {
       "id": "shovel",
@@ -760,7 +646,8 @@
         "ore",
         "wood"
       ],
-      "description": "Digging tool"
+      "description": "Digging tool",
+      "quality": "good"
     },
     {
       "id": "hoe",
@@ -773,7 +660,8 @@
         "ore",
         "wood"
       ],
-      "description": "Farming tool"
+      "description": "Farming tool",
+      "quality": "good"
     },
     {
       "id": "scythe",
@@ -786,7 +674,8 @@
         "ore",
         "wood"
       ],
-      "description": "Harvesting tool"
+      "description": "Harvesting tool",
+      "quality": "luxury"
     },
     {
       "id": "chisel",
@@ -799,7 +688,8 @@
         "ore",
         "wood"
       ],
-      "description": "Carving tool"
+      "description": "Carving tool",
+      "quality": "good"
     },
     {
       "id": "needle",
@@ -811,7 +701,8 @@
       "dependencies": [
         "ore"
       ],
-      "description": "Sewing tool"
+      "description": "Sewing tool",
+      "quality": "basic"
     },
     {
       "id": "chair",
@@ -824,7 +715,8 @@
         "wood",
         "nails"
       ],
-      "description": "Seating furniture"
+      "description": "Seating furniture",
+      "quality": "good"
     },
     {
       "id": "table",
@@ -837,7 +729,8 @@
         "wood",
         "nails"
       ],
-      "description": "Dining furniture"
+      "description": "Dining furniture",
+      "quality": "luxury"
     },
     {
       "id": "bed",
@@ -851,7 +744,8 @@
         "cloth",
         "nails"
       ],
-      "description": "Sleeping furniture"
+      "description": "Sleeping furniture",
+      "quality": "luxury"
     },
     {
       "id": "cabinet",
@@ -864,7 +758,8 @@
         "wood",
         "nails"
       ],
-      "description": "Storage furniture"
+      "description": "Storage furniture",
+      "quality": "luxury"
     },
     {
       "id": "wardrobe",
@@ -877,7 +772,8 @@
         "wood",
         "nails"
       ],
-      "description": "Clothing storage"
+      "description": "Clothing storage",
+      "quality": "luxury"
     },
     {
       "id": "bench",
@@ -890,7 +786,8 @@
         "wood",
         "nails"
       ],
-      "description": "Long seat"
+      "description": "Long seat",
+      "quality": "luxury"
     },
     {
       "id": "bookshelf",
@@ -903,7 +800,8 @@
         "wood",
         "nails"
       ],
-      "description": "Book storage"
+      "description": "Book storage",
+      "quality": "luxury"
     },
     {
       "id": "desk",
@@ -916,7 +814,8 @@
         "wood",
         "nails"
       ],
-      "description": "Work surface"
+      "description": "Work surface",
+      "quality": "luxury"
     },
     {
       "id": "coal",
@@ -926,7 +825,8 @@
       "stackSize": 10000,
       "baseValue": 3,
       "isRaw": true,
-      "description": "Combustible mineral"
+      "description": "Combustible mineral",
+      "quality": "basic"
     },
     {
       "id": "copper_ore",
@@ -936,7 +836,8 @@
       "stackSize": 6000,
       "baseValue": 6,
       "isRaw": true,
-      "description": "Copper bearing ore"
+      "description": "Copper bearing ore",
+      "quality": "basic"
     },
     {
       "id": "gold_ore",
@@ -946,7 +847,8 @@
       "stackSize": 1000,
       "baseValue": 50,
       "isRaw": true,
-      "description": "Precious metal ore"
+      "description": "Precious metal ore",
+      "quality": "luxury"
     },
     {
       "id": "silver_ore",
@@ -956,7 +858,8 @@
       "stackSize": 2000,
       "baseValue": 30,
       "isRaw": true,
-      "description": "Valuable metal ore"
+      "description": "Valuable metal ore",
+      "quality": "good"
     },
     {
       "id": "stone",
@@ -966,7 +869,8 @@
       "stackSize": 10000,
       "baseValue": 1,
       "isRaw": true,
-      "description": "Building stone"
+      "description": "Building stone",
+      "quality": "basic"
     },
     {
       "id": "marble",
@@ -976,7 +880,8 @@
       "stackSize": 3000,
       "baseValue": 20,
       "isRaw": true,
-      "description": "Decorative stone"
+      "description": "Decorative stone",
+      "quality": "good"
     },
     {
       "id": "clay",
@@ -986,7 +891,8 @@
       "stackSize": 5000,
       "baseValue": 2,
       "isRaw": true,
-      "description": "Moldable earth"
+      "description": "Moldable earth",
+      "quality": "basic"
     },
     {
       "id": "sand",
@@ -996,7 +902,8 @@
       "stackSize": 8000,
       "baseValue": 1,
       "isRaw": true,
-      "description": "Glass material"
+      "description": "Glass material",
+      "quality": "basic"
     },
     {
       "id": "iron",
@@ -1008,7 +915,8 @@
       "dependencies": [
         "ore"
       ],
-      "description": "Refined metal"
+      "description": "Refined metal",
+      "quality": "basic"
     },
     {
       "id": "steel",
@@ -1021,7 +929,8 @@
         "ore",
         "coal"
       ],
-      "description": "Strong alloy"
+      "description": "Strong alloy",
+      "quality": "good"
     },
     {
       "id": "copper",
@@ -1033,7 +942,8 @@
       "dependencies": [
         "copper_ore"
       ],
-      "description": "Refined copper"
+      "description": "Refined copper",
+      "quality": "basic"
     },
     {
       "id": "bronze",
@@ -1045,7 +955,8 @@
       "dependencies": [
         "copper_ore"
       ],
-      "description": "Copper alloy"
+      "description": "Copper alloy",
+      "quality": "good"
     },
     {
       "id": "gold",
@@ -1057,7 +968,8 @@
       "dependencies": [
         "gold_ore"
       ],
-      "description": "Precious metal"
+      "description": "Precious metal",
+      "quality": "luxury"
     },
     {
       "id": "silver",
@@ -1069,7 +981,8 @@
       "dependencies": [
         "silver_ore"
       ],
-      "description": "Valuable metal"
+      "description": "Valuable metal",
+      "quality": "luxury"
     },
     {
       "id": "bricks",
@@ -1081,7 +994,8 @@
       "dependencies": [
         "clay"
       ],
-      "description": "Fired clay blocks"
+      "description": "Fired clay blocks",
+      "quality": "basic"
     },
     {
       "id": "timber",
@@ -1091,7 +1005,8 @@
       "stackSize": 2000,
       "baseValue": 8,
       "isRaw": true,
-      "description": "Cut logs"
+      "description": "Cut logs",
+      "quality": "basic"
     },
     {
       "id": "planks",
@@ -1103,7 +1018,8 @@
       "dependencies": [
         "timber"
       ],
-      "description": "Processed wood"
+      "description": "Processed wood",
+      "quality": "basic"
     },
     {
       "id": "cement",
@@ -1115,7 +1031,8 @@
       "dependencies": [
         "stone"
       ],
-      "description": "Binding material"
+      "description": "Binding material",
+      "quality": "basic"
     },
     {
       "id": "glass",
@@ -1127,7 +1044,8 @@
       "dependencies": [
         "sand"
       ],
-      "description": "Transparent material"
+      "description": "Transparent material",
+      "quality": "good"
     },
     {
       "id": "nails",
@@ -1139,7 +1057,8 @@
       "dependencies": [
         "ore"
       ],
-      "description": "Fasteners"
+      "description": "Fasteners",
+      "quality": "basic"
     },
     {
       "id": "pottery",
@@ -1151,7 +1070,8 @@
       "dependencies": [
         "clay"
       ],
-      "description": "Ceramic vessels"
+      "description": "Ceramic vessels",
+      "quality": "good"
     },
     {
       "id": "jewelry",
@@ -1164,7 +1084,8 @@
         "gold_ore",
         "silver_ore"
       ],
-      "description": "Decorative items"
+      "description": "Decorative items",
+      "quality": "luxury"
     },
     {
       "id": "perfume",
@@ -1176,7 +1097,8 @@
       "dependencies": [
         "flowers"
       ],
-      "description": "Fragrant liquid"
+      "description": "Fragrant liquid",
+      "quality": "luxury"
     },
     {
       "id": "painting",
@@ -1191,7 +1113,8 @@
         "blue_dye",
         "yellow_dye"
       ],
-      "description": "Art piece"
+      "description": "Art piece",
+      "quality": "luxury"
     },
     {
       "id": "sculpture",
@@ -1204,7 +1127,8 @@
         "marble",
         "ore"
       ],
-      "description": "Stone art carved with metal tools"
+      "description": "Stone art carved with metal tools",
+      "quality": "luxury"
     },
     {
       "id": "book",
@@ -1217,30 +1141,21 @@
         "paper",
         "black_dye"
       ],
-      "description": "Written work"
+      "description": "Written work",
+      "quality": "luxury"
     },
     {
       "id": "candle",
       "name": "Candle",
       "category": "misc",
-      "icon": "Ca",
-      "stackSize": 1000,
-      "baseValue": 5,
-      "dependencies": [
-        "honey"
-      ],
+      "quality": "good",
       "description": "Light source made from beeswax"
     },
     {
       "id": "lamp_oil",
       "name": "Lamp Oil",
       "category": "misc",
-      "icon": "LO",
-      "stackSize": 800,
-      "baseValue": 8,
-      "dependencies": [
-        "oil"
-      ],
+      "quality": "good",
       "description": "Fuel for lamps"
     },
     {
@@ -1253,7 +1168,8 @@
       "dependencies": [
         "oil"
       ],
-      "description": "Cleaning agent from oil and lye"
+      "description": "Cleaning agent from oil and lye",
+      "quality": "basic"
     },
     {
       "id": "medicine",
@@ -1265,7 +1181,8 @@
       "dependencies": [
         "flowers"
       ],
-      "description": "Healing herbs and remedies"
+      "description": "Healing herbs and remedies",
+      "quality": "luxury"
     },
     {
       "id": "wood",
@@ -1275,7 +1192,8 @@
       "stackSize": 5000,
       "baseValue": 2,
       "isRaw": true,
-      "description": "Firewood"
+      "description": "Firewood",
+      "quality": "basic"
     },
     {
       "id": "charcoal",
@@ -1284,7 +1202,8 @@
       "icon": "Cc",
       "stackSize": 3000,
       "baseValue": 5,
-      "description": "Processed fuel"
+      "description": "Processed fuel",
+      "quality": "basic"
     },
     {
       "id": "oil",
@@ -1293,18 +1212,21 @@
       "icon": "Oi",
       "stackSize": 2000,
       "baseValue": 12,
-      "description": "Liquid fuel"
+      "description": "Liquid fuel",
+      "quality": "basic"
     },
     {
       "id": "rubber",
       "name": "Rubber",
       "category": "tree_product",
-      "description": "Product which is derived from Rubber trees, is used as a input for producing many other products like shoes"
+      "description": "Product which is derived from Rubber trees, is used as a input for producing many other products like shoes",
+      "quality": "basic"
     },
     {
       "id": "cake",
       "name": "Cake",
       "category": "processed_food",
+      "quality": "good",
       "description": "Cake is a sweet delicacy"
     },
     {
@@ -1315,7 +1237,8 @@
       "stackSize": 1000,
       "baseValue": 2,
       "isRaw": true,
-      "description": "Seeds for growing wheat"
+      "description": "Seeds for growing wheat",
+      "quality": "basic"
     },
     {
       "id": "vegetable_seed",
@@ -1325,7 +1248,8 @@
       "stackSize": 1000,
       "baseValue": 2,
       "isRaw": true,
-      "description": "Seeds for growing vegetables"
+      "description": "Seeds for growing vegetables",
+      "quality": "basic"
     },
     {
       "id": "fruit_seed",
@@ -1335,7 +1259,8 @@
       "stackSize": 800,
       "baseValue": 3,
       "isRaw": true,
-      "description": "Seeds for growing fruit"
+      "description": "Seeds for growing fruit",
+      "quality": "basic"
     },
     {
       "id": "cotton_seed",
@@ -1345,39 +1270,8 @@
       "stackSize": 1000,
       "baseValue": 2,
       "isRaw": true,
-      "description": "Seeds for growing cotton"
-    },
-    {
-      "id": "grain",
-      "name": "Grain",
-      "category": "grain",
-      "icon": "Gr",
-      "stackSize": 5000,
-      "baseValue": 1,
-      "isRaw": true,
-      "description": "General grain commodity"
-    },
-    {
-      "id": "vegetable",
-      "name": "Vegetable",
-      "category": "vegetable",
-      "icon": "Vg",
-      "stackSize": 2000,
-      "baseValue": 2,
-      "isRaw": true,
-      "perishable": true,
-      "description": "General vegetable commodity"
-    },
-    {
-      "id": "fruit",
-      "name": "Fruit",
-      "category": "fruit",
-      "icon": "Fr",
-      "stackSize": 1000,
-      "baseValue": 3,
-      "isRaw": true,
-      "perishable": true,
-      "description": "General fruit commodity"
+      "description": "Seeds for growing cotton",
+      "quality": "basic"
     },
     {
       "id": "tree",
@@ -1387,7 +1281,8 @@
       "stackSize": 100,
       "baseValue": 10,
       "isRaw": true,
-      "description": "Whole tree for lumber or crafting"
+      "description": "Whole tree for lumber or crafting",
+      "quality": "basic"
     },
     {
       "id": "lumber",
@@ -1399,7 +1294,8 @@
       "dependencies": [
         "tree"
       ],
-      "description": "Processed wood from trees"
+      "description": "Processed wood from trees",
+      "quality": "basic"
     },
     {
       "id": "soil",
@@ -1409,7 +1305,8 @@
       "stackSize": 10000,
       "baseValue": 1,
       "isRaw": true,
-      "description": "Earth for making bricks"
+      "description": "Earth for making bricks",
+      "quality": "basic"
     },
     {
       "id": "iron_ore",
@@ -1419,7 +1316,8 @@
       "stackSize": 8000,
       "baseValue": 5,
       "isRaw": true,
-      "description": "Raw iron ore for smelting"
+      "description": "Raw iron ore for smelting",
+      "quality": "basic"
     },
     {
       "id": "yarn",
@@ -1431,7 +1329,8 @@
       "dependencies": [
         "cotton"
       ],
-      "description": "Spun thread from cotton"
+      "description": "Spun thread from cotton",
+      "quality": "basic"
     },
     {
       "id": "clothing",
@@ -1444,7 +1343,8 @@
         "cotton",
         "thread"
       ],
-      "description": "General garments"
+      "description": "General garments",
+      "quality": "good"
     },
     {
       "id": "meal",
@@ -1458,7 +1358,8 @@
         "vegetable"
       ],
       "perishable": true,
-      "description": "Prepared food"
+      "description": "Prepared food",
+      "quality": "basic"
     },
     {
       "id": "whiskey",
@@ -1470,7 +1371,8 @@
       "dependencies": [
         "rye"
       ],
-      "description": "Distilled spirit from rye"
+      "description": "Distilled spirit from rye",
+      "quality": "good"
     },
     {
       "id": "knife",
@@ -1483,7 +1385,8 @@
         "iron_ore",
         "tree"
       ],
-      "description": "Cutting tool"
+      "description": "Cutting tool",
+      "quality": "good"
     },
     {
       "id": "gold_item",
@@ -1495,7 +1398,8 @@
       "dependencies": [
         "gold_ore"
       ],
-      "description": "Crafted gold jewelry or ornament"
+      "description": "Crafted gold jewelry or ornament",
+      "quality": "luxury"
     },
     {
       "id": "currency_note",
@@ -1507,7 +1411,8 @@
       "dependencies": [
         "tree"
       ],
-      "description": "Paper money printed by central bank"
+      "description": "Paper money printed by central bank",
+      "quality": "basic"
     }
   ]
 }

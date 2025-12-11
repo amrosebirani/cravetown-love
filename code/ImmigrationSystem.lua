@@ -21,11 +21,24 @@ function ImmigrationSystem:Create(world)
     -- Load configuration
     sys:LoadConfig()
 
+    -- Load land config for immigration requirements
+    sys.landConfig = DataLoader.loadLandConfig()
+
     -- Queue state
     sys.queue = {}
     sys.lastGenerationDay = 0
 
+    -- Generate initial applicants so there's something to see
+    sys:GenerateInitialApplicants()
+
     return sys
+end
+
+function ImmigrationSystem:GenerateInitialApplicants()
+    -- Generate 5-8 initial applicants
+    local count = math.random(5, 8)
+    self:GenerateApplicants(count, 1)
+    print("ImmigrationSystem: Generated " .. count .. " initial applicants")
 end
 
 function ImmigrationSystem:LoadConfig()
@@ -203,11 +216,56 @@ end
 -- APPLICANT ACTIONS
 -- =============================================================================
 
-function ImmigrationSystem:AcceptApplicant(applicant)
-    -- Find housing
-    local housing = self:FindHousingForClass(applicant.class)
+function ImmigrationSystem:AcceptApplicant(applicant, selectedPlots)
+    -- Phase 4: Check land requirements for wealthy/merchant roles
+    local landReqs = applicant.landRequirements or {}
+    if landReqs.minPlots and landReqs.minPlots > 0 then
+        if not selectedPlots or #selectedPlots < landReqs.minPlots then
+            return false, "Must purchase at least " .. landReqs.minPlots .. " plots"
+        end
+
+        -- Verify applicant can afford the plots
+        local totalPlotCost = 0
+        if self.world.landSystem then
+            for _, plotId in ipairs(selectedPlots) do
+                local plot = self.world.landSystem:GetPlotById(plotId)
+                if plot then
+                    totalPlotCost = totalPlotCost + (plot.purchasePrice or 0)
+                end
+            end
+        end
+
+        if totalPlotCost > (applicant.wealth or 0) then
+            return false, "Insufficient funds for land purchase"
+        end
+
+        -- Deduct plot cost from wealth
+        applicant.wealth = applicant.wealth - totalPlotCost
+        -- Town receives the money
+        self.world.gold = self.world.gold + totalPlotCost
+    end
+
+    -- Find housing using HousingSystem if available
+    local housing = nil
+    if self.world.housingSystem then
+        local availableHousing = self.world.housingSystem:GetAvailableHousing(applicant.class)
+        if #availableHousing > 0 then
+            housing = { id = availableHousing[1].buildingId }
+        end
+    else
+        housing = self:FindHousingForClass(applicant.class)
+    end
+
     if not housing then
-        return false, "No suitable housing available"
+        -- For wealthy/merchant who bought land, they can build their own housing
+        if landReqs.minPlots and landReqs.minPlots > 0 and selectedPlots and #selectedPlots > 0 then
+            -- Auto-setup for elites: place a house on their first plot
+            housing = self:AutoSetupEliteHousing(applicant, selectedPlots)
+        end
+
+        if not housing then
+            return false, "No suitable housing available"
+        end
     end
 
     -- Create citizen from applicant
@@ -216,40 +274,201 @@ function ImmigrationSystem:AcceptApplicant(applicant)
         return false, "Failed to create citizen"
     end
 
-    -- Assign housing
-    citizen.residence = housing
-    if housing.residents then
-        table.insert(housing.residents, citizen)
+    -- Phase 4: Initialize in economics system
+    if self.world.economicsSystem then
+        self.world.economicsSystem:InitializeCharacter(citizen.id, applicant.wealth or 0)
+    end
+
+    -- Assign housing using HousingSystem if available
+    if self.world.housingSystem and housing and housing.id then
+        self.world.housingSystem:AssignHousing(citizen.id, housing.id)
+    else
+        -- Legacy housing assignment
+        citizen.residence = housing
+        if housing and housing.residents then
+            table.insert(housing.residents, citizen)
+        end
+    end
+
+    -- Phase 4: Transfer land plots to new owner
+    if selectedPlots and self.world.landSystem then
+        for _, plotId in ipairs(selectedPlots) do
+            self.world.landSystem:TransferOwnership(plotId, citizen.id, 0, self.world.timeManager:GetDay())
+        end
     end
 
     -- Add to world
     table.insert(self.world.citizens, citizen)
 
     -- Add family members
+    local familyMembers = {}
     if applicant.family then
         for _, familyMember in ipairs(applicant.family) do
             local member = self:CreateCitizenFromApplicant(familyMember)
             if member then
-                member.residence = housing
-                if housing.residents then
-                    table.insert(housing.residents, member)
+                -- Initialize family member in economics (dependents have 0 wealth)
+                if self.world.economicsSystem then
+                    self.world.economicsSystem:InitializeCharacter(member.id, 0)
                 end
+
+                -- Assign housing
+                if self.world.housingSystem and housing and housing.id then
+                    self.world.housingSystem:AssignHousing(member.id, housing.id)
+                else
+                    member.residence = housing
+                    if housing and housing.residents then
+                        table.insert(housing.residents, member)
+                    end
+                end
+
+                -- Add family relationships
+                citizen:AddRelationship(member.id, familyMember.familyRelationType or "family", self.world.timeManager:GetDay())
+                member:AddRelationship(citizen.id, "family", self.world.timeManager:GetDay())
+
                 table.insert(self.world.citizens, member)
+                table.insert(familyMembers, member)
             end
         end
     end
-
-    -- Add wealth to town
-    self.world.gold = self.world.gold + (applicant.wealth or 0)
 
     -- Remove from queue
     self:RemoveFromQueue(applicant)
 
     -- Log event
     local familyNote = applicant.family and (" (with " .. #applicant.family .. " family members)") or ""
-    self.world:LogEvent("immigration", applicant.name .. " has joined the town!" .. familyNote, {})
+    local landNote = (selectedPlots and #selectedPlots > 0) and (" and purchased " .. #selectedPlots .. " plots") or ""
+    self.world:LogEvent("immigration", applicant.name .. " has joined the town!" .. familyNote .. landNote, {})
+
+    return true, citizen, nil
+end
+
+-- Auto-setup housing for elite immigrants (Phase 4)
+function ImmigrationSystem:AutoSetupEliteHousing(applicant, selectedPlots)
+    if not selectedPlots or #selectedPlots == 0 then
+        return nil
+    end
+
+    -- Get the first plot to build on
+    local firstPlotId = selectedPlots[1]
+    local plot = self.world.landSystem and self.world.landSystem:GetPlotById(firstPlotId)
+
+    if not plot then
+        return nil
+    end
+
+    -- Determine housing type based on intended role
+    local housingType = "house"  -- default
+    if applicant.intendedRole == "wealthy" then
+        housingType = "manor"
+        if (applicant.wealth or 0) > 3000 then
+            housingType = "estate"
+        end
+    elseif applicant.intendedRole == "merchant" then
+        housingType = "townhouse"
+    end
+
+    -- Check if building type exists
+    local buildingType = self.world.buildingTypesById and self.world.buildingTypesById[housingType]
+    if not buildingType then
+        housingType = "house"  -- fallback
+    end
+
+    -- Create the building
+    local building = self.world:AddBuilding(housingType, plot.worldX, plot.worldY, {
+        ownerId = applicant.name,  -- Will be updated to citizen.id after creation
+        purchasePrice = 0  -- They already own the land
+    })
+
+    if building then
+        print(string.format("[ImmigrationSystem] Auto-placed %s for %s on plot %s",
+            housingType, applicant.name, firstPlotId))
+        return building
+    end
+
+    return nil
+end
+
+-- Check if applicant can be accepted (for UI) (Phase 4)
+function ImmigrationSystem:CanAcceptApplicant(applicant)
+    local landReqs = applicant.landRequirements or {}
+
+    -- Check land requirements
+    if landReqs.minPlots and landReqs.minPlots > 0 then
+        -- Check if enough town-owned plots are available
+        local availablePlots = 0
+        if self.world.landSystem then
+            local townPlots = self.world.landSystem:GetAvailablePlots()
+            availablePlots = #townPlots
+        end
+
+        if availablePlots < landReqs.minPlots then
+            return false, "Not enough plots available (need " .. landReqs.minPlots .. ", have " .. availablePlots .. ")"
+        end
+
+        -- Check if applicant can afford the minimum required plots
+        local minPlotCost = 0
+        if self.world.landSystem then
+            local townPlots = self.world.landSystem:GetAvailablePlots()
+            -- Sort by price (cheapest first)
+            table.sort(townPlots, function(a, b)
+                return (a.purchasePrice or 0) < (b.purchasePrice or 0)
+            end)
+            for i = 1, math.min(landReqs.minPlots, #townPlots) do
+                minPlotCost = minPlotCost + (townPlots[i].purchasePrice or 0)
+            end
+        end
+
+        if minPlotCost > (applicant.wealth or 0) then
+            return false, "Cannot afford minimum plots (cost " .. minPlotCost .. ", have " .. (applicant.wealth or 0) .. ")"
+        end
+    end
+
+    -- Check housing availability (for non-land-buying immigrants)
+    if not landReqs.minPlots or landReqs.minPlots == 0 then
+        local hasHousing = false
+        if self.world.housingSystem then
+            local available = self.world.housingSystem:GetAvailableHousing(applicant.class)
+            hasHousing = #available > 0
+        else
+            hasHousing = self:FindHousingForClass(applicant.class) ~= nil
+        end
+
+        if not hasHousing then
+            return false, "No suitable housing available"
+        end
+    end
 
     return true, nil
+end
+
+-- Get available plots for selection (Phase 4)
+function ImmigrationSystem:GetAvailablePlotsForPurchase(applicant)
+    if not self.world.landSystem then
+        return {}
+    end
+
+    local townPlots = self.world.landSystem:GetAvailablePlots()
+    local affordablePlots = {}
+
+    for _, plot in ipairs(townPlots) do
+        if (plot.purchasePrice or 0) <= (applicant.wealth or 0) then
+            table.insert(affordablePlots, {
+                id = plot.id,
+                gridX = plot.gridX,
+                gridY = plot.gridY,
+                price = plot.purchasePrice or 0,
+                terrainType = plot.terrainType,
+                resources = plot.naturalResources
+            })
+        end
+    end
+
+    -- Sort by price
+    table.sort(affordablePlots, function(a, b)
+        return a.price < b.price
+    end)
+
+    return affordablePlots
 end
 
 function ImmigrationSystem:RejectApplicant(applicant)
@@ -365,8 +584,11 @@ function ImmigrationSystem:GenerateApplicantOfClass(class, currentDay)
     local age = math.random(classRange.ageMin, classRange.ageMax)
     local wealth = math.random(classRange.wealthMin, classRange.wealthMax)
 
-    -- Vocation
-    local vocations = self.config.vocationsForClass[class] or {"Laborer"}
+    -- Determine intendedRole based on class and wealth (Phase 4)
+    local intendedRole = self:DetermineIntendedRole(class, wealth)
+
+    -- Vocation - "General Worker" is the fallback from worker_types.json
+    local vocations = self.config.vocationsForClass[class] or {"General Worker"}
     local vocation = vocations[math.random(1, #vocations)]
 
     -- Traits
@@ -392,6 +614,9 @@ function ImmigrationSystem:GenerateApplicantOfClass(class, currentDay)
     -- Generate backstory
     local backstory = self:GenerateBackstory(name, gender, vocation, origin, cravingProfile)
 
+    -- Get land requirements for this role
+    local landRequirements = self:GetLandRequirementsForRole(intendedRole)
+
     local applicant = {
         name = name,
         firstName = firstName,
@@ -399,21 +624,80 @@ function ImmigrationSystem:GenerateApplicantOfClass(class, currentDay)
         gender = gender,
         age = age,
         class = class,
+        intendedRole = intendedRole,  -- Phase 4: wealthy/merchant/craftsman/laborer
         vocation = vocation,
         traits = traits,
         wealth = wealth,
+        startingWealth = wealth,  -- Alias for Phase 4 compatibility
         origin = origin,
         backstory = backstory,
         family = family,
         cravingProfile = cravingProfile,
         expiryDay = expiryDay,
-        arrivalDay = currentDay
+        arrivalDay = currentDay,
+        landRequirements = landRequirements  -- Phase 4: how many plots they need
     }
 
     -- Calculate compatibility
     applicant.compatibility = self:CalculateCompatibility(applicant)
 
     return applicant
+end
+
+-- Determine intended role based on class and wealth (Phase 4)
+function ImmigrationSystem:DetermineIntendedRole(class, wealth)
+    -- Map class to intendedRole
+    if class == "Elite" then
+        return "wealthy"
+    elseif class == "Upper" then
+        -- Upper class could be wealthy or merchant depending on wealth
+        if wealth >= 2000 then
+            return "wealthy"
+        else
+            return "merchant"
+        end
+    elseif class == "Middle" then
+        -- Middle class could be merchant or craftsman
+        if wealth >= 500 then
+            return "merchant"
+        else
+            return "craftsman"
+        end
+    elseif class == "Working" or class == "Poor" then
+        return "laborer"
+    else
+        return "laborer"
+    end
+end
+
+-- Get land requirements for an intended role (Phase 4)
+function ImmigrationSystem:GetLandRequirementsForRole(intendedRole)
+    local requirements = {
+        minPlots = 0,
+        maxPlots = 0,
+        minTotalValue = 0
+    }
+
+    if self.landConfig and self.landConfig.immigrationRequirements then
+        local roleReqs = self.landConfig.immigrationRequirements[intendedRole]
+        if roleReqs then
+            requirements.minPlots = roleReqs.minPlots or 0
+            requirements.maxPlots = roleReqs.maxPlots or 0
+            requirements.minTotalValue = roleReqs.minTotalValue or 0
+        end
+    else
+        -- Default requirements
+        if intendedRole == "wealthy" then
+            requirements.minPlots = 4
+            requirements.maxPlots = 10
+        elseif intendedRole == "merchant" then
+            requirements.minPlots = 2
+            requirements.maxPlots = 4
+        end
+        -- craftsman and laborer have 0 requirements
+    end
+
+    return requirements
 end
 
 function ImmigrationSystem:GenerateFamily(class, lastName, currentDay)
@@ -747,7 +1031,7 @@ function ImmigrationSystem:WeightedRandomVocation(needs)
     end
 
     if total == 0 then
-        return "Laborer"
+        return "General Worker"
     end
 
     local rand = math.random() * total
@@ -760,7 +1044,7 @@ function ImmigrationSystem:WeightedRandomVocation(needs)
         end
     end
 
-    return "Laborer"
+    return "General Worker"
 end
 
 function ImmigrationSystem:GetClassForVocation(vocation)
@@ -784,10 +1068,16 @@ function ImmigrationSystem:RandomLastName()
 end
 
 function ImmigrationSystem:GenerateRandomTraits(count)
-    local allTraits = self.world.characterTraits or {}
+    -- characterTraits has structure {version: "...", traits: [...]}
+    local traitsData = self.world.characterTraits or {}
+    local allTraits = traitsData.traits or {}
     local traitIds = {}
-    for id, _ in pairs(allTraits) do
-        table.insert(traitIds, id)
+
+    -- allTraits is an array of trait objects with id, name, etc.
+    for _, trait in ipairs(allTraits) do
+        if trait.id then
+            table.insert(traitIds, trait.name or trait.id)
+        end
     end
 
     if #traitIds == 0 then

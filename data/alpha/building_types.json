@@ -1,24 +1,68 @@
 {
   "buildingTypes": [
     {
-      "id": "simple_house",
-      "name": "Simple House",
+      "id": "lodge",
+      "name": "Lodge",
       "category": "housing",
-      "label": "Hs",
-      "description": "A simple dwelling for citizens",
-      "color": [0.6, 0.5, 0.4],
+      "label": "Lg",
+      "description": "Communal sleeping quarters with shared facilities",
+      "color": [0.5, 0.4, 0.3],
       "constructionCost": {
-        "gold": 100
+        "gold": 50,
+        "wood": 20
+      },
+      "housingConfig": {
+        "housingQuality": 0.3,
+        "qualityTier": "poor",
+        "rentPerOccupant": 2,
+        "targetClasses": ["lower"],
+        "acceptableClasses": ["lower", "middle"],
+        "occupancyType": "singles_or_families_penalty",
+        "upgradeableTo": null
       },
       "upgradeLevels": [
         {
           "level": 0,
-          "name": "Simple House",
-          "description": "A simple house for up to 4 residents",
+          "name": "Lodge",
+          "description": "A lodge with communal beds for up to 12 residents",
           "stations": 0,
-          "width": 50,
-          "height": 50,
-          "capacity": 4
+          "width": 80,
+          "height": 60,
+          "capacity": 12
+        }
+      ]
+    },
+    {
+      "id": "tenement",
+      "name": "Tenement",
+      "category": "housing",
+      "label": "Tn",
+      "description": "Multi-family building with cramped apartments",
+      "color": [0.55, 0.45, 0.35],
+      "constructionCost": {
+        "gold": 150,
+        "wood": 40,
+        "stone": 20
+      },
+      "housingConfig": {
+        "housingQuality": 0.4,
+        "qualityTier": "basic",
+        "rentPerOccupant": 3,
+        "targetClasses": ["lower"],
+        "acceptableClasses": ["lower"],
+        "occupancyType": "families_or_mixed",
+        "unitsCount": 4,
+        "upgradeableTo": null
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Tenement",
+          "description": "A tenement building with 4 cramped units for up to 20 residents",
+          "stations": 0,
+          "width": 100,
+          "height": 80,
+          "capacity": 20
         }
       ]
     },
@@ -30,7 +74,23 @@
       "description": "A cozy cottage for a small family",
       "color": [0.65, 0.55, 0.45],
       "constructionCost": {
-        "gold": 200
+        "gold": 200,
+        "wood": 30,
+        "stone": 10
+      },
+      "housingConfig": {
+        "housingQuality": 0.5,
+        "qualityTier": "basic",
+        "rentPerOccupant": 5,
+        "targetClasses": ["lower", "middle"],
+        "acceptableClasses": ["lower", "middle"],
+        "occupancyType": "family_or_mixed",
+        "upgradeableTo": "house",
+        "upgradeCost": {
+          "gold": 150,
+          "wood": 20,
+          "stone": 20
+        }
       },
       "upgradeLevels": [
         {
@@ -45,42 +105,196 @@
       ]
     },
     {
-      "id": "wheat_farm",
-      "name": "Wheat Farm",
-      "category": "production",
-      "label": "WF",
-      "description": "Grows wheat for the bakery",
-      "color": [0.8, 0.7, 0.3],
+      "id": "house",
+      "name": "House",
+      "category": "housing",
+      "label": "Hs",
+      "description": "Standard single-family dwelling",
+      "color": [0.6, 0.5, 0.4],
       "constructionCost": {
-        "gold": 150
+        "gold": 350,
+        "wood": 50,
+        "stone": 30
       },
-      "placementConstraints": {
-        "enabled": true,
-        "requiredResources": [
-          {
-            "resourceId": "fertility",
-            "weight": 0.7,
-            "minValue": 0.2,
-            "displayName": "Soil Fertility"
-          },
-          {
-            "resourceId": "ground_water",
-            "weight": 0.3,
-            "minValue": 0.1,
-            "displayName": "Ground Water"
-          }
-        ],
-        "efficiencyFormula": "weighted_average",
-        "blockingThreshold": 0.15
+      "housingConfig": {
+        "housingQuality": 0.6,
+        "qualityTier": "good",
+        "rentPerOccupant": 8,
+        "targetClasses": ["middle"],
+        "acceptableClasses": ["lower", "middle"],
+        "occupancyType": "family_or_mixed",
+        "upgradeableTo": "townhouse",
+        "upgradeCost": {
+          "gold": 200,
+          "wood": 10,
+          "stone": 20,
+          "glass": 10
+        }
       },
       "upgradeLevels": [
         {
           "level": 0,
-          "name": "Small Wheat Farm",
-          "description": "A small farm that produces wheat",
-          "stations": 1,
-          "width": 60,
-          "height": 60
+          "name": "House",
+          "description": "A house for up to 8 residents",
+          "stations": 0,
+          "width": 70,
+          "height": 70,
+          "capacity": 8
+        }
+      ]
+    },
+    {
+      "id": "apartment_block",
+      "name": "Apartment Block",
+      "category": "housing",
+      "label": "Ab",
+      "description": "Modern multi-family residential building",
+      "color": [0.55, 0.55, 0.5],
+      "constructionCost": {
+        "gold": 800,
+        "wood": 80,
+        "stone": 100,
+        "glass": 30
+      },
+      "housingConfig": {
+        "housingQuality": 0.55,
+        "qualityTier": "good",
+        "rentPerOccupant": 6,
+        "targetClasses": ["middle"],
+        "acceptableClasses": ["lower", "middle"],
+        "occupancyType": "families_or_mixed",
+        "unitsCount": 6,
+        "upgradeableTo": null
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Apartment Block",
+          "description": "An apartment block with 6 units for up to 30 residents",
+          "stations": 0,
+          "width": 100,
+          "height": 100,
+          "capacity": 30
+        }
+      ]
+    },
+    {
+      "id": "townhouse",
+      "name": "Townhouse",
+      "category": "housing",
+      "label": "Th",
+      "description": "Multi-story urban dwelling with quality finishes",
+      "color": [0.6, 0.55, 0.5],
+      "constructionCost": {
+        "gold": 500,
+        "wood": 60,
+        "stone": 50,
+        "glass": 10
+      },
+      "housingConfig": {
+        "housingQuality": 0.7,
+        "qualityTier": "good",
+        "rentPerOccupant": 12,
+        "targetClasses": ["middle", "upper"],
+        "acceptableClasses": ["middle", "upper"],
+        "occupancyType": "family_or_mixed",
+        "upgradeableTo": "manor",
+        "upgradeCost": {
+          "gold": 500,
+          "wood": 40,
+          "stone": 30,
+          "glass": 10,
+          "marble": 10
+        }
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Townhouse",
+          "description": "A townhouse for up to 6 residents",
+          "stations": 0,
+          "width": 50,
+          "height": 80,
+          "capacity": 6
+        }
+      ]
+    },
+    {
+      "id": "manor",
+      "name": "Manor",
+      "category": "housing",
+      "label": "Mn",
+      "description": "Large prestigious home with grounds",
+      "color": [0.7, 0.6, 0.5],
+      "constructionCost": {
+        "gold": 1000,
+        "wood": 100,
+        "stone": 80,
+        "glass": 20,
+        "marble": 10
+      },
+      "housingConfig": {
+        "housingQuality": 0.85,
+        "qualityTier": "luxury",
+        "rentPerOccupant": 20,
+        "targetClasses": ["upper", "elite"],
+        "acceptableClasses": ["upper", "elite"],
+        "occupancyType": "family_or_mixed",
+        "upgradeableTo": "estate",
+        "upgradeCost": {
+          "gold": 1500,
+          "wood": 100,
+          "stone": 70,
+          "glass": 30,
+          "marble": 20,
+          "gold_item": 10
+        }
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Manor",
+          "description": "A manor for up to 10 residents",
+          "stations": 0,
+          "width": 120,
+          "height": 100,
+          "capacity": 10
+        }
+      ]
+    },
+    {
+      "id": "estate",
+      "name": "Estate",
+      "category": "housing",
+      "label": "Es",
+      "description": "Grand property with multiple buildings and extensive grounds",
+      "color": [0.75, 0.65, 0.55],
+      "constructionCost": {
+        "gold": 2500,
+        "wood": 200,
+        "stone": 150,
+        "glass": 50,
+        "marble": 30,
+        "gold_item": 10
+      },
+      "housingConfig": {
+        "housingQuality": 1.0,
+        "qualityTier": "masterwork",
+        "rentPerOccupant": 35,
+        "targetClasses": ["elite"],
+        "acceptableClasses": ["elite"],
+        "occupancyType": "family_or_mixed",
+        "upgradeableTo": null
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Estate",
+          "description": "An estate for up to 12 residents",
+          "stations": 0,
+          "width": 200,
+          "height": 150,
+          "capacity": 12
         }
       ]
     },
@@ -91,6 +305,7 @@
       "label": "Ws",
       "description": "Crafts tools and goods",
       "color": [0.5, 0.5, 0.6],
+      "workCategories": ["Woodworking", "Artisan Crafts", "General Labor"],
       "constructionCost": {
         "gold": 250
       },
@@ -112,6 +327,7 @@
       "label": "Mk",
       "description": "A place for trade and commerce",
       "color": [0.6, 0.6, 0.4],
+      "workCategories": ["Commerce", "General Labor"],
       "constructionCost": {
         "gold": 300
       },
@@ -493,10 +709,12 @@
       ],
       "description": "Produces bread and baked goods from grain",
       "workCategories": [
-        "Baking"
+        "Baking",
+        "General Labor"
       ],
       "workerEfficiency": {
-        "Baking": 1
+        "Baking": 1,
+        "General Labor": 0.3
       },
       "upgradeLevels": [
         {
@@ -2166,6 +2384,78 @@
       ]
     },
     {
+      "id": "sheep_farm",
+      "name": "Sheep Farm",
+      "category": "extraction",
+      "label": "SF",
+      "color": [
+        0.85,
+        0.85,
+        0.8
+      ],
+      "description": "Raises sheep for wool and meat production",
+      "workCategories": [
+        "Animal Husbandry",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Animal Husbandry": 1.0,
+        "General Labor": 0.4
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Sheep Farm",
+          "description": "A basic sheep farm with 2 workers",
+          "stations": 2,
+          "width": 80,
+          "height": 80,
+          "constructionMaterials": {
+            "wood": 50,
+            "stone": 25
+          },
+          "storage": {
+            "inputCapacity": 100,
+            "outputCapacity": 400
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Sheep Farm",
+          "description": "An improved sheep farm with 4 workers",
+          "stations": 4,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "wood": 40,
+            "stone": 20,
+            "iron": 8
+          },
+          "storage": {
+            "inputCapacity": 150,
+            "outputCapacity": 600
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Sheep Farm",
+          "description": "An advanced sheep farm with 6 workers and large flock",
+          "stations": 6,
+          "width": 160,
+          "height": 160,
+          "upgradeMaterials": {
+            "wood": 60,
+            "stone": 35,
+            "iron": 15
+          },
+          "storage": {
+            "inputCapacity": 200,
+            "outputCapacity": 900
+          }
+        }
+      ]
+    },
+    {
       "id": "dairy_farm",
       "name": "Dairy Farm",
       "category": "extraction",
@@ -2233,6 +2523,662 @@
           "storage": {
             "inputCapacity": 200,
             "outputCapacity": 800
+          }
+        }
+      ]
+    },
+    {
+      "id": "poultry_farm",
+      "name": "Poultry Farm",
+      "category": "extraction",
+      "label": "PF",
+      "color": [
+        0.95,
+        0.9,
+        0.8
+      ],
+      "description": "Raises chickens for eggs and meat",
+      "workCategories": [
+        "Animal Husbandry",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Animal Husbandry": 1.0,
+        "General Labor": 0.4
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Poultry Farm",
+          "description": "A basic poultry farm with 2 workers",
+          "stations": 2,
+          "width": 60,
+          "height": 60,
+          "constructionMaterials": {
+            "wood": 40,
+            "stone": 15
+          },
+          "storage": {
+            "inputCapacity": 200,
+            "outputCapacity": 400
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Poultry Farm",
+          "description": "An improved poultry farm with 4 workers",
+          "stations": 4,
+          "width": 90,
+          "height": 90,
+          "upgradeMaterials": {
+            "wood": 30,
+            "stone": 15,
+            "iron": 5
+          },
+          "storage": {
+            "inputCapacity": 350,
+            "outputCapacity": 600
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Poultry Farm",
+          "description": "An advanced poultry farm with 6 workers",
+          "stations": 6,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "wood": 50,
+            "stone": 25,
+            "iron": 10
+          },
+          "storage": {
+            "inputCapacity": 500,
+            "outputCapacity": 900
+          }
+        }
+      ]
+    },
+    {
+      "id": "apiary",
+      "name": "Apiary",
+      "category": "extraction",
+      "label": "Ap",
+      "color": [
+        0.95,
+        0.85,
+        0.4
+      ],
+      "description": "Keeps bees for honey and beeswax production",
+      "workCategories": [
+        "Beekeeping",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Beekeeping": 1.0,
+        "General Labor": 0.3
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Apiary",
+          "description": "A basic apiary with 1 worker and few hives",
+          "stations": 1,
+          "width": 40,
+          "height": 40,
+          "constructionMaterials": {
+            "wood": 30,
+            "stone": 10
+          },
+          "storage": {
+            "inputCapacity": 100,
+            "outputCapacity": 200
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Apiary",
+          "description": "An improved apiary with 2 workers",
+          "stations": 2,
+          "width": 60,
+          "height": 60,
+          "upgradeMaterials": {
+            "wood": 25,
+            "stone": 10
+          },
+          "storage": {
+            "inputCapacity": 150,
+            "outputCapacity": 350
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Apiary",
+          "description": "An advanced apiary with 3 workers and many hives",
+          "stations": 3,
+          "width": 80,
+          "height": 80,
+          "upgradeMaterials": {
+            "wood": 40,
+            "stone": 15
+          },
+          "storage": {
+            "inputCapacity": 200,
+            "outputCapacity": 500
+          }
+        }
+      ]
+    },
+    {
+      "id": "dye_workshop",
+      "name": "Dye Workshop",
+      "category": "production",
+      "label": "DW",
+      "color": [
+        0.7,
+        0.4,
+        0.6
+      ],
+      "description": "Produces dyes from plants and materials",
+      "workCategories": [
+        "Dyeing",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Dyeing": 1.0,
+        "General Labor": 0.35
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Dye Workshop",
+          "description": "A basic dye workshop with 2 work stations",
+          "stations": 2,
+          "width": 50,
+          "height": 50,
+          "constructionMaterials": {
+            "wood": 35,
+            "stone": 20,
+            "iron": 10
+          },
+          "storage": {
+            "inputCapacity": 400,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Dye Workshop",
+          "description": "An improved dye workshop with 4 work stations",
+          "stations": 4,
+          "width": 75,
+          "height": 75,
+          "upgradeMaterials": {
+            "wood": 30,
+            "stone": 18,
+            "iron": 8
+          },
+          "storage": {
+            "inputCapacity": 600,
+            "outputCapacity": 450
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Dye Workshop",
+          "description": "An advanced dye workshop with 6 work stations",
+          "stations": 6,
+          "width": 100,
+          "height": 100,
+          "upgradeMaterials": {
+            "wood": 45,
+            "stone": 25,
+            "iron": 15
+          },
+          "storage": {
+            "inputCapacity": 900,
+            "outputCapacity": 700
+          }
+        }
+      ]
+    },
+    {
+      "id": "tannery",
+      "name": "Tannery",
+      "category": "production",
+      "label": "Tn",
+      "color": [
+        0.55,
+        0.4,
+        0.3
+      ],
+      "description": "Processes raw hides into leather",
+      "workCategories": [
+        "Leatherworking",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Leatherworking": 1.0,
+        "General Labor": 0.35
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Tannery",
+          "description": "A basic tannery with 2 work stations",
+          "stations": 2,
+          "width": 55,
+          "height": 55,
+          "constructionMaterials": {
+            "wood": 40,
+            "stone": 25,
+            "iron": 10
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 250
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Tannery",
+          "description": "An improved tannery with 4 work stations",
+          "stations": 4,
+          "width": 80,
+          "height": 80,
+          "upgradeMaterials": {
+            "wood": 35,
+            "stone": 20,
+            "iron": 10
+          },
+          "storage": {
+            "inputCapacity": 500,
+            "outputCapacity": 400
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Tannery",
+          "description": "An advanced tannery with 6 work stations",
+          "stations": 6,
+          "width": 110,
+          "height": 110,
+          "upgradeMaterials": {
+            "wood": 50,
+            "stone": 30,
+            "iron": 20
+          },
+          "storage": {
+            "inputCapacity": 750,
+            "outputCapacity": 600
+          }
+        }
+      ]
+    },
+    {
+      "id": "paper_mill",
+      "name": "Paper Mill",
+      "category": "production",
+      "label": "PM",
+      "color": [
+        0.9,
+        0.9,
+        0.85
+      ],
+      "description": "Produces paper and pulp from wood",
+      "workCategories": [
+        "Papermaking",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Papermaking": 1.0,
+        "General Labor": 0.35
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Paper Mill",
+          "description": "A basic paper mill with 2 work stations",
+          "stations": 2,
+          "width": 60,
+          "height": 60,
+          "constructionMaterials": {
+            "wood": 50,
+            "stone": 30,
+            "iron": 15
+          },
+          "storage": {
+            "inputCapacity": 400,
+            "outputCapacity": 500
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Paper Mill",
+          "description": "An improved paper mill with 4 work stations",
+          "stations": 4,
+          "width": 90,
+          "height": 90,
+          "upgradeMaterials": {
+            "wood": 40,
+            "stone": 25,
+            "iron": 12
+          },
+          "storage": {
+            "inputCapacity": 600,
+            "outputCapacity": 750
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Paper Mill",
+          "description": "An advanced paper mill with 6 work stations",
+          "stations": 6,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "wood": 60,
+            "stone": 35,
+            "iron": 20
+          },
+          "storage": {
+            "inputCapacity": 900,
+            "outputCapacity": 1200
+          }
+        }
+      ]
+    },
+    {
+      "id": "scriptorium",
+      "name": "Scriptorium",
+      "category": "production",
+      "label": "Sc",
+      "color": [
+        0.7,
+        0.6,
+        0.5
+      ],
+      "description": "Creates books and manuscripts",
+      "workCategories": [
+        "Scribing",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Scribing": 1.0,
+        "General Labor": 0.25
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Scriptorium",
+          "description": "A basic scriptorium with 1 work station",
+          "stations": 1,
+          "width": 45,
+          "height": 45,
+          "constructionMaterials": {
+            "wood": 35,
+            "stone": 20,
+            "iron": 5
+          },
+          "storage": {
+            "inputCapacity": 200,
+            "outputCapacity": 100
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Scriptorium",
+          "description": "An improved scriptorium with 2 work stations",
+          "stations": 2,
+          "width": 65,
+          "height": 65,
+          "upgradeMaterials": {
+            "wood": 25,
+            "stone": 15,
+            "iron": 5
+          },
+          "storage": {
+            "inputCapacity": 350,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Scriptorium",
+          "description": "An advanced scriptorium with 3 work stations",
+          "stations": 3,
+          "width": 85,
+          "height": 85,
+          "upgradeMaterials": {
+            "wood": 40,
+            "stone": 20,
+            "iron": 10
+          },
+          "storage": {
+            "inputCapacity": 500,
+            "outputCapacity": 300
+          }
+        }
+      ]
+    },
+    {
+      "id": "apothecary",
+      "name": "Apothecary",
+      "category": "production",
+      "label": "Ap",
+      "color": [
+        0.4,
+        0.6,
+        0.4
+      ],
+      "description": "Produces medicines, remedies, and healing products",
+      "workCategories": [
+        "Medicine",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Medicine": 1.0,
+        "General Labor": 0.3
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Apothecary",
+          "description": "A basic apothecary with 2 work stations",
+          "stations": 2,
+          "width": 50,
+          "height": 50,
+          "constructionMaterials": {
+            "wood": 40,
+            "stone": 25,
+            "iron": 10
+          },
+          "storage": {
+            "inputCapacity": 350,
+            "outputCapacity": 250
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Apothecary",
+          "description": "An improved apothecary with 3 work stations",
+          "stations": 3,
+          "width": 70,
+          "height": 70,
+          "upgradeMaterials": {
+            "wood": 30,
+            "stone": 18,
+            "iron": 8
+          },
+          "storage": {
+            "inputCapacity": 500,
+            "outputCapacity": 400
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Apothecary",
+          "description": "An advanced apothecary with 4 work stations",
+          "stations": 4,
+          "width": 90,
+          "height": 90,
+          "upgradeMaterials": {
+            "wood": 45,
+            "stone": 25,
+            "iron": 15
+          },
+          "storage": {
+            "inputCapacity": 700,
+            "outputCapacity": 550
+          }
+        }
+      ]
+    },
+    {
+      "id": "chandlery",
+      "name": "Chandlery",
+      "category": "production",
+      "label": "Ch",
+      "color": [
+        0.9,
+        0.8,
+        0.5
+      ],
+      "description": "Produces candles and soap",
+      "workCategories": [
+        "Chandlery",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Chandlery": 1.0,
+        "General Labor": 0.35
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Chandlery",
+          "description": "A basic chandlery with 2 work stations",
+          "stations": 2,
+          "width": 45,
+          "height": 45,
+          "constructionMaterials": {
+            "wood": 35,
+            "stone": 20,
+            "iron": 8
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 350
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Chandlery",
+          "description": "An improved chandlery with 3 work stations",
+          "stations": 3,
+          "width": 65,
+          "height": 65,
+          "upgradeMaterials": {
+            "wood": 28,
+            "stone": 15,
+            "iron": 6
+          },
+          "storage": {
+            "inputCapacity": 450,
+            "outputCapacity": 500
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Chandlery",
+          "description": "An advanced chandlery with 4 work stations",
+          "stations": 4,
+          "width": 85,
+          "height": 85,
+          "upgradeMaterials": {
+            "wood": 40,
+            "stone": 22,
+            "iron": 12
+          },
+          "storage": {
+            "inputCapacity": 650,
+            "outputCapacity": 750
+          }
+        }
+      ]
+    },
+    {
+      "id": "perfumery",
+      "name": "Perfumery",
+      "category": "production",
+      "label": "Pf",
+      "color": [
+        0.85,
+        0.6,
+        0.7
+      ],
+      "description": "Produces perfumes and fragrant products",
+      "workCategories": [
+        "Perfumery",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Perfumery": 1.0,
+        "General Labor": 0.25
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Perfumery",
+          "description": "A basic perfumery with 1 work station",
+          "stations": 1,
+          "width": 40,
+          "height": 40,
+          "constructionMaterials": {
+            "wood": 30,
+            "stone": 18,
+            "iron": 8,
+            "glass": 10
+          },
+          "storage": {
+            "inputCapacity": 250,
+            "outputCapacity": 150
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Perfumery",
+          "description": "An improved perfumery with 2 work stations",
+          "stations": 2,
+          "width": 55,
+          "height": 55,
+          "upgradeMaterials": {
+            "wood": 25,
+            "stone": 12,
+            "iron": 6,
+            "glass": 8
+          },
+          "storage": {
+            "inputCapacity": 400,
+            "outputCapacity": 250
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Perfumery",
+          "description": "An advanced perfumery with 3 work stations",
+          "stations": 3,
+          "width": 70,
+          "height": 70,
+          "upgradeMaterials": {
+            "wood": 35,
+            "stone": 18,
+            "iron": 10,
+            "glass": 15
+          },
+          "storage": {
+            "inputCapacity": 600,
+            "outputCapacity": 400
           }
         }
       ]
@@ -2882,6 +3828,494 @@
           "storage": {
             "inputCapacity": 700,
             "outputCapacity": 580
+          }
+        }
+      ]
+    },
+    {
+      "id": "dye_house",
+      "name": "Dye House",
+      "category": "production",
+      "label": "DH",
+      "color": [0.6, 0.3, 0.5],
+      "description": "Dyes cloth and textiles in various colors",
+      "workCategories": ["Textile Processing", "Artisan Crafts", "General Labor"],
+      "workerEfficiency": {
+        "Textile Processing": 1.0,
+        "Artisan Crafts": 0.8,
+        "General Labor": 0.35
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Dye House",
+          "description": "A basic dye house with 2 work stations",
+          "stations": 2,
+          "width": 55,
+          "height": 55,
+          "constructionMaterials": {
+            "wood": 40,
+            "stone": 25,
+            "iron": 10
+          },
+          "storage": {
+            "inputCapacity": 400,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Dye House",
+          "description": "An improved dye house with 4 work stations",
+          "stations": 4,
+          "width": 80,
+          "height": 80,
+          "upgradeMaterials": {
+            "wood": 30,
+            "stone": 20,
+            "iron": 8
+          },
+          "storage": {
+            "inputCapacity": 650,
+            "outputCapacity": 500
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Dye House",
+          "description": "An advanced dye house with 6 work stations",
+          "stations": 6,
+          "width": 110,
+          "height": 110,
+          "upgradeMaterials": {
+            "wood": 45,
+            "stone": 30,
+            "iron": 12
+          },
+          "storage": {
+            "inputCapacity": 900,
+            "outputCapacity": 750
+          }
+        }
+      ]
+    },
+    {
+      "id": "jewelry_workshop",
+      "name": "Jewelry Workshop",
+      "category": "production",
+      "label": "JW",
+      "color": [0.9, 0.8, 0.3],
+      "description": "Crafts fine jewelry from precious metals and gemstones",
+      "workCategories": ["Jewelry Making", "Metalworking", "Artisan Crafts"],
+      "workerEfficiency": {
+        "Jewelry Making": 1.0,
+        "Metalworking": 0.8,
+        "Artisan Crafts": 0.6
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Jewelry Workshop",
+          "description": "A basic jewelry workshop with 2 work stations",
+          "stations": 2,
+          "width": 50,
+          "height": 50,
+          "constructionMaterials": {
+            "wood": 35,
+            "stone": 30,
+            "iron": 15
+          },
+          "storage": {
+            "inputCapacity": 200,
+            "outputCapacity": 150
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Jewelry Workshop",
+          "description": "An improved jewelry workshop with 4 work stations",
+          "stations": 4,
+          "width": 75,
+          "height": 75,
+          "upgradeMaterials": {
+            "wood": 25,
+            "stone": 25,
+            "iron": 12
+          },
+          "storage": {
+            "inputCapacity": 350,
+            "outputCapacity": 250
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Jewelry Workshop",
+          "description": "An advanced jewelry workshop with 6 work stations",
+          "stations": 6,
+          "width": 100,
+          "height": 100,
+          "upgradeMaterials": {
+            "wood": 35,
+            "stone": 35,
+            "iron": 18
+          },
+          "storage": {
+            "inputCapacity": 500,
+            "outputCapacity": 400
+          }
+        }
+      ]
+    },
+    {
+      "id": "art_workshop",
+      "name": "Art Workshop",
+      "category": "production",
+      "label": "AW",
+      "color": [0.7, 0.5, 0.6],
+      "description": "Creates paintings, sculptures, and decorative art",
+      "workCategories": ["Art", "Artisan Crafts", "General Labor"],
+      "workerEfficiency": {
+        "Art": 1.0,
+        "Artisan Crafts": 0.7,
+        "General Labor": 0.3
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Art Workshop",
+          "description": "A basic art workshop with 2 work stations",
+          "stations": 2,
+          "width": 55,
+          "height": 55,
+          "constructionMaterials": {
+            "wood": 45,
+            "stone": 20
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 150
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Art Workshop",
+          "description": "An improved art workshop with 4 work stations",
+          "stations": 4,
+          "width": 80,
+          "height": 80,
+          "upgradeMaterials": {
+            "wood": 35,
+            "stone": 15
+          },
+          "storage": {
+            "inputCapacity": 500,
+            "outputCapacity": 250
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Art Workshop",
+          "description": "An advanced art workshop with 6 work stations",
+          "stations": 6,
+          "width": 110,
+          "height": 110,
+          "upgradeMaterials": {
+            "wood": 50,
+            "stone": 25
+          },
+          "storage": {
+            "inputCapacity": 750,
+            "outputCapacity": 400
+          }
+        }
+      ]
+    },
+    {
+      "id": "weaving_workshop",
+      "name": "Weaving Workshop",
+      "category": "production",
+      "label": "WW",
+      "color": [0.5, 0.4, 0.6],
+      "description": "Creates tapestries and fine woven textiles",
+      "workCategories": ["Textile Processing", "Artisan Crafts", "General Labor"],
+      "workerEfficiency": {
+        "Textile Processing": 1.0,
+        "Artisan Crafts": 0.8,
+        "General Labor": 0.3
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Weaving Workshop",
+          "description": "A basic weaving workshop with 2 work stations",
+          "stations": 2,
+          "width": 60,
+          "height": 60,
+          "constructionMaterials": {
+            "wood": 50,
+            "iron": 15
+          },
+          "storage": {
+            "inputCapacity": 400,
+            "outputCapacity": 200
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Weaving Workshop",
+          "description": "An improved weaving workshop with 4 work stations",
+          "stations": 4,
+          "width": 90,
+          "height": 90,
+          "upgradeMaterials": {
+            "wood": 40,
+            "iron": 12
+          },
+          "storage": {
+            "inputCapacity": 650,
+            "outputCapacity": 350
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Weaving Workshop",
+          "description": "An advanced weaving workshop with 6 work stations",
+          "stations": 6,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "wood": 60,
+            "iron": 18
+          },
+          "storage": {
+            "inputCapacity": 900,
+            "outputCapacity": 500
+          }
+        }
+      ]
+    },
+    {
+      "id": "lime_kiln",
+      "name": "Lime Kiln",
+      "category": "production",
+      "label": "LK",
+      "color": [0.85, 0.85, 0.8],
+      "description": "Burns limestone to produce quicklime for construction",
+      "workCategories": ["Mining", "General Labor"],
+      "workerEfficiency": {
+        "Mining": 1.0,
+        "General Labor": 0.4
+      },
+      "placementConstraints": {
+        "enabled": true,
+        "requiredResources": [
+          {
+            "resourceId": "stone_deposit",
+            "weight": 1.0,
+            "minValue": 0.3,
+            "displayName": "Stone Deposits"
+          }
+        ],
+        "efficiencyFormula": "weighted_average",
+        "warningThreshold": 0.4,
+        "blockingThreshold": 0.2
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Lime Kiln",
+          "description": "A basic lime kiln with 2 work stations",
+          "stations": 2,
+          "width": 60,
+          "height": 60,
+          "constructionMaterials": {
+            "stone": 80,
+            "iron": 20
+          },
+          "storage": {
+            "inputCapacity": 600,
+            "outputCapacity": 400
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Lime Kiln",
+          "description": "An improved lime kiln with 4 work stations",
+          "stations": 4,
+          "width": 90,
+          "height": 90,
+          "upgradeMaterials": {
+            "stone": 60,
+            "iron": 15
+          },
+          "storage": {
+            "inputCapacity": 1000,
+            "outputCapacity": 700
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Lime Kiln",
+          "description": "An advanced lime kiln with 6 work stations",
+          "stations": 6,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "stone": 80,
+            "iron": 25
+          },
+          "storage": {
+            "inputCapacity": 1500,
+            "outputCapacity": 1100
+          }
+        }
+      ]
+    },
+    {
+      "id": "cement_works",
+      "name": "Cement Works",
+      "category": "production",
+      "label": "CW",
+      "color": [0.6, 0.6, 0.6],
+      "description": "Produces cement, mortar, and concrete for construction",
+      "workCategories": ["Mining", "General Labor"],
+      "workerEfficiency": {
+        "Mining": 1.0,
+        "General Labor": 0.4
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Cement Works",
+          "description": "A basic cement works with 2 work stations",
+          "stations": 2,
+          "width": 65,
+          "height": 65,
+          "constructionMaterials": {
+            "stone": 100,
+            "iron": 30,
+            "wood": 40
+          },
+          "storage": {
+            "inputCapacity": 800,
+            "outputCapacity": 600
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Cement Works",
+          "description": "An improved cement works with 4 work stations",
+          "stations": 4,
+          "width": 95,
+          "height": 95,
+          "upgradeMaterials": {
+            "stone": 70,
+            "iron": 25,
+            "wood": 30
+          },
+          "storage": {
+            "inputCapacity": 1300,
+            "outputCapacity": 1000
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Cement Works",
+          "description": "An advanced cement works with 6 work stations",
+          "stations": 6,
+          "width": 130,
+          "height": 130,
+          "upgradeMaterials": {
+            "stone": 100,
+            "iron": 35,
+            "wood": 45
+          },
+          "storage": {
+            "inputCapacity": 2000,
+            "outputCapacity": 1500
+          }
+        }
+      ]
+    },
+    {
+      "id": "gemstone_mine",
+      "name": "Gemstone Mine",
+      "category": "extraction",
+      "label": "GM",
+      "color": [0.4, 0.2, 0.5],
+      "description": "Extracts precious gemstones from the earth",
+      "workCategories": ["Mining", "General Labor"],
+      "workerEfficiency": {
+        "Mining": 1.0,
+        "General Labor": 0.3
+      },
+      "placementConstraints": {
+        "enabled": true,
+        "requiredResources": [
+          {
+            "resourceId": "gemstone_deposit",
+            "weight": 1.0,
+            "minValue": 0.3,
+            "displayName": "Gemstone Deposits"
+          }
+        ],
+        "efficiencyFormula": "weighted_average",
+        "warningThreshold": 0.4,
+        "blockingThreshold": 0.2
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Gemstone Mine",
+          "description": "A basic gemstone mine with 2 work stations",
+          "stations": 2,
+          "width": 70,
+          "height": 70,
+          "constructionMaterials": {
+            "wood": 60,
+            "stone": 50,
+            "iron": 30,
+            "pickaxe": 4
+          },
+          "storage": {
+            "inputCapacity": 200,
+            "outputCapacity": 100
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Gemstone Mine",
+          "description": "An improved gemstone mine with 4 work stations",
+          "stations": 4,
+          "width": 100,
+          "height": 100,
+          "upgradeMaterials": {
+            "wood": 45,
+            "stone": 40,
+            "iron": 25,
+            "pickaxe": 4
+          },
+          "storage": {
+            "inputCapacity": 350,
+            "outputCapacity": 200
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Gemstone Mine",
+          "description": "An advanced gemstone mine with 6 work stations",
+          "stations": 6,
+          "width": 140,
+          "height": 140,
+          "upgradeMaterials": {
+            "wood": 60,
+            "stone": 55,
+            "iron": 35,
+            "pickaxe": 6
+          },
+          "storage": {
+            "inputCapacity": 500,
+            "outputCapacity": 350
           }
         }
       ]

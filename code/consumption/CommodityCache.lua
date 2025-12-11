@@ -6,8 +6,11 @@
 -- - Allocation cycle: < 5ms for 100 characters with 50 commodities
 -- - Cache rebuild: < 2ms for full rebuild
 -- - Smart invalidation by dimension/group
+--
+-- Now supports pre-computed cache from info-system for faster startup
 
 local CommodityCache = {}
+local DataLoader = require("code.DataLoader")
 
 -- Module-level data
 local FulfillmentVectors = nil
@@ -29,7 +32,8 @@ CommodityCache.cache = {
     -- Metadata
     lastFullRebuild = 0,
     totalRebuilds = 0,
-    totalInvalidations = 0
+    totalInvalidations = 0,
+    loadedFromPrecomputed = false
 }
 
 -- Performance tracking
@@ -40,6 +44,83 @@ CommodityCache.stats = {
     cacheMisses = 0
 }
 
+-- Try to load pre-computed cache from info-system
+function CommodityCache.TryLoadPrecomputed()
+    local startTime = love.timer.getTime()
+    local filepath = "data/" .. DataLoader.activeVersion .. "/craving_system/commodity_cache.json"
+
+    -- Try to load the pre-computed cache file
+    local success, precomputed = pcall(function()
+        return DataLoader.loadJSON(filepath)
+    end)
+
+    if not success or not precomputed then
+        print("CommodityCache: No pre-computed cache found at " .. filepath)
+        return false
+    end
+
+    -- Validate structure
+    if not precomputed.byCoarseDimension or not precomputed.byFineDimension then
+        print("CommodityCache: Pre-computed cache has invalid structure")
+        return false
+    end
+
+    -- Load into cache structure
+    local cache = CommodityCache.cache
+
+    -- Load coarse dimension caches
+    for coarseName, cacheData in pairs(precomputed.byCoarseDimension) do
+        cache.byCoarseDimension[coarseName] = {
+            available = cacheData.available or {},
+            sortedByValue = cacheData.sortedByValue or {},
+            lastUpdated = love.timer.getTime(),
+            dirty = false,
+            lookupCount = 0
+        }
+    end
+
+    -- Load fine dimension caches
+    for fineName, cacheData in pairs(precomputed.byFineDimension) do
+        cache.byFineDimension[fineName] = {
+            available = cacheData.available or {},
+            sortedByValue = cacheData.sortedByValue or {},
+            lastUpdated = love.timer.getTime(),
+            dirty = false,
+            lookupCount = 0
+        }
+    end
+
+    -- Load substitution groups
+    if precomputed.substitutionGroups then
+        for category, groupData in pairs(precomputed.substitutionGroups) do
+            cache.substitutionGroups[category] = {
+                members = groupData.members or {},
+                available = groupData.available or {},
+                lastUpdated = love.timer.getTime(),
+                dirty = false
+            }
+        end
+    end
+
+    cache.loadedFromPrecomputed = true
+    cache.precomputedVersion = precomputed.version
+    cache.precomputedGeneratedAt = precomputed.generatedAt
+
+    local endTime = love.timer.getTime()
+    local loadTime = (endTime - startTime) * 1000
+
+    print(string.format("CommodityCache: Loaded pre-computed cache in %.2fms", loadTime))
+    if precomputed.metadata then
+        print(string.format("  - Coarse caches: %d", precomputed.metadata.coarseCacheCount or 0))
+        print(string.format("  - Fine caches: %d", precomputed.metadata.fineCacheCount or 0))
+        print(string.format("  - Substitution groups: %d", precomputed.metadata.substitutionGroupCount or 0))
+        print(string.format("  - Total commodities: %d", precomputed.metadata.totalCommodities or 0))
+    end
+    print(string.format("  - Generated at: %s", precomputed.generatedAt or "unknown"))
+
+    return true
+end
+
 -- Initialize cache system
 function CommodityCache.Init(fulfillmentData, dimensionsData, substitutionData, characterV2Module)
     FulfillmentVectors = fulfillmentData
@@ -48,6 +129,15 @@ function CommodityCache.Init(fulfillmentData, dimensionsData, substitutionData, 
     CharacterV2 = characterV2Module
 
     print("CommodityCache: Initializing cache system...")
+
+    -- First, try to load pre-computed cache from info-system
+    if CommodityCache.TryLoadPrecomputed() then
+        print("CommodityCache: Using pre-computed cache (skipping rebuild)")
+        return
+    end
+
+    -- Fall back to building cache from scratch
+    print("CommodityCache: Building cache from scratch...")
 
     -- Build initial cache structure
     CommodityCache.InitializeCacheStructure()
@@ -474,7 +564,10 @@ function CommodityCache.GetStats()
         lastRebuildTimeMs = CommodityCache.stats.rebuildTimeMs,
         coarseCaches = CommodityCache.CountCoarseCaches(),
         fineCaches = CommodityCache.CountFineCaches(),
-        substitutionGroups = CommodityCache.CountSubstitutionGroups()
+        substitutionGroups = CommodityCache.CountSubstitutionGroups(),
+        loadedFromPrecomputed = CommodityCache.cache.loadedFromPrecomputed or false,
+        precomputedVersion = CommodityCache.cache.precomputedVersion,
+        precomputedGeneratedAt = CommodityCache.cache.precomputedGeneratedAt
     }
 end
 
@@ -482,6 +575,12 @@ end
 function CommodityCache.PrintStats()
     local stats = CommodityCache.GetStats()
     print("=== CommodityCache Statistics ===")
+    if stats.loadedFromPrecomputed then
+        print("  Source: Pre-computed (from info-system)")
+        print(string.format("  Generated at: %s", stats.precomputedGeneratedAt or "unknown"))
+    else
+        print("  Source: Built at runtime")
+    end
     print(string.format("  Total rebuilds: %d", stats.totalRebuilds))
     print(string.format("  Total invalidations: %d", stats.totalInvalidations))
     print(string.format("  Lookup count: %d", stats.lookupCount))

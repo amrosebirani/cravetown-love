@@ -338,4 +338,113 @@ function DataLoader.loadAlphaStarterConfig()
     end
 end
 
+-- =============================================================================
+-- STARTING LOCATIONS
+-- =============================================================================
+
+function DataLoader.loadStartingLocations()
+    local filepath = "data/" .. DataLoader.activeVersion .. "/starting_locations.json"
+    print("Loading starting locations from " .. filepath .. "...")
+    local success, data = pcall(function()
+        return DataLoader.loadJSON(filepath)
+    end)
+    if success and data then
+        return data.locations or {}
+    else
+        print("  WARNING: Could not load starting locations, returning empty")
+        return {}
+    end
+end
+
+function DataLoader.getStartingLocationById(locationId)
+    local locations = DataLoader.loadStartingLocations()
+    for _, loc in ipairs(locations) do
+        if loc.id == locationId then
+            return loc
+        end
+    end
+    return nil
+end
+
+-- =============================================================================
+-- LAND & OWNERSHIP SYSTEM DATA
+-- =============================================================================
+
+function DataLoader.loadLandConfig()
+    local filepath = "data/" .. DataLoader.activeVersion .. "/land_config.json"
+    print("Loading land config from " .. filepath .. "...")
+    local success, data = pcall(function()
+        return DataLoader.loadJSON(filepath)
+    end)
+    if success and data then
+        return data
+    else
+        print("  WARNING: Could not load land config, returning defaults")
+        return {
+            gridSettings = { plotWidth = 100, plotHeight = 100 },
+            pricing = { basePlotPrice = 100 },
+            rent = { baseRentRate = 0.02 },
+            immigrationRequirements = {},
+            overlay = {}
+        }
+    end
+end
+
+function DataLoader.loadClassThresholds()
+    local filepath = "data/" .. DataLoader.activeVersion .. "/class_thresholds.json"
+    print("Loading class thresholds from " .. filepath .. "...")
+    local success, data = pcall(function()
+        return DataLoader.loadJSON(filepath)
+    end)
+    if success and data then
+        return data
+    else
+        print("  WARNING: Could not load class thresholds, returning defaults")
+        return {
+            classCalculationInterval = 20,
+            netWorthThresholds = {
+                elite = { min = 10000 },
+                upper = { min = 3000 },
+                middle = { min = 500 }
+            },
+            capitalRatioThresholds = {
+                elite = 0.8,
+                upper = 0.5,
+                middle = 0.2
+            }
+        }
+    end
+end
+
+function DataLoader.loadEconomicSystems()
+    local filepath = "data/" .. DataLoader.activeVersion .. "/economic_systems.json"
+    print("Loading economic systems from " .. filepath .. "...")
+    local success, data = pcall(function()
+        return DataLoader.loadJSON(filepath)
+    end)
+    if success and data then
+        return data
+    else
+        print("  WARNING: Could not load economic systems, returning defaults")
+        return {
+            activeSystem = "capitalist",
+            systems = {
+                capitalist = {
+                    name = "Capitalist",
+                    description = "Default free market system"
+                }
+            }
+        }
+    end
+end
+
+function DataLoader.getActiveEconomicSystem()
+    local config = DataLoader.loadEconomicSystems()
+    local activeId = config.activeSystem or "capitalist"
+    if config.systems and config.systems[activeId] then
+        return activeId, config.systems[activeId]
+    end
+    return "capitalist", { name = "Capitalist", description = "Default" }
+end
+
 return DataLoader

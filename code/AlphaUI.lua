@@ -14,6 +14,21 @@
 local DataLoader = require("code/DataLoader")
 local SaveLoadModal = require("code.SaveLoadModal")
 local ResourceOverlay = require("code.ResourceOverlay")
+local GameSettings = require("code.GameSettings")
+local CharacterV3 = require("code.consumption.CharacterV3")
+local PlotSelectionModal = require("code.PlotSelectionModal")
+local SuggestedBuildingsModal = require("code.SuggestedBuildingsModal")
+
+-- Phase 8: New UI panels for ownership/housing system
+local LandOverlayModule = require("code.LandOverlay")
+local LandRegistryPanel = require("code.LandRegistryPanel")
+local HousingOverviewPanel = require("code.HousingOverviewPanel")
+local HousingAssignmentModal = require("code.HousingAssignmentModal")
+local CharacterDetailPanel = require("code.CharacterDetailPanel")
+
+-- New systems: Notifications, Tutorial, Visual indicators
+local NotificationSystem = require("code.NotificationSystem")
+local TutorialSystem = require("code.TutorialSystem")
 
 AlphaUI = {}
 AlphaUI.__index = AlphaUI
@@ -104,6 +119,8 @@ function AlphaUI:Create(world)
     -- Build menu modal
     ui.showBuildMenuModal = false
     ui.buildMenuScrollOffset = 0
+    ui.buildMenuSearchQuery = ""
+    ui.buildMenuSearchActive = false
 
     -- Resource overlay (using full ResourceOverlay system with panel)
     ui.showResourceOverlay = false
@@ -118,6 +135,43 @@ function AlphaUI:Create(world)
     ui.showImmigrationModal = false
     ui.selectedApplicant = nil
     ui.immigrationScrollOffset = 0
+
+    -- Plot selection modal state (for land purchase during immigration)
+    ui.showPlotSelectionModal = false
+    ui.plotSelectionModal = nil
+    ui.pendingImmigrantApplicant = nil  -- Applicant waiting for plot selection
+
+    -- Land distribution overlay state
+    ui.showLandOverlay = false
+    ui.landOverlay = LandOverlayModule:Create(world)
+
+    -- Land registry panel state
+    ui.showLandRegistryPanel = false
+    ui.landRegistryPanel = LandRegistryPanel:Create(world)
+
+    -- Housing overview panel state
+    ui.showHousingOverviewPanel = false
+    ui.housingOverviewPanel = HousingOverviewPanel:Create(world)
+
+    -- Housing assignment modal state
+    ui.showHousingAssignmentModal = false
+    ui.housingAssignmentModal = HousingAssignmentModal:Create(world)
+
+    -- Character detail panel state
+    ui.characterDetailPanel = CharacterDetailPanel:Create(world)
+
+    -- Notification system
+    ui.notificationSystem = NotificationSystem:Create(world)
+    world.notificationSystem = ui.notificationSystem  -- Make accessible from world
+
+    -- Tutorial system
+    ui.tutorialSystem = TutorialSystem:Create(world)
+    world.tutorialSystem = ui.tutorialSystem  -- Make accessible from world
+
+    -- Suggested buildings modal state (for elite immigrants after land purchase)
+    ui.showSuggestedBuildingsModal = false
+    ui.suggestedBuildingsModal = nil
+    ui.suggestedBuildingsCitizen = nil  -- Citizen the modal is for
 
     -- Help overlay state
     ui.showHelpOverlay = false
@@ -146,6 +200,16 @@ function AlphaUI:Create(world)
     -- Analytics panel state
     ui.showAnalyticsPanel = false
     ui.analyticsTab = "overview"
+
+    -- Production Analytics panel state
+    ui.showProductionAnalyticsPanel = false
+    ui.productionAnalyticsTab = "commodities"  -- commodities, buildings
+    ui.productionAnalyticsScrollOffset = 0
+    ui.productionAnalyticsMaxScroll = 0
+    ui.selectedAnalyticsCommodity = nil
+    ui.productionAnalyticsCloseBtn = nil
+    ui.productionAnalyticsTabBtns = {}
+    ui.productionAnalyticsCommodityBtns = {}
 
     -- Inventory panel state
     ui.showInventoryPanel = false
@@ -177,6 +241,24 @@ function AlphaUI:Create(world)
     ui.recipeModalScrollMax = 0
     ui.selectedStation = nil
     ui.modalJustOpened = false
+
+    -- Settings panel state
+    ui.showSettingsPanel = false
+    ui.settingsTab = "gameplay"  -- gameplay, display, audio, accessibility
+    ui.settingsScrollOffset = 0
+    ui.settingsMaxScroll = 0
+    ui.settingsCloseBtn = nil
+    ui.settingsTabBtns = {}
+    ui.settingsControls = {}
+    ui.gameSettings = GameSettings:GetInstance()
+
+    -- Emigration warning panel state
+    ui.showEmigrationPanel = false
+    ui.emigrationScrollOffset = 0
+    ui.emigrationMaxScroll = 0
+    ui.emigrationCloseBtn = nil
+    ui.emigrationCitizenBtns = {}
+    ui.emigrationPrioritizeBtns = {}
 
     return ui
 end
@@ -222,6 +304,16 @@ function AlphaUI:Render()
         self:RenderImmigrationModal()
     end
 
+    -- Render plot selection modal on top of immigration modal
+    if self.showPlotSelectionModal and self.plotSelectionModal then
+        self.plotSelectionModal:Render()
+    end
+
+    -- Render suggested buildings modal (for elite immigrants after land purchase)
+    if self.showSuggestedBuildingsModal and self.suggestedBuildingsModal then
+        self.suggestedBuildingsModal:Render()
+    end
+
     -- Render placement mode instructions
     if self.placementMode then
         self:RenderPlacementInstructions()
@@ -232,6 +324,31 @@ function AlphaUI:Render()
         self.resourceOverlay:renderPanel()
     end
 
+    -- Render land overlay (using new module)
+    if self.showLandOverlay and self.landOverlay then
+        self.landOverlay:Render(self)  -- Pass self as camera
+    end
+
+    -- Render land registry panel
+    if self.showLandRegistryPanel and self.landRegistryPanel then
+        self.landRegistryPanel:Render()
+    end
+
+    -- Render housing overview panel
+    if self.showHousingOverviewPanel and self.housingOverviewPanel then
+        self.housingOverviewPanel:Render()
+    end
+
+    -- Render housing assignment modal
+    if self.showHousingAssignmentModal and self.housingAssignmentModal then
+        self.housingAssignmentModal:Render()
+    end
+
+    -- Render character detail panel
+    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
+        self.characterDetailPanel:Render()
+    end
+
     -- Render inventory panel
     if self.showInventoryPanel then
         self:RenderInventoryPanel()
@@ -240,6 +357,21 @@ function AlphaUI:Render()
     -- Render citizens panel
     if self.showCitizensPanel then
         self:RenderCitizensPanel()
+    end
+
+    -- Render production analytics panel
+    if self.showProductionAnalyticsPanel then
+        self:RenderProductionAnalyticsPanel()
+    end
+
+    -- Render settings panel
+    if self.showSettingsPanel then
+        self:RenderSettingsPanel()
+    end
+
+    -- Render emigration warning panel
+    if self.showEmigrationPanel then
+        self:RenderEmigrationPanel()
     end
 
     -- Render building modal (detailed building management)
@@ -260,6 +392,16 @@ function AlphaUI:Render()
     -- Render save/load modal on top of everything
     if self.showSaveLoadModal and self.saveLoadModal then
         self.saveLoadModal:Render()
+    end
+
+    -- Render notification toasts (almost on top)
+    if self.notificationSystem then
+        self.notificationSystem:Render()
+    end
+
+    -- Render tutorial overlay (on very top)
+    if self.tutorialSystem and self.tutorialSystem:IsActive() then
+        self.tutorialSystem:Render()
     end
 end
 
@@ -305,16 +447,16 @@ function AlphaUI:RenderTopBar()
     love.graphics.print("Gold: " .. self.world.gold, goldX, 12)
 
     -- Day and Time (using TimeManager via world)
-    local timeX = 420
+    local timeX = 400
     love.graphics.setFont(self.fonts.normal)
     love.graphics.setColor(self.colors.text)
-    love.graphics.print("Day " .. self.world:GetDayNumber(), timeX, 12)
+    local slot = self.world:GetCurrentSlot()
+    local slotName = slot and slot.name or "???"
+    love.graphics.print("Day " .. self.world:GetDayNumber() .. " - " .. slotName, timeX, 12)
 
     love.graphics.setFont(self.fonts.small)
     love.graphics.setColor(self.colors.accent)
-    local slot = self.world:GetCurrentSlot()
-    local slotName = slot and slot.name or "???"
-    love.graphics.print(slotName .. " (" .. self.world:GetTimeString() .. ")", timeX, 32)
+    love.graphics.print(self.world:GetTimeString(), timeX, 32)
 
     -- Speed controls
     local speedX = screenW - 200
@@ -348,15 +490,15 @@ function AlphaUI:RenderTopBar()
     local btnY = 8
     local btnH = 32
     local btnSpacing = 8
-    local btnStartX = 540
+    local btnStartX = 620
     love.graphics.setFont(self.fonts.small)
 
     local topBarButtons = {
-        {id = "analytics", label = "Analytics", shortcut = "A"},
+        {id = "production", label = "Production", shortcut = "P"},
         {id = "build", label = "Build", shortcut = "B"},
         {id = "citizens", label = "Citizens", shortcut = "C"},
         {id = "inventory", label = "Inventory", shortcut = "I"},
-        {id = "settings", label = "Settings", shortcut = "S"},
+        {id = "settings", label = "Settings", shortcut = "O"},
         {id = "help", label = "Help", shortcut = "H"}
     }
 
@@ -370,7 +512,7 @@ function AlphaUI:RenderTopBar()
 
         -- Check if this panel is active
         local isActive = false
-        if btn.id == "analytics" then isActive = self.showAnalyticsPanel
+        if btn.id == "production" then isActive = self.showProductionAnalyticsPanel
         elseif btn.id == "build" then isActive = self.showBuildMenuModal
         elseif btn.id == "citizens" then isActive = self.showCitizensPanel
         elseif btn.id == "inventory" then isActive = self.showInventoryPanel
@@ -449,18 +591,21 @@ function AlphaUI:RenderLeftPanel()
     love.graphics.print("By Class:", x + 10, contentY)
     contentY = contentY + 14
 
-    local classes = {"Elite", "Upper", "Middle", "Working", "Poor"}
-    for _, class in ipairs(classes) do
-        local classSat = self.world.stats.satisfactionByClass[class] or 0
+    -- Get classes from data
+    local classesData = self.world.characterClasses and self.world.characterClasses.classes or {}
+    for _, classInfo in ipairs(classesData) do
+        local classId = classInfo.id or ""
+        local className = classInfo.name or classId
+        local classSat = self.world.stats.satisfactionByClass[classId] or 0
         local classColor = classSat > 70 and self.colors.satisfactionHigh or
                           (classSat > 40 and self.colors.satisfactionMed or self.colors.satisfactionLow)
 
         love.graphics.setColor(self.colors.textDim)
-        love.graphics.print(class .. ":", x + 10, contentY)
+        love.graphics.print(className .. ":", x + 10, contentY)
         love.graphics.setColor(classColor)
-        love.graphics.print(string.format("%.0f%%", classSat), x + 60, contentY)
+        love.graphics.print(string.format("%.0f%%", classSat), x + 75, contentY)
 
-        self:RenderProgressBar(x + 95, contentY + 1, w - 110, 6, classSat / 100, classColor)
+        self:RenderProgressBar(x + 110, contentY + 1, w - 125, 6, classSat / 100, classColor)
         contentY = contentY + 12
     end
 
@@ -553,6 +698,9 @@ function AlphaUI:RenderLeftPanel()
 end
 
 function AlphaUI:RenderMiniMap(x, y, w, h)
+    -- Store minimap bounds for click handling
+    self.minimapBounds = {x = x, y = y, w = w, h = h}
+
     -- Background
     love.graphics.setColor(0.15, 0.2, 0.15, 0.9)
     love.graphics.rectangle("fill", x, y, w, h, 4, 4)
@@ -564,12 +712,33 @@ function AlphaUI:RenderMiniMap(x, y, w, h)
     -- Scale factors
     local scaleX = w / self.worldWidth
     local scaleY = h / self.worldHeight
+    local halfW = self.worldWidth / 2
+    local halfH = self.worldHeight / 2
+
+    -- Draw forests (if available)
+    if self.world.forests then
+        love.graphics.setColor(0.2, 0.4, 0.2, 0.7)
+        for _, forest in ipairs(self.world.forests) do
+            if forest.regions then
+                for _, region in ipairs(forest.regions) do
+                    local fx = x + (region.x + halfW) * scaleX
+                    local fy = y + (region.y + halfH) * scaleY
+                    local fw = (region.width or 100) * scaleX
+                    local fh = (region.height or 100) * scaleY
+                    love.graphics.rectangle("fill", fx, fy, math.max(4, fw), math.max(4, fh))
+                end
+            elseif forest.x and forest.y then
+                local fx = x + (forest.x + halfW) * scaleX
+                local fy = y + (forest.y + halfH) * scaleY
+                local fr = (forest.radius or 50) * math.min(scaleX, scaleY)
+                love.graphics.circle("fill", fx, fy, math.max(3, fr))
+            end
+        end
+    end
 
     -- Draw river (convert from river-centered coords to world coords)
     if self.world.river and self.world.river.mPoints then
         love.graphics.setColor(0.2, 0.4, 0.7, 0.9)
-        local halfW = self.worldWidth / 2
-        local halfH = self.worldHeight / 2
 
         for i = 1, #self.world.river.mPoints - 1 do
             local p1 = self.world.river.mPoints[i]
@@ -607,15 +776,41 @@ function AlphaUI:RenderMiniMap(x, y, w, h)
         love.graphics.setLineWidth(1)
     end
 
-    -- Draw buildings as small squares
+    -- Draw resource deposits (if available)
+    if self.world.resourceDeposits then
+        for _, deposit in ipairs(self.world.resourceDeposits) do
+            local dx = x + deposit.x * scaleX
+            local dy = y + deposit.y * scaleY
+
+            -- Color by resource type
+            if deposit.type == "iron" or deposit.type == "iron_ore" then
+                love.graphics.setColor(0.6, 0.4, 0.3, 0.8)
+            elseif deposit.type == "coal" then
+                love.graphics.setColor(0.3, 0.3, 0.3, 0.8)
+            elseif deposit.type == "gold" or deposit.type == "gold_ore" then
+                love.graphics.setColor(0.9, 0.8, 0.3, 0.8)
+            elseif deposit.type == "stone" then
+                love.graphics.setColor(0.5, 0.5, 0.5, 0.8)
+            else
+                love.graphics.setColor(0.5, 0.4, 0.3, 0.8)
+            end
+
+            love.graphics.circle("fill", dx, dy, 3)
+        end
+    end
+
+    -- Draw buildings as small squares with status indication
     for _, building in ipairs(self.world.buildings) do
         local bx = x + building.x * scaleX
         local by = y + building.y * scaleY
         local bw = 60 * scaleX
         local bh = 60 * scaleY
 
-        -- Color by type
-        if building.type and building.type.category == "housing" then
+        -- Color by type and status
+        local isPaused = building.isPaused or building.mIsPaused
+        if isPaused then
+            love.graphics.setColor(0.5, 0.4, 0.3)  -- Orange-ish for paused
+        elseif building.type and building.type.category == "housing" then
             love.graphics.setColor(0.6, 0.5, 0.4)
         elseif building.type and building.type.category == "production" then
             love.graphics.setColor(0.4, 0.6, 0.4)
@@ -626,11 +821,27 @@ function AlphaUI:RenderMiniMap(x, y, w, h)
         love.graphics.rectangle("fill", bx, by, math.max(3, bw), math.max(3, bh))
     end
 
-    -- Draw citizens as tiny dots
-    love.graphics.setColor(1, 1, 1, 0.8)
+    -- Draw citizens as tiny dots (color by satisfaction)
     for _, citizen in ipairs(self.world.citizens) do
         local cx = x + citizen.x * scaleX
         local cy = y + citizen.y * scaleY
+
+        -- Color by satisfaction level
+        local satisfaction = 0.5
+        if citizen.GetAverageSatisfaction then
+            satisfaction = citizen:GetAverageSatisfaction() / 100
+        elseif citizen.satisfaction then
+            satisfaction = citizen.satisfaction / 100
+        end
+
+        if satisfaction >= 0.7 then
+            love.graphics.setColor(0.4, 0.9, 0.4, 0.9)  -- Green = happy
+        elseif satisfaction >= 0.4 then
+            love.graphics.setColor(0.9, 0.9, 0.4, 0.9)  -- Yellow = neutral
+        else
+            love.graphics.setColor(0.9, 0.4, 0.4, 0.9)  -- Red = unhappy
+        end
+
         love.graphics.circle("fill", cx, cy, 1.5)
     end
 
@@ -646,6 +857,43 @@ function AlphaUI:RenderMiniMap(x, y, w, h)
 
     love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], 0.5)
     love.graphics.rectangle("line", vpX, vpY, vpW, vpH)
+
+    -- Mini-map legend hint
+    love.graphics.setFont(self.fonts.tiny)
+    love.graphics.setColor(0.5, 0.5, 0.5, 0.7)
+    love.graphics.print("Click to navigate", x + 2, y + h - 10)
+end
+
+-- Handle minimap click for navigation
+function AlphaUI:HandleMinimapClick(mx, my)
+    if not self.minimapBounds then return false end
+
+    local bounds = self.minimapBounds
+    if mx < bounds.x or mx > bounds.x + bounds.w or
+       my < bounds.y or my > bounds.y + bounds.h then
+        return false
+    end
+
+    -- Convert minimap coordinates to world coordinates
+    local scaleX = bounds.w / self.worldWidth
+    local scaleY = bounds.h / self.worldHeight
+
+    local worldX = (mx - bounds.x) / scaleX
+    local worldY = (my - bounds.y) / scaleY
+
+    -- Center camera on clicked position
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+    local viewW = screenW - self.leftPanelWidth - self.rightPanelWidth
+    local viewH = screenH - self.topBarHeight - self.bottomBarHeight
+
+    -- Clamp camera position
+    local maxCameraX = math.max(0, self.worldWidth - viewW)
+    local maxCameraY = math.max(0, self.worldHeight - viewH)
+
+    self.cameraX = math.max(0, math.min(maxCameraX, worldX - viewW / 2))
+    self.cameraY = math.max(0, math.min(maxCameraY, worldY - viewH / 2))
+
+    return true
 end
 
 function AlphaUI:RenderQuickBuildButtons(x, y, w)
@@ -757,8 +1005,8 @@ function AlphaUI:RenderImmigrationModal()
     love.graphics.rectangle("fill", 0, 0, screenW, screenH)
 
     -- Modal dimensions
-    local modalW = 800
-    local modalH = 550
+    local modalW = 900
+    local modalH = 620
     local modalX = (screenW - modalW) / 2
     local modalY = (screenH - modalH) / 2
 
@@ -785,31 +1033,94 @@ function AlphaUI:RenderImmigrationModal()
     love.graphics.print("X", closeX + 8, closeY + 2)
     self.immigrationCloseBtn = {x = closeX, y = closeY, w = 30, h = 30}
 
-    -- Stats line
-    love.graphics.setFont(self.fonts.small)
-    love.graphics.setColor(self.colors.textDim)
     local immigrationSystem = self.world.immigrationSystem
+
+    -- Town Attractiveness visual display
     local attractiveness = immigrationSystem and immigrationSystem:GetOverallAttractiveness() or 50
     local vacantHousing = immigrationSystem and immigrationSystem:GetTotalVacantHousing() or 0
     local totalJobs = immigrationSystem and immigrationSystem:GetTotalJobOpenings() or 0
 
-    love.graphics.print(string.format("Town Attractiveness: %.0f%% | Vacant Housing: %d | Open Jobs: %d",
-        attractiveness, vacantHousing, totalJobs), modalX + 20, modalY + 50)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.text)
+    love.graphics.print("Town Attractiveness:", modalX + 20, modalY + 48)
+
+    local attractColor = attractiveness >= 70 and self.colors.success or
+                        (attractiveness >= 40 and self.colors.warning or self.colors.danger)
+    love.graphics.setColor(attractColor)
+    love.graphics.print(string.format("%.0f%%", attractiveness), modalX + 155, modalY + 48)
+    self:RenderProgressBar(modalX + 200, modalY + 50, 100, 12, attractiveness / 100, attractColor)
+
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print(string.format("Housing: %d available", vacantHousing), modalX + 290, modalY + 48)
+    love.graphics.print(string.format("Jobs: %d open", totalJobs), modalX + 420, modalY + 48)
+
+    -- Bulk action buttons
+    local bulkBtnY = modalY + 44
+    local bulkBtnH = 22
+    local bulkBtnSpacing = 5
+    local bulkStartX = modalX + 530
+
+    -- Accept All (70%+) button
+    local applicants = immigrationSystem and immigrationSystem:GetApplicants() or {}
+    local highCompatCount = 0
+    for _, app in ipairs(applicants) do
+        if (app.compatibility or 0) >= 70 then
+            highCompatCount = highCompatCount + 1
+        end
+    end
+
+    if highCompatCount > 0 and vacantHousing > 0 then
+        love.graphics.setColor(0.2, 0.5, 0.3, 0.9)
+    else
+        love.graphics.setColor(0.2, 0.2, 0.2, 0.6)
+    end
+    local autoAcceptW = 110
+    love.graphics.rectangle("fill", bulkStartX, bulkBtnY, autoAcceptW, bulkBtnH, 3, 3)
+    love.graphics.setColor(1, 1, 1, highCompatCount > 0 and 1 or 0.5)
+    love.graphics.setFont(self.fonts.tiny)
+    love.graphics.print("Accept 70%+ (" .. highCompatCount .. ")", bulkStartX + 5, bulkBtnY + 5)
+    self.immigrationAcceptHighBtn = {x = bulkStartX, y = bulkBtnY, w = autoAcceptW, h = bulkBtnH, enabled = highCompatCount > 0 and vacantHousing > 0}
+
+    -- Accept All button
+    bulkStartX = bulkStartX + autoAcceptW + bulkBtnSpacing
+    if #applicants > 0 and vacantHousing > 0 then
+        love.graphics.setColor(0.2, 0.4, 0.2, 0.9)
+    else
+        love.graphics.setColor(0.2, 0.2, 0.2, 0.6)
+    end
+    local acceptAllW = 70
+    love.graphics.rectangle("fill", bulkStartX, bulkBtnY, acceptAllW, bulkBtnH, 3, 3)
+    love.graphics.setColor(1, 1, 1, #applicants > 0 and 1 or 0.5)
+    love.graphics.print("Accept All", bulkStartX + 5, bulkBtnY + 5)
+    self.immigrationAcceptAllBtn = {x = bulkStartX, y = bulkBtnY, w = acceptAllW, h = bulkBtnH, enabled = #applicants > 0 and vacantHousing > 0}
+
+    -- Reject All button
+    bulkStartX = bulkStartX + acceptAllW + bulkBtnSpacing
+    if #applicants > 0 then
+        love.graphics.setColor(0.5, 0.2, 0.2, 0.9)
+    else
+        love.graphics.setColor(0.2, 0.2, 0.2, 0.6)
+    end
+    local rejectAllW = 70
+    love.graphics.rectangle("fill", bulkStartX, bulkBtnY, rejectAllW, bulkBtnH, 3, 3)
+    love.graphics.setColor(1, 1, 1, #applicants > 0 and 1 or 0.5)
+    love.graphics.print("Reject All", bulkStartX + 5, bulkBtnY + 5)
+    self.immigrationRejectAllBtn = {x = bulkStartX, y = bulkBtnY, w = rejectAllW, h = bulkBtnH, enabled = #applicants > 0}
 
     -- Divider
     love.graphics.setColor(0.3, 0.3, 0.35)
-    love.graphics.line(modalX + 20, modalY + 70, modalX + modalW - 20, modalY + 70)
+    love.graphics.line(modalX + 20, modalY + 72, modalX + modalW - 20, modalY + 72)
 
     -- Split: Left side = applicant list, Right side = selected applicant details
     local listX = modalX + 15
-    local listY = modalY + 80
-    local listW = 320
-    local listH = modalH - 100
+    local listY = modalY + 82
+    local listW = 340
+    local listH = modalH - 102
 
     local detailX = modalX + listW + 30
-    local detailY = modalY + 80
+    local detailY = modalY + 82
     local detailW = modalW - listW - 45
-    local detailH = modalH - 100
+    local detailH = modalH - 102
 
     -- Render applicant list
     self:RenderApplicantList(listX, listY, listW, listH)
@@ -931,107 +1242,258 @@ function AlphaUI:RenderApplicantDetails(x, y, w, h)
         return
     end
 
-    local contentY = y + 10
+    -- Scrollable content area
+    local contentX = x + 10
+    local contentW = w - 20
+    local contentStartY = y + 5
+    local contentH = h - 60  -- Leave room for buttons
+
+    love.graphics.setScissor(x, y, w, contentH)
+
+    local contentY = contentStartY - (self.applicantDetailScrollOffset or 0)
 
     -- Name and portrait area
     love.graphics.setFont(self.fonts.header)
     love.graphics.setColor(self.colors.text)
-    love.graphics.print(applicant.name, x + 10, contentY)
-    contentY = contentY + 28
+    love.graphics.print(applicant.name, contentX, contentY)
+    contentY = contentY + 26
 
-    -- Basic info line
-    love.graphics.setFont(self.fonts.normal)
+    -- Basic info - two columns
+    love.graphics.setFont(self.fonts.small)
     love.graphics.setColor(self.colors.textDim)
-    love.graphics.print(string.format("%s, Age %d", applicant.class, applicant.age), x + 10, contentY)
-    contentY = contentY + 20
+    love.graphics.print(string.format("%s Class, Age %d", applicant.class, applicant.age), contentX, contentY)
+    love.graphics.print("Wealth: " .. applicant.wealth .. " gold", contentX + contentW/2, contentY)
+    contentY = contentY + 16
 
-    love.graphics.print("Vocation: " .. applicant.vocation, x + 10, contentY)
-    contentY = contentY + 20
+    love.graphics.print("Vocation: " .. applicant.vocation, contentX, contentY)
+    love.graphics.print("From: " .. applicant.origin, contentX + contentW/2, contentY)
+    contentY = contentY + 16
 
-    love.graphics.print("From: " .. applicant.origin, x + 10, contentY)
-    contentY = contentY + 20
+    -- Intended role and land requirements
+    local intendedRole = applicant.intendedRole or "laborer"
+    local landReqs = applicant.landRequirements
+    love.graphics.setColor(self.colors.accent)
+    love.graphics.print("Role: " .. intendedRole, contentX, contentY)
 
-    love.graphics.print("Wealth: " .. applicant.wealth .. " gold", x + 10, contentY)
-    contentY = contentY + 25
+    if landReqs and landReqs.minPlots and landReqs.minPlots > 0 then
+        love.graphics.setColor(self.colors.warning)
+        love.graphics.print(string.format("Land: %d-%d plots", landReqs.minPlots, landReqs.maxPlots or landReqs.minPlots), contentX + contentW/2, contentY)
+    else
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("Land: Not required", contentX + contentW/2, contentY)
+    end
+    contentY = contentY + 20
 
     -- Divider
     love.graphics.setColor(0.3, 0.3, 0.35)
-    love.graphics.line(x + 10, contentY, x + w - 10, contentY)
-    contentY = contentY + 10
+    love.graphics.line(contentX, contentY, contentX + contentW, contentY)
+    contentY = contentY + 8
 
-    -- Compatibility breakdown
+    -- Overall Compatibility
     love.graphics.setFont(self.fonts.normal)
     love.graphics.setColor(self.colors.text)
-    love.graphics.print("Compatibility", x + 10, contentY)
-    contentY = contentY + 22
+    love.graphics.print("Compatibility Score", contentX, contentY)
 
     local compat = applicant.compatibility or 50
     local compatColor = compat >= 70 and self.colors.success or
                        (compat >= 40 and self.colors.warning or self.colors.danger)
 
-    love.graphics.setFont(self.fonts.header)
     love.graphics.setColor(compatColor)
-    love.graphics.print(string.format("%d%%", compat), x + 10, contentY)
-    self:RenderProgressBar(x + 55, contentY + 4, w - 75, 14, compat / 100, compatColor)
-    contentY = contentY + 28
+    love.graphics.print(string.format("%d%%", compat), contentX + 150, contentY)
+    contentY = contentY + 22
 
-    -- Traits
-    love.graphics.setFont(self.fonts.small)
-    love.graphics.setColor(self.colors.textDim)
-    love.graphics.print("Traits: " .. table.concat(applicant.traits or {}, ", "), x + 10, contentY)
-    contentY = contentY + 25
+    self:RenderProgressBar(contentX, contentY, contentW, 12, compat / 100, compatColor)
+    contentY = contentY + 20
+
+    -- Compatibility breakdown
+    love.graphics.setFont(self.fonts.tiny)
+    local immigrationSystem = self.world.immigrationSystem
+    if immigrationSystem then
+        -- Calculate individual scores
+        local housingScore = immigrationSystem:CalculateHousingMatch(applicant)
+        local jobScore = immigrationSystem:CalculateJobMatch(applicant)
+        local socialScore = immigrationSystem:CalculateSocialFit(applicant)
+        local cravingScore = immigrationSystem:CalculateCravingSatisfactionPotential(applicant)
+
+        local breakdownY = contentY
+        local barW = (contentW - 15) / 2
+        local barH = 10
+
+        -- Housing match
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("Housing", contentX, breakdownY)
+        local housingColor = housingScore >= 70 and self.colors.success or
+                            (housingScore >= 40 and self.colors.warning or self.colors.danger)
+        self:RenderProgressBar(contentX + 55, breakdownY + 2, barW - 55, barH, housingScore / 100, housingColor)
+        love.graphics.setColor(housingColor)
+        love.graphics.print(string.format("%d%%", housingScore), contentX + barW + 5, breakdownY)
+
+        -- Job match
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("Job", contentX + barW + 35, breakdownY)
+        local jobColor = jobScore >= 70 and self.colors.success or
+                        (jobScore >= 40 and self.colors.warning or self.colors.danger)
+        self:RenderProgressBar(contentX + barW + 65, breakdownY + 2, barW - 55, barH, jobScore / 100, jobColor)
+        love.graphics.setColor(jobColor)
+        love.graphics.print(string.format("%d%%", jobScore), contentX + contentW - 25, breakdownY)
+
+        breakdownY = breakdownY + 16
+
+        -- Social fit
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("Social", contentX, breakdownY)
+        local socialColor = socialScore >= 70 and self.colors.success or
+                           (socialScore >= 40 and self.colors.warning or self.colors.danger)
+        self:RenderProgressBar(contentX + 55, breakdownY + 2, barW - 55, barH, socialScore / 100, socialColor)
+        love.graphics.setColor(socialColor)
+        love.graphics.print(string.format("%d%%", socialScore), contentX + barW + 5, breakdownY)
+
+        -- Craving potential
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("Needs", contentX + barW + 35, breakdownY)
+        local cravingColor = cravingScore >= 70 and self.colors.success or
+                            (cravingScore >= 40 and self.colors.warning or self.colors.danger)
+        self:RenderProgressBar(contentX + barW + 65, breakdownY + 2, barW - 55, barH, cravingScore / 100, cravingColor)
+        love.graphics.setColor(cravingColor)
+        love.graphics.print(string.format("%d%%", cravingScore), contentX + contentW - 25, breakdownY)
+
+        contentY = breakdownY + 22
+    end
 
     -- Divider
     love.graphics.setColor(0.3, 0.3, 0.35)
-    love.graphics.line(x + 10, contentY, x + w - 10, contentY)
-    contentY = contentY + 10
+    love.graphics.line(contentX, contentY, contentX + contentW, contentY)
+    contentY = contentY + 8
 
-    -- Backstory
+    -- Top Cravings/Needs
     love.graphics.setFont(self.fonts.normal)
     love.graphics.setColor(self.colors.text)
-    love.graphics.print("Backstory", x + 10, contentY)
-    contentY = contentY + 20
+    love.graphics.print("Primary Needs", contentX, contentY)
+    contentY = contentY + 18
 
+    love.graphics.setFont(self.fonts.tiny)
+    if applicant.cravingProfile then
+        local topCravings = immigrationSystem:GetTopCravings(applicant.cravingProfile, 4)
+        local cravingX = contentX
+        for i, craving in ipairs(topCravings) do
+            local cravingW = contentW / 4 - 5
+            love.graphics.setColor(self.colors.textDim)
+            love.graphics.print(craving.name:sub(1, 6), cravingX, contentY)
+            love.graphics.setColor(self.colors.accent)
+            love.graphics.print(string.format("%d", craving.value), cravingX, contentY + 10)
+            cravingX = cravingX + cravingW + 5
+        end
+        contentY = contentY + 28
+    else
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("No craving data available", contentX, contentY)
+        contentY = contentY + 18
+    end
+
+    -- Traits
     love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.text)
+    love.graphics.print("Traits", contentX, contentY)
+    contentY = contentY + 16
+
+    love.graphics.setFont(self.fonts.tiny)
+    if applicant.traits and #applicant.traits > 0 then
+        local traitX = contentX
+        for _, trait in ipairs(applicant.traits) do
+            -- Trait chip
+            local traitText = tostring(trait)
+            local chipW = self.fonts.tiny:getWidth(traitText) + 10
+            love.graphics.setColor(0.25, 0.25, 0.35)
+            love.graphics.rectangle("fill", traitX, contentY, chipW, 16, 3, 3)
+            love.graphics.setColor(0.7, 0.7, 0.8)
+            love.graphics.print(traitText, traitX + 5, contentY + 2)
+            traitX = traitX + chipW + 5
+            if traitX > contentX + contentW - 50 then
+                traitX = contentX
+                contentY = contentY + 18
+            end
+        end
+        contentY = contentY + 22
+    else
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("No special traits", contentX, contentY)
+        contentY = contentY + 18
+    end
+
+    -- Divider
+    love.graphics.setColor(0.3, 0.3, 0.35)
+    love.graphics.line(contentX, contentY, contentX + contentW, contentY)
+    contentY = contentY + 8
+
+    -- Backstory
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.text)
+    love.graphics.print("Backstory", contentX, contentY)
+    contentY = contentY + 16
+
+    love.graphics.setFont(self.fonts.tiny)
     love.graphics.setColor(self.colors.textDim)
     local backstory = applicant.backstory or "No backstory available."
-    -- Word wrap backstory
-    local maxWidth = w - 25
-    local wrappedLines = self:WrapText(backstory, maxWidth, self.fonts.small)
+    local wrappedLines = self:WrapText(backstory, contentW, self.fonts.tiny)
     for _, line in ipairs(wrappedLines) do
-        love.graphics.print(line, x + 10, contentY)
-        contentY = contentY + 14
+        love.graphics.print(line, contentX, contentY)
+        contentY = contentY + 12
     end
-    contentY = contentY + 10
+    contentY = contentY + 8
 
     -- Family section
     if applicant.family and #applicant.family > 0 then
         love.graphics.setColor(0.3, 0.3, 0.35)
-        love.graphics.line(x + 10, contentY, x + w - 10, contentY)
-        contentY = contentY + 10
-
-        love.graphics.setFont(self.fonts.normal)
-        love.graphics.setColor(self.colors.text)
-        love.graphics.print("Family (" .. #applicant.family .. ")", x + 10, contentY)
-        contentY = contentY + 20
+        love.graphics.line(contentX, contentY, contentX + contentW, contentY)
+        contentY = contentY + 8
 
         love.graphics.setFont(self.fonts.small)
-        love.graphics.setColor(self.colors.textDim)
+        love.graphics.setColor(self.colors.text)
+        love.graphics.print("Family (" .. #applicant.family .. " members)", contentX, contentY)
+        contentY = contentY + 16
+
+        love.graphics.setFont(self.fonts.tiny)
         for _, member in ipairs(applicant.family) do
-            love.graphics.print(member.name .. " (" .. member.vocation .. ", age " .. member.age .. ")", x + 15, contentY)
-            contentY = contentY + 14
+            love.graphics.setColor(0.18, 0.18, 0.22)
+            love.graphics.rectangle("fill", contentX, contentY, contentW, 28, 3, 3)
+
+            love.graphics.setColor(self.colors.text)
+            love.graphics.print(member.name, contentX + 5, contentY + 2)
+            love.graphics.setColor(self.colors.textDim)
+            love.graphics.print(member.vocation .. ", Age " .. member.age, contentX + 5, contentY + 14)
+
+            if member.isDependent then
+                love.graphics.setColor(0.6, 0.5, 0.3)
+                love.graphics.print("Dependent", contentX + contentW - 55, contentY + 8)
+            end
+
+            contentY = contentY + 32
         end
-        contentY = contentY + 10
     end
+
+    -- Store max scroll
+    self.applicantDetailScrollMax = math.max(0, contentY - contentStartY - contentH + 50)
+
+    love.graphics.setScissor()
 
     -- Action buttons at bottom
     local btnY = y + h - 45
     local btnW = (w - 40) / 3
     local btnH = 32
 
-    -- Accept button
+    -- Accept/Select Land button
     local canAccept = self.world.immigrationSystem:GetTotalVacantHousing() > 0
-    if canAccept then
+    local landReqs = applicant.landRequirements
+    local needsLand = landReqs and landReqs.minPlots and landReqs.minPlots > 0
+
+    -- Check if enough plots available for land-requiring applicants
+    local canAffordLand = true
+    if needsLand and self.world.landSystem then
+        local availablePlots = self.world.landSystem:GetAvailablePlots()
+        canAffordLand = #availablePlots >= landReqs.minPlots
+    end
+
+    if canAccept and canAffordLand then
         love.graphics.setColor(self.colors.success[1], self.colors.success[2], self.colors.success[3], 0.9)
     else
         love.graphics.setColor(0.3, 0.3, 0.3)
@@ -1039,10 +1501,10 @@ function AlphaUI:RenderApplicantDetails(x, y, w, h)
     love.graphics.rectangle("fill", x + 10, btnY, btnW, btnH, 4, 4)
     love.graphics.setColor(1, 1, 1)
     love.graphics.setFont(self.fonts.normal)
-    local acceptText = "ACCEPT"
+    local acceptText = needsLand and "SELECT LAND" or "ACCEPT"
     local acceptTextW = self.fonts.normal:getWidth(acceptText)
     love.graphics.print(acceptText, x + 10 + (btnW - acceptTextW) / 2, btnY + 7)
-    self.acceptApplicantBtn = {x = x + 10, y = btnY, w = btnW, h = btnH, enabled = canAccept}
+    self.acceptApplicantBtn = {x = x + 10, y = btnY, w = btnW, h = btnH, enabled = canAccept and canAffordLand}
 
     -- Defer button
     love.graphics.setColor(self.colors.warning[1], self.colors.warning[2], self.colors.warning[3], 0.8)
@@ -1509,6 +1971,11 @@ function AlphaUI:RenderWorldView()
         self:RenderResourceOverlayAligned(x, y, w, h)
     end
 
+    -- Render land distribution overlay (if visible)
+    if self.showLandOverlay and self.world.landSystem then
+        self:RenderLandOverlay(x, y, w, h)
+    end
+
     -- Offset for camera - translate to world coordinates
     love.graphics.push()
     love.graphics.translate(x - self.cameraX, y - self.cameraY)
@@ -1525,6 +1992,11 @@ function AlphaUI:RenderWorldView()
     -- Render forest using native Forest:Render
     if self.world.forest then
         self.world.forest:Render()
+    end
+
+    -- Render mountains using native Mountain:Render
+    if self.world.mountains then
+        self.world.mountains:Render()
     end
 
     -- Render paths/roads between buildings (simple connections)
@@ -1658,6 +2130,124 @@ function AlphaUI:RenderResourceOverlayAligned(viewX, viewY, viewW, viewH)
     love.graphics.setColor(1, 1, 1, 1)
 end
 
+-- Render land distribution overlay showing plot ownership
+function AlphaUI:RenderLandOverlay(viewX, viewY, viewW, viewH)
+    local landSystem = self.world.landSystem
+    if not landSystem then return end
+
+    local plotWidth = landSystem.plotWidth
+    local plotHeight = landSystem.plotHeight
+
+    -- Calculate visible grid range
+    local startGridX = math.floor(self.cameraX / plotWidth)
+    local startGridY = math.floor(self.cameraY / plotHeight)
+    local endGridX = math.ceil((self.cameraX + viewW) / plotWidth)
+    local endGridY = math.ceil((self.cameraY + viewH) / plotHeight)
+
+    -- Clamp to grid bounds
+    startGridX = math.max(0, startGridX)
+    startGridY = math.max(0, startGridY)
+    endGridX = math.min(landSystem.gridColumns - 1, endGridX)
+    endGridY = math.min(landSystem.gridRows - 1, endGridY)
+
+    -- Colors for different ownership states
+    local colors = {
+        townOwned = {0.2, 0.4, 0.8, 0.35},      -- Blue for town-owned
+        citizenOwned = {0.6, 0.4, 0.2, 0.4},    -- Brown for citizen-owned
+        blocked = {0.3, 0.3, 0.3, 0.2},         -- Gray for blocked (water/mountain)
+        available = {0.2, 0.6, 0.2, 0.3},       -- Green for available/purchasable
+        gridLine = {0.4, 0.4, 0.4, 0.4}
+    }
+
+    -- Draw plot colors
+    for gx = startGridX, endGridX do
+        for gy = startGridY, endGridY do
+            local plotId = landSystem:GetPlotId(gx, gy)
+            local plot = landSystem.plots[plotId]
+
+            if plot then
+                local screenX = viewX + (gx * plotWidth) - self.cameraX
+                local screenY = viewY + (gy * plotHeight) - self.cameraY
+
+                -- Determine plot color based on ownership and state
+                if plot.isBlocked then
+                    love.graphics.setColor(colors.blocked)
+                elseif plot.ownerId == "TOWN" or not plot.ownerId then
+                    -- Town-owned or unclaimed - show as available
+                    love.graphics.setColor(colors.available)
+                else
+                    -- Citizen-owned
+                    love.graphics.setColor(colors.citizenOwned)
+                end
+
+                love.graphics.rectangle("fill", screenX, screenY, plotWidth, plotHeight)
+
+                -- Draw grid lines
+                love.graphics.setColor(colors.gridLine)
+                love.graphics.rectangle("line", screenX, screenY, plotWidth, plotHeight)
+            end
+        end
+    end
+
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
+-- Render land overlay legend panel
+function AlphaUI:RenderLandOverlayPanel()
+    local panelX = self.leftPanelWidth + 10
+    local panelY = self.topBarHeight + 10
+    local panelW = 180
+    local panelH = 130
+
+    -- Background
+    love.graphics.setColor(0.1, 0.1, 0.12, 0.9)
+    love.graphics.rectangle("fill", panelX, panelY, panelW, panelH, 4, 4)
+
+    -- Border
+    love.graphics.setColor(0.3, 0.3, 0.35)
+    love.graphics.rectangle("line", panelX, panelY, panelW, panelH, 4, 4)
+
+    -- Title
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print("LAND OWNERSHIP", panelX + 10, panelY + 8)
+
+    -- Legend items
+    local legendY = panelY + 30
+    local legendItems = {
+        {color = {0.2, 0.6, 0.2, 0.8}, label = "Available (Town)"},
+        {color = {0.6, 0.4, 0.2, 0.8}, label = "Citizen Owned"},
+        {color = {0.3, 0.3, 0.3, 0.5}, label = "Blocked"},
+    }
+
+    love.graphics.setFont(self.fonts.tiny)
+    for _, item in ipairs(legendItems) do
+        love.graphics.setColor(item.color)
+        love.graphics.rectangle("fill", panelX + 10, legendY, 15, 15)
+        love.graphics.setColor(0.5, 0.5, 0.5)
+        love.graphics.rectangle("line", panelX + 10, legendY, 15, 15)
+        love.graphics.setColor(0.8, 0.8, 0.8)
+        love.graphics.print(item.label, panelX + 30, legendY + 2)
+        legendY = legendY + 20
+    end
+
+    -- Statistics
+    local landSystem = self.world.landSystem
+    if landSystem then
+        legendY = legendY + 5
+        love.graphics.setColor(0.7, 0.7, 0.7)
+        local townPlots = #(landSystem:GetAvailablePlots() or {})
+        local totalPlots = landSystem.gridColumns * landSystem.gridRows
+        love.graphics.print("Available: " .. townPlots .. "/" .. totalPlots, panelX + 10, legendY)
+    end
+
+    -- Hint
+    love.graphics.setColor(0.5, 0.5, 0.5)
+    love.graphics.print("Press L to toggle", panelX + 10, panelY + panelH - 18)
+
+    love.graphics.setColor(1, 1, 1)
+end
+
 function AlphaUI:RenderPaths(dayR, dayG, dayB)
     -- Draw simple path connections between buildings
     local pathColor = self.colors.path
@@ -1722,22 +2312,75 @@ function AlphaUI:RenderBuilding(building)
     -- Day/night tint
     local r, g, b = self.world:GetDayNightColor()
 
+    -- Determine building status for visual indicator
+    local status = "idle"  -- idle, producing, understaffed, stopped, paused
+    local isPaused = building.isPaused or building.mIsPaused or false
+    local producing = false
+    local hasNoMaterials = false
+    local hasNoWorker = false
+
+    if isPaused then
+        status = "paused"
+    else
+        for _, station in ipairs(building.stations or {}) do
+            if station.state == "PRODUCING" then
+                producing = true
+            elseif station.state == "NO_MATERIALS" then
+                hasNoMaterials = true
+            elseif station.state == "NO_WORKER" then
+                hasNoWorker = true
+            end
+        end
+
+        if producing then
+            status = "producing"
+        elseif hasNoMaterials then
+            status = "stopped"
+        elseif hasNoWorker then
+            status = "understaffed"
+        end
+    end
+
+    -- Status glow effect (renders behind building)
+    local glowColor = nil
+    local glowPulse = (math.sin(love.timer.getTime() * 3) + 1) / 2  -- 0 to 1 pulse
+
+    if status == "producing" then
+        glowColor = {0.3, 0.9, 0.3, 0.3 + glowPulse * 0.2}  -- Green glow
+    elseif status == "understaffed" then
+        glowColor = {0.9, 0.7, 0.2, 0.3 + glowPulse * 0.2}  -- Yellow glow
+    elseif status == "stopped" then
+        glowColor = {0.9, 0.3, 0.3, 0.3 + glowPulse * 0.3}  -- Red glow
+    elseif status == "paused" then
+        glowColor = {0.6, 0.5, 0.3, 0.3}  -- Orange glow (no pulse)
+    end
+
+    -- Draw glow
+    if glowColor then
+        love.graphics.setColor(glowColor)
+        love.graphics.rectangle("fill", bx - 4, by - 4, bw + 8, bh + 8, 8, 8)
+    end
+
     -- Building body
     love.graphics.setColor(buildingColor[1] * r, buildingColor[2] * g, buildingColor[3] * b)
     love.graphics.rectangle("fill", bx, by, bw, bh, 4, 4)
 
-    -- Status indicator
-    local producing = false
-    for _, station in ipairs(building.stations or {}) do
-        if station.state == "PRODUCING" then
-            producing = true
-            break
-        end
-    end
-
-    if producing then
-        love.graphics.setColor(0.3, 0.8, 0.3, 0.5)
-        love.graphics.rectangle("line", bx - 2, by - 2, bw + 4, bh + 4, 6, 6)
+    -- Status border
+    if status == "producing" then
+        love.graphics.setColor(0.3, 0.9, 0.3, 0.8)
+        love.graphics.setLineWidth(2)
+        love.graphics.rectangle("line", bx - 1, by - 1, bw + 2, bh + 2, 5, 5)
+        love.graphics.setLineWidth(1)
+    elseif status == "stopped" then
+        love.graphics.setColor(0.9, 0.3, 0.3, 0.8)
+        love.graphics.setLineWidth(2)
+        love.graphics.rectangle("line", bx - 1, by - 1, bw + 2, bh + 2, 5, 5)
+        love.graphics.setLineWidth(1)
+    elseif status == "understaffed" then
+        love.graphics.setColor(0.9, 0.7, 0.2, 0.8)
+        love.graphics.setLineWidth(2)
+        love.graphics.rectangle("line", bx - 1, by - 1, bw + 2, bh + 2, 5, 5)
+        love.graphics.setLineWidth(1)
     end
 
     -- Selection highlight
@@ -1754,6 +2397,30 @@ function AlphaUI:RenderBuilding(building)
     local name = building.name or "?"
     if #name > 10 then name = name:sub(1, 8) .. ".." end
     love.graphics.print(name, bx + 5, by + bh - 14)
+
+    -- Status icon (speech bubble style for issues)
+    if status == "stopped" then
+        -- Red "!" bubble
+        love.graphics.setColor(0.9, 0.2, 0.2, 0.9)
+        love.graphics.circle("fill", bx + bw - 5, by - 5, 8)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.setFont(self.fonts.small)
+        love.graphics.print("!", bx + bw - 8, by - 12)
+    elseif status == "understaffed" then
+        -- Yellow "?" bubble
+        love.graphics.setColor(0.9, 0.7, 0.2, 0.9)
+        love.graphics.circle("fill", bx + bw - 5, by - 5, 8)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.setFont(self.fonts.small)
+        love.graphics.print("?", bx + bw - 8, by - 12)
+    elseif status == "paused" then
+        -- Gray "||" bubble
+        love.graphics.setColor(0.5, 0.5, 0.5, 0.9)
+        love.graphics.circle("fill", bx + bw - 5, by - 5, 8)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.setFont(self.fonts.tiny)
+        love.graphics.print("||", bx + bw - 10, by - 11)
+    end
 end
 
 function AlphaUI:RenderCitizen(citizen)
@@ -1768,6 +2435,9 @@ function AlphaUI:RenderCitizen(citizen)
     local sat = citizen:GetAverageSatisfaction() or 50
     local satColor
     local statusIndicator = nil
+    local emigrationRisk = false
+    local isProtesting = citizen.isProtesting or false
+    local isSearching = citizen.searchingForWork or (not citizen.workplace and citizen.vocation)
 
     if sat > 70 then
         satColor = {0.4, 0.8, 0.4}  -- Green = Happy
@@ -1778,9 +2448,37 @@ function AlphaUI:RenderCitizen(citizen)
         statusIndicator = "!"  -- Needs attention
     end
 
+    -- Check emigration risk (very low satisfaction for extended time)
+    if sat < 25 then
+        emigrationRisk = true
+    end
+
+    -- Override status indicator based on special states
+    if isProtesting then
+        statusIndicator = "X"  -- Protesting
+    elseif emigrationRisk then
+        statusIndicator = "!!"  -- Emigration risk
+    elseif isSearching then
+        statusIndicator = "?"  -- Looking for work
+    end
+
     -- Shadow
     love.graphics.setColor(0, 0, 0, 0.3)
     love.graphics.ellipse("fill", cx + 2, cy + radius - 2, radius * 0.8, radius * 0.3)
+
+    -- Emigration risk warning glow (pulsing red aura)
+    if emigrationRisk then
+        local pulse = (math.sin(love.timer.getTime() * 5) + 1) / 2
+        love.graphics.setColor(0.9, 0.2, 0.2, 0.3 + pulse * 0.3)
+        love.graphics.circle("fill", cx, cy, radius + 8)
+    end
+
+    -- Protesting indicator (angry red glow)
+    if isProtesting then
+        local pulse = (math.sin(love.timer.getTime() * 8) + 1) / 2
+        love.graphics.setColor(1, 0, 0, 0.4 + pulse * 0.3)
+        love.graphics.circle("fill", cx, cy, radius + 6)
+    end
 
     -- Status circle (outer ring showing happiness)
     love.graphics.setColor(satColor[1] * r * 0.7, satColor[2] * g * 0.7, satColor[3] * b * 0.7)
@@ -1806,11 +2504,36 @@ function AlphaUI:RenderCitizen(citizen)
     love.graphics.setColor(classColor[1] * r, classColor[2] * g, classColor[3] * b)
     love.graphics.rectangle("fill", cx - radius * 0.5, cy + radius * 0.2, radius, 4, 2, 2)
 
-    -- Status indicator (! for unhappy, ? for looking)
+    -- Status indicator with speech bubble
     if statusIndicator then
+        local bubbleX = cx + radius + 2
+        local bubbleY = cy - radius - 12
+        local bubbleW = statusIndicator == "!!" and 18 or 14
+        local bubbleH = 14
+
+        -- Speech bubble background
+        love.graphics.setColor(1, 1, 1, 0.9)
+        love.graphics.rectangle("fill", bubbleX, bubbleY, bubbleW, bubbleH, 3, 3)
+
+        -- Bubble pointer
+        love.graphics.polygon("fill",
+            bubbleX + 3, bubbleY + bubbleH,
+            bubbleX + 8, bubbleY + bubbleH,
+            bubbleX + 2, bubbleY + bubbleH + 4
+        )
+
+        -- Status text with appropriate color
         love.graphics.setFont(self.fonts.small)
-        love.graphics.setColor(1, 0.3, 0.3)
-        love.graphics.print(statusIndicator, cx + radius + 2, cy - radius - 5)
+        if statusIndicator == "X" then
+            love.graphics.setColor(0.8, 0, 0)  -- Red for protesting
+        elseif statusIndicator == "!!" then
+            love.graphics.setColor(0.7, 0.1, 0.1)  -- Dark red for emigration risk
+        elseif statusIndicator == "?" then
+            love.graphics.setColor(0.2, 0.5, 0.8)  -- Blue for searching
+        else
+            love.graphics.setColor(0.9, 0.5, 0.1)  -- Orange for unhappy
+        end
+        love.graphics.print(statusIndicator, bubbleX + 3, bubbleY + 1)
     end
 
     -- Activity indicator
@@ -2116,82 +2839,175 @@ function AlphaUI:RenderBuildMenuModal()
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
 
     -- Dim background
-    love.graphics.setColor(0, 0, 0, 0.5)
+    love.graphics.setColor(0, 0, 0, 0.6)
     love.graphics.rectangle("fill", 0, 0, screenW, screenH)
 
-    -- Modal dimensions
-    local modalW = 700
-    local modalH = 500
+    -- Modal dimensions - larger for better layout
+    local modalW = 850
+    local modalH = 600
     local modalX = (screenW - modalW) / 2
     local modalY = (screenH - modalH) / 2
 
     -- Modal background
     love.graphics.setColor(0.12, 0.12, 0.15, 0.98)
-    love.graphics.rectangle("fill", modalX, modalY, modalW, modalH, 8, 8)
+    love.graphics.rectangle("fill", modalX, modalY, modalW, modalH, 10, 10)
 
     -- Modal border
     love.graphics.setColor(0.4, 0.4, 0.5)
     love.graphics.setLineWidth(2)
-    love.graphics.rectangle("line", modalX, modalY, modalW, modalH, 8, 8)
+    love.graphics.rectangle("line", modalX, modalY, modalW, modalH, 10, 10)
     love.graphics.setLineWidth(1)
 
-    -- Header
+    -- Header area with gradient effect
+    love.graphics.setColor(0.15, 0.15, 0.2, 0.8)
+    love.graphics.rectangle("fill", modalX, modalY, modalW, 55, 10, 10)
+    love.graphics.setColor(0.3, 0.3, 0.35)
+    love.graphics.line(modalX + 10, modalY + 55, modalX + modalW - 10, modalY + 55)
+
+    -- Header title
     love.graphics.setFont(self.fonts.title)
     love.graphics.setColor(self.colors.text)
     love.graphics.print("BUILD MENU", modalX + 20, modalY + 15)
 
     -- Close button
-    local closeX = modalX + modalW - 40
-    local closeY = modalY + 10
+    local closeX = modalX + modalW - 45
+    local closeY = modalY + 12
+    local mx, my = love.mouse.getPosition()
+    local closeHovered = mx >= closeX and mx <= closeX + 30 and my >= closeY and my <= closeY + 30
+    love.graphics.setColor(closeHovered and {0.8, 0.2, 0.2} or self.colors.danger)
+    love.graphics.rectangle("fill", closeX, closeY, 30, 30, 4, 4)
     love.graphics.setFont(self.fonts.header)
-    love.graphics.setColor(self.colors.danger)
-    love.graphics.print("X", closeX + 8, closeY + 2)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print("X", closeX + 9, closeY + 4)
     self.buildMenuCloseBtn = {x = closeX, y = closeY, w = 30, h = 30}
 
-    -- Category tabs
-    local categories = {"All", "Housing", "Production", "Services"}
-    local tabY = modalY + 55
-    local tabX = modalX + 20
+    -- Search bar
+    local searchY = modalY + 65
+    local searchX = modalX + 20
+    local searchW = 250
+    local searchH = 32
 
-    love.graphics.setFont(self.fonts.normal)
-    for i, cat in ipairs(categories) do
-        local isActive = self.buildMenuCategory == cat:lower()
-        local tabW = 80
+    -- Search box background
+    local searchActive = self.buildMenuSearchActive
+    love.graphics.setColor(searchActive and {0.2, 0.2, 0.25} or {0.15, 0.15, 0.18})
+    love.graphics.rectangle("fill", searchX, searchY, searchW, searchH, 4, 4)
+    love.graphics.setColor(searchActive and self.colors.accent or {0.35, 0.35, 0.4})
+    love.graphics.rectangle("line", searchX, searchY, searchW, searchH, 4, 4)
 
-        if isActive then
-            love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], 0.6)
-        else
-            love.graphics.setColor(self.colors.button)
-        end
-        love.graphics.rectangle("fill", tabX, tabY, tabW, 28, 4, 4)
+    -- Search icon
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.5, 0.5, 0.55)
+    love.graphics.print("[?]", searchX + 8, searchY + 9)
 
-        love.graphics.setColor(isActive and {1, 1, 1} or self.colors.textDim)
-        local textW = self.fonts.normal:getWidth(cat)
-        love.graphics.print(cat, tabX + (tabW - textW) / 2, tabY + 5)
+    -- Search text or placeholder
+    local currentQuery = self.buildMenuSearchQuery or ""
+    love.graphics.setColor(currentQuery == "" and {0.5, 0.5, 0.55} or self.colors.text)
+    local searchText = currentQuery == "" and "Search buildings..." or currentQuery
+    love.graphics.print(searchText, searchX + 35, searchY + 9)
 
-        -- Store tab bounds
-        self["buildMenuTab_" .. cat:lower()] = {x = tabX, y = tabY, w = tabW, h = 28}
-        tabX = tabX + tabW + 10
+    -- Blinking cursor when active
+    if searchActive and math.floor(love.timer.getTime() * 2) % 2 == 0 then
+        local cursorX = searchX + 35 + self.fonts.small:getWidth(currentQuery)
+        love.graphics.setColor(self.colors.text)
+        love.graphics.rectangle("fill", cursorX, searchY + 8, 2, 16)
     end
 
+    self.buildMenuSearchBox = {x = searchX, y = searchY, w = searchW, h = searchH}
+
+    -- Category tabs - more categories with icons
+    local categories = {
+        {id = "all", name = "All", icon = "*"},
+        {id = "housing", name = "Housing", icon = "H"},
+        {id = "production", name = "Production", icon = "P"},
+        {id = "agriculture", name = "Agriculture", icon = "A"},
+        {id = "extraction", name = "Extraction", icon = "E"},
+        {id = "services", name = "Services", icon = "S"}
+    }
+    local tabY = searchY
+    local tabX = searchX + searchW + 20
+    local tabH = 32
+
+    love.graphics.setFont(self.fonts.small)
+    self.buildMenuTabs = {}
+    for i, cat in ipairs(categories) do
+        local isActive = self.buildMenuCategory == cat.id
+        local tabW = self.fonts.small:getWidth(cat.name) + 24
+        local tabHovered = mx >= tabX and mx <= tabX + tabW and my >= tabY and my <= tabY + tabH
+
+        -- Tab background
+        if isActive then
+            love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], 0.7)
+        elseif tabHovered then
+            love.graphics.setColor(0.25, 0.25, 0.3)
+        else
+            love.graphics.setColor(0.18, 0.18, 0.22)
+        end
+        love.graphics.rectangle("fill", tabX, tabY, tabW, tabH, 4, 4)
+
+        -- Tab border when active
+        if isActive then
+            love.graphics.setColor(self.colors.accent)
+            love.graphics.rectangle("line", tabX, tabY, tabW, tabH, 4, 4)
+        end
+
+        -- Tab text
+        love.graphics.setColor(isActive and {1, 1, 1} or (tabHovered and {0.9, 0.9, 0.9} or self.colors.textDim))
+        local textW = self.fonts.small:getWidth(cat.name)
+        love.graphics.print(cat.name, tabX + (tabW - textW) / 2, tabY + 9)
+
+        -- Store tab bounds
+        self.buildMenuTabs[cat.id] = {x = tabX, y = tabY, w = tabW, h = tabH}
+        tabX = tabX + tabW + 8
+    end
+
+    -- Building count - positioned below the tabs/search bar
+    local buildings = self:GetFilteredBuildingTypes()
+
     -- Building cards area
-    local cardsY = tabY + 45
+    local cardsY = searchY + searchH + 15
     local cardsX = modalX + 20
     local cardsW = modalW - 40
-    local cardsH = modalH - 130
+    local cardsH = modalH - (cardsY - modalY) - 20
+
+    -- Building count text in the cards area header
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print(#buildings .. " buildings found", cardsX + cardsW - 120, searchY + searchH - 2)
+
+    -- Cards area background
+    love.graphics.setColor(0.1, 0.1, 0.12)
+    love.graphics.rectangle("fill", cardsX - 5, cardsY - 5, cardsW + 10, cardsH + 10, 6, 6)
 
     -- Scissor for scrolling
     love.graphics.setScissor(cardsX, cardsY, cardsW, cardsH)
 
-    -- Get filtered buildings
-    local buildings = self:GetFilteredBuildingTypes()
-
-    -- Card layout
-    local cardW = 140
-    local cardH = 120
-    local cardSpacing = 15
-    local cardsPerRow = math.floor(cardsW / (cardW + cardSpacing))
+    -- Card layout - larger cards with more info
+    local cardW = 160
+    local cardH = 145
+    local cardSpacing = 12
+    local cardsPerRow = math.floor((cardsW + cardSpacing) / (cardW + cardSpacing))
     if cardsPerRow < 1 then cardsPerRow = 1 end
+
+    -- Calculate total content height for scroll
+    local totalRows = math.ceil(#buildings / cardsPerRow)
+    local totalContentH = totalRows * (cardH + cardSpacing) - cardSpacing  -- Remove trailing spacing
+    self.buildMenuMaxScroll = math.max(0, totalContentH - cardsH)
+
+    -- Clamp scroll offset to valid range
+    self.buildMenuScrollOffset = self.buildMenuScrollOffset or 0
+    if self.buildMenuScrollOffset > self.buildMenuMaxScroll then
+        self.buildMenuScrollOffset = self.buildMenuMaxScroll
+    end
+    if self.buildMenuScrollOffset < 0 then
+        self.buildMenuScrollOffset = 0
+    end
+
+    -- Clear old card bounds
+    for k in pairs(self) do
+        if type(k) == "string" and k:match("^buildCard_") then
+            self[k] = nil
+        end
+    end
 
     love.graphics.setFont(self.fonts.small)
 
@@ -2208,53 +3024,110 @@ function AlphaUI:RenderBuildMenuModal()
 
         -- Check affordability
         local canAfford, _ = self.world:CanAffordBuilding(bType)
+        local cardHovered = mx >= cardX and mx <= cardX + cardW and my >= cardY and my <= cardY + cardH
 
-        -- Card background
-        if canAfford then
-            love.graphics.setColor(self.colors.button)
+        -- Card background with hover effect
+        if cardHovered and canAfford then
+            love.graphics.setColor(0.22, 0.22, 0.28)
+        elseif canAfford then
+            love.graphics.setColor(0.17, 0.17, 0.22)
         else
-            love.graphics.setColor(0.2, 0.2, 0.2, 0.7)
+            love.graphics.setColor(0.15, 0.15, 0.18, 0.8)
         end
-        love.graphics.rectangle("fill", cardX, cardY, cardW, cardH, 4, 4)
+        love.graphics.rectangle("fill", cardX, cardY, cardW, cardH, 6, 6)
 
         -- Card border
-        love.graphics.setColor(0.4, 0.4, 0.45)
-        love.graphics.rectangle("line", cardX, cardY, cardW, cardH, 4, 4)
+        if cardHovered and canAfford then
+            love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], 0.8)
+            love.graphics.setLineWidth(2)
+        else
+            love.graphics.setColor(0.35, 0.35, 0.4)
+            love.graphics.setLineWidth(1)
+        end
+        love.graphics.rectangle("line", cardX, cardY, cardW, cardH, 6, 6)
+        love.graphics.setLineWidth(1)
 
-        -- Icon placeholder
-        local iconColor = bType.category == "housing" and {0.6, 0.5, 0.4} or
-                         (bType.category == "production" and {0.4, 0.6, 0.4} or {0.5, 0.5, 0.7})
-        love.graphics.setColor(iconColor[1], iconColor[2], iconColor[3], canAfford and 1 or 0.5)
-        love.graphics.rectangle("fill", cardX + 45, cardY + 10, 50, 40, 4, 4)
+        -- Icon/Visual area with category-based color
+        local iconColors = {
+            housing = {0.6, 0.5, 0.4},
+            production = {0.4, 0.55, 0.7},
+            agriculture = {0.4, 0.65, 0.35},
+            extraction = {0.55, 0.45, 0.35},
+            services = {0.6, 0.5, 0.65}
+        }
+        local iconColor = iconColors[bType.category] or {0.5, 0.5, 0.5}
+        local alpha = canAfford and 1 or 0.4
 
-        -- Name
+        -- Icon background
+        love.graphics.setColor(iconColor[1] * 0.3, iconColor[2] * 0.3, iconColor[3] * 0.3, alpha)
+        love.graphics.rectangle("fill", cardX + 10, cardY + 10, cardW - 20, 45, 4, 4)
+
+        -- Building label/icon
+        love.graphics.setColor(iconColor[1], iconColor[2], iconColor[3], alpha)
+        love.graphics.setFont(self.fonts.header)
+        local label = bType.label or bType.id:sub(1, 2):upper()
+        local labelW = self.fonts.header:getWidth(label)
+        love.graphics.print(label, cardX + (cardW - labelW) / 2, cardY + 20)
+
+        -- Building name
+        love.graphics.setFont(self.fonts.normal)
         love.graphics.setColor(canAfford and {1, 1, 1} or {0.5, 0.5, 0.5})
         local name = bType.name or bType.id
-        if #name > 16 then name = name:sub(1, 14) .. ".." end
-        love.graphics.print(name, cardX + 8, cardY + 55)
+        if #name > 18 then name = name:sub(1, 16) .. ".." end
+        love.graphics.print(name, cardX + 10, cardY + 60)
 
-        -- Category/Info
-        love.graphics.setColor(self.colors.textDim)
+        -- Category chip
+        love.graphics.setFont(self.fonts.small)
         local category = bType.category or "other"
-        love.graphics.print(category:sub(1, 1):upper() .. category:sub(2), cardX + 8, cardY + 70)
+        local catColor = iconColors[category] or {0.5, 0.5, 0.5}
+        love.graphics.setColor(catColor[1], catColor[2], catColor[3], 0.3)
+        local catText = category:sub(1, 1):upper() .. category:sub(2)
+        local catTextW = self.fonts.small:getWidth(catText)
+        love.graphics.rectangle("fill", cardX + 10, cardY + 80, catTextW + 10, 16, 3, 3)
+        love.graphics.setColor(catColor[1], catColor[2], catColor[3], canAfford and 1 or 0.5)
+        love.graphics.print(catText, cardX + 15, cardY + 81)
 
-        -- Cost
+        -- Workers info
+        local stations = 0
+        if bType.upgradeLevels and bType.upgradeLevels[1] then
+            stations = bType.upgradeLevels[1].stations or 0
+        end
+        if stations > 0 then
+            love.graphics.setColor(self.colors.textDim)
+            love.graphics.print("Workers: " .. stations, cardX + 10, cardY + 100)
+        elseif bType.category == "housing" then
+            local capacity = 0
+            if bType.upgradeLevels and bType.upgradeLevels[1] then
+                capacity = bType.upgradeLevels[1].capacity or 0
+            end
+            love.graphics.setColor(self.colors.textDim)
+            love.graphics.print("Capacity: " .. capacity, cardX + 10, cardY + 100)
+        end
+
+        -- Cost display
         local cost = bType.constructionCost or {}
         local goldCost = cost.gold or 0
         love.graphics.setColor(canAfford and self.colors.gold or self.colors.danger)
-        love.graphics.print(goldCost .. "g", cardX + 8, cardY + 85)
+        love.graphics.print(goldCost .. " gold", cardX + cardW - 55, cardY + 100)
 
         -- BUILD button
-        local btnY = cardY + cardH - 25
+        local btnY = cardY + cardH - 28
+        local btnHovered = cardHovered and my >= btnY
         if canAfford then
-            love.graphics.setColor(self.colors.success[1], self.colors.success[2], self.colors.success[3], 0.8)
+            if btnHovered then
+                love.graphics.setColor(self.colors.success[1] * 1.2, self.colors.success[2] * 1.2, self.colors.success[3] * 1.2, 0.9)
+            else
+                love.graphics.setColor(self.colors.success[1], self.colors.success[2], self.colors.success[3], 0.8)
+            end
         else
-            love.graphics.setColor(0.3, 0.3, 0.3)
+            love.graphics.setColor(0.3, 0.3, 0.3, 0.7)
         end
-        love.graphics.rectangle("fill", cardX + 8, btnY, cardW - 16, 18, 2, 2)
+        love.graphics.rectangle("fill", cardX + 8, btnY, cardW - 16, 22, 4, 4)
 
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.print("BUILD", cardX + cardW/2 - 18, btnY + 2)
+        love.graphics.setColor(1, 1, 1, canAfford and 1 or 0.5)
+        local btnText = canAfford and "BUILD" or "LOCKED"
+        local btnTextW = self.fonts.small:getWidth(btnText)
+        love.graphics.print(btnText, cardX + (cardW - btnTextW) / 2, btnY + 4)
 
         -- Store card bounds for click detection
         self["buildCard_" .. i] = {x = cardX, y = cardY, w = cardW, h = cardH, buildingType = bType, canAfford = canAfford}
@@ -2263,7 +3136,515 @@ function AlphaUI:RenderBuildMenuModal()
     end
 
     love.graphics.setScissor()
+
+    -- Scrollbar - only show if there's content to scroll
+    if self.buildMenuMaxScroll > 0 then
+        local scrollbarX = cardsX + cardsW + 5
+        local scrollbarH = cardsH
+        local thumbH = math.max(30, (cardsH / totalContentH) * scrollbarH)
+        local scrollRatio = self.buildMenuScrollOffset / self.buildMenuMaxScroll
+        local thumbY = cardsY + scrollRatio * (scrollbarH - thumbH)
+
+        -- Scrollbar track
+        love.graphics.setColor(0.15, 0.15, 0.18)
+        love.graphics.rectangle("fill", scrollbarX, cardsY, 8, scrollbarH, 4, 4)
+
+        -- Scrollbar thumb
+        love.graphics.setColor(0.4, 0.4, 0.45)
+        love.graphics.rectangle("fill", scrollbarX, thumbY, 8, thumbH, 4, 4)
+    end
+
+    -- No results message
+    if #buildings == 0 then
+        love.graphics.setFont(self.fonts.normal)
+        love.graphics.setColor(self.colors.textDim)
+        local noResultsText = self.buildMenuSearchQuery ~= "" and "No buildings match your search" or "No buildings available"
+        local textW = self.fonts.normal:getWidth(noResultsText)
+        love.graphics.print(noResultsText, cardsX + (cardsW - textW) / 2, cardsY + cardsH / 2 - 10)
+    end
+
     love.graphics.setColor(1, 1, 1)
+end
+
+-- =============================================================================
+-- PRODUCTION ANALYTICS PANEL
+-- =============================================================================
+
+function AlphaUI:RenderProductionAnalyticsPanel()
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+
+    -- Initialize state if needed (hot reload safety)
+    self.productionAnalyticsTab = self.productionAnalyticsTab or "commodities"
+    self.productionAnalyticsScrollOffset = self.productionAnalyticsScrollOffset or 0
+    self.selectedAnalyticsCommodity = self.selectedAnalyticsCommodity or nil
+
+    -- Dim background
+    love.graphics.setColor(0, 0, 0, 0.6)
+    love.graphics.rectangle("fill", 0, 0, screenW, screenH)
+
+    -- Panel dimensions (large centered panel)
+    local panelW = math.min(900, screenW - 100)
+    local panelH = screenH - self.topBarHeight - self.bottomBarHeight - 40
+    local panelX = (screenW - panelW) / 2
+    local panelY = self.topBarHeight + 20
+
+    -- Panel background
+    love.graphics.setColor(0.12, 0.12, 0.15)
+    love.graphics.rectangle("fill", panelX, panelY, panelW, panelH, 8, 8)
+
+    -- Panel border
+    love.graphics.setColor(0.3, 0.3, 0.35)
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", panelX, panelY, panelW, panelH, 8, 8)
+
+    -- Header
+    love.graphics.setFont(self.fonts.header)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print("Production Analytics", panelX + 20, panelY + 15)
+
+    -- Close button
+    local closeBtnX = panelX + panelW - 40
+    local closeBtnY = panelY + 15
+    local closeBtnSize = 25
+    local mx, my = love.mouse.getPosition()
+    local closeHover = mx >= closeBtnX and mx < closeBtnX + closeBtnSize and
+                       my >= closeBtnY and my < closeBtnY + closeBtnSize
+
+    love.graphics.setColor(closeHover and {0.8, 0.3, 0.3} or {0.5, 0.5, 0.5})
+    love.graphics.rectangle("fill", closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, 4, 4)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.print("X", closeBtnX + 7, closeBtnY + 3)
+
+    self.productionAnalyticsCloseBtn = {x = closeBtnX, y = closeBtnY, w = closeBtnSize, h = closeBtnSize}
+
+    -- Tab buttons
+    local tabY = panelY + 55
+    local tabX = panelX + 20
+    local tabs = {
+        {id = "commodities", label = "Commodities"},
+        {id = "buildings", label = "Buildings"}
+    }
+
+    self.productionAnalyticsTabBtns = {}
+    love.graphics.setFont(self.fonts.small)
+
+    for _, tab in ipairs(tabs) do
+        local tabW = self.fonts.small:getWidth(tab.label) + 24
+        local tabH = 28
+        local isActive = self.productionAnalyticsTab == tab.id
+        local isHover = mx >= tabX and mx < tabX + tabW and my >= tabY and my < tabY + tabH
+
+        if isActive then
+            love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], 0.7)
+        elseif isHover then
+            love.graphics.setColor(0.3, 0.3, 0.35)
+        else
+            love.graphics.setColor(0.2, 0.2, 0.25)
+        end
+        love.graphics.rectangle("fill", tabX, tabY, tabW, tabH, 4, 4)
+
+        love.graphics.setColor(isActive and {1, 1, 1} or self.colors.textDim)
+        love.graphics.print(tab.label, tabX + 12, tabY + 6)
+
+        table.insert(self.productionAnalyticsTabBtns, {x = tabX, y = tabY, w = tabW, h = tabH, tabId = tab.id})
+        tabX = tabX + tabW + 8
+    end
+
+    -- Content area
+    local contentY = tabY + 40
+    local contentH = panelH - (contentY - panelY) - 20
+
+    if self.productionAnalyticsTab == "commodities" then
+        self:RenderProductionCommoditiesTab(panelX + 15, contentY, panelW - 30, contentH)
+    else
+        self:RenderProductionBuildingsTab(panelX + 15, contentY, panelW - 30, contentH)
+    end
+end
+
+function AlphaUI:RenderProductionCommoditiesTab(x, y, w, h)
+    -- Get production metrics from world
+    local metrics = self.world:GetProductionMetrics()
+    if not metrics then
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.setFont(self.fonts.normal)
+        love.graphics.print("No production data yet. Start some buildings producing!", x + 20, y + 20)
+        return
+    end
+
+    -- Split into two columns: commodity list on left, detail on right
+    local listW = 350
+    local detailX = x + listW + 20
+    local detailW = w - listW - 20
+
+    -- Summary stats at top
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print("Worker Utilization:", x, y)
+
+    local utilization = metrics.workerUtilization or 0
+    local utilColor = utilization > 70 and self.colors.success or
+                      utilization > 40 and self.colors.warning or
+                      self.colors.danger
+    love.graphics.setColor(utilColor)
+    love.graphics.print(string.format("%.0f%% (%d/%d employed)", utilization,
+        metrics.activeWorkers or 0, metrics.totalWorkers or 0), x + 140, y)
+
+    -- Commodity list
+    local listY = y + 35
+    local listH = h - 35
+
+    love.graphics.setColor(0.15, 0.15, 0.18)
+    love.graphics.rectangle("fill", x, listY, listW, listH, 4, 4)
+
+    -- Headers
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Commodity", x + 10, listY + 8)
+    love.graphics.print("Prod/min", x + 180, listY + 8)
+    love.graphics.print("Net", x + 260, listY + 8)
+    love.graphics.print("Stock", x + 305, listY + 8)
+
+    -- Get all commodities with production or consumption
+    local commodityList = {}
+    for commodityId, rate in pairs(metrics.productionRate or {}) do
+        commodityList[commodityId] = commodityList[commodityId] or {}
+        commodityList[commodityId].productionRate = rate
+    end
+    for commodityId, rate in pairs(metrics.consumptionRate or {}) do
+        commodityList[commodityId] = commodityList[commodityId] or {}
+        commodityList[commodityId].consumptionRate = rate
+    end
+    for commodityId, net in pairs(metrics.netProduction or {}) do
+        commodityList[commodityId] = commodityList[commodityId] or {}
+        commodityList[commodityId].netProduction = net
+    end
+
+    -- Convert to sorted array
+    local sortedCommodities = {}
+    for id, data in pairs(commodityList) do
+        data.id = id
+        data.productionRate = data.productionRate or 0
+        data.consumptionRate = data.consumptionRate or 0
+        data.netProduction = data.netProduction or 0
+        -- Get current stock
+        data.stock = self.world:GetInventoryCount(id)
+        -- Get commodity name
+        local commodity = self.world.commoditiesById[id]
+        data.name = commodity and commodity.name or id
+        table.insert(sortedCommodities, data)
+    end
+
+    -- Sort by production rate descending
+    table.sort(sortedCommodities, function(a, b)
+        return a.productionRate > b.productionRate
+    end)
+
+    -- Render commodity rows
+    love.graphics.setScissor(x, listY + 30, listW, listH - 30)
+
+    local rowY = listY + 30 - self.productionAnalyticsScrollOffset
+    local rowH = 32
+    self.productionAnalyticsCommodityBtns = {}
+
+    for _, commodity in ipairs(sortedCommodities) do
+        if rowY + rowH > listY + 30 and rowY < listY + listH then
+            local mx, my = love.mouse.getPosition()
+            local isHover = mx >= x and mx < x + listW and my >= rowY and my < rowY + rowH
+            local isSelected = self.selectedAnalyticsCommodity == commodity.id
+
+            -- Row background
+            if isSelected then
+                love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], 0.3)
+            elseif isHover then
+                love.graphics.setColor(0.25, 0.25, 0.28)
+            else
+                love.graphics.setColor(0, 0, 0, 0)
+            end
+            love.graphics.rectangle("fill", x + 2, rowY, listW - 4, rowH)
+
+            -- Commodity name
+            love.graphics.setFont(self.fonts.small)
+            love.graphics.setColor(1, 1, 1)
+            local displayName = #commodity.name > 18 and commodity.name:sub(1, 16) .. ".." or commodity.name
+            love.graphics.print(displayName, x + 10, rowY + 8)
+
+            -- Production rate
+            love.graphics.setColor(self.colors.success)
+            love.graphics.print(string.format("%.1f", commodity.productionRate), x + 180, rowY + 8)
+
+            -- Net production (color coded)
+            local netColor = commodity.netProduction > 0 and self.colors.success or
+                             commodity.netProduction < 0 and self.colors.danger or
+                             self.colors.textDim
+            love.graphics.setColor(netColor)
+            local netPrefix = commodity.netProduction > 0 and "+" or ""
+            love.graphics.print(netPrefix .. string.format("%.1f", commodity.netProduction), x + 260, rowY + 8)
+
+            -- Stock
+            love.graphics.setColor(self.colors.text)
+            love.graphics.print(tostring(commodity.stock), x + 305, rowY + 8)
+
+            table.insert(self.productionAnalyticsCommodityBtns, {
+                x = x, y = rowY, w = listW, h = rowH, commodityId = commodity.id
+            })
+        end
+        rowY = rowY + rowH
+    end
+
+    -- Update max scroll
+    local totalHeight = #sortedCommodities * rowH
+    self.productionAnalyticsMaxScroll = math.max(0, totalHeight - (listH - 30))
+
+    love.graphics.setScissor()
+
+    -- Scrollbar
+    if self.productionAnalyticsMaxScroll > 0 then
+        local scrollBarH = (listH - 30) * ((listH - 30) / totalHeight)
+        local scrollBarY = listY + 30 + (self.productionAnalyticsScrollOffset / self.productionAnalyticsMaxScroll) * ((listH - 30) - scrollBarH)
+
+        love.graphics.setColor(0.4, 0.4, 0.45)
+        love.graphics.rectangle("fill", x + listW - 8, scrollBarY, 6, scrollBarH, 3, 3)
+    end
+
+    -- Detail panel (right side)
+    love.graphics.setColor(0.15, 0.15, 0.18)
+    love.graphics.rectangle("fill", detailX, listY, detailW, listH, 4, 4)
+
+    if self.selectedAnalyticsCommodity then
+        local commodity = nil
+        for _, c in ipairs(sortedCommodities) do
+            if c.id == self.selectedAnalyticsCommodity then
+                commodity = c
+                break
+            end
+        end
+
+        if commodity then
+            self:RenderCommodityDetail(detailX + 15, listY + 15, detailW - 30, listH - 30, commodity)
+        end
+    else
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.setFont(self.fonts.normal)
+        love.graphics.print("Select a commodity to see details", detailX + 20, listY + 20)
+    end
+end
+
+function AlphaUI:RenderCommodityDetail(x, y, w, h, commodity)
+    love.graphics.setFont(self.fonts.header)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print(commodity.name, x, y)
+
+    love.graphics.setFont(self.fonts.normal)
+
+    -- Production rate
+    local statY = y + 40
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Production Rate:", x, statY)
+    love.graphics.setColor(self.colors.success)
+    love.graphics.print(string.format("%.2f /min", commodity.productionRate), x + 150, statY)
+
+    -- Consumption rate
+    statY = statY + 25
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Consumption Rate:", x, statY)
+    love.graphics.setColor(self.colors.danger)
+    love.graphics.print(string.format("%.2f /min", commodity.consumptionRate), x + 150, statY)
+
+    -- Net production
+    statY = statY + 25
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Net Production:", x, statY)
+    local netColor = commodity.netProduction > 0 and self.colors.success or
+                     commodity.netProduction < 0 and self.colors.danger or
+                     self.colors.textDim
+    love.graphics.setColor(netColor)
+    local netPrefix = commodity.netProduction > 0 and "+" or ""
+    love.graphics.print(netPrefix .. string.format("%.2f /min", commodity.netProduction), x + 150, statY)
+
+    -- Current stock
+    statY = statY + 25
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Current Stock:", x, statY)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print(tostring(commodity.stock), x + 150, statY)
+
+    -- Time to depletion/surplus estimate
+    statY = statY + 35
+    love.graphics.setColor(self.colors.textDim)
+    if commodity.netProduction < 0 and commodity.stock > 0 then
+        local minutesToDepletion = commodity.stock / math.abs(commodity.netProduction)
+        love.graphics.print("Est. Depletion:", x, statY)
+        love.graphics.setColor(self.colors.warning)
+        if minutesToDepletion < 60 then
+            love.graphics.print(string.format("%.0f minutes", minutesToDepletion), x + 150, statY)
+        else
+            love.graphics.print(string.format("%.1f hours", minutesToDepletion / 60), x + 150, statY)
+        end
+    elseif commodity.netProduction > 0 then
+        love.graphics.print("Status:", x, statY)
+        love.graphics.setColor(self.colors.success)
+        love.graphics.print("Surplus - Growing", x + 150, statY)
+    else
+        love.graphics.print("Status:", x, statY)
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("Balanced", x + 150, statY)
+    end
+end
+
+function AlphaUI:RenderProductionBuildingsTab(x, y, w, h)
+    -- Get building efficiencies from world
+    local efficiencies = self.world:GetBuildingEfficiencies()
+
+    if not efficiencies or #efficiencies == 0 then
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.setFont(self.fonts.normal)
+        love.graphics.print("No buildings placed yet. Use the Build menu to add buildings!", x + 20, y + 20)
+        return
+    end
+
+    -- Background
+    love.graphics.setColor(0.15, 0.15, 0.18)
+    love.graphics.rectangle("fill", x, y, w, h, 4, 4)
+
+    -- Headers
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Building", x + 10, y + 10)
+    love.graphics.print("Efficiency", x + 220, y + 10)
+    love.graphics.print("Workers", x + 380, y + 10)
+    love.graphics.print("Stations", x + 480, y + 10)
+    love.graphics.print("Status", x + 590, y + 10)
+
+    -- Building rows
+    local rowY = y + 35
+    local rowH = 40
+
+    love.graphics.setScissor(x, y + 30, w, h - 30)
+
+    for _, building in ipairs(efficiencies) do
+        if rowY < y + h then
+            -- Row background with efficiency color
+            local effColor
+            if building.efficiency >= 80 then
+                effColor = {0.2, 0.4, 0.2, 0.3}
+            elseif building.efficiency >= 50 then
+                effColor = {0.4, 0.4, 0.2, 0.3}
+            elseif building.efficiency > 0 then
+                effColor = {0.4, 0.3, 0.2, 0.3}
+            else
+                effColor = {0.3, 0.2, 0.2, 0.3}
+            end
+
+            love.graphics.setColor(effColor)
+            love.graphics.rectangle("fill", x + 2, rowY, w - 4, rowH - 2, 4, 4)
+
+            -- Building name
+            love.graphics.setFont(self.fonts.small)
+            love.graphics.setColor(1, 1, 1)
+            local displayName = #building.name > 25 and building.name:sub(1, 23) .. ".." or building.name
+            love.graphics.print(displayName .. " #" .. building.id, x + 10, rowY + 5)
+
+            -- Building type
+            love.graphics.setColor(self.colors.textDim)
+            love.graphics.setFont(self.fonts.tiny)
+            love.graphics.print(building.typeId or "", x + 10, rowY + 22)
+
+            -- Efficiency bar
+            love.graphics.setFont(self.fonts.small)
+            local barX = x + 220
+            local barW = 100
+            local barH = 16
+
+            -- Bar background
+            love.graphics.setColor(0.2, 0.2, 0.25)
+            love.graphics.rectangle("fill", barX, rowY + 10, barW, barH, 3, 3)
+
+            -- Bar fill
+            local fillColor = building.efficiency >= 80 and self.colors.success or
+                              building.efficiency >= 50 and self.colors.warning or
+                              building.efficiency > 0 and {0.9, 0.6, 0.2} or
+                              self.colors.danger
+            love.graphics.setColor(fillColor)
+            local fillW = (building.efficiency / 100) * barW
+            if fillW > 0 then
+                love.graphics.rectangle("fill", barX, rowY + 10, fillW, barH, 3, 3)
+            end
+
+            -- Efficiency text (inside bar)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.print(string.format("%.0f%%", building.efficiency), barX + barW + 10, rowY + 10)
+
+            -- Workers
+            local workerColor = building.workerCount >= building.maxWorkers and self.colors.success or
+                                building.workerCount > 0 and self.colors.warning or
+                                self.colors.danger
+            love.graphics.setColor(workerColor)
+            love.graphics.print(string.format("%d/%d", building.workerCount, building.maxWorkers), x + 380, rowY + 10)
+
+            -- Stations
+            love.graphics.setColor(self.colors.text)
+            love.graphics.print(string.format("%d/%d active", building.producingStations, building.totalStations), x + 480, rowY + 10)
+
+            -- Status
+            local status, statusColor
+            if building.producingStations > 0 then
+                status = "Producing"
+                statusColor = self.colors.success
+            elseif building.activeStations > 0 and building.workerCount == 0 then
+                status = "No Workers"
+                statusColor = self.colors.danger
+            elseif building.activeStations > 0 then
+                status = "No Materials"
+                statusColor = self.colors.warning
+            elseif building.activeStations == 0 then
+                status = "No Recipe"
+                statusColor = self.colors.textDim
+            else
+                status = "Idle"
+                statusColor = self.colors.textDim
+            end
+
+            love.graphics.setColor(statusColor)
+            love.graphics.print(status, x + 590, rowY + 10)
+        end
+        rowY = rowY + rowH
+    end
+
+    love.graphics.setScissor()
+end
+
+function AlphaUI:HandleProductionAnalyticsPanelClick(x, y)
+    -- Close button
+    if self.productionAnalyticsCloseBtn then
+        local btn = self.productionAnalyticsCloseBtn
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            self.showProductionAnalyticsPanel = false
+            return true
+        end
+    end
+
+    -- Tab buttons
+    for _, btn in ipairs(self.productionAnalyticsTabBtns or {}) do
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            self.productionAnalyticsTab = btn.tabId
+            self.productionAnalyticsScrollOffset = 0
+            self.selectedAnalyticsCommodity = nil
+            return true
+        end
+    end
+
+    -- Commodity list clicks (only on commodities tab)
+    if self.productionAnalyticsTab == "commodities" then
+        for _, btn in ipairs(self.productionAnalyticsCommodityBtns or {}) do
+            if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+                self.selectedAnalyticsCommodity = btn.commodityId
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
 -- =============================================================================
@@ -3471,8 +4852,135 @@ function AlphaUI:RenderBuildingModal()
     love.graphics.setColor(0.8, 0.8, 0.8)
     love.graphics.print(outputUsed .. " / " .. outputCap .. " units", modalX + 160, storageY)
 
+    yOffset = yOffset + storageSectionHeight + 15
+
+    -- Section 4: Building Management (Upgrade, Priority, Pause, Demolish)
+    local managementSectionHeight = 200
+    love.graphics.setColor(0.35, 0.35, 0.38)
+    love.graphics.rectangle("fill", modalX + 20, yOffset, modalWidth - 40, managementSectionHeight, 8, 8)
+
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(self.fonts.header)
+    love.graphics.print("Building Management", modalX + 30, yOffset + 10)
+
+    local mgmtY = yOffset + 45
+    local btnWidth = 150
+    local btnHeight = 35
+    local btnSpacing = 15
+
+    -- Store management buttons for click handling
+    self.buildingMgmtButtons = {}
+
+    -- Row 1: Upgrade and Priority
+    -- Upgrade Button
+    local currentLevel = building.level or building.mCurrentLevel or 0
+    local maxLevel = 2  -- Max upgrade level
+    local canUpgrade = currentLevel < maxLevel
+    local upgradeCost = self:GetUpgradeCost(building, currentLevel + 1)
+
+    if canUpgrade then
+        love.graphics.setColor(0.3, 0.6, 0.4)
+    else
+        love.graphics.setColor(0.3, 0.3, 0.3)
+    end
+    love.graphics.rectangle("fill", modalX + 30, mgmtY, btnWidth, btnHeight, 6, 6)
+
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(canUpgrade and {1, 1, 1} or {0.5, 0.5, 0.5})
+    local upgradeText = canUpgrade and ("Upgrade (Lvl " .. (currentLevel + 2) .. ")") or "Max Level"
+    local upgradeTextW = self.fonts.small:getWidth(upgradeText)
+    love.graphics.print(upgradeText, modalX + 30 + (btnWidth - upgradeTextW) / 2, mgmtY + 5)
+
+    if canUpgrade then
+        love.graphics.setColor(0.9, 0.8, 0.4)
+        local costText = upgradeCost .. " gold"
+        local costTextW = self.fonts.small:getWidth(costText)
+        love.graphics.print(costText, modalX + 30 + (btnWidth - costTextW) / 2, mgmtY + 20)
+    end
+
+    table.insert(self.buildingMgmtButtons, {
+        x = modalX + 30, y = mgmtY, w = btnWidth, h = btnHeight,
+        action = "upgrade", enabled = canUpgrade
+    })
+
+    -- Current Level indicator
+    love.graphics.setFont(self.fonts.tiny)
+    love.graphics.setColor(0.7, 0.7, 0.7)
+    love.graphics.print("Current: Level " .. (currentLevel + 1), modalX + 30, mgmtY + btnHeight + 4)
+
+    -- Priority Button
+    local priorityX = modalX + 30 + btnWidth + btnSpacing
+    local priority = building.priority or "normal"
+    local priorityColors = {
+        high = {0.7, 0.5, 0.3},
+        normal = {0.4, 0.5, 0.6},
+        low = {0.4, 0.4, 0.4}
+    }
+    love.graphics.setColor(priorityColors[priority] or priorityColors.normal)
+    love.graphics.rectangle("fill", priorityX, mgmtY, btnWidth, btnHeight, 6, 6)
+
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(1, 1, 1)
+    local priorityText = "Priority: " .. (priority:sub(1,1):upper() .. priority:sub(2))
+    local priorityTextW = self.fonts.small:getWidth(priorityText)
+    love.graphics.print(priorityText, priorityX + (btnWidth - priorityTextW) / 2, mgmtY + 10)
+
+    table.insert(self.buildingMgmtButtons, {
+        x = priorityX, y = mgmtY, w = btnWidth, h = btnHeight,
+        action = "priority", enabled = true
+    })
+
+    love.graphics.setFont(self.fonts.tiny)
+    love.graphics.setColor(0.6, 0.6, 0.6)
+    love.graphics.print("Click to cycle", priorityX, mgmtY + btnHeight + 4)
+
+    mgmtY = mgmtY + btnHeight + 25
+
+    -- Row 2: Pause and Demolish
+    -- Pause Production Button
+    local isPaused = building.isPaused or building.mIsPaused or false
+
+    if isPaused then
+        love.graphics.setColor(0.6, 0.5, 0.3)
+    else
+        love.graphics.setColor(0.4, 0.5, 0.6)
+    end
+    love.graphics.rectangle("fill", modalX + 30, mgmtY, btnWidth, btnHeight, 6, 6)
+
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(1, 1, 1)
+    local pauseText = isPaused and "Resume Production" or "Pause Production"
+    local pauseTextW = self.fonts.small:getWidth(pauseText)
+    love.graphics.print(pauseText, modalX + 30 + (btnWidth - pauseTextW) / 2, mgmtY + 10)
+
+    table.insert(self.buildingMgmtButtons, {
+        x = modalX + 30, y = mgmtY, w = btnWidth, h = btnHeight,
+        action = "pause", enabled = true
+    })
+
+    -- Demolish Button
+    local demolishX = modalX + 30 + btnWidth + btnSpacing
+    local salvageValue = self:GetDemolishSalvage(building)
+
+    love.graphics.setColor(0.6, 0.3, 0.3)
+    love.graphics.rectangle("fill", demolishX, mgmtY, btnWidth, btnHeight, 6, 6)
+
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print("Demolish", demolishX + (btnWidth - self.fonts.small:getWidth("Demolish")) / 2, mgmtY + 5)
+
+    love.graphics.setColor(0.9, 0.8, 0.4)
+    local salvageText = "Salvage: " .. salvageValue .. "g"
+    local salvageTextW = self.fonts.small:getWidth(salvageText)
+    love.graphics.print(salvageText, demolishX + (btnWidth - salvageTextW) / 2, mgmtY + 20)
+
+    table.insert(self.buildingMgmtButtons, {
+        x = demolishX, y = mgmtY, w = btnWidth, h = btnHeight,
+        action = "demolish", enabled = true
+    })
+
     -- Calculate total content height for scrolling
-    local totalContentHeight = stationSectionHeight + 15 + workerSectionHeight + 15 + storageSectionHeight + 20
+    local totalContentHeight = stationSectionHeight + 15 + workerSectionHeight + 15 + storageSectionHeight + 15 + managementSectionHeight + 20
     self.buildingModalScrollMax = math.max(0, totalContentHeight - contentHeight)
 
     love.graphics.setScissor()
@@ -3668,6 +5176,38 @@ function AlphaUI:GetCommodityDisplayName(commodityId)
     return commodityId
 end
 
+-- Helper function to get upgrade cost for a building
+function AlphaUI:GetUpgradeCost(building, targetLevel)
+    -- Base cost increases with level
+    local baseCost = 100
+    local buildingType = building.mBuildingType or building.type
+
+    -- Get base cost from building type if available
+    if buildingType and buildingType.cost then
+        baseCost = buildingType.cost
+    end
+
+    -- Upgrade cost is roughly 50% of base cost per level
+    return math.floor(baseCost * 0.5 * targetLevel)
+end
+
+-- Helper function to get demolish salvage value
+function AlphaUI:GetDemolishSalvage(building)
+    local baseCost = 100
+    local buildingType = building.mBuildingType or building.type
+
+    -- Get base cost from building type if available
+    if buildingType and buildingType.cost then
+        baseCost = buildingType.cost
+    end
+
+    -- Salvage is 30% of original cost
+    local currentLevel = building.level or building.mCurrentLevel or 0
+    local totalInvested = baseCost + (baseCost * 0.5 * currentLevel)
+
+    return math.floor(totalInvested * 0.3)
+end
+
 -- Helper function to get filtered commodities based on current filter
 function AlphaUI:GetFilteredCommodities()
     local filtered = {}
@@ -3718,19 +5258,46 @@ end
 function AlphaUI:GetFilteredBuildingTypes()
     local result = {}
     local allTypes = self.world.buildingTypes or {}
+    local searchQuery = (self.buildMenuSearchQuery or ""):lower()
 
     for _, bType in ipairs(allTypes) do
         local category = bType.category or "other"
+        local name = (bType.name or bType.id or ""):lower()
+        local description = (bType.description or ""):lower()
 
+        -- Check search filter first
+        local matchesSearch = true
+        if searchQuery ~= "" then
+            matchesSearch = name:find(searchQuery, 1, true) or
+                           description:find(searchQuery, 1, true) or
+                           category:find(searchQuery, 1, true)
+        end
+
+        if not matchesSearch then
+            goto continue
+        end
+
+        -- Check category filter
+        local matchesCategory = false
         if self.buildMenuCategory == "all" then
-            table.insert(result, bType)
+            matchesCategory = true
         elseif self.buildMenuCategory == "housing" and category == "housing" then
-            table.insert(result, bType)
+            matchesCategory = true
         elseif self.buildMenuCategory == "production" and category == "production" then
-            table.insert(result, bType)
+            matchesCategory = true
+        elseif self.buildMenuCategory == "agriculture" and category == "agriculture" then
+            matchesCategory = true
+        elseif self.buildMenuCategory == "extraction" and category == "extraction" then
+            matchesCategory = true
         elseif self.buildMenuCategory == "services" and (category == "services" or category == "service") then
+            matchesCategory = true
+        end
+
+        if matchesCategory then
             table.insert(result, bType)
         end
+
+        ::continue::
     end
 
     return result
@@ -3824,6 +5391,21 @@ function AlphaUI:HandleClick(x, y, button)
         return self:HandleCitizensPanelClick(x, y)
     end
 
+    -- Handle production analytics panel clicks
+    if self.showProductionAnalyticsPanel then
+        return self:HandleProductionAnalyticsPanelClick(x, y)
+    end
+
+    -- Handle settings panel clicks
+    if self.showSettingsPanel then
+        return self:HandleSettingsPanelClick(x, y)
+    end
+
+    -- Handle emigration panel clicks
+    if self.showEmigrationPanel then
+        return self:HandleEmigrationPanelClick(x, y)
+    end
+
     -- Handle right-click to cancel placement
     if button == 2 then
         if self.placementMode then
@@ -3840,6 +5422,44 @@ function AlphaUI:HandleClick(x, y, button)
         if self.resourceOverlay:handlePanelClick(x, y) then
             return true
         end
+    end
+
+    -- Handle character detail panel clicks (highest priority modal)
+    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
+        if self.characterDetailPanel:HandleClick(x, y) then
+            return true
+        end
+    end
+
+    -- Handle housing assignment modal clicks
+    if self.showHousingAssignmentModal and self.housingAssignmentModal then
+        if self.housingAssignmentModal:HandleClick(x, y) then
+            return true
+        end
+    end
+
+    -- Handle housing overview panel clicks
+    if self.showHousingOverviewPanel and self.housingOverviewPanel then
+        if self.housingOverviewPanel:HandleClick(x, y) then
+            return true
+        end
+    end
+
+    -- Handle land registry panel clicks
+    if self.showLandRegistryPanel and self.landRegistryPanel then
+        if self.landRegistryPanel:HandleClick(x, y) then
+            return true
+        end
+    end
+
+    -- Handle plot selection modal clicks (highest priority - on top of immigration)
+    if self.showPlotSelectionModal and self.plotSelectionModal then
+        return self.plotSelectionModal:HandleClick(x, y, button)
+    end
+
+    -- Handle suggested buildings modal clicks
+    if self.showSuggestedBuildingsModal and self.suggestedBuildingsModal then
+        return self.suggestedBuildingsModal:HandleClick(x, y, button)
     end
 
     -- Handle build menu modal clicks
@@ -3868,14 +5488,20 @@ function AlphaUI:HandleClick(x, y, button)
                 self.showAnalyticsPanel = false
                 self.showInventoryPanel = false
                 self.showHelpOverlay = false
+                self.showProductionAnalyticsPanel = false
+                self.showSettingsPanel = false
+                self.showEmigrationPanel = false
             end
 
-            if btnId == "analytics" then
+            if btnId == "production" then
                 closeOthers()
-                self.showAnalyticsPanel = true
+                self.showProductionAnalyticsPanel = true
             elseif btnId == "build" then
                 closeOthers()
                 self.showBuildMenuModal = true
+                self.buildMenuScrollOffset = 0
+                self.buildMenuSearchQuery = ""
+                self.buildMenuSearchActive = false
             elseif btnId == "citizens" then
                 closeOthers()
                 self.showCitizensPanel = true
@@ -3884,8 +5510,9 @@ function AlphaUI:HandleClick(x, y, button)
                 self.showInventoryPanel = true
                 self.inventoryScrollOffset = 0
             elseif btnId == "settings" then
-                -- Settings not yet implemented
-                print("Settings panel not yet implemented")
+                closeOthers()
+                self.showSettingsPanel = true
+                self.settingsScrollOffset = 0
             elseif btnId == "help" then
                 closeOthers()
                 self.showHelpOverlay = true
@@ -3907,6 +5534,23 @@ function AlphaUI:HandleClick(x, y, button)
         end
     end
 
+    -- Handle minimap click (navigation)
+    if self:HandleMinimapClick(x, y) then
+        return true
+    end
+
+    -- Handle notification system clicks
+    if self.notificationSystem and self.notificationSystem:HandleClick(x, y) then
+        return true
+    end
+
+    -- Handle tutorial system clicks
+    if self.tutorialSystem and self.tutorialSystem:IsActive() then
+        if self.tutorialSystem:HandleClick(x, y) then
+            return true
+        end
+    end
+
     -- Check quick build buttons (left panel)
     for btnId, btn in pairs(self.quickBuildButtons) do
         if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
@@ -3925,6 +5569,9 @@ function AlphaUI:HandleClick(x, y, button)
         local btn = self.moreBuildingsBtn
         if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
             self.showBuildMenuModal = true
+            self.buildMenuScrollOffset = 0
+            self.buildMenuSearchQuery = ""
+            self.buildMenuSearchActive = false
             return true
         end
     end
@@ -4148,7 +5795,17 @@ function AlphaUI:HandleCitizensPanelClick(x, y)
             -- Select this citizen and show details in right panel
             self.world.selectedEntity = btn.citizen
             self.selectedCitizenForModal = btn.citizen
-            -- Could open a citizen detail modal here in future
+            -- Double-click opens detail panel
+            local currentTime = love.timer.getTime()
+            if self.lastCitizenClickTime and self.lastCitizenClicked == btn.citizen and
+               (currentTime - self.lastCitizenClickTime) < 0.4 then
+                -- Double-click: Open CharacterDetailPanel
+                self:OpenCharacterDetailPanel(btn.citizen)
+                self.lastCitizenClickTime = nil
+            else
+                self.lastCitizenClickTime = currentTime
+                self.lastCitizenClicked = btn.citizen
+            end
             return true
         end
     end
@@ -4201,7 +5858,120 @@ function AlphaUI:HandleBuildingModalClick(x, y)
         end
     end
 
+    -- Check building management button clicks
+    for _, btn in ipairs(self.buildingMgmtButtons or {}) do
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            self:HandleBuildingManagementAction(btn.action, btn.enabled)
+            return true
+        end
+    end
+
     return true  -- Consume click inside modal
+end
+
+-- Handle building management actions (upgrade, priority, pause, demolish)
+function AlphaUI:HandleBuildingManagementAction(action, enabled)
+    local building = self.selectedBuildingForModal
+    if not building then return end
+
+    if action == "upgrade" and enabled then
+        local currentLevel = building.level or building.mCurrentLevel or 0
+        local cost = self:GetUpgradeCost(building, currentLevel + 1)
+
+        if self.world.gold >= cost then
+            self.world.gold = self.world.gold - cost
+
+            -- Apply upgrade
+            if building.mCurrentLevel ~= nil then
+                building.mCurrentLevel = building.mCurrentLevel + 1
+            else
+                building.level = (building.level or 0) + 1
+            end
+
+            -- Increase building stats with upgrade
+            if building.maxWorkers then
+                building.maxWorkers = building.maxWorkers + 1
+            end
+
+            -- Notification
+            if self.notificationSystem then
+                self.notificationSystem:Success(
+                    "Building Upgraded!",
+                    (building.name or "Building") .. " is now Level " .. ((building.level or building.mCurrentLevel or 0) + 1)
+                )
+            end
+        else
+            if self.notificationSystem then
+                self.notificationSystem:Warning(
+                    "Insufficient Gold",
+                    "Need " .. cost .. " gold to upgrade"
+                )
+            end
+        end
+
+    elseif action == "priority" then
+        -- Cycle through priorities: normal -> high -> low -> normal
+        local currentPriority = building.priority or "normal"
+        local nextPriority = {
+            normal = "high",
+            high = "low",
+            low = "normal"
+        }
+        building.priority = nextPriority[currentPriority] or "normal"
+
+    elseif action == "pause" then
+        -- Toggle pause state
+        if building.mIsPaused ~= nil then
+            building.mIsPaused = not building.mIsPaused
+        else
+            building.isPaused = not (building.isPaused or false)
+        end
+
+        local isPaused = building.isPaused or building.mIsPaused or false
+        if self.notificationSystem then
+            self.notificationSystem:Info(
+                isPaused and "Production Paused" or "Production Resumed",
+                (building.name or "Building") .. " production " .. (isPaused and "paused" or "resumed")
+            )
+        end
+
+    elseif action == "demolish" then
+        -- Confirm demolish with notification first
+        local salvage = self:GetDemolishSalvage(building)
+
+        -- Remove building from world
+        for i, b in ipairs(self.world.buildings) do
+            if b == building or b.id == building.id then
+                table.remove(self.world.buildings, i)
+                break
+            end
+        end
+
+        -- Release workers
+        for _, worker in ipairs(building.workers or {}) do
+            if worker then
+                worker.workplace = nil
+                worker.workplaceId = nil
+            end
+        end
+
+        -- Add salvage to treasury
+        self.world.gold = self.world.gold + salvage
+
+        -- Notification
+        if self.notificationSystem then
+            self.notificationSystem:Info(
+                "Building Demolished",
+                (building.name or "Building") .. " demolished. Salvaged " .. salvage .. " gold."
+            )
+        end
+
+        -- Close modal
+        self.showBuildingModal = false
+        self.selectedBuildingForModal = nil
+        self.world.selectedEntity = nil
+        self.world.selectedEntityType = nil
+    end
 end
 
 function AlphaUI:HandleRecipeModalClick(x, y)
@@ -4254,8 +6024,8 @@ end
 
 function AlphaUI:HandleBuildMenuClick(x, y)
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
-    local modalW = 700
-    local modalH = 500
+    local modalW = 850
+    local modalH = 600
     local modalX = (screenW - modalW) / 2
     local modalY = (screenH - modalH) / 2
 
@@ -4264,27 +6034,41 @@ function AlphaUI:HandleBuildMenuClick(x, y)
         local btn = self.buildMenuCloseBtn
         if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
             self.showBuildMenuModal = false
+            self.buildMenuSearchActive = false
             return true
         end
     end
 
-    -- Check category tabs
-    local categories = {"all", "housing", "production", "services"}
-    for _, cat in ipairs(categories) do
-        local tab = self["buildMenuTab_" .. cat]
-        if tab and x >= tab.x and x < tab.x + tab.w and y >= tab.y and y < tab.y + tab.h then
-            self.buildMenuCategory = cat
-            self.buildMenuScrollOffset = 0
+    -- Check search box click
+    if self.buildMenuSearchBox then
+        local box = self.buildMenuSearchBox
+        if x >= box.x and x < box.x + box.w and y >= box.y and y < box.y + box.h then
+            self.buildMenuSearchActive = true
             return true
+        else
+            -- Click outside search box deactivates it
+            self.buildMenuSearchActive = false
+        end
+    end
+
+    -- Check category tabs (new style with buildMenuTabs table)
+    if self.buildMenuTabs then
+        for catId, tab in pairs(self.buildMenuTabs) do
+            if x >= tab.x and x < tab.x + tab.w and y >= tab.y and y < tab.y + tab.h then
+                self.buildMenuCategory = catId
+                self.buildMenuScrollOffset = 0
+                return true
+            end
         end
     end
 
     -- Check building cards
-    for i = 1, 50 do  -- Check up to 50 cards
+    for i = 1, 100 do  -- Check up to 100 cards (more buildings now)
         local card = self["buildCard_" .. i]
         if card and x >= card.x and x < card.x + card.w and y >= card.y and y < card.y + card.h then
             if card.canAfford and card.buildingType then
                 self.showBuildMenuModal = false
+                self.buildMenuSearchActive = false
                 self:EnterPlacementMode(card.buildingType)
             end
             return true
@@ -4294,6 +6078,7 @@ function AlphaUI:HandleBuildMenuClick(x, y)
     -- Click outside modal = close
     if x < modalX or x > modalX + modalW or y < modalY or y > modalY + modalH then
         self.showBuildMenuModal = false
+        self.buildMenuSearchActive = false
         return true
     end
 
@@ -4302,10 +6087,12 @@ end
 
 function AlphaUI:HandleImmigrationClick(x, y)
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
-    local modalW = 800
-    local modalH = 550
+    local modalW = 900
+    local modalH = 620
     local modalX = (screenW - modalW) / 2
     local modalY = (screenH - modalH) / 2
+
+    local immigrationSystem = self.world.immigrationSystem
 
     -- Check close button
     if self.immigrationCloseBtn then
@@ -4317,28 +6104,100 @@ function AlphaUI:HandleImmigrationClick(x, y)
         end
     end
 
+    -- Check bulk action buttons
+    -- Accept 70%+ button
+    if self.immigrationAcceptHighBtn and self.immigrationAcceptHighBtn.enabled then
+        local btn = self.immigrationAcceptHighBtn
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            local applicants = immigrationSystem:GetApplicants()
+            local toAccept = {}
+            for _, app in ipairs(applicants) do
+                if (app.compatibility or 0) >= 70 then
+                    table.insert(toAccept, app)
+                end
+            end
+            local accepted = 0
+            for _, app in ipairs(toAccept) do
+                if immigrationSystem:GetTotalVacantHousing() > 0 then
+                    local success = immigrationSystem:AcceptApplicant(app)
+                    if success then accepted = accepted + 1 end
+                end
+            end
+            self.selectedApplicant = nil
+            self.world:LogEvent("immigration", "Bulk accepted " .. accepted .. " high-compatibility immigrants", {})
+            return true
+        end
+    end
+
+    -- Accept All button
+    if self.immigrationAcceptAllBtn and self.immigrationAcceptAllBtn.enabled then
+        local btn = self.immigrationAcceptAllBtn
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            local applicants = immigrationSystem:GetApplicants()
+            local toAccept = {}
+            for _, app in ipairs(applicants) do
+                table.insert(toAccept, app)
+            end
+            local accepted = 0
+            for _, app in ipairs(toAccept) do
+                if immigrationSystem:GetTotalVacantHousing() > 0 then
+                    local success = immigrationSystem:AcceptApplicant(app)
+                    if success then accepted = accepted + 1 end
+                end
+            end
+            self.selectedApplicant = nil
+            self.world:LogEvent("immigration", "Bulk accepted " .. accepted .. " immigrants", {})
+            return true
+        end
+    end
+
+    -- Reject All button
+    if self.immigrationRejectAllBtn and self.immigrationRejectAllBtn.enabled then
+        local btn = self.immigrationRejectAllBtn
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            local applicants = immigrationSystem:GetApplicants()
+            local toReject = {}
+            for _, app in ipairs(applicants) do
+                table.insert(toReject, app)
+            end
+            for _, app in ipairs(toReject) do
+                immigrationSystem:RejectApplicant(app)
+            end
+            self.selectedApplicant = nil
+            self.world:LogEvent("immigration", "Rejected all " .. #toReject .. " applicants", {})
+            return true
+        end
+    end
+
     -- Check applicant cards
     for i = 1, 20 do  -- Check up to 20 applicant cards
         local card = self["applicantCard_" .. i]
         if card and x >= card.x and x < card.x + card.w and y >= card.y and y < card.y + card.h then
             self.selectedApplicant = card.applicant
+            self.applicantDetailScrollOffset = 0  -- Reset scroll when selecting new applicant
             return true
         end
     end
 
     -- Check action buttons (only if applicant selected)
     if self.selectedApplicant then
-        local immigrationSystem = self.world.immigrationSystem
-
         -- Accept button
         if self.acceptApplicantBtn and self.acceptApplicantBtn.enabled then
             local btn = self.acceptApplicantBtn
             if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
-                local success, err = immigrationSystem:AcceptApplicant(self.selectedApplicant)
-                if success then
-                    self.selectedApplicant = nil
+                -- Check if applicant needs land (wealthy/merchant roles)
+                local landReqs = self.selectedApplicant.landRequirements
+                if landReqs and landReqs.minPlots and landReqs.minPlots > 0 then
+                    -- Open plot selection modal
+                    self:OpenPlotSelectionModal(self.selectedApplicant)
                 else
-                    print("Could not accept: " .. (err or "unknown error"))
+                    -- No land required, accept directly
+                    local success, _, err = immigrationSystem:AcceptApplicant(self.selectedApplicant, {})
+                    if success then
+                        self.selectedApplicant = nil
+                    else
+                        print("Could not accept: " .. (err or "unknown error"))
+                    end
                 end
                 return true
             end
@@ -4398,6 +6257,46 @@ function AlphaUI:GetBuildingTypeForQuickBuild(btnId)
 end
 
 function AlphaUI:HandleKeyPress(key)
+    -- Handle plot selection modal keys (highest priority)
+    if self.showPlotSelectionModal and self.plotSelectionModal then
+        if self.plotSelectionModal:HandleKeyPress(key) then
+            return true
+        end
+    end
+
+    -- Handle suggested buildings modal keys
+    if self.showSuggestedBuildingsModal and self.suggestedBuildingsModal then
+        if self.suggestedBuildingsModal:HandleKeyPress(key) then
+            return true
+        end
+    end
+
+    -- Handle build menu search input first (highest priority when search is active)
+    if self.showBuildMenuModal and self.buildMenuSearchActive then
+        if key == "backspace" then
+            if #self.buildMenuSearchQuery > 0 then
+                self.buildMenuSearchQuery = self.buildMenuSearchQuery:sub(1, -2)
+                self.buildMenuScrollOffset = 0
+            end
+            return true
+        elseif key == "escape" then
+            if self.buildMenuSearchQuery ~= "" then
+                -- First escape clears search
+                self.buildMenuSearchQuery = ""
+                self.buildMenuScrollOffset = 0
+            else
+                -- Second escape deactivates search
+                self.buildMenuSearchActive = false
+            end
+            return true
+        elseif key == "return" then
+            self.buildMenuSearchActive = false
+            return true
+        end
+        -- Other keys are handled by textinput
+        return false
+    end
+
     -- Handle save/load modal first (has priority)
     if self.showSaveLoadModal and self.saveLoadModal then
         return self.saveLoadModal:HandleKeyPress(key)
@@ -4412,8 +6311,8 @@ function AlphaUI:HandleKeyPress(key)
         return true
     end
 
-    -- Handle 'H' to toggle help overlay (works anywhere)
-    if key == "h" then
+    -- Handle 'H' to toggle help overlay (works anywhere except when search is active)
+    if key == "h" and not self.buildMenuSearchActive then
         self.showHelpOverlay = not self.showHelpOverlay
         return true
     end
@@ -4426,7 +6325,20 @@ function AlphaUI:HandleKeyPress(key)
 
     -- Handle escape during modals or placement
     if key == "escape" then
-        if self.showSaveLoadModal then
+        -- New Phase 8 panels first (highest priority)
+        if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
+            self:CloseCharacterDetailPanel()
+            return true
+        elseif self.showHousingAssignmentModal then
+            self:CloseHousingAssignmentModal()
+            return true
+        elseif self.showHousingOverviewPanel then
+            self:CloseHousingOverviewPanel()
+            return true
+        elseif self.showLandRegistryPanel then
+            self:CloseLandRegistryPanel()
+            return true
+        elseif self.showSaveLoadModal then
             self:CloseSaveLoadModal()
             return true
         elseif self.showRecipeModal then
@@ -4443,6 +6355,7 @@ function AlphaUI:HandleKeyPress(key)
             return true
         elseif self.showBuildMenuModal then
             self.showBuildMenuModal = false
+            self.buildMenuSearchActive = false
             return true
         elseif self.showCitizensPanel then
             self.showCitizensPanel = false
@@ -4452,6 +6365,16 @@ function AlphaUI:HandleKeyPress(key)
             return true
         elseif self.showInventoryPanel then
             self.showInventoryPanel = false
+            return true
+        elseif self.showProductionAnalyticsPanel then
+            self.showProductionAnalyticsPanel = false
+            self.selectedAnalyticsCommodity = nil
+            return true
+        elseif self.showSettingsPanel then
+            self.showSettingsPanel = false
+            return true
+        elseif self.showEmigrationPanel then
+            self.showEmigrationPanel = false
             return true
         elseif self.placementMode then
             self:ExitPlacementMode()
@@ -4473,6 +6396,40 @@ function AlphaUI:HandleKeyPress(key)
                 self.resourceOverlay.mPanelVisible = false
                 self.resourceOverlay:hideAll()
             end
+        end
+        return true
+    end
+
+    -- Handle 'L' for land overlays
+    if key == "l" then
+        local isShiftHeld = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+        if isShiftHeld then
+            -- SHIFT+L: Toggle Land Registry Panel
+            self.showLandRegistryPanel = not self.showLandRegistryPanel
+            if self.showLandRegistryPanel and self.landRegistryPanel then
+                self.landRegistryPanel:Show()
+            elseif self.landRegistryPanel then
+                self.landRegistryPanel:Hide()
+            end
+        else
+            -- L: Toggle Land Overlay
+            self.showLandOverlay = not self.showLandOverlay
+            if self.showLandOverlay and self.landOverlay then
+                self.landOverlay.enabled = true
+            elseif self.landOverlay then
+                self.landOverlay.enabled = false
+            end
+        end
+        return true
+    end
+
+    -- Handle 'G' for Housing Overview Panel
+    if key == "g" then
+        self.showHousingOverviewPanel = not self.showHousingOverviewPanel
+        if self.showHousingOverviewPanel and self.housingOverviewPanel then
+            self.housingOverviewPanel:Show()
+        elseif self.housingOverviewPanel then
+            self.housingOverviewPanel:Hide()
         end
         return true
     end
@@ -4502,6 +6459,10 @@ function AlphaUI:HandleKeyPress(key)
             self.showImmigrationModal = false
             self.showCitizensPanel = false
             self.showAnalyticsPanel = false
+            self.showProductionAnalyticsPanel = false
+            self.buildMenuScrollOffset = 0
+            self.buildMenuSearchQuery = ""
+            self.buildMenuSearchActive = false
         end
         return true
     end
@@ -4515,6 +6476,7 @@ function AlphaUI:HandleKeyPress(key)
                 self.showBuildMenuModal = false
                 self.showCitizensPanel = false
                 self.showAnalyticsPanel = false
+                self.showProductionAnalyticsPanel = false
                 self.selectedApplicant = nil
                 self.immigrationScrollOffset = 0
             end
@@ -4529,6 +6491,7 @@ function AlphaUI:HandleKeyPress(key)
             self.showBuildMenuModal = false
             self.showImmigrationModal = false
             self.showAnalyticsPanel = false
+            self.showProductionAnalyticsPanel = false
         end
         return true
     end
@@ -4541,6 +6504,7 @@ function AlphaUI:HandleKeyPress(key)
             self.showImmigrationModal = false
             self.showCitizensPanel = false
             self.showInventoryPanel = false
+            self.showProductionAnalyticsPanel = false
         end
         return true
     end
@@ -4553,19 +6517,75 @@ function AlphaUI:HandleKeyPress(key)
             self.showImmigrationModal = false
             self.showCitizensPanel = false
             self.showAnalyticsPanel = false
+            self.showProductionAnalyticsPanel = false
             self.inventoryScrollOffset = 0
         end
         return true
     end
 
-    if key == "l" then
-        -- Save/Load modal
+    if key == "p" then
+        -- Production Analytics panel
+        self.showProductionAnalyticsPanel = not self.showProductionAnalyticsPanel
+        if self.showProductionAnalyticsPanel then
+            self.showBuildMenuModal = false
+            self.showImmigrationModal = false
+            self.showCitizensPanel = false
+            self.showAnalyticsPanel = false
+            self.showInventoryPanel = false
+            self.productionAnalyticsScrollOffset = 0
+            self.selectedAnalyticsCommodity = nil
+        end
+        return true
+    end
+
+    if key == "f6" then
+        -- Save/Load modal (F6 for save menu)
         self:OpenSaveLoadModal("save")
         return true
     end
 
+    if key == "o" then
+        -- Settings/Options panel
+        self.showSettingsPanel = not self.showSettingsPanel
+        if self.showSettingsPanel then
+            self.showBuildMenuModal = false
+            self.showImmigrationModal = false
+            self.showCitizensPanel = false
+            self.showAnalyticsPanel = false
+            self.showInventoryPanel = false
+            self.showProductionAnalyticsPanel = false
+            self.showEmigrationPanel = false
+            self.settingsScrollOffset = 0
+        end
+        return true
+    end
+
+    if key == "e" then
+        -- Emigration warning panel
+        self.showEmigrationPanel = not self.showEmigrationPanel
+        if self.showEmigrationPanel then
+            self.showBuildMenuModal = false
+            self.showImmigrationModal = false
+            self.showCitizensPanel = false
+            self.showAnalyticsPanel = false
+            self.showInventoryPanel = false
+            self.showProductionAnalyticsPanel = false
+            self.showSettingsPanel = false
+            self.emigrationScrollOffset = 0
+        end
+        return true
+    end
+
+    if key == "d" then
+        -- Open character detail panel for selected citizen
+        if self.world.selectedEntity and self.world.selectedEntityType == "citizen" then
+            self:OpenCharacterDetailPanel(self.world.selectedEntity)
+            return true
+        end
+    end
+
     -- Don't handle game controls during modals
-    if self.showBuildMenuModal or self.showImmigrationModal or self.showCitizensPanel or self.showAnalyticsPanel then
+    if self.showBuildMenuModal or self.showImmigrationModal or self.showCitizensPanel or self.showAnalyticsPanel or self.showProductionAnalyticsPanel or self.showInventoryPanel or self.showSettingsPanel or self.showEmigrationPanel then
         return false
     end
 
@@ -4596,11 +6616,24 @@ function AlphaUI:Update(dt)
         self.saveLoadModal:Update(dt)
     end
 
+    -- Update notification system
+    if self.notificationSystem then
+        self.notificationSystem:Update(dt)
+    end
+
+    -- Update tutorial system
+    if self.tutorialSystem then
+        self.tutorialSystem:Update(dt)
+    end
+
     -- Update placement mode (track mouse position)
     if self.placementMode then
         local mx, my = love.mouse.getPosition()
         self:UpdatePlacement(mx, my)
     end
+
+    -- Track camera movement for tutorial
+    local oldCamX, oldCamY = self.cameraX, self.cameraY
 
     -- Handle continuous camera movement with WASD/arrow keys
     local camSpeed = 200 * dt
@@ -4626,9 +6659,56 @@ function AlphaUI:Update(dt)
     if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
         self.cameraX = math.min(maxCameraX, self.cameraX + camSpeed)
     end
+
+    -- Notify tutorial of camera movement
+    if self.tutorialSystem and (self.cameraX ~= oldCamX or self.cameraY ~= oldCamY) then
+        self.tutorialSystem:OnCameraMoved()
+    end
 end
 
 function AlphaUI:HandleMouseWheel(x, y)
+    -- Handle character detail panel scroll (highest priority)
+    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
+        if self.characterDetailPanel:HandleMouseWheel(y) then
+            return
+        end
+    end
+
+    -- Handle housing assignment modal scroll
+    if self.showHousingAssignmentModal and self.housingAssignmentModal then
+        if self.housingAssignmentModal:HandleMouseWheel(y) then
+            return
+        end
+    end
+
+    -- Handle housing overview panel scroll
+    if self.showHousingOverviewPanel and self.housingOverviewPanel then
+        if self.housingOverviewPanel:HandleMouseWheel(y) then
+            return
+        end
+    end
+
+    -- Handle land registry panel scroll
+    if self.showLandRegistryPanel and self.landRegistryPanel then
+        if self.landRegistryPanel:HandleMouseWheel(y) then
+            return
+        end
+    end
+
+    -- Handle plot selection modal scroll (highest priority)
+    if self.showPlotSelectionModal and self.plotSelectionModal then
+        if self.plotSelectionModal:HandleMouseWheel(x, y, 0, y) then
+            return
+        end
+    end
+
+    -- Handle suggested buildings modal scroll
+    if self.showSuggestedBuildingsModal and self.suggestedBuildingsModal then
+        if self.suggestedBuildingsModal:HandleMouseWheel(x, y, 0, y) then
+            return
+        end
+    end
+
     -- Scroll recipe modal (has priority over building modal)
     if self.showRecipeModal then
         local newOffset = self.recipeModalScrollOffset - y * 30
@@ -4651,7 +6731,28 @@ function AlphaUI:HandleMouseWheel(x, y)
 
     -- Scroll immigration modal
     if self.showImmigrationModal then
-        self.immigrationScrollOffset = math.max(0, self.immigrationScrollOffset - y * 30)
+        local mx, my = love.mouse.getPosition()
+        local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+        local modalW, modalH = 900, 620
+        local modalX = (screenW - modalW) / 2
+        local modalY = (screenH - modalH) / 2
+
+        -- Check if mouse is over detail panel (right side)
+        local detailX = modalX + 340 + 30
+        local detailY = modalY + 82
+        local detailW = modalW - 340 - 45
+        local detailH = modalH - 162
+
+        if mx >= detailX and mx < detailX + detailW and
+           my >= detailY and my < detailY + detailH then
+            -- Scroll detail panel
+            self.applicantDetailScrollOffset = self.applicantDetailScrollOffset or 0
+            local newOffset = self.applicantDetailScrollOffset - y * 30
+            self.applicantDetailScrollOffset = math.max(0, math.min(newOffset, self.applicantDetailScrollMax or 0))
+        else
+            -- Scroll applicant list
+            self.immigrationScrollOffset = math.max(0, self.immigrationScrollOffset - y * 30)
+        end
         return
     end
 
@@ -4694,6 +6795,20 @@ function AlphaUI:HandleMouseWheel(x, y)
         return  -- Don't zoom when citizens panel is open
     end
 
+    -- Scroll production analytics panel
+    if self.showProductionAnalyticsPanel then
+        local newOffset = self.productionAnalyticsScrollOffset - y * 30
+        self.productionAnalyticsScrollOffset = math.max(0, math.min(newOffset, self.productionAnalyticsMaxScroll or 0))
+        return
+    end
+
+    -- Scroll emigration panel
+    if self.showEmigrationPanel then
+        local newOffset = self.emigrationScrollOffset - y * 30
+        self.emigrationScrollOffset = math.max(0, math.min(newOffset, self.emigrationMaxScroll or 0))
+        return
+    end
+
     -- Zoom in/out with mouse wheel
     local zoomSpeed = 0.1
     if y > 0 then
@@ -4704,6 +6819,33 @@ function AlphaUI:HandleMouseWheel(x, y)
 end
 
 function AlphaUI:HandleMouseMove(x, y)
+    -- Handle plot selection modal mouse move (highest priority)
+    if self.showPlotSelectionModal and self.plotSelectionModal then
+        -- Calculate dx, dy for drag handling
+        local dx, dy = 0, 0
+        if love.mouse.isDown(1) then
+            -- Get delta from previous position (stored in modal or calculated)
+            dx = x - (self.lastMouseX or x)
+            dy = y - (self.lastMouseY or y)
+            self.plotSelectionModal:HandleDrag(dx, dy)
+        end
+        self.plotSelectionModal:HandleMouseMove(x, y, dx, dy)
+        self.lastMouseX = x
+        self.lastMouseY = y
+        return
+    end
+
+    -- Handle suggested buildings modal mouse move
+    if self.showSuggestedBuildingsModal and self.suggestedBuildingsModal then
+        self.suggestedBuildingsModal:HandleMouseMove(x, y)
+        self.lastMouseX = x
+        self.lastMouseY = y
+        return
+    end
+
+    self.lastMouseX = x
+    self.lastMouseY = y
+
     -- Handle save/load modal mouse move first (has priority)
     if self.showSaveLoadModal and self.saveLoadModal then
         self.saveLoadModal:HandleMouseMove(x, y)
@@ -4738,9 +6880,9 @@ function AlphaUI:RenderHelpOverlay()
     love.graphics.setColor(0, 0, 0, 0.85)
     love.graphics.rectangle("fill", 0, 0, screenW, screenH)
 
-    -- Panel dimensions
-    local panelW = math.min(650, screenW - 100)
-    local panelH = math.min(500, screenH - 100)
+    -- Panel dimensions (increased height for more shortcuts)
+    local panelW = math.min(700, screenW - 100)
+    local panelH = math.min(580, screenH - 100)
     local panelX = (screenW - panelW) / 2
     local panelY = (screenH - panelH) / 2
 
@@ -4798,11 +6940,19 @@ function AlphaUI:RenderHelpOverlay()
     local shortcuts2 = {
         {"B", "Build menu"},
         {"C", "Citizens panel"},
+        {"I", "Inventory"},
+        {"P", "Production Analytics"},
         {"M", "Immigration"},
+        {"E", "Emigration warnings"},
         {"A", "Analytics"},
-        {"L", "Save/Load menu"},
+        {"O", "Settings/Options"},
+        {"G", "Housing overview"},
+        {"L", "Land overlay"},
+        {"SHIFT+L", "Land registry panel"},
+        {"D", "Citizen details (if selected)"},
+        {"F6", "Save/Load menu"},
         {"H", "This help overlay"},
-        {"ESC", "Close panel / Clear selection"}
+        {"ESC", "Close panel"}
     }
 
     for _, shortcut in ipairs(shortcuts2) do
@@ -4952,6 +7102,1310 @@ function AlphaUI:DoQuickload()
         self.onLoadGame(data)
     else
         self.world:LogEvent("warning", "Quickload failed", {})
+    end
+end
+
+-- =============================================================================
+-- SETTINGS PANEL
+-- =============================================================================
+
+function AlphaUI:RenderSettingsPanel()
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+
+    -- Initialize state if needed
+    self.settingsTab = self.settingsTab or "gameplay"
+    self.settingsScrollOffset = self.settingsScrollOffset or 0
+
+    -- Dim background
+    love.graphics.setColor(0, 0, 0, 0.7)
+    love.graphics.rectangle("fill", 0, 0, screenW, screenH)
+
+    -- Panel dimensions
+    local panelW = math.min(700, screenW - 100)
+    local panelH = math.min(550, screenH - 100)
+    local panelX = (screenW - panelW) / 2
+    local panelY = (screenH - panelH) / 2
+
+    -- Panel background
+    love.graphics.setColor(0.12, 0.12, 0.16)
+    love.graphics.rectangle("fill", panelX, panelY, panelW, panelH, 8, 8)
+
+    -- Panel border
+    love.graphics.setColor(0.3, 0.3, 0.35)
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", panelX, panelY, panelW, panelH, 8, 8)
+
+    -- Header
+    love.graphics.setFont(self.fonts.header)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.print("Settings", panelX + 20, panelY + 15)
+
+    -- Close button
+    local closeBtnX = panelX + panelW - 40
+    local closeBtnY = panelY + 15
+    local closeBtnSize = 25
+    local mx, my = love.mouse.getPosition()
+    local closeHover = mx >= closeBtnX and mx < closeBtnX + closeBtnSize and
+                       my >= closeBtnY and my < closeBtnY + closeBtnSize
+
+    love.graphics.setColor(closeHover and {0.8, 0.3, 0.3} or {0.5, 0.5, 0.5})
+    love.graphics.rectangle("fill", closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, 4, 4)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.print("X", closeBtnX + 7, closeBtnY + 3)
+
+    self.settingsCloseBtn = {x = closeBtnX, y = closeBtnY, w = closeBtnSize, h = closeBtnSize}
+
+    -- Tab buttons
+    local tabY = panelY + 55
+    local tabX = panelX + 20
+    local tabs = {
+        {id = "gameplay", label = "Gameplay"},
+        {id = "display", label = "Display"},
+        {id = "audio", label = "Audio"},
+        {id = "accessibility", label = "Accessibility"}
+    }
+
+    self.settingsTabBtns = {}
+    love.graphics.setFont(self.fonts.small)
+
+    for _, tab in ipairs(tabs) do
+        local tabW = self.fonts.small:getWidth(tab.label) + 24
+        local tabH = 28
+        local isActive = self.settingsTab == tab.id
+        local isHover = mx >= tabX and mx < tabX + tabW and my >= tabY and my < tabY + tabH
+
+        if isActive then
+            love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], 0.7)
+        elseif isHover then
+            love.graphics.setColor(0.3, 0.3, 0.35)
+        else
+            love.graphics.setColor(0.2, 0.2, 0.25)
+        end
+        love.graphics.rectangle("fill", tabX, tabY, tabW, tabH, 4, 4)
+
+        love.graphics.setColor(isActive and {1, 1, 1} or self.colors.textDim)
+        love.graphics.print(tab.label, tabX + 12, tabY + 6)
+
+        table.insert(self.settingsTabBtns, {x = tabX, y = tabY, w = tabW, h = tabH, tabId = tab.id})
+        tabX = tabX + tabW + 8
+    end
+
+    -- Content area
+    local contentX = panelX + 20
+    local contentY = tabY + 45
+    local contentW = panelW - 40
+    local contentH = panelH - (contentY - panelY) - 60
+
+    -- Content background
+    love.graphics.setColor(0.15, 0.15, 0.18)
+    love.graphics.rectangle("fill", contentX, contentY, contentW, contentH, 4, 4)
+
+    -- Render tab content
+    love.graphics.setScissor(contentX, contentY, contentW, contentH)
+
+    if self.settingsTab == "gameplay" then
+        self:RenderSettingsGameplayTab(contentX + 15, contentY + 10, contentW - 30, contentH - 20)
+    elseif self.settingsTab == "display" then
+        self:RenderSettingsDisplayTab(contentX + 15, contentY + 10, contentW - 30, contentH - 20)
+    elseif self.settingsTab == "audio" then
+        self:RenderSettingsAudioTab(contentX + 15, contentY + 10, contentW - 30, contentH - 20)
+    elseif self.settingsTab == "accessibility" then
+        self:RenderSettingsAccessibilityTab(contentX + 15, contentY + 10, contentW - 30, contentH - 20)
+    end
+
+    love.graphics.setScissor()
+
+    -- Reset to defaults button
+    local resetBtnW = 120
+    local resetBtnH = 30
+    local resetBtnX = panelX + panelW - resetBtnW - 20
+    local resetBtnY = panelY + panelH - resetBtnH - 15
+    local resetHover = mx >= resetBtnX and mx < resetBtnX + resetBtnW and
+                       my >= resetBtnY and my < resetBtnY + resetBtnH
+
+    love.graphics.setColor(resetHover and {0.6, 0.3, 0.3} or {0.4, 0.25, 0.25})
+    love.graphics.rectangle("fill", resetBtnX, resetBtnY, resetBtnW, resetBtnH, 4, 4)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(self.fonts.small)
+    local resetText = "Reset to Defaults"
+    local resetTextW = self.fonts.small:getWidth(resetText)
+    love.graphics.print(resetText, resetBtnX + (resetBtnW - resetTextW) / 2, resetBtnY + 7)
+
+    self.settingsResetBtn = {x = resetBtnX, y = resetBtnY, w = resetBtnW, h = resetBtnH}
+end
+
+function AlphaUI:RenderSettingsGameplayTab(x, y, w, h)
+    self.settingsControls = {}
+    -- Lazy initialization in case gameSettings wasn't set up
+    if not self.gameSettings then
+        self.gameSettings = GameSettings:GetInstance()
+    end
+    local settings = self.gameSettings
+    local rowY = y
+
+    love.graphics.setFont(self.fonts.normal)
+
+    -- Auto-pause on Critical Events
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "autoPauseOnCritical", "Auto-pause on Critical Events",
+        "Automatically pause the game when critical events occur",
+        settings:Get("gameplay", "autoPauseOnCritical"))
+
+    -- Auto-pause on Warnings
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "autoPauseOnWarning", "Auto-pause on Warnings",
+        "Automatically pause the game when warnings occur",
+        settings:Get("gameplay", "autoPauseOnWarning"))
+
+    -- Tutorial Hints
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "tutorialHints", "Tutorial Hints",
+        "Show helpful hints during gameplay",
+        settings:Get("gameplay", "tutorialHints"))
+
+    -- Show Production Numbers
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "showProductionNumbers", "Show Production Numbers",
+        "Display production rates on buildings",
+        settings:Get("gameplay", "showProductionNumbers"))
+
+    -- Autosave Enabled
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "autosaveEnabled", "Enable Autosave",
+        "Automatically save the game periodically",
+        settings:Get("gameplay", "autosaveEnabled"))
+
+    -- Autosave Interval
+    rowY = rowY + 10
+    rowY = self:RenderSettingsSlider(x, rowY, w, "autosaveInterval", "Autosave Interval",
+        "Cycles between autosaves",
+        settings:Get("gameplay", "autosaveInterval"), 10, 100, 5, " cycles")
+
+    -- Notification Frequency
+    rowY = rowY + 10
+    rowY = self:RenderSettingsDropdown(x, rowY, w, "notificationFrequency", "Notification Frequency",
+        "How often to show notifications",
+        settings:Get("gameplay", "notificationFrequency"),
+        {
+            {value = "minimal", label = "Minimal"},
+            {value = "normal", label = "Normal"},
+            {value = "verbose", label = "Verbose"}
+        })
+end
+
+function AlphaUI:RenderSettingsDisplayTab(x, y, w, h)
+    self.settingsControls = {}
+    if not self.gameSettings then
+        self.gameSettings = GameSettings:GetInstance()
+    end
+    local settings = self.gameSettings
+    local rowY = y
+
+    love.graphics.setFont(self.fonts.normal)
+
+    -- Fullscreen
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "fullscreen", "Fullscreen",
+        "Run the game in fullscreen mode",
+        settings:Get("display", "fullscreen"))
+
+    -- VSync
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "vsync", "VSync",
+        "Synchronize frame rate with monitor refresh rate",
+        settings:Get("display", "vsync"))
+
+    -- Show Building Names
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "showBuildingNames", "Show Building Names",
+        "Display building names in the world view",
+        settings:Get("display", "showBuildingNames"))
+
+    -- UI Scale
+    rowY = rowY + 10
+    rowY = self:RenderSettingsSlider(x, rowY, w, "uiScale", "UI Scale",
+        "Adjust the size of UI elements",
+        settings:Get("display", "uiScale"), 0.75, 1.5, 0.05, "x")
+
+    -- Camera Zoom Speed
+    rowY = rowY + 10
+    rowY = self:RenderSettingsSlider(x, rowY, w, "cameraZoomSpeed", "Zoom Speed",
+        "How fast the camera zooms in/out",
+        settings:Get("display", "cameraZoomSpeed"), 0.05, 0.3, 0.05, "")
+
+    -- Show Character Names
+    rowY = rowY + 10
+    rowY = self:RenderSettingsDropdown(x, rowY, w, "showCharacterNames", "Character Names",
+        "When to show character names",
+        settings:Get("display", "showCharacterNames"),
+        {
+            {value = "always", label = "Always"},
+            {value = "hover", label = "On Hover"},
+            {value = "never", label = "Never"}
+        })
+
+    -- Color Blind Mode
+    rowY = rowY + 10
+    rowY = self:RenderSettingsDropdown(x, rowY, w, "colorBlindMode", "Color Blind Mode",
+        "Adjust colors for color blindness",
+        settings:Get("display", "colorBlindMode"),
+        {
+            {value = "none", label = "None"},
+            {value = "protanopia", label = "Protanopia (Red-Blind)"},
+            {value = "deuteranopia", label = "Deuteranopia (Green-Blind)"},
+            {value = "tritanopia", label = "Tritanopia (Blue-Blind)"}
+        })
+end
+
+function AlphaUI:RenderSettingsAudioTab(x, y, w, h)
+    self.settingsControls = {}
+    if not self.gameSettings then
+        self.gameSettings = GameSettings:GetInstance()
+    end
+    local settings = self.gameSettings
+    local rowY = y
+
+    love.graphics.setFont(self.fonts.normal)
+
+    -- Note about audio
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Audio system is planned for future implementation.", x, rowY)
+    love.graphics.print("Settings below will take effect when audio is added.", x, rowY + 20)
+    rowY = rowY + 50
+
+    -- Master Volume
+    rowY = self:RenderSettingsSlider(x, rowY, w, "masterVolume", "Master Volume",
+        "Overall game volume",
+        settings:Get("audio", "masterVolume"), 0, 1, 0.1, "%", true)
+
+    -- Music Volume
+    rowY = rowY + 10
+    rowY = self:RenderSettingsSlider(x, rowY, w, "musicVolume", "Music Volume",
+        "Background music volume",
+        settings:Get("audio", "musicVolume"), 0, 1, 0.1, "%", true)
+
+    -- SFX Volume
+    rowY = rowY + 10
+    rowY = self:RenderSettingsSlider(x, rowY, w, "sfxVolume", "SFX Volume",
+        "Sound effects volume",
+        settings:Get("audio", "sfxVolume"), 0, 1, 0.1, "%", true)
+
+    -- Ambient Volume
+    rowY = rowY + 10
+    rowY = self:RenderSettingsSlider(x, rowY, w, "ambientVolume", "Ambient Volume",
+        "Environmental sounds volume",
+        settings:Get("audio", "ambientVolume"), 0, 1, 0.1, "%", true)
+
+    -- Notification Sounds
+    rowY = rowY + 15
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "notificationSounds", "Notification Sounds",
+        "Play sounds for notifications",
+        settings:Get("audio", "notificationSounds"))
+
+    -- UI Sounds
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "uiSounds", "UI Sounds",
+        "Play sounds for UI interactions",
+        settings:Get("audio", "uiSounds"))
+end
+
+function AlphaUI:RenderSettingsAccessibilityTab(x, y, w, h)
+    self.settingsControls = {}
+    if not self.gameSettings then
+        self.gameSettings = GameSettings:GetInstance()
+    end
+    local settings = self.gameSettings
+    local rowY = y
+
+    love.graphics.setFont(self.fonts.normal)
+
+    -- Larger Text
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "largerText", "Larger Text",
+        "Increase text size throughout the game",
+        settings:Get("accessibility", "largerText"))
+
+    -- High Contrast
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "highContrast", "High Contrast Mode",
+        "Increase contrast for better visibility",
+        settings:Get("accessibility", "highContrast"))
+
+    -- Reduced Motion
+    rowY = self:RenderSettingsCheckbox(x, rowY, w, "reducedMotion", "Reduced Motion",
+        "Minimize animations and movement",
+        settings:Get("accessibility", "reducedMotion"))
+
+    -- Note about additional accessibility features
+    rowY = rowY + 20
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Additional accessibility features coming soon:", x, rowY)
+    rowY = rowY + 25
+    love.graphics.print("- Screen reader support", x + 20, rowY)
+    rowY = rowY + 20
+    love.graphics.print("- Keyboard-only navigation", x + 20, rowY)
+    rowY = rowY + 20
+    love.graphics.print("- Customizable hotkeys", x + 20, rowY)
+end
+
+-- Helper: Render checkbox setting
+function AlphaUI:RenderSettingsCheckbox(x, y, w, key, label, description, value)
+    local mx, my = love.mouse.getPosition()
+    local checkSize = 20
+    local rowH = 45
+
+    -- Checkbox
+    local checkX = x
+    local checkY = y + 5
+    local isHover = mx >= checkX and mx < checkX + checkSize and my >= checkY and my < checkY + checkSize
+
+    love.graphics.setColor(isHover and {0.35, 0.35, 0.4} or {0.25, 0.25, 0.3})
+    love.graphics.rectangle("fill", checkX, checkY, checkSize, checkSize, 3, 3)
+    love.graphics.setColor(0.4, 0.4, 0.45)
+    love.graphics.rectangle("line", checkX, checkY, checkSize, checkSize, 3, 3)
+
+    if value then
+        love.graphics.setColor(self.colors.success)
+        love.graphics.setFont(self.fonts.normal)
+        love.graphics.print("✓", checkX + 3, checkY + 1)
+    end
+
+    -- Label
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.print(label, x + checkSize + 10, y + 3)
+
+    -- Description
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.print(description, x + checkSize + 10, y + 22)
+
+    table.insert(self.settingsControls, {
+        type = "checkbox",
+        key = key,
+        x = checkX,
+        y = checkY,
+        w = checkSize,
+        h = checkSize,
+        value = value
+    })
+
+    return y + rowH
+end
+
+-- Helper: Render slider setting
+function AlphaUI:RenderSettingsSlider(x, y, w, key, label, description, value, minVal, maxVal, step, suffix, isPercent)
+    local mx, my = love.mouse.getPosition()
+    local sliderW = 200
+    local sliderH = 8
+    local sliderX = x + w - sliderW - 60
+    local sliderY = y + 10
+    local rowH = 50
+
+    -- Label
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.print(label, x, y + 3)
+
+    -- Description
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.print(description, x, y + 22)
+
+    -- Slider track
+    love.graphics.setColor(0.25, 0.25, 0.3)
+    love.graphics.rectangle("fill", sliderX, sliderY, sliderW, sliderH, 4, 4)
+
+    -- Slider fill
+    local normalizedValue = (value - minVal) / (maxVal - minVal)
+    local fillW = normalizedValue * sliderW
+    love.graphics.setColor(self.colors.accent)
+    love.graphics.rectangle("fill", sliderX, sliderY, fillW, sliderH, 4, 4)
+
+    -- Slider handle
+    local handleX = sliderX + fillW - 6
+    local handleY = sliderY - 4
+    local handleW = 12
+    local handleH = 16
+    local handleHover = mx >= handleX and mx < handleX + handleW and my >= handleY and my < handleY + handleH
+
+    love.graphics.setColor(handleHover and {1, 1, 1} or {0.9, 0.9, 0.9})
+    love.graphics.rectangle("fill", handleX, handleY, handleW, handleH, 3, 3)
+
+    -- Value display
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(self.fonts.small)
+    local displayValue = isPercent and string.format("%.0f%%", value * 100) or
+                         (suffix == " cycles" and string.format("%.0f%s", value, suffix) or
+                         string.format("%.2f%s", value, suffix))
+    love.graphics.print(displayValue, sliderX + sliderW + 10, y + 8)
+
+    table.insert(self.settingsControls, {
+        type = "slider",
+        key = key,
+        x = sliderX,
+        y = sliderY - 4,
+        w = sliderW,
+        h = sliderH + 8,
+        value = value,
+        minVal = minVal,
+        maxVal = maxVal,
+        step = step
+    })
+
+    return y + rowH
+end
+
+-- Helper: Render dropdown setting
+function AlphaUI:RenderSettingsDropdown(x, y, w, key, label, description, value, options)
+    local mx, my = love.mouse.getPosition()
+    local dropW = 180
+    local dropH = 26
+    local dropX = x + w - dropW
+    local dropY = y + 5
+    local rowH = 55
+
+    -- Label
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.print(label, x, y + 3)
+
+    -- Description
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.print(description, x, y + 22)
+
+    -- Find current option label
+    local currentLabel = value
+    for _, opt in ipairs(options) do
+        if opt.value == value then
+            currentLabel = opt.label
+            break
+        end
+    end
+
+    -- Dropdown button
+    local isHover = mx >= dropX and mx < dropX + dropW and my >= dropY and my < dropY + dropH
+    love.graphics.setColor(isHover and {0.35, 0.35, 0.4} or {0.25, 0.25, 0.3})
+    love.graphics.rectangle("fill", dropX, dropY, dropW, dropH, 4, 4)
+    love.graphics.setColor(0.4, 0.4, 0.45)
+    love.graphics.rectangle("line", dropX, dropY, dropW, dropH, 4, 4)
+
+    -- Current value
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.print(currentLabel, dropX + 10, dropY + 5)
+
+    -- Arrow
+    love.graphics.print("▼", dropX + dropW - 20, dropY + 5)
+
+    table.insert(self.settingsControls, {
+        type = "dropdown",
+        key = key,
+        x = dropX,
+        y = dropY,
+        w = dropW,
+        h = dropH,
+        value = value,
+        options = options
+    })
+
+    return y + rowH
+end
+
+function AlphaUI:HandleSettingsPanelClick(x, y)
+    -- Lazy initialization
+    if not self.gameSettings then
+        self.gameSettings = GameSettings:GetInstance()
+    end
+
+    -- Close button
+    if self.settingsCloseBtn then
+        local btn = self.settingsCloseBtn
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            self.showSettingsPanel = false
+            return true
+        end
+    end
+
+    -- Tab buttons
+    for _, btn in ipairs(self.settingsTabBtns or {}) do
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            self.settingsTab = btn.tabId
+            self.settingsScrollOffset = 0
+            return true
+        end
+    end
+
+    -- Reset button
+    if self.settingsResetBtn then
+        local btn = self.settingsResetBtn
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            self.gameSettings:ResetCategory(self.settingsTab)
+            return true
+        end
+    end
+
+    -- Settings controls
+    for _, ctrl in ipairs(self.settingsControls or {}) do
+        if x >= ctrl.x and x < ctrl.x + ctrl.w and y >= ctrl.y and y < ctrl.y + ctrl.h then
+            if ctrl.type == "checkbox" then
+                self:ToggleSettingsCheckbox(ctrl.key)
+                return true
+            elseif ctrl.type == "slider" then
+                -- Calculate new value based on click position
+                local relX = x - ctrl.x
+                local normalized = math.max(0, math.min(1, relX / ctrl.w))
+                local newValue = ctrl.minVal + normalized * (ctrl.maxVal - ctrl.minVal)
+                -- Round to step
+                newValue = math.floor(newValue / ctrl.step + 0.5) * ctrl.step
+                self:SetSettingsValue(ctrl.key, newValue)
+                return true
+            elseif ctrl.type == "dropdown" then
+                self:CycleSettingsDropdown(ctrl.key, ctrl.options, ctrl.value)
+                return true
+            end
+        end
+    end
+
+    return true  -- Consume click
+end
+
+function AlphaUI:ToggleSettingsCheckbox(key)
+    if not self.gameSettings then
+        self.gameSettings = GameSettings:GetInstance()
+    end
+    local category = self:GetSettingsCategory(key)
+    local currentValue = self.gameSettings:Get(category, key)
+    self.gameSettings:Set(category, key, not currentValue)
+
+    -- Apply immediate effects
+    if key == "fullscreen" then
+        self.gameSettings:ApplyDisplaySettings()
+    elseif key == "vsync" then
+        self.gameSettings:ApplyDisplaySettings()
+    end
+end
+
+function AlphaUI:SetSettingsValue(key, value)
+    if not self.gameSettings then
+        self.gameSettings = GameSettings:GetInstance()
+    end
+    local category = self:GetSettingsCategory(key)
+    self.gameSettings:Set(category, key, value)
+
+    -- Apply immediate effects
+    if key == "fullscreen" or key == "vsync" then
+        self.gameSettings:ApplyDisplaySettings()
+    end
+end
+
+function AlphaUI:CycleSettingsDropdown(key, options, currentValue)
+    if not self.gameSettings then
+        self.gameSettings = GameSettings:GetInstance()
+    end
+    -- Find current index and cycle to next
+    local currentIndex = 1
+    for i, opt in ipairs(options) do
+        if opt.value == currentValue then
+            currentIndex = i
+            break
+        end
+    end
+    local nextIndex = (currentIndex % #options) + 1
+    local newValue = options[nextIndex].value
+
+    local category = self:GetSettingsCategory(key)
+    self.gameSettings:Set(category, key, newValue)
+end
+
+function AlphaUI:GetSettingsCategory(key)
+    -- Map key to category
+    local categoryMap = {
+        -- Gameplay
+        autoPauseOnCritical = "gameplay",
+        autoPauseOnWarning = "gameplay",
+        autoPauseOnInfo = "gameplay",
+        tutorialHints = "gameplay",
+        notificationFrequency = "gameplay",
+        autosaveEnabled = "gameplay",
+        autosaveInterval = "gameplay",
+        showProductionNumbers = "gameplay",
+        showSatisfactionNumbers = "gameplay",
+        -- Display
+        fullscreen = "display",
+        vsync = "display",
+        uiScale = "display",
+        showCharacterNames = "display",
+        showBuildingNames = "display",
+        colorBlindMode = "display",
+        cameraZoomSpeed = "display",
+        cameraPanSpeed = "display",
+        -- Audio
+        masterVolume = "audio",
+        musicVolume = "audio",
+        sfxVolume = "audio",
+        ambientVolume = "audio",
+        notificationSounds = "audio",
+        uiSounds = "audio",
+        -- Accessibility
+        largerText = "accessibility",
+        highContrast = "accessibility",
+        reducedMotion = "accessibility",
+        screenReaderMode = "accessibility"
+    }
+    return categoryMap[key] or "gameplay"
+end
+
+-- =============================================================================
+-- EMIGRATION WARNING PANEL
+-- =============================================================================
+
+function AlphaUI:GetAtRiskCitizens()
+    -- Calculate emigration risk for all citizens and return sorted list
+    local atRiskCitizens = {}
+
+    -- Get emigration config
+    local config = nil
+    if CharacterV3 and CharacterV3._ConsumptionMechanics and
+       CharacterV3._ConsumptionMechanics.consequenceThresholds and
+       CharacterV3._ConsumptionMechanics.consequenceThresholds.emigration then
+        config = CharacterV3._ConsumptionMechanics.consequenceThresholds.emigration
+    end
+
+    for _, citizen in ipairs(self.world.citizens) do
+        if not citizen.hasEmigrated and citizen.status ~= "leaving" then
+            local riskData = self:CalculateEmigrationRisk(citizen, config)
+            if riskData.riskPercent > 0 then
+                table.insert(atRiskCitizens, {
+                    citizen = citizen,
+                    riskPercent = riskData.riskPercent,
+                    reasons = riskData.reasons,
+                    solutions = riskData.solutions,
+                    cyclesRemaining = riskData.cyclesRemaining
+                })
+            end
+        end
+    end
+
+    -- Sort by risk percent (highest first)
+    table.sort(atRiskCitizens, function(a, b)
+        return a.riskPercent > b.riskPercent
+    end)
+
+    return atRiskCitizens
+end
+
+function AlphaUI:CalculateEmigrationRisk(citizen, config)
+    local riskData = {
+        riskPercent = 0,
+        reasons = {},
+        solutions = {},
+        cyclesRemaining = nil
+    }
+
+    if not config or not config.enabled then
+        return riskData
+    end
+
+    local avgSatisfaction = citizen:GetAverageSatisfaction() or 50
+    local satisfactionThreshold = config.averageSatisfactionThreshold[citizen.class] or 30
+    local cycleThreshold = config.consecutiveLowSatisfactionCycles[citizen.class] or 5
+    local criticalRequired = config.criticalCravingsRequired or 2
+    local criticalCount = citizen:GetCriticalCravingCount() or 0
+    local lowCycles = citizen.consecutiveLowSatisfactionCycles or 0
+
+    -- Check if below satisfaction threshold
+    local isBelowThreshold = avgSatisfaction < satisfactionThreshold
+
+    if not isBelowThreshold then
+        return riskData  -- Not at risk
+    end
+
+    -- Calculate risk based on progress toward emigration
+    local cycleProgress = math.min(lowCycles / cycleThreshold, 1.0)
+    local criticalProgress = math.min(criticalCount / criticalRequired, 1.0)
+
+    -- Base risk calculation
+    -- Risk increases as they get closer to meeting both conditions
+    if lowCycles > 0 or criticalCount > 0 then
+        -- Calculate overall risk percentage
+        local baseRisk = cycleProgress * 0.5 + criticalProgress * 0.5
+
+        -- If both conditions met, they're at immediate risk (chance-based emigration)
+        if lowCycles >= cycleThreshold and criticalCount >= criticalRequired then
+            local emigrationChance = config.emigrationChancePerCycle or 0.15
+            riskData.riskPercent = math.floor(baseRisk * 100 + emigrationChance * 100)
+            riskData.riskPercent = math.min(100, riskData.riskPercent)
+            riskData.cyclesRemaining = 0
+            table.insert(riskData.reasons, "Immediate emigration risk!")
+        else
+            riskData.riskPercent = math.floor(baseRisk * 80)  -- Cap at 80% until conditions fully met
+            local cyclesLeft = cycleThreshold - lowCycles
+            if cyclesLeft > 0 then
+                riskData.cyclesRemaining = cyclesLeft
+            end
+        end
+
+        -- Add reasons
+        if avgSatisfaction < satisfactionThreshold then
+            table.insert(riskData.reasons, string.format("Low satisfaction: %.0f%% (needs %d%%)",
+                avgSatisfaction, satisfactionThreshold))
+        end
+
+        if lowCycles > 0 then
+            table.insert(riskData.reasons, string.format("Unhappy for %d cycles (threshold: %d)",
+                lowCycles, cycleThreshold))
+        end
+
+        if criticalCount > 0 then
+            table.insert(riskData.reasons, string.format("%d critical craving(s) (threshold: %d)",
+                criticalCount, criticalRequired))
+        end
+
+        -- Get critical cravings and suggest solutions
+        local criticalCravings = citizen:GetCriticalCravings and citizen:GetCriticalCravings() or {}
+        for _, craving in ipairs(criticalCravings) do
+            local solution = self:GetCravingSolution(craving, citizen)
+            if solution then
+                table.insert(riskData.solutions, solution)
+            end
+        end
+
+        -- Generic solution
+        if #riskData.solutions == 0 then
+            table.insert(riskData.solutions, "Increase commodity production to meet needs")
+            table.insert(riskData.solutions, "Prioritize this citizen in allocation")
+        end
+    end
+
+    return riskData
+end
+
+function AlphaUI:GetCravingSolution(craving, citizen)
+    -- Map craving types to suggested solutions
+    local solutions = {
+        -- Physiological needs
+        food = "Build more farms or bakeries",
+        water = "Build a well or expand water access",
+        sleep = "Ensure housing availability",
+        -- Safety needs
+        shelter = "Build more housing",
+        security = "Build a guardhouse or walls",
+        -- Social needs
+        companionship = "Organize social events",
+        family = "Help family members immigrate",
+        -- Esteem needs
+        recognition = "Promote to better position",
+        achievement = "Assign to productive building",
+    }
+
+    -- Try to match craving to solution
+    if craving and craving.id then
+        local cravingLower = string.lower(craving.id)
+        for key, solution in pairs(solutions) do
+            if string.find(cravingLower, key) then
+                return solution
+            end
+        end
+    end
+
+    return nil
+end
+
+function AlphaUI:RenderEmigrationPanel()
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+
+    -- Dim background
+    love.graphics.setColor(0, 0, 0, 0.7)
+    love.graphics.rectangle("fill", 0, 0, screenW, screenH)
+
+    -- Panel dimensions
+    local panelW = math.min(800, screenW - 80)
+    local panelH = math.min(600, screenH - 100)
+    local panelX = (screenW - panelW) / 2
+    local panelY = (screenH - panelH) / 2
+
+    -- Panel background
+    love.graphics.setColor(0.12, 0.12, 0.16)
+    love.graphics.rectangle("fill", panelX, panelY, panelW, panelH, 8, 8)
+
+    -- Panel border (red-tinted for warning)
+    love.graphics.setColor(0.7, 0.3, 0.3)
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", panelX, panelY, panelW, panelH, 8, 8)
+    love.graphics.setLineWidth(1)
+
+    -- Get at-risk citizens
+    local atRiskCitizens = self:GetAtRiskCitizens()
+
+    -- Header
+    love.graphics.setFont(self.fonts.header)
+    love.graphics.setColor(self.colors.danger)
+    love.graphics.print("EMIGRATION WARNING", panelX + 20, panelY + 15)
+
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print(string.format("%d citizen(s) at risk of leaving", #atRiskCitizens),
+        panelX + 200, panelY + 20)
+
+    -- Close button
+    local closeBtnX = panelX + panelW - 40
+    local closeBtnY = panelY + 15
+    local closeBtnSize = 25
+    local mx, my = love.mouse.getPosition()
+    local closeHover = mx >= closeBtnX and mx < closeBtnX + closeBtnSize and
+                       my >= closeBtnY and my < closeBtnY + closeBtnSize
+
+    love.graphics.setColor(closeHover and {0.8, 0.3, 0.3} or {0.5, 0.5, 0.5})
+    love.graphics.rectangle("fill", closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, 4, 4)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.print("X", closeBtnX + 7, closeBtnY + 3)
+
+    self.emigrationCloseBtn = {x = closeBtnX, y = closeBtnY, w = closeBtnSize, h = closeBtnSize}
+
+    -- Content area
+    local contentX = panelX + 15
+    local contentY = panelY + 55
+    local contentW = panelW - 30
+    local contentH = panelH - 70
+
+    -- Scrollable area
+    love.graphics.setScissor(contentX, contentY, contentW, contentH)
+
+    self.emigrationCitizenBtns = {}
+    self.emigrationPrioritizeBtns = {}
+
+    if #atRiskCitizens == 0 then
+        -- No citizens at risk
+        love.graphics.setFont(self.fonts.header)
+        love.graphics.setColor(self.colors.success)
+        local msg = "No citizens at risk of emigrating!"
+        local msgW = self.fonts.header:getWidth(msg)
+        love.graphics.print(msg, contentX + (contentW - msgW) / 2, contentY + 100)
+
+        love.graphics.setFont(self.fonts.normal)
+        love.graphics.setColor(self.colors.textDim)
+        local subMsg = "Your citizens are content with life in " .. (self.world.townName or "town")
+        local subMsgW = self.fonts.normal:getWidth(subMsg)
+        love.graphics.print(subMsg, contentX + (contentW - subMsgW) / 2, contentY + 135)
+    else
+        local rowY = contentY - self.emigrationScrollOffset
+        local rowH = 120  -- Height per citizen card
+
+        for i, riskData in ipairs(atRiskCitizens) do
+            local citizen = riskData.citizen
+
+            if rowY + rowH > contentY - 20 and rowY < contentY + contentH then
+                -- Card background
+                local cardX = contentX + 5
+                local cardW = contentW - 10
+
+                -- Risk-based color
+                local bgAlpha = 0.3
+                if riskData.riskPercent >= 80 then
+                    love.graphics.setColor(0.5, 0.2, 0.2, bgAlpha)
+                elseif riskData.riskPercent >= 50 then
+                    love.graphics.setColor(0.5, 0.35, 0.2, bgAlpha)
+                else
+                    love.graphics.setColor(0.4, 0.4, 0.2, bgAlpha)
+                end
+                love.graphics.rectangle("fill", cardX, rowY, cardW, rowH - 10, 6, 6)
+
+                -- Card border
+                love.graphics.setColor(0.4, 0.4, 0.45)
+                love.graphics.rectangle("line", cardX, rowY, cardW, rowH - 10, 6, 6)
+
+                -- Citizen name and class
+                love.graphics.setFont(self.fonts.normal)
+                love.graphics.setColor(1, 1, 1)
+                local displayName = citizen.name or "Unknown"
+                love.graphics.print(displayName, cardX + 10, rowY + 8)
+
+                love.graphics.setFont(self.fonts.tiny)
+                love.graphics.setColor(self:GetClassColor(citizen.class))
+                love.graphics.print(string.upper(citizen.class or "unknown"), cardX + 10, rowY + 28)
+
+                -- Risk percentage (large, right side)
+                love.graphics.setFont(self.fonts.header)
+                local riskColor = riskData.riskPercent >= 80 and self.colors.danger or
+                                  (riskData.riskPercent >= 50 and self.colors.warning or {0.8, 0.8, 0.3})
+                love.graphics.setColor(riskColor)
+                local riskText = string.format("%d%%", riskData.riskPercent)
+                local riskTextW = self.fonts.header:getWidth(riskText)
+                love.graphics.print(riskText, cardX + cardW - riskTextW - 100, rowY + 10)
+
+                love.graphics.setFont(self.fonts.tiny)
+                love.graphics.setColor(self.colors.textDim)
+                love.graphics.print("RISK", cardX + cardW - riskTextW - 100, rowY + 35)
+
+                -- Cycles remaining
+                if riskData.cyclesRemaining and riskData.cyclesRemaining > 0 then
+                    love.graphics.setColor(self.colors.warning)
+                    love.graphics.print(string.format("~%d cycles left", riskData.cyclesRemaining),
+                        cardX + cardW - riskTextW - 100, rowY + 48)
+                elseif riskData.cyclesRemaining == 0 then
+                    love.graphics.setColor(self.colors.danger)
+                    love.graphics.print("IMMINENT!", cardX + cardW - riskTextW - 100, rowY + 48)
+                end
+
+                -- Reasons (left column)
+                love.graphics.setFont(self.fonts.tiny)
+                love.graphics.setColor(self.colors.textDim)
+                love.graphics.print("Reasons:", cardX + 10, rowY + 45)
+
+                local reasonY = rowY + 58
+                love.graphics.setColor(self.colors.warning)
+                for j, reason in ipairs(riskData.reasons) do
+                    if j <= 3 then  -- Limit to 3 reasons
+                        love.graphics.print("- " .. reason, cardX + 15, reasonY)
+                        reasonY = reasonY + 12
+                    end
+                end
+
+                -- Solutions (right column, middle)
+                local solutionX = cardX + 300
+                love.graphics.setColor(self.colors.textDim)
+                love.graphics.print("Suggested Actions:", solutionX, rowY + 45)
+
+                local solutionY = rowY + 58
+                love.graphics.setColor(self.colors.success)
+                for j, solution in ipairs(riskData.solutions) do
+                    if j <= 3 then  -- Limit to 3 solutions
+                        love.graphics.print("+ " .. solution, solutionX + 5, solutionY)
+                        solutionY = solutionY + 12
+                    end
+                end
+
+                -- Prioritize button
+                local btnW = 75
+                local btnH = 24
+                local btnX = cardX + cardW - btnW - 10
+                local btnY = rowY + rowH - btnH - 18
+                local btnHover = mx >= btnX and mx < btnX + btnW and my >= btnY and my < btnY + btnH
+
+                love.graphics.setColor(btnHover and {0.3, 0.5, 0.3} or {0.2, 0.35, 0.2})
+                love.graphics.rectangle("fill", btnX, btnY, btnW, btnH, 4, 4)
+                love.graphics.setColor(1, 1, 1)
+                love.graphics.setFont(self.fonts.tiny)
+                local btnText = "Prioritize"
+                local btnTextW = self.fonts.tiny:getWidth(btnText)
+                love.graphics.print(btnText, btnX + (btnW - btnTextW) / 2, btnY + 6)
+
+                table.insert(self.emigrationPrioritizeBtns, {
+                    x = btnX, y = btnY, w = btnW, h = btnH,
+                    citizenId = citizen.id
+                })
+
+                -- Store clickable area for citizen card
+                table.insert(self.emigrationCitizenBtns, {
+                    x = cardX, y = rowY, w = cardW, h = rowH - 10,
+                    citizen = citizen
+                })
+            end
+
+            rowY = rowY + rowH
+        end
+
+        -- Calculate max scroll
+        local totalHeight = #atRiskCitizens * rowH
+        self.emigrationMaxScroll = math.max(0, totalHeight - contentH)
+    end
+
+    love.graphics.setScissor()
+
+    -- Summary bar at bottom
+    local summaryY = panelY + panelH - 35
+    love.graphics.setColor(0.15, 0.15, 0.18)
+    love.graphics.rectangle("fill", panelX + 10, summaryY - 5, panelW - 20, 30, 4, 4)
+
+    love.graphics.setFont(self.fonts.small)
+    if #atRiskCitizens > 0 then
+        local highRisk = 0
+        local medRisk = 0
+        local lowRisk = 0
+        for _, rd in ipairs(atRiskCitizens) do
+            if rd.riskPercent >= 80 then highRisk = highRisk + 1
+            elseif rd.riskPercent >= 50 then medRisk = medRisk + 1
+            else lowRisk = lowRisk + 1
+            end
+        end
+
+        love.graphics.setColor(self.colors.danger)
+        love.graphics.print(string.format("Critical: %d", highRisk), panelX + 20, summaryY)
+
+        love.graphics.setColor(self.colors.warning)
+        love.graphics.print(string.format("Warning: %d", medRisk), panelX + 120, summaryY)
+
+        love.graphics.setColor({0.8, 0.8, 0.3})
+        love.graphics.print(string.format("Watch: %d", lowRisk), panelX + 220, summaryY)
+    else
+        love.graphics.setColor(self.colors.success)
+        love.graphics.print("All citizens stable", panelX + 20, summaryY)
+    end
+
+    -- Keyboard hint
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.setFont(self.fonts.tiny)
+    love.graphics.print("Press E or ESC to close", panelX + panelW - 140, summaryY + 2)
+end
+
+function AlphaUI:HandleEmigrationPanelClick(x, y)
+    -- Close button
+    if self.emigrationCloseBtn then
+        local btn = self.emigrationCloseBtn
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            self.showEmigrationPanel = false
+            return true
+        end
+    end
+
+    -- Prioritize buttons
+    for _, btn in ipairs(self.emigrationPrioritizeBtns or {}) do
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            -- Prioritize this citizen in allocation
+            self:PrioritizeCitizen(btn.citizenId)
+            return true
+        end
+    end
+
+    -- Citizen cards (click to select/view)
+    for _, btn in ipairs(self.emigrationCitizenBtns or {}) do
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            -- Select citizen and close panel
+            self.world:SelectCitizen(btn.citizen)
+            self.showEmigrationPanel = false
+            return true
+        end
+    end
+
+    return true  -- Consume click to prevent clicking through panel
+end
+
+function AlphaUI:PrioritizeCitizen(citizenId)
+    -- Find citizen and boost their allocation priority
+    for _, citizen in ipairs(self.world.citizens) do
+        if citizen.id == citizenId then
+            -- Boost fairness penalty to give them priority in next allocation
+            citizen.fairnessPenalty = (citizen.fairnessPenalty or 0) + 200
+
+            -- Log the action
+            if self.world.LogEvent then
+                self.world:LogEvent({
+                    type = "action",
+                    message = string.format("Prioritized %s for resource allocation", citizen.name),
+                    cycle = self.world.currentCycle
+                })
+            end
+
+            break
+        end
+    end
+end
+
+-- =============================================================================
+-- TEXT INPUT HANDLING
+-- =============================================================================
+
+function AlphaUI:HandleTextInput(text)
+    -- Handle build menu search input
+    if self.showBuildMenuModal and self.buildMenuSearchActive then
+        -- Only allow printable characters (no control chars)
+        if text:match("^[%w%s%p]$") then
+            self.buildMenuSearchQuery = self.buildMenuSearchQuery .. text
+            self.buildMenuScrollOffset = 0
+            return true
+        end
+    end
+    return false
+end
+
+-- =============================================================================
+-- PLOT SELECTION MODAL (for land purchase during immigration)
+-- =============================================================================
+
+function AlphaUI:OpenPlotSelectionModal(applicant)
+    -- Store the applicant for after plot selection
+    self.pendingImmigrantApplicant = applicant
+
+    -- Create the modal with callbacks
+    self.plotSelectionModal = PlotSelectionModal:Create(
+        self.world,
+        applicant,
+        function(selectedPlots, totalCost)
+            -- On confirm: accept immigrant with selected plots
+            self:OnPlotSelectionComplete(selectedPlots, totalCost)
+        end,
+        function()
+            -- On cancel: close modal, return to immigration
+            self:OnPlotSelectionCancel()
+        end
+    )
+
+    self.showPlotSelectionModal = true
+end
+
+function AlphaUI:OnPlotSelectionComplete(selectedPlots, totalCost)
+    local applicant = self.pendingImmigrantApplicant
+    if not applicant then
+        print("[AlphaUI] Error: No pending applicant for plot selection")
+        self:ClosePlotSelectionModal()
+        return
+    end
+
+    local immigrationSystem = self.world.immigrationSystem
+    if not immigrationSystem then
+        print("[AlphaUI] Error: No immigration system")
+        self:ClosePlotSelectionModal()
+        return
+    end
+
+    -- Accept the applicant with the selected plots
+    local success, citizen, err = immigrationSystem:AcceptApplicant(applicant, selectedPlots)
+
+    if success then
+        self.world:LogEvent("immigration", applicant.name .. " immigrated and purchased " .. #selectedPlots .. " plots for " .. totalCost .. " gold", {})
+        self.selectedApplicant = nil
+
+        -- For elite/wealthy immigrants, show suggested buildings modal if they have remaining plots
+        local intendedRole = applicant.intendedRole or "laborer"
+        local minPlotsRequired = (applicant.landRequirements and applicant.landRequirements.minPlots) or 1
+
+        -- Elite/wealthy immigrants typically buy more plots than needed for residence
+        -- Show suggested buildings if they have remaining plots (beyond what residence needs)
+        if (intendedRole == "elite" or intendedRole == "wealthy" or intendedRole == "merchant") and
+           #selectedPlots > minPlotsRequired and citizen then
+            -- Calculate remaining plots (plots beyond the residence)
+            local remainingPlots = {}
+            for i = 2, #selectedPlots do  -- Skip first plot (residence)
+                table.insert(remainingPlots, selectedPlots[i])
+            end
+
+            if #remainingPlots > 0 then
+                self:ClosePlotSelectionModal()
+                self:OpenSuggestedBuildingsModal(citizen, remainingPlots)
+                return  -- Don't close plot selection modal twice
+            end
+        end
+    else
+        print("[AlphaUI] Failed to accept immigrant: " .. (err or "unknown error"))
+        self.world:LogEvent("warning", "Immigration failed for " .. applicant.name .. ": " .. (err or "unknown"), {})
+    end
+
+    self:ClosePlotSelectionModal()
+end
+
+function AlphaUI:OnPlotSelectionCancel()
+    self.world:LogEvent("info", "Land purchase cancelled for " .. (self.pendingImmigrantApplicant and self.pendingImmigrantApplicant.name or "applicant"), {})
+    self:ClosePlotSelectionModal()
+end
+
+function AlphaUI:ClosePlotSelectionModal()
+    self.showPlotSelectionModal = false
+    self.plotSelectionModal = nil
+    self.pendingImmigrantApplicant = nil
+end
+
+-- =============================================================================
+-- SUGGESTED BUILDINGS MODAL (for elite immigrants after land purchase)
+-- =============================================================================
+
+function AlphaUI:OpenSuggestedBuildingsModal(citizen, remainingPlots)
+    self.suggestedBuildingsCitizen = citizen
+
+    self.suggestedBuildingsModal = SuggestedBuildingsModal:Create(
+        self.world,
+        citizen,
+        remainingPlots,
+        function(action, buildingTypeId)
+            self:OnSuggestedBuildingsClose(action, buildingTypeId)
+        end
+    )
+
+    self.showSuggestedBuildingsModal = true
+    print("[AlphaUI] Opened suggested buildings modal for " .. (citizen.name or "citizen"))
+end
+
+function AlphaUI:OnSuggestedBuildingsClose(action, buildingTypeId)
+    if action == "build" and buildingTypeId then
+        -- Enter building placement mode for the selected building
+        self:CloseSuggestedBuildingsModal()
+        self:EnterPlacementMode(buildingTypeId)
+        self.world:LogEvent("info", "Starting placement for " .. buildingTypeId, {})
+    elseif action == "view_land" then
+        -- Close modal and enable land overlay
+        self:CloseSuggestedBuildingsModal()
+        self.showLandOverlay = true
+    else
+        -- Skip - just close the modal
+        self:CloseSuggestedBuildingsModal()
+    end
+end
+
+function AlphaUI:CloseSuggestedBuildingsModal()
+    self.showSuggestedBuildingsModal = false
+    self.suggestedBuildingsModal = nil
+    self.suggestedBuildingsCitizen = nil
+end
+
+-- =============================================================================
+-- CAMERA ADAPTER METHODS (for modules expecting camera:GetPosition/GetScale)
+-- =============================================================================
+
+function AlphaUI:GetPosition()
+    return self.cameraX, self.cameraY
+end
+
+function AlphaUI:GetScale()
+    return self.cameraZoom
+end
+
+-- =============================================================================
+-- NEW PANEL HELPER METHODS
+-- =============================================================================
+
+function AlphaUI:OpenLandRegistryPanel()
+    self.showLandRegistryPanel = true
+    if self.landRegistryPanel then
+        self.landRegistryPanel:Show()
+    end
+end
+
+function AlphaUI:CloseLandRegistryPanel()
+    self.showLandRegistryPanel = false
+    if self.landRegistryPanel then
+        self.landRegistryPanel:Hide()
+    end
+end
+
+function AlphaUI:OpenHousingOverviewPanel()
+    self.showHousingOverviewPanel = true
+    if self.housingOverviewPanel then
+        self.housingOverviewPanel:Show()
+    end
+end
+
+function AlphaUI:CloseHousingOverviewPanel()
+    self.showHousingOverviewPanel = false
+    if self.housingOverviewPanel then
+        self.housingOverviewPanel:Hide()
+    end
+end
+
+function AlphaUI:OpenHousingAssignmentModal(building)
+    self.showHousingAssignmentModal = true
+    if self.housingAssignmentModal then
+        self.housingAssignmentModal:Show(building)
+    end
+end
+
+function AlphaUI:CloseHousingAssignmentModal()
+    self.showHousingAssignmentModal = false
+    if self.housingAssignmentModal then
+        self.housingAssignmentModal:Hide()
+    end
+end
+
+function AlphaUI:OpenCharacterDetailPanel(character)
+    if self.characterDetailPanel then
+        self.characterDetailPanel:Show(character)
+    end
+end
+
+function AlphaUI:CloseCharacterDetailPanel()
+    if self.characterDetailPanel then
+        self.characterDetailPanel:Hide()
     end
 end
 

@@ -1,0 +1,749 @@
+{
+  "version": "1.0.0",
+  "description": "Starting location configurations for new games",
+  "locations": [
+    {
+      "id": "river_valley",
+      "name": "River Valley",
+      "icon": "~",
+      "description": "A lush valley bisected by a wide river, perfect for farming and water-dependent industries.",
+      "bonus": "+20% farming, +water access",
+      "challenge": "-15% mining output",
+      "terrain": {
+        "riverEnabled": true,
+        "riverWidth": 120,
+        "riverPosition": "center",
+        "forestDensity": 0.3,
+        "mountainsEnabled": false,
+        "mountainCount": 0,
+        "mountainPositions": [],
+        "groundColor": [0.35, 0.55, 0.25],
+        "waterColor": [0.2, 0.4, 0.7]
+      },
+      "productionModifiers": {
+        "farming": 1.2,
+        "mining": 0.85,
+        "water_access": 1.5
+      },
+      "starterBuildings": [
+        {"typeId": "farm", "x": 100, "y": 100, "autoAssignRecipe": true},
+        {"typeId": "bakery", "x": 200, "y": 150, "autoAssignRecipe": true},
+        {"typeId": "tailor_shop", "x": 300, "y": 150, "autoAssignRecipe": true, "ownerCitizenIndex": 0},
+        {"typeId": "cottage", "x": 400, "y": 100, "autoAssignRecipe": false, "initialOccupants": [0, 1, 2]},
+        {"typeId": "lodge", "x": 500, "y": 100, "autoAssignRecipe": false, "initialOccupants": [3, 4, 5, 6, 7]}
+      ],
+      "starterResources": [
+        {"commodityId": "wheat", "quantity": 40},
+        {"commodityId": "flour", "quantity": 30},
+        {"commodityId": "bread", "quantity": 20}
+      ],
+      "starterGold": 1000,
+      "startingTreasury": 500,
+      "economicSystem": "capitalist",
+      "starterCitizens": [
+        {
+          "name": "Heinrich Mueller",
+          "startingWealth": 800,
+          "intendedRole": "merchant",
+          "vocation": "Tailor",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 3
+        },
+        {
+          "name": "Anna Mueller",
+          "startingWealth": 0,
+          "intendedRole": "craftsman",
+          "vocation": "Baker",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 3,
+          "familyRelation": {"type": "spouse", "targetIndex": 0}
+        },
+        {
+          "name": "Karl Mueller",
+          "startingWealth": 0,
+          "intendedRole": "laborer",
+          "vocation": "Apprentice",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 3,
+          "familyRelation": {"type": "child", "targetIndex": 0}
+        },
+        {
+          "name": "Hans Weber",
+          "startingWealth": 300,
+          "intendedRole": "craftsman",
+          "vocation": "Baker",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Fritz Schmidt",
+          "startingWealth": 100,
+          "intendedRole": "laborer",
+          "vocation": "Farmer",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Greta Fischer",
+          "startingWealth": 150,
+          "intendedRole": "laborer",
+          "vocation": "Farmer",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Wilhelm Bauer",
+          "startingWealth": 80,
+          "intendedRole": "laborer",
+          "vocation": "Laborer",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Maria Hoffmann",
+          "startingWealth": 120,
+          "intendedRole": "laborer",
+          "vocation": "Laborer",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 4
+        }
+      ],
+      "starterLandPlots": [
+        {"gridX": 3, "gridY": 1, "ownerCitizenIndex": 0},
+        {"gridX": 4, "gridY": 1, "ownerCitizenIndex": 0}
+      ],
+      "population": {
+        "initialCount": 8,
+        "classDistribution": {}
+      }
+    },
+    {
+      "id": "mountain_pass",
+      "name": "Mountain Pass",
+      "icon": "^",
+      "description": "A rocky highland surrounded by mountains rich in ore and gems, but with limited farmland.",
+      "bonus": "+30% ore/mining",
+      "challenge": "-20% farm output",
+      "terrain": {
+        "riverEnabled": false,
+        "riverWidth": 0,
+        "riverPosition": "none",
+        "forestDensity": 0.15,
+        "mountainsEnabled": true,
+        "mountainCount": 6,
+        "mountainPositions": [
+          {"x": 200, "y": 100, "width": 180, "height": 120},
+          {"x": 2800, "y": 150, "width": 200, "height": 150},
+          {"x": 150, "y": 2000, "width": 160, "height": 100},
+          {"x": 2700, "y": 2100, "width": 190, "height": 130},
+          {"x": 1500, "y": 100, "width": 150, "height": 110},
+          {"x": 1400, "y": 2200, "width": 170, "height": 120}
+        ],
+        "groundColor": [0.45, 0.40, 0.35],
+        "waterColor": [0.3, 0.4, 0.5]
+      },
+      "productionModifiers": {
+        "mining": 1.3,
+        "ore_extraction": 1.3,
+        "gem_finding": 1.25,
+        "farming": 0.8
+      },
+      "starterBuildings": [
+        {"typeId": "mine", "x": 300, "y": 200, "autoAssignRecipe": true},
+        {"typeId": "farm", "x": 150, "y": 400, "autoAssignRecipe": true},
+        {"typeId": "forge", "x": 400, "y": 200, "autoAssignRecipe": true, "ownerCitizenIndex": 0},
+        {"typeId": "cottage", "x": 250, "y": 350, "autoAssignRecipe": false, "initialOccupants": [0, 1]},
+        {"typeId": "lodge", "x": 350, "y": 350, "autoAssignRecipe": false, "initialOccupants": [2, 3, 4, 5, 6, 7]}
+      ],
+      "starterResources": [
+        {"commodityId": "iron_ore", "quantity": 40},
+        {"commodityId": "stone", "quantity": 50},
+        {"commodityId": "wheat", "quantity": 30},
+        {"commodityId": "coal", "quantity": 30}
+      ],
+      "starterGold": 1200,
+      "startingTreasury": 600,
+      "economicSystem": "capitalist",
+      "starterCitizens": [
+        {
+          "name": "Gustav Eisen",
+          "startingWealth": 600,
+          "intendedRole": "merchant",
+          "vocation": "Blacksmith",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 3
+        },
+        {
+          "name": "Helga Eisen",
+          "startingWealth": 0,
+          "intendedRole": "craftsman",
+          "vocation": "Blacksmith",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 3,
+          "familyRelation": {"type": "spouse", "targetIndex": 0}
+        },
+        {
+          "name": "Otto Berg",
+          "startingWealth": 200,
+          "intendedRole": "craftsman",
+          "vocation": "Miner",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Klaus Stein",
+          "startingWealth": 100,
+          "intendedRole": "laborer",
+          "vocation": "Miner",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Bruno Fels",
+          "startingWealth": 80,
+          "intendedRole": "laborer",
+          "vocation": "Miner",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Ingrid Acker",
+          "startingWealth": 120,
+          "intendedRole": "laborer",
+          "vocation": "Farmer",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Rolf Hammer",
+          "startingWealth": 90,
+          "intendedRole": "laborer",
+          "vocation": "Laborer",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Liesel Grube",
+          "startingWealth": 70,
+          "intendedRole": "laborer",
+          "vocation": "Laborer",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4
+        }
+      ],
+      "starterLandPlots": [
+        {"gridX": 4, "gridY": 2, "ownerCitizenIndex": 0},
+        {"gridX": 5, "gridY": 2, "ownerCitizenIndex": 0}
+      ],
+      "population": {
+        "initialCount": 8,
+        "classDistribution": {}
+      }
+    },
+    {
+      "id": "fertile_plains",
+      "name": "Fertile Plains",
+      "icon": "*",
+      "description": "Vast open grasslands with rich soil, ideal for agriculture and animal husbandry.",
+      "bonus": "+20% farm output",
+      "challenge": "-10% ore availability",
+      "terrain": {
+        "riverEnabled": true,
+        "riverWidth": 80,
+        "riverPosition": "east",
+        "forestDensity": 0.2,
+        "mountainsEnabled": false,
+        "mountainCount": 0,
+        "mountainPositions": [],
+        "groundColor": [0.4, 0.6, 0.3],
+        "waterColor": [0.25, 0.45, 0.65]
+      },
+      "productionModifiers": {
+        "farming": 1.2,
+        "animal_husbandry": 1.15,
+        "mining": 0.9,
+        "ore_extraction": 0.9
+      },
+      "starterBuildings": [
+        {"typeId": "farm", "x": 100, "y": 100, "autoAssignRecipe": true},
+        {"typeId": "bakery", "x": 200, "y": 100, "autoAssignRecipe": true},
+        {"typeId": "farm", "x": 300, "y": 150, "autoAssignRecipe": true},
+        {"typeId": "butcher", "x": 400, "y": 100, "autoAssignRecipe": true, "ownerCitizenIndex": 0},
+        {"typeId": "cottage", "x": 200, "y": 250, "autoAssignRecipe": false, "initialOccupants": [0, 1, 2]},
+        {"typeId": "lodge", "x": 320, "y": 250, "autoAssignRecipe": false, "initialOccupants": [3, 4, 5, 6, 7, 8]}
+      ],
+      "starterResources": [
+        {"commodityId": "wheat", "quantity": 60},
+        {"commodityId": "bread", "quantity": 40},
+        {"commodityId": "beef", "quantity": 25},
+        {"commodityId": "carrot", "quantity": 30}
+      ],
+      "starterGold": 1000,
+      "startingTreasury": 500,
+      "economicSystem": "capitalist",
+      "starterCitizens": [
+        {
+          "name": "Friedrich Fleischer",
+          "startingWealth": 700,
+          "intendedRole": "merchant",
+          "vocation": "Butcher",
+          "workplaceIndex": 3,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Hilde Fleischer",
+          "startingWealth": 0,
+          "intendedRole": "craftsman",
+          "vocation": "Butcher",
+          "workplaceIndex": 3,
+          "housingBuildingIndex": 4,
+          "familyRelation": {"type": "spouse", "targetIndex": 0}
+        },
+        {
+          "name": "Peter Fleischer",
+          "startingWealth": 0,
+          "intendedRole": "laborer",
+          "vocation": "Apprentice",
+          "workplaceIndex": 3,
+          "housingBuildingIndex": 4,
+          "familyRelation": {"type": "child", "targetIndex": 0}
+        },
+        {
+          "name": "Ernst Bauer",
+          "startingWealth": 250,
+          "intendedRole": "craftsman",
+          "vocation": "Baker",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Johann Korn",
+          "startingWealth": 120,
+          "intendedRole": "laborer",
+          "vocation": "Farmer",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Marta Wiese",
+          "startingWealth": 100,
+          "intendedRole": "laborer",
+          "vocation": "Farmer",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Konrad Feld",
+          "startingWealth": 90,
+          "intendedRole": "laborer",
+          "vocation": "Farmer",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Gerda Milch",
+          "startingWealth": 80,
+          "intendedRole": "laborer",
+          "vocation": "Farmer",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Ludwig Pflug",
+          "startingWealth": 70,
+          "intendedRole": "laborer",
+          "vocation": "Laborer",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 5
+        }
+      ],
+      "starterLandPlots": [
+        {"gridX": 4, "gridY": 1, "ownerCitizenIndex": 0},
+        {"gridX": 5, "gridY": 1, "ownerCitizenIndex": 0}
+      ],
+      "population": {
+        "initialCount": 9,
+        "classDistribution": {}
+      }
+    },
+    {
+      "id": "forest_edge",
+      "name": "Forest Edge",
+      "icon": "#",
+      "description": "A settlement at the edge of an ancient forest, abundant in lumber and wild game.",
+      "bonus": "+30% lumber, +hunting",
+      "challenge": "-15% open building space",
+      "terrain": {
+        "riverEnabled": true,
+        "riverWidth": 60,
+        "riverPosition": "west",
+        "forestDensity": 0.55,
+        "mountainsEnabled": false,
+        "mountainCount": 0,
+        "mountainPositions": [],
+        "groundColor": [0.3, 0.45, 0.25],
+        "waterColor": [0.2, 0.35, 0.5]
+      },
+      "productionModifiers": {
+        "lumber": 1.3,
+        "woodworking": 1.2,
+        "hunting": 1.25,
+        "foraging": 1.2
+      },
+      "starterBuildings": [
+        {"typeId": "sawmill", "x": 150, "y": 120, "autoAssignRecipe": true, "ownerCitizenIndex": 0},
+        {"typeId": "hunting_lodge", "x": 280, "y": 150, "autoAssignRecipe": true},
+        {"typeId": "farm", "x": 400, "y": 200, "autoAssignRecipe": true},
+        {"typeId": "carpentry", "x": 150, "y": 220, "autoAssignRecipe": true},
+        {"typeId": "cottage", "x": 300, "y": 300, "autoAssignRecipe": false, "initialOccupants": [0, 1, 2]},
+        {"typeId": "lodge", "x": 420, "y": 300, "autoAssignRecipe": false, "initialOccupants": [3, 4, 5, 6, 7]}
+      ],
+      "starterResources": [
+        {"commodityId": "lumber", "quantity": 60},
+        {"commodityId": "timber", "quantity": 40},
+        {"commodityId": "wheat", "quantity": 35},
+        {"commodityId": "apple", "quantity": 20}
+      ],
+      "starterGold": 900,
+      "startingTreasury": 450,
+      "economicSystem": "capitalist",
+      "starterCitizens": [
+        {
+          "name": "Werner Holz",
+          "startingWealth": 650,
+          "intendedRole": "merchant",
+          "vocation": "Carpenter",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Brigitte Holz",
+          "startingWealth": 0,
+          "intendedRole": "craftsman",
+          "vocation": "Carpenter",
+          "workplaceIndex": 3,
+          "housingBuildingIndex": 4,
+          "familyRelation": {"type": "spouse", "targetIndex": 0}
+        },
+        {
+          "name": "Felix Holz",
+          "startingWealth": 0,
+          "intendedRole": "laborer",
+          "vocation": "Apprentice",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4,
+          "familyRelation": {"type": "child", "targetIndex": 0}
+        },
+        {
+          "name": "Dieter Jaeger",
+          "startingWealth": 280,
+          "intendedRole": "craftsman",
+          "vocation": "Hunter",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Erika Wald",
+          "startingWealth": 130,
+          "intendedRole": "laborer",
+          "vocation": "Hunter",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Heinz Saege",
+          "startingWealth": 100,
+          "intendedRole": "laborer",
+          "vocation": "Woodcutter",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Rosa Bauer",
+          "startingWealth": 90,
+          "intendedRole": "laborer",
+          "vocation": "Farmer",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Oskar Stamm",
+          "startingWealth": 75,
+          "intendedRole": "laborer",
+          "vocation": "Woodcutter",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 5
+        }
+      ],
+      "starterLandPlots": [
+        {"gridX": 1, "gridY": 1, "ownerCitizenIndex": 0},
+        {"gridX": 2, "gridY": 1, "ownerCitizenIndex": 0}
+      ],
+      "population": {
+        "initialCount": 8,
+        "classDistribution": {}
+      }
+    },
+    {
+      "id": "desert_oasis",
+      "name": "Desert Oasis",
+      "icon": "o",
+      "description": "A trading hub around a desert oasis, excellent for exotic goods but harsh for agriculture.",
+      "bonus": "+exotic goods trade",
+      "challenge": "-30% water, -20% farming",
+      "terrain": {
+        "riverEnabled": false,
+        "riverWidth": 0,
+        "riverPosition": "none",
+        "forestDensity": 0.05,
+        "mountainsEnabled": true,
+        "mountainCount": 3,
+        "mountainPositions": [
+          {"x": 2600, "y": 300, "width": 200, "height": 140},
+          {"x": 2500, "y": 1800, "width": 180, "height": 120},
+          {"x": 200, "y": 1200, "width": 150, "height": 100}
+        ],
+        "oasisEnabled": true,
+        "oasisPosition": {"x": 1600, "y": 1200},
+        "oasisRadius": 200,
+        "groundColor": [0.7, 0.6, 0.4],
+        "waterColor": [0.3, 0.5, 0.7]
+      },
+      "productionModifiers": {
+        "trade": 1.3,
+        "exotic_goods": 1.4,
+        "farming": 0.8,
+        "water_access": 0.7
+      },
+      "starterBuildings": [
+        {"typeId": "market", "x": 1550, "y": 1150, "autoAssignRecipe": false, "ownerCitizenIndex": 0},
+        {"typeId": "farm", "x": 1650, "y": 1100, "autoAssignRecipe": true},
+        {"typeId": "weaver", "x": 1450, "y": 1150, "autoAssignRecipe": true},
+        {"typeId": "cottage", "x": 1550, "y": 1250, "autoAssignRecipe": false, "initialOccupants": [0, 1]},
+        {"typeId": "lodge", "x": 1670, "y": 1250, "autoAssignRecipe": false, "initialOccupants": [2, 3, 4, 5, 6]}
+      ],
+      "starterResources": [
+        {"commodityId": "gold", "quantity": 50},
+        {"commodityId": "silk", "quantity": 15},
+        {"commodityId": "wheat", "quantity": 25},
+        {"commodityId": "cotton", "quantity": 30}
+      ],
+      "starterGold": 1500,
+      "startingTreasury": 750,
+      "economicSystem": "capitalist",
+      "starterCitizens": [
+        {
+          "name": "Ahmed Hakim",
+          "startingWealth": 1200,
+          "intendedRole": "merchant",
+          "vocation": "Merchant",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 3
+        },
+        {
+          "name": "Fatima Hakim",
+          "startingWealth": 0,
+          "intendedRole": "craftsman",
+          "vocation": "Weaver",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 3,
+          "familyRelation": {"type": "spouse", "targetIndex": 0}
+        },
+        {
+          "name": "Yusuf Said",
+          "startingWealth": 300,
+          "intendedRole": "craftsman",
+          "vocation": "Weaver",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Layla Noor",
+          "startingWealth": 150,
+          "intendedRole": "laborer",
+          "vocation": "Farmer",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Omar Rashid",
+          "startingWealth": 100,
+          "intendedRole": "laborer",
+          "vocation": "Farmer",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Aisha Malik",
+          "startingWealth": 80,
+          "intendedRole": "laborer",
+          "vocation": "Laborer",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Hassan Qasim",
+          "startingWealth": 90,
+          "intendedRole": "laborer",
+          "vocation": "Laborer",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 4
+        }
+      ],
+      "starterLandPlots": [
+        {"gridX": 15, "gridY": 11, "ownerCitizenIndex": 0},
+        {"gridX": 15, "gridY": 12, "ownerCitizenIndex": 0},
+        {"gridX": 16, "gridY": 11, "ownerCitizenIndex": 0}
+      ],
+      "population": {
+        "initialCount": 7,
+        "classDistribution": {}
+      }
+    },
+    {
+      "id": "mining_hills",
+      "name": "Mining Hills",
+      "icon": "M",
+      "description": "Rolling hills studded with mineral deposits and gem caves, a miner's paradise.",
+      "bonus": "+40% ore, +gems",
+      "challenge": "-25% farming, limited water",
+      "terrain": {
+        "riverEnabled": false,
+        "riverWidth": 0,
+        "riverPosition": "none",
+        "forestDensity": 0.1,
+        "mountainsEnabled": true,
+        "mountainCount": 8,
+        "mountainPositions": [
+          {"x": 300, "y": 200, "width": 140, "height": 100},
+          {"x": 800, "y": 150, "width": 160, "height": 110},
+          {"x": 1400, "y": 250, "width": 150, "height": 95},
+          {"x": 2200, "y": 180, "width": 170, "height": 115},
+          {"x": 400, "y": 1800, "width": 155, "height": 105},
+          {"x": 1100, "y": 2000, "width": 145, "height": 100},
+          {"x": 2000, "y": 1900, "width": 165, "height": 110},
+          {"x": 2600, "y": 1600, "width": 175, "height": 120}
+        ],
+        "groundColor": [0.5, 0.45, 0.38],
+        "waterColor": [0.35, 0.45, 0.55]
+      },
+      "productionModifiers": {
+        "mining": 1.4,
+        "ore_extraction": 1.4,
+        "gem_finding": 1.35,
+        "farming": 0.75,
+        "water_access": 0.6
+      },
+      "starterBuildings": [
+        {"typeId": "mine", "x": 500, "y": 400, "autoAssignRecipe": true},
+        {"typeId": "mine", "x": 700, "y": 350, "autoAssignRecipe": true},
+        {"typeId": "forge", "x": 600, "y": 500, "autoAssignRecipe": true, "ownerCitizenIndex": 0},
+        {"typeId": "smelter", "x": 700, "y": 500, "autoAssignRecipe": true},
+        {"typeId": "cottage", "x": 500, "y": 550, "autoAssignRecipe": false, "initialOccupants": [0, 1, 2]},
+        {"typeId": "lodge", "x": 600, "y": 600, "autoAssignRecipe": false, "initialOccupants": [3, 4, 5, 6, 7, 8, 9]}
+      ],
+      "starterResources": [
+        {"commodityId": "iron_ore", "quantity": 80},
+        {"commodityId": "copper_ore", "quantity": 50},
+        {"commodityId": "coal", "quantity": 60},
+        {"commodityId": "stone", "quantity": 70},
+        {"commodityId": "wheat", "quantity": 20}
+      ],
+      "starterGold": 1100,
+      "startingTreasury": 550,
+      "economicSystem": "capitalist",
+      "starterCitizens": [
+        {
+          "name": "Viktor Stahl",
+          "startingWealth": 900,
+          "intendedRole": "merchant",
+          "vocation": "Blacksmith",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 4
+        },
+        {
+          "name": "Elsa Stahl",
+          "startingWealth": 0,
+          "intendedRole": "craftsman",
+          "vocation": "Blacksmith",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 4,
+          "familyRelation": {"type": "spouse", "targetIndex": 0}
+        },
+        {
+          "name": "Max Stahl",
+          "startingWealth": 0,
+          "intendedRole": "laborer",
+          "vocation": "Apprentice",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 4,
+          "familyRelation": {"type": "child", "targetIndex": 0}
+        },
+        {
+          "name": "Bernd Kohle",
+          "startingWealth": 250,
+          "intendedRole": "craftsman",
+          "vocation": "Smelter",
+          "workplaceIndex": 3,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Ulrich Berg",
+          "startingWealth": 150,
+          "intendedRole": "laborer",
+          "vocation": "Miner",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Gerd Stein",
+          "startingWealth": 120,
+          "intendedRole": "laborer",
+          "vocation": "Miner",
+          "workplaceIndex": 0,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Horst Erz",
+          "startingWealth": 100,
+          "intendedRole": "laborer",
+          "vocation": "Miner",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Inge Kupfer",
+          "startingWealth": 90,
+          "intendedRole": "laborer",
+          "vocation": "Miner",
+          "workplaceIndex": 1,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Walter Schacht",
+          "startingWealth": 80,
+          "intendedRole": "laborer",
+          "vocation": "Laborer",
+          "workplaceIndex": 3,
+          "housingBuildingIndex": 5
+        },
+        {
+          "name": "Frieda Grube",
+          "startingWealth": 70,
+          "intendedRole": "laborer",
+          "vocation": "Laborer",
+          "workplaceIndex": 2,
+          "housingBuildingIndex": 5
+        }
+      ],
+      "starterLandPlots": [
+        {"gridX": 6, "gridY": 5, "ownerCitizenIndex": 0},
+        {"gridX": 7, "gridY": 5, "ownerCitizenIndex": 0}
+      ],
+      "population": {
+        "initialCount": 10,
+        "classDistribution": {}
+      }
+    }
+  ]
+}

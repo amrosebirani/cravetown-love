@@ -15,8 +15,12 @@ const VectorVisualization: React.FC<VectorVisualizationProps> = ({
   values,
   title = 'Craving Profile',
   comparisonValues = [],
-  maxValue = 10,
+  maxValue,
 }) => {
+  // Calculate dynamic max if not provided
+  const allValues = [...values, ...comparisonValues.flatMap(c => c.values)];
+  const calculatedMax = Math.max(...allValues, 1);
+  const effectiveMax = maxValue ?? Math.ceil(calculatedMax * 1.2); // 20% headroom
   // Prepare data for radar chart
   const prepareData = () => {
     const data: any[] = [];
@@ -53,7 +57,7 @@ const VectorVisualization: React.FC<VectorVisualizationProps> = ({
       value: {
         alias: 'Craving Value',
         min: 0,
-        max: maxValue,
+        max: effectiveMax,
       },
     },
     xAxis: {
@@ -79,10 +83,26 @@ const VectorVisualization: React.FC<VectorVisualizationProps> = ({
         },
       },
     },
-    area: {},
-    point: {
-      size: 3,
+    area: {
+      style: {
+        fillOpacity: 0.3,
+      },
     },
+    point: {
+      size: 4,
+      shape: 'circle',
+      style: {
+        fill: '#5B8FF9',
+        stroke: '#5B8FF9',
+        lineWidth: 2,
+      },
+    },
+    line: {
+      style: {
+        lineWidth: 2,
+      },
+    },
+    legend: false,  // Hide legend for single series
   };
 
   return (

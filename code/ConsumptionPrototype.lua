@@ -131,18 +131,20 @@ function ConsumptionPrototype:Create()
 
     -- Policy settings (runtime overrides of consumption_mechanics)
     prototype.allocationPolicy = {
-        -- Priority mode: "need_based" (default), "equality", "class_based"
+        -- Priority mode: "need_based" (default), "equality"
+        -- Phase 5: "class_based" removed - priority is now purely desperation-based
         priorityMode = "need_based",
 
         -- Fairness mode: spreads resources more evenly when enabled
         fairnessEnabled = false,
 
-        -- Class priority weights (multipliers)
+        -- Class consumption budgets now control class advantage (not priority)
+        -- Higher budget = more items consumed per cycle (wealthier classes can afford more)
         classPriorities = {
-            Elite = 10,
-            Upper = 7,
-            Middle = 4,
-            Working = 2,
+            Elite = 1,
+            Upper = 1,
+            Middle = 1,
+            Working = 1,
             Poor = 1
         },
 
@@ -193,11 +195,11 @@ function ConsumptionPrototype:Create()
         },
         {
             name = "Hierarchical",
-            description = "Class-based priority, elites first",
+            description = "Higher class = more consumption budget (class advantage through quantity)",
             settings = {
-                priorityMode = "class_based",
+                priorityMode = "need_based",
                 fairnessEnabled = false,
-                classPriorities = {Elite = 20, Upper = 10, Middle = 5, Working = 2, Poor = 1},
+                classPriorities = {Elite = 1, Upper = 1, Middle = 1, Working = 1, Poor = 1},
                 consumptionBudgets = {Elite = 15, Upper = 10, Middle = 5, Working = 2, Poor = 1},
                 reserveThreshold = 0.0
             }
@@ -224,7 +226,7 @@ function ConsumptionPrototype:Create()
             settings = {
                 priorityMode = "need_based",
                 fairnessEnabled = false,
-                classPriorities = {Elite = 10, Upper = 7, Middle = 4, Working = 2, Poor = 1},
+                classPriorities = {Elite = 1, Upper = 1, Middle = 1, Working = 1, Poor = 1},
                 consumptionBudgets = {Elite = 10, Upper = 7, Middle = 5, Working = 3, Poor = 2},
                 dimensionPriorities = {
                     biological = 1.0, safety = 0.9, touch = 0.7,
@@ -3482,9 +3484,9 @@ function ConsumptionPrototype:RenderAllocationPolicyModal()
     y = y + 30
 
     local modes = {
-        {id = "need_based", label = "Need-Based", desc = "Prioritize characters with highest cravings"},
-        {id = "equality", label = "Equality", desc = "Equal chance regardless of class/need"},
-        {id = "class_based", label = "Class-Based", desc = "Prioritize by social class (Elite first)"}
+        {id = "need_based", label = "Need-Based", desc = "Prioritize characters with highest cravings (desperation)"},
+        {id = "equality", label = "Equality", desc = "Equal chance regardless of need level"}
+        -- Phase 5: "class_based" removed - class advantage is now through consumption budgets, not priority
     }
 
     for _, mode in ipairs(modes) do
@@ -3521,56 +3523,15 @@ function ConsumptionPrototype:RenderAllocationPolicyModal()
     y = y + itemSpacing + sectionSpacing
 
     -- =============================================================================
-    -- Section 4: Class Priority Weights
+    -- Section 4: Class Priority Weights (DEPRECATED - Phase 5)
+    -- Priority is now purely desperation-based. Class advantage is through consumption budgets.
     -- =============================================================================
-    love.graphics.setColor(0.8, 0.65, 0.4)
-    love.graphics.print("CLASS PRIORITY WEIGHTS", contentX, y, 0, 1.1, 1.1)
-
     love.graphics.setColor(0.5, 0.5, 0.5)
-    love.graphics.print("(Higher = more priority in allocation)", contentX + 220, y + 3, 0, 0.8, 0.8)
-    y = y + 30
+    love.graphics.print("CLASS PRIORITY WEIGHTS (Deprecated)", contentX, y, 0, 1.1, 1.1)
 
-    local classes = {"Elite", "Upper", "Middle", "Working", "Poor"}
-    for _, className in ipairs(classes) do
-        local weight = self.allocationPolicy.classPriorities[className] or 1
-
-        -- Class name
-        local classColor = self:GetClassColor(className)
-        love.graphics.setColor(classColor[1], classColor[2], classColor[3])
-        love.graphics.print(className .. ":", contentX, y + 5, 0, 0.9, 0.9)
-
-        -- Weight value
-        love.graphics.setColor(0.9, 0.9, 0.9)
-        love.graphics.print(string.format("%d", weight), contentX + 100, y + 5, 0, 0.9, 0.9)
-
-        -- Decrease button
-        self:RenderButton("-", contentX + 140, y, 30, 28, function()
-            self.allocationPolicy.classPriorities[className] = math.max(0, weight - 1)
-            self.allocationPolicy.activePreset = nil
-        end, false, {0.5, 0.3, 0.3})
-
-        -- Increase button
-        self:RenderButton("+", contentX + 175, y, 30, 28, function()
-            self.allocationPolicy.classPriorities[className] = math.min(50, weight + 1)
-            self.allocationPolicy.activePreset = nil
-        end, false, {0.3, 0.5, 0.3})
-
-        -- Visual bar
-        local barX = contentX + 220
-        local barW = 200
-        local barH = 20
-        local maxWeight = 20
-        local fillW = math.min(1, weight / maxWeight) * barW
-
-        love.graphics.setColor(0.2, 0.2, 0.25)
-        love.graphics.rectangle("fill", barX, y + 4, barW, barH)
-        love.graphics.setColor(classColor[1] * 0.7, classColor[2] * 0.7, classColor[3] * 0.7)
-        love.graphics.rectangle("fill", barX, y + 4, fillW, barH)
-
-        y = y + 32
-    end
-
-    y = y + sectionSpacing
+    love.graphics.setColor(0.4, 0.4, 0.4)
+    love.graphics.print("Phase 5: Priority is now desperation-based. Use Consumption Budgets for class advantage.", contentX, y + 22, 0, 0.75, 0.75)
+    y = y + 50
 
     -- =============================================================================
     -- Section 5: Class Consumption Budgets
@@ -3895,35 +3856,31 @@ function ConsumptionPrototype:CalculatePolicyImpactPreview()
 end
 
 -- Calculate character priority based on current policy settings
+-- Phase 5: Priority is based on desperation (unfulfilled cravings) + fairness penalty
+-- Class is NOT used for priority - only for quality acceptance and consumption budgets
 function ConsumptionPrototype:CalculateCharacterPriorityWithPolicy(character)
     local policy = self.allocationPolicy
     local priority = 0
-
-    -- Base class weight
-    local classWeight = policy.classPriorities[character.class] or 1
 
     if policy.priorityMode == "equality" then
         -- Everyone gets same base priority
         priority = 100 + math.random(0, 10)  -- Small random factor
 
-    elseif policy.priorityMode == "class_based" then
-        -- Pure class-based priority
-        priority = classWeight * 100
-
-    else -- need_based (default)
-        -- Use dimension priorities to weight cravings
+    else -- need_based (default) - Phase 5: desperation-based, no class weight
+        -- Use dimension priorities to weight cravings (desperation score)
         local coarseCravings = character:AggregateCurrentCravingsToCoarse()
-        local weightedCraving = 0
+        local desperationScore = 0
 
         for dimKey, dimWeight in pairs(policy.dimensionPriorities) do
             local craving = coarseCravings[dimKey] or 0
-            weightedCraving = weightedCraving + (craving * dimWeight)
+            desperationScore = desperationScore + (craving * dimWeight)
         end
 
-        priority = classWeight * 10 + weightedCraving
+        -- Priority is purely based on desperation (no class weight)
+        priority = desperationScore
     end
 
-    -- Apply fairness penalty if enabled
+    -- Apply fairness penalty if enabled (reduces priority for recently satisfied characters)
     if policy.fairnessEnabled then
         priority = priority - (character.fairnessPenalty or 0)
     end

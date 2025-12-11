@@ -137,14 +137,33 @@ function AlphaPrototypeState:StartGame()
     self.mPhase = "game"
     self.mTitleScreen = nil
 
-    -- Initialize the alpha world
-    self.mWorld = AlphaWorld:Create()
+    -- Load starting location based on game config
+    local locationId = self.mGameConfig and self.mGameConfig.location or "fertile_plains"
+    local startingLocation = DataLoader.getStartingLocationById(locationId)
+
+    -- Store the starting location for SetupStarterContent
+    self.mStartingLocation = startingLocation
+
+    -- Get terrain config from starting location
+    local terrainConfig = nil
+    if startingLocation and startingLocation.terrain then
+        terrainConfig = startingLocation.terrain
+    end
+
+    -- Initialize the alpha world with terrain config
+    self.mWorld = AlphaWorld:Create(terrainConfig)
 
     -- Apply game config if available
     if self.mGameConfig then
         self.mWorld.townName = self.mGameConfig.townName or "Prosperityville"
         -- Store other config for use in setup
         self.mWorld.gameConfig = self.mGameConfig
+    end
+
+    -- Store production modifiers from starting location
+    if startingLocation and startingLocation.productionModifiers then
+        self.mWorld.productionModifiers = startingLocation.productionModifiers
+        print("[AlphaPrototypeState] Applied production modifiers from location: " .. locationId)
     end
 
     -- Initialize UI
@@ -196,25 +215,42 @@ function AlphaPrototypeState:LoadSaveFile(filename)
 end
 
 function AlphaPrototypeState:SetupStarterContent()
-    -- Load starter configuration from data
-    local config = DataLoader.loadAlphaStarterConfig()
-
-    if not config then
-        -- Fallback to defaults using DataLoader
+    -- Use starting location if available, otherwise fall back to alpha_starter_config
+    local config
+    if self.mStartingLocation then
+        -- Use starting location data
         config = {
-            population = {
+            population = self.mStartingLocation.population or {
                 initialCount = 15,
                 classDistribution = DataLoader.getDefaultClassDistribution()
             },
-            starterBuildings = {},
-            starterResources = {},
-            starterGold = 1000
+            starterBuildings = self.mStartingLocation.starterBuildings or {},
+            starterResources = self.mStartingLocation.starterResources or {},
+            starterGold = self.mStartingLocation.starterGold or 1000,
+            starterCitizens = self.mStartingLocation.starterCitizens or nil,
+            starterLandPlots = self.mStartingLocation.starterLandPlots or {}
         }
+        print("[SetupStarterContent] Using starting location: " .. (self.mStartingLocation.id or "unknown"))
+    else
+        -- Fallback to alpha_starter_config
+        config = DataLoader.loadAlphaStarterConfig()
+        if not config then
+            config = {
+                population = {
+                    initialCount = 15,
+                    classDistribution = DataLoader.getDefaultClassDistribution()
+                },
+                starterBuildings = {},
+                starterResources = {},
+                starterGold = 1000
+            }
+        end
+        print("[SetupStarterContent] Using fallback alpha_starter_config")
     end
 
     -- Apply game config overrides if available
     if self.mGameConfig then
-        if self.mGameConfig.startingPopulation then
+        if self.mGameConfig.startingPopulation and not config.starterCitizens then
             config.population = config.population or {}
             config.population.initialCount = self.mGameConfig.startingPopulation
         end
@@ -233,23 +269,17 @@ function AlphaPrototypeState:SetupStarterContent()
         end
     end
 
-    -- Spawn initial population from config
-    local popConfig = config.population or {}
-    local count = popConfig.initialCount or 15
-    local distribution = popConfig.classDistribution or DataLoader.getDefaultClassDistribution()
-    self.mWorld:SpawnInitialPopulation(count, distribution)
+    -- Track created buildings by index for citizen assignment
+    local buildingsByIndex = {}
 
-    -- Track created buildings by type for worker assignment
-    local buildingsByType = {}
-
-    -- Add starter buildings from config
+    -- Add starter buildings from config FIRST (before citizens, so we can assign housing)
     -- Validate positions to avoid water, trees, and other buildings
     local usedPositions = {}  -- Track positions already used
 
-    for _, buildingConfig in ipairs(config.starterBuildings or {}) do
+    for buildingIndex, buildingConfig in ipairs(config.starterBuildings or {}) do
         local x, y = buildingConfig.x, buildingConfig.y
 
-        -- Helper to check if position is valid (not in water, trees, or overlapping other buildings)
+        -- Helper to check if position is valid (not in water, trees, mountains, or overlapping other buildings)
         local function isValidPosition(px, py)
             -- Check water
             if self.mWorld:IsBuildingInWater(px, py, 60, 60) then
@@ -257,6 +287,10 @@ function AlphaPrototypeState:SetupStarterContent()
             end
             -- Check trees
             if self.mWorld.forest and self.mWorld.forest:CheckRectCollision(px, py, 60, 60) then
+                return false
+            end
+            -- Check mountains
+            if self.mWorld.mountains and self.mWorld.mountains:CheckRectCollision(px, py, 60, 60) then
                 return false
             end
             -- Check already used positions
@@ -301,7 +335,8 @@ function AlphaPrototypeState:SetupStarterContent()
             y
         )
         if building then
-            buildingsByType[buildingConfig.typeId] = building
+            -- Store by 0-based index (to match JSON format)
+            buildingsByIndex[buildingIndex - 1] = building
 
             -- Auto-assign first matching recipe if configured
             if buildingConfig.autoAssignRecipe then
@@ -311,6 +346,83 @@ function AlphaPrototypeState:SetupStarterContent()
                         break
                     end
                 end
+            end
+        end
+    end
+
+    -- Spawn citizens - either from starterCitizens or population config
+    local citizensByIndex = {}  -- Track citizens by their index for building/land assignment
+
+    if config.starterCitizens and #config.starterCitizens > 0 then
+        -- Use detailed starter citizens from starting_locations.json
+        print("[SetupStarterContent] Spawning " .. #config.starterCitizens .. " starter citizens")
+        for citizenIndex, citizenConfig in ipairs(config.starterCitizens) do
+            -- Determine class based on intendedRole
+            local classId = "middle"  -- default
+            if citizenConfig.intendedRole == "wealthy" then
+                classId = "upper"
+            elseif citizenConfig.intendedRole == "merchant" then
+                classId = "middle"
+            elseif citizenConfig.intendedRole == "craftsman" then
+                classId = "middle"
+            elseif citizenConfig.intendedRole == "laborer" then
+                classId = "lower"
+            end
+
+            local citizen = self.mWorld:AddCitizen(classId, citizenConfig.name, nil, {
+                startingWealth = citizenConfig.startingWealth or 0,
+                vocation = citizenConfig.vocation
+            })
+
+            if citizen then
+                -- Store by 0-based index
+                citizensByIndex[citizenIndex - 1] = citizen
+
+                -- Assign to workplace if specified
+                if citizenConfig.workplaceIndex ~= nil then
+                    local workplace = buildingsByIndex[citizenConfig.workplaceIndex]
+                    if workplace then
+                        self.mWorld:AssignWorkerToBuilding(citizen, workplace)
+                    end
+                end
+
+                -- Assign to housing if specified
+                if citizenConfig.housingBuildingIndex ~= nil and self.mWorld.housingSystem then
+                    local housingBuilding = buildingsByIndex[citizenConfig.housingBuildingIndex]
+                    if housingBuilding then
+                        self.mWorld.housingSystem:AssignHousing(citizen.id, housingBuilding.id)
+                    end
+                end
+            end
+        end
+    else
+        -- Fallback: Spawn initial population from config (legacy method)
+        local popConfig = config.population or {}
+        local count = popConfig.initialCount or 15
+        local distribution = popConfig.classDistribution or DataLoader.getDefaultClassDistribution()
+        self.mWorld:SpawnInitialPopulation(count, distribution)
+    end
+
+    -- Assign starter land plots to citizens
+    if self.mWorld.landSystem then
+        for _, plotConfig in ipairs(config.starterLandPlots or {}) do
+            local plotId = self.mWorld.landSystem:GetPlotId(plotConfig.gridX, plotConfig.gridY)
+            local ownerCitizen = citizensByIndex[plotConfig.ownerCitizenIndex]
+            if plotId and ownerCitizen then
+                self.mWorld.landSystem:TransferOwnership(plotId, ownerCitizen.id, 0, 1)
+                print("[SetupStarterContent] Assigned plot " .. plotId .. " to " .. ownerCitizen.name)
+            end
+        end
+    end
+
+    -- Assign building ownership for buildings with ownerCitizenIndex
+    for buildingIndex, buildingConfig in ipairs(config.starterBuildings or {}) do
+        if buildingConfig.ownerCitizenIndex ~= nil then
+            local building = buildingsByIndex[buildingIndex - 1]
+            local ownerCitizen = citizensByIndex[buildingConfig.ownerCitizenIndex]
+            if building and ownerCitizen and self.mWorld.ownershipManager then
+                self.mWorld.ownershipManager:TransferBuilding(building.id, ownerCitizen.id, 0, 1)
+                print("[SetupStarterContent] Assigned building " .. building.name .. " to " .. ownerCitizen.name)
             end
         end
     end
@@ -325,47 +437,11 @@ function AlphaPrototypeState:SetupStarterContent()
         self.mWorld.gold = config.starterGold
     end
 
-    -- Auto-assign workers based on config
-    local workerConfig = config.workerAssignment or {}
-    if workerConfig.autoAssignLowerClasses then
-        -- Find workers from lower classes (last class in the list)
-        local classIds = DataLoader.getClassIds()
-        local lowerClassId = classIds[#classIds]  -- Last class is typically "lower"
-
-        local workers = {}
-        for _, citizen in ipairs(self.mWorld.citizens) do
-            if citizen.class == lowerClassId then
-                table.insert(workers, citizen)
-            end
-        end
-
-        local workerIndex = 1
-
-        -- Assign workers to farm
-        local farm = buildingsByType["farm"]
-        if farm and workerConfig.farmWorkers then
-            for i = 1, workerConfig.farmWorkers do
-                if workers[workerIndex] then
-                    self.mWorld:AssignWorkerToBuilding(workers[workerIndex], farm)
-                    workerIndex = workerIndex + 1
-                end
-            end
-        end
-
-        -- Assign workers to bakery
-        local bakery = buildingsByType["bakery"]
-        if bakery and workerConfig.bakeryWorkers then
-            for i = 1, workerConfig.bakeryWorkers do
-                if workers[workerIndex] then
-                    self.mWorld:AssignWorkerToBuilding(workers[workerIndex], bakery)
-                    workerIndex = workerIndex + 1
-                end
-            end
-        end
-    end
-
     -- Update stats
     self.mWorld:UpdateStats()
+
+    -- Run free agency to assign any remaining workers based on their vocations
+    self.mWorld:RunFreeAgency()
 
     -- Log initial setup with town name
     local townName = self.mWorld.townName or "CraveTown"
@@ -464,6 +540,10 @@ function AlphaPrototypeState:textinput(text)
     if self.mPhase == "setup" then
         if self.mNewGameSetup then
             return self.mNewGameSetup:TextInput(text)
+        end
+    elseif self.mPhase == "game" then
+        if self.mUI then
+            return self.mUI:HandleTextInput(text)
         end
     end
     return false

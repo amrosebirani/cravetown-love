@@ -599,15 +599,11 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
 end
 
 -- Calculate priority using policy settings
--- policy contains: priorityMode, fairnessEnabled, classPriorities, dimensionPriorities
+-- Phase 5: Priority is based on desperation (unfulfilled cravings) + fairness penalty
+-- Class is NOT used for priority - only for quality acceptance and consumption budgets
+-- policy contains: priorityMode, fairnessEnabled, dimensionPriorities
 function AllocationEngineV2.CalculatePriorityWithPolicy(character, currentCycle, policy)
     local priority = 0
-
-    -- Get class weight from policy
-    local classWeight = 1
-    if policy.classPriorities and policy.classPriorities[character.class] then
-        classWeight = policy.classPriorities[character.class]
-    end
 
     local priorityMode = policy.priorityMode or "need_based"
 
@@ -615,31 +611,28 @@ function AllocationEngineV2.CalculatePriorityWithPolicy(character, currentCycle,
         -- Everyone gets same base priority with small random factor
         priority = 100 + math.random(0, 10)
 
-    elseif priorityMode == "class_based" then
-        -- Pure class-based priority
-        priority = classWeight * 100
-
-    else -- need_based (default)
-        -- Use dimension priorities to weight cravings
+    else -- need_based (default) - Phase 5: desperation-based, no class weight
+        -- Use dimension priorities to weight cravings (desperation score)
         local coarseCravings = character:AggregateCurrentCravingsToCoarse()
-        local weightedCraving = 0
+        local desperationScore = 0
 
         if policy.dimensionPriorities then
             for dimKey, dimWeight in pairs(policy.dimensionPriorities) do
                 local craving = coarseCravings[dimKey] or 0
-                weightedCraving = weightedCraving + (craving * dimWeight)
+                desperationScore = desperationScore + (craving * dimWeight)
             end
         else
-            -- Fallback: sum all cravings
+            -- Fallback: sum all cravings with default weights
             for _, craving in pairs(coarseCravings) do
-                weightedCraving = weightedCraving + craving
+                desperationScore = desperationScore + craving
             end
         end
 
-        priority = classWeight * 10 + weightedCraving
+        -- Priority is purely based on desperation (no class weight)
+        priority = desperationScore
     end
 
-    -- Apply fairness penalty if enabled
+    -- Apply fairness penalty if enabled (reduces priority for recently satisfied characters)
     if policy.fairnessEnabled then
         priority = priority - (character.fairnessPenalty or 0)
     end

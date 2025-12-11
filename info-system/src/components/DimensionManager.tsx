@@ -13,7 +13,8 @@ const DimensionManager: React.FC = () => {
   const [editingFine, setEditingFine] = useState<FineDimension | null>(null);
   const [isCoarseModalVisible, setIsCoarseModalVisible] = useState(false);
   const [isFineModalVisible, setIsFineModalVisible] = useState(false);
-  const [form] = Form.useForm();
+  const [coarseForm] = Form.useForm();
+  const [fineForm] = Form.useForm();
 
   useEffect(() => {
     loadData();
@@ -46,13 +47,13 @@ const DimensionManager: React.FC = () => {
   // Coarse Dimension handlers
   const handleAddCoarse = () => {
     setEditingCoarse(null);
-    form.resetFields();
+    coarseForm.resetFields();
     setIsCoarseModalVisible(true);
   };
 
   const handleEditCoarse = (record: CoarseDimension) => {
     setEditingCoarse(record);
-    form.setFieldsValue(record);
+    coarseForm.setFieldsValue(record);
     setIsCoarseModalVisible(true);
   };
 
@@ -73,7 +74,7 @@ const DimensionManager: React.FC = () => {
 
   const handleCoarseModalOk = async () => {
     try {
-      const values = await form.validateFields();
+      const values = await coarseForm.validateFields();
       if (!data) return;
 
       let newCoarseDimensions: CoarseDimension[];
@@ -103,7 +104,7 @@ const DimensionManager: React.FC = () => {
 
       await saveData(newData);
       setIsCoarseModalVisible(false);
-      form.resetFields();
+      coarseForm.resetFields();
     } catch (error) {
       console.error('Validation failed:', error);
     }
@@ -112,13 +113,13 @@ const DimensionManager: React.FC = () => {
   // Fine Dimension handlers
   const handleAddFine = () => {
     setEditingFine(null);
-    form.resetFields();
+    fineForm.resetFields();
     setIsFineModalVisible(true);
   };
 
   const handleEditFine = (record: FineDimension) => {
     setEditingFine(record);
-    form.setFieldsValue({
+    fineForm.setFieldsValue({
       ...record,
       tags: record.tags.join(', ')
     });
@@ -142,7 +143,7 @@ const DimensionManager: React.FC = () => {
 
   const handleFineModalOk = async () => {
     try {
-      const values = await form.validateFields();
+      const values = await fineForm.validateFields();
       if (!data) return;
 
       // Parse tags
@@ -179,7 +180,7 @@ const DimensionManager: React.FC = () => {
 
       await saveData(newData);
       setIsFineModalVisible(false);
-      form.resetFields();
+      fineForm.resetFields();
     } catch (error) {
       console.error('Validation failed:', error);
     }
@@ -436,11 +437,11 @@ const DimensionManager: React.FC = () => {
         onOk={handleCoarseModalOk}
         onCancel={() => {
           setIsCoarseModalVisible(false);
-          form.resetFields();
+          coarseForm.resetFields();
         }}
         width={600}
       >
-        <Form form={form} layout="vertical">
+        <Form form={coarseForm} layout="vertical">
           <Form.Item
             name="id"
             label="ID"
@@ -520,11 +521,11 @@ const DimensionManager: React.FC = () => {
         onOk={handleFineModalOk}
         onCancel={() => {
           setIsFineModalVisible(false);
-          form.resetFields();
+          fineForm.resetFields();
         }}
         width={600}
       >
-        <Form form={form} layout="vertical">
+        <Form form={fineForm} layout="vertical">
           <Form.Item
             name="id"
             label="ID"

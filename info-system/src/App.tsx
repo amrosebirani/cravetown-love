@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout, Menu, Spin } from 'antd';
 import { DatabaseOutlined, AppstoreOutlined, TeamOutlined, HomeOutlined, TagsOutlined,
-         BulbOutlined, UserOutlined, SmileOutlined, GiftOutlined, ThunderboltOutlined, SwapOutlined, BranchesOutlined, FireOutlined, NodeIndexOutlined, ClockCircleOutlined, LinkOutlined, CalculatorOutlined } from '@ant-design/icons';
+         BulbOutlined, UserOutlined, SmileOutlined, GiftOutlined, ThunderboltOutlined, SwapOutlined, BranchesOutlined, FireOutlined, NodeIndexOutlined, ClockCircleOutlined, LinkOutlined, CalculatorOutlined, EnvironmentOutlined, DollarOutlined, GlobalOutlined } from '@ant-design/icons';
 import RecipeManager from './components/RecipeManager';
 import CommodityManager from './components/CommodityManager';
 import CommodityCategoryManager from './components/CommodityCategoryManager';
@@ -20,6 +20,10 @@ import VersionManager from './components/VersionManager';
 import TimeSlotManager from './components/TimeSlotManager';
 import CravingSlotManager from './components/CravingSlotManager';
 import UnitsManager from './components/UnitsManager';
+import StartingLocationManager from './components/StartingLocationManager';
+import ClassThresholdsManager from './components/ClassThresholdsManager';
+import LandConfigManager from './components/LandConfigManager';
+import HousingConfigManager from './components/HousingConfigManager';
 import { initializeVersionSystem } from './api';
 import './App.css';
 
@@ -28,7 +32,8 @@ const { Header, Content, Sider } = Layout;
 type TabKey = 'versions' | 'recipes' | 'commodities' | 'commodity-categories' | 'workers' | 'buildings' | 'work-categories' |
               'dimensions' | 'character-classes' | 'traits' | 'fulfillment-vectors' | 'enablement-rules' |
               'substitution-calculator' | 'commodity-fatigue' | 'substitution-rules' |
-              'time-slots' | 'craving-slots' | 'units';
+              'time-slots' | 'craving-slots' | 'units' | 'starting-locations' |
+              'class-thresholds' | 'land-config' | 'housing-config';
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<TabKey>('recipes');
@@ -86,6 +91,11 @@ function App() {
                     icon: <BranchesOutlined />,
                     label: 'Version Manager',
                   },
+                  {
+                    key: 'starting-locations',
+                    icon: <EnvironmentOutlined />,
+                    label: 'Starting Locations',
+                  },
                 ]
               },
               {
@@ -137,6 +147,27 @@ function App() {
                     key: 'units',
                     icon: <CalculatorOutlined />,
                     label: 'Units & Baselines',
+                  },
+                ]
+              },
+              {
+                type: 'group',
+                label: 'Economy & Housing',
+                children: [
+                  {
+                    key: 'class-thresholds',
+                    icon: <UserOutlined />,
+                    label: 'Class Thresholds',
+                  },
+                  {
+                    key: 'land-config',
+                    icon: <GlobalOutlined />,
+                    label: 'Land System',
+                  },
+                  {
+                    key: 'housing-config',
+                    icon: <HomeOutlined />,
+                    label: 'Housing Config',
                   },
                 ]
               },
@@ -217,6 +248,7 @@ function App() {
             ) : (
               <>
                 {selectedTab === 'versions' && <VersionManager />}
+                {selectedTab === 'starting-locations' && <StartingLocationManager />}
                 {selectedTab === 'buildings' && <BuildingTypeManager />}
                 {selectedTab === 'recipes' && <RecipeManager />}
                 {selectedTab === 'commodities' && <CommodityManager />}
@@ -234,6 +266,9 @@ function App() {
                 {selectedTab === 'time-slots' && <TimeSlotManager />}
                 {selectedTab === 'craving-slots' && <CravingSlotManager />}
                 {selectedTab === 'units' && <UnitsManager />}
+                {selectedTab === 'class-thresholds' && <ClassThresholdsManager />}
+                {selectedTab === 'land-config' && <LandConfigManager />}
+                {selectedTab === 'housing-config' && <HousingConfigManager />}
               </>
             )}
           </Content>

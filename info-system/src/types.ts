@@ -39,11 +39,44 @@ export interface CommodityCategoriesData {
   categories: CommodityCategory[];
 }
 
+export type QualityTier = 'poor' | 'basic' | 'good' | 'luxury' | 'masterwork';
+
 export interface Commodity {
   id: string;
   name: string;
   category: string;
   description?: string;
+  quality?: QualityTier;  // Default quality tier for this commodity
+  icon?: string;
+  stackSize?: number;
+  baseValue?: number;
+  isRaw?: boolean;
+  perishable?: boolean;
+}
+
+// Quality Tier Definition Types
+export interface QualityTierDefinition {
+  id: string;
+  name: string;
+  description: string;
+  order: number;
+  defaultMultiplier: number;
+  valueMultiplier: number;
+  color: [number, number, number];
+}
+
+export interface QualityTiersData {
+  version: string;
+  description?: string;
+  tiers: QualityTierDefinition[];
+  defaultTier: string;
+  productionRules?: {
+    description: string;
+    factors: Record<string, { description: string; weight: number }>;
+    upgradeChance?: { description: string; baseChance: number; skillBonus: number };
+    degradeChance?: { description: string; baseChance: number; penaltyForLowMaintenance: number };
+  };
+  classAcceptance?: Record<string, { accepted: string[]; rejected: string[] }>;
 }
 
 export interface CommoditiesData {
@@ -242,7 +275,8 @@ export interface CommodityFulfillment {
   tags: string[];
   durability: string;
   qualityMultipliers: Record<string, number>;
-  reusableValue?: number;
+  durationCycles?: number | null;  // How many cycles before expiry (null for consumable/permanent)
+  effectDecayRate?: number;        // Effectiveness loss per cycle (0 = no decay)
   notes?: string;
 }
 
@@ -482,4 +516,404 @@ export interface UnitsData {
   personDayBaseline: PersonDayBaseline;
   commodityUnits: Record<string, CommodityUnit>;
   displayFormats?: Record<string, string>;
+}
+
+// ============================================================================
+// Starting Locations Types
+// ============================================================================
+
+export interface MountainPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface OasisPosition {
+  x: number;
+  y: number;
+}
+
+export interface LocationTerrain {
+  riverEnabled: boolean;
+  riverWidth: number;
+  riverPosition: 'none' | 'center' | 'east' | 'west';
+  forestDensity: number;  // 0.0 to 1.0
+  mountainsEnabled: boolean;
+  mountainCount: number;
+  mountainPositions: MountainPosition[];
+  oasisEnabled?: boolean;
+  oasisPosition?: OasisPosition;
+  oasisRadius?: number;
+  groundColor: [number, number, number];  // RGB [0-1, 0-1, 0-1]
+  waterColor: [number, number, number];  // RGB [0-1, 0-1, 0-1]
+}
+
+export interface StarterBuilding {
+  typeId: string;
+  x: number;
+  y: number;
+  autoAssignRecipe: boolean;
+}
+
+export interface StarterResource {
+  commodityId: string;
+  quantity: number;
+}
+
+export interface StarterCitizen {
+  classId: string;
+  vocationId: string;
+  traitIds?: string[];  // Optional array of traits
+}
+
+export interface LocationPopulation {
+  initialCount: number;
+  classDistribution: Record<string, number>;  // class id -> percentage (0-1) - used as fallback
+  starterCitizens?: StarterCitizen[];  // Specific citizens to spawn (optional, overrides distribution)
+}
+
+export interface StartingLocation {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  bonus: string;
+  challenge: string;
+  terrain: LocationTerrain;
+  productionModifiers: Record<string, number>;  // category -> multiplier
+  starterBuildings: StarterBuilding[];
+  starterResources: StarterResource[];
+  starterGold: number;
+  population: LocationPopulation;
+}
+
+export interface StartingLocationsData {
+  version: string;
+  description?: string;
+  locations: StartingLocation[];
+}
+
+// ============================================================================
+// Phase 7: Ownership & Housing System Types
+// ============================================================================
+
+// Emergent Class role for starter citizens (not fixed class)
+export type IntendedRole = 'wealthy' | 'merchant' | 'craftsman' | 'laborer';
+
+// Updated StarterCitizen with emergent class support
+export interface StarterCitizenV2 {
+  name?: string;  // Optional custom name
+  vocationId: string;
+  traitIds?: string[];
+  // Emergent class fields (replaces classId)
+  startingWealth: number;  // Gold amount to start with
+  intendedRole: IntendedRole;  // Role determines starting wealth defaults
+  housingBuildingIndex?: number;  // Index into starterBuildings for housing assignment
+  // Legacy support
+  classId?: string;  // Deprecated, kept for backwards compatibility
+}
+
+// Updated StarterBuilding with ownership and housing support
+export interface StarterBuildingV2 {
+  typeId: string;
+  x: number;
+  y: number;
+  autoAssignRecipe: boolean;
+  // Ownership fields
+  ownerCitizenIndex?: number;  // null/undefined = town-owned, number = citizen index
+  // Housing fields
+  initialOccupants?: number[];  // Citizen indices for housing buildings
+  rentRate?: number;  // Override default rent rate
+}
+
+// Land plot for starter locations
+export interface StarterLandPlot {
+  gridX: number;
+  gridY: number;
+  ownerCitizenIndex?: number;  // null/undefined = town-owned
+  purchasePrice?: number;  // Override auto-calculated price
+}
+
+// Economic system type
+export type EconomicSystemType = 'capitalist' | 'collectivist' | 'feudal';
+
+// Updated StartingLocation with land and economy support
+export interface StartingLocationV2 extends StartingLocation {
+  // New fields
+  starterLandPlots?: StarterLandPlot[];
+  economicSystem?: EconomicSystemType;
+  startingTreasury?: number;  // Override default starting gold
+  // V2 buildings and citizens (with ownership support)
+  starterBuildingsV2?: StarterBuildingV2[];
+  starterCitizensV2?: StarterCitizenV2[];
+}
+
+// ============================================================================
+// Land System Types
+// ============================================================================
+
+export interface LandGridSettings {
+  plotWidth: number;
+  plotHeight: number;
+  worldWidth?: number;
+  worldHeight?: number;
+}
+
+export interface LandPricing {
+  basePlotPrice: number;
+  locationMultipliers: Record<string, number>;  // center, edge, river-adjacent, etc.
+  terrainMultipliers: Record<string, number>;  // fertile, rocky, etc.
+}
+
+export interface LandImmigrationRequirement {
+  minPlots: number;
+  maxPlots: number;
+  description?: string;
+}
+
+export interface LandOverlayColors {
+  townOwned: string;
+  citizenOwned: string;
+  forSale: string;
+  gridLines: string;
+  gridLinesOpacity?: number;
+}
+
+export interface LandConfig {
+  version: string;
+  gridSettings: LandGridSettings;
+  pricing: LandPricing;
+  immigrationRequirements: Record<IntendedRole, LandImmigrationRequirement>;
+  overlayColors: LandOverlayColors;
+}
+
+// ============================================================================
+// Class Thresholds Types (Emergent Class System)
+// ============================================================================
+
+export interface NetWorthThreshold {
+  min?: number;
+  max?: number;
+}
+
+export interface ClassThresholds {
+  version: string;
+  description?: string;
+  netWorthThresholds: {
+    elite: NetWorthThreshold;
+    upper: NetWorthThreshold;
+    middle: NetWorthThreshold;
+    lower: NetWorthThreshold;
+  };
+  capitalRatioThresholds: {
+    elite: number;  // Min capital ratio to be elite
+    upper: number;  // Min capital ratio to be upper
+    middle: number;  // Min capital ratio to be middle
+  };
+  skillIncomeThresholds?: {
+    elite: number;
+    upper: number;
+    middle: number;
+  };
+}
+
+// ============================================================================
+// Economic System Configuration Types
+// ============================================================================
+
+export interface CapitalistConfig {
+  privateOwnershipEnabled: boolean;
+  profitDistribution: {
+    owner: number;  // Percentage to owner
+    workers: number;  // Percentage to workers
+    treasury: number;  // Percentage to town treasury (tax)
+  };
+  taxRates: {
+    income: number;  // Income tax rate
+    property: number;  // Property/land tax rate
+    trade: number;  // Sales/trade tax rate
+  };
+}
+
+export interface CollectivistConfig {
+  stateOwnershipPercentage: number;  // % of buildings town-owned
+  resourceDistribution: 'equal' | 'need_based' | 'contribution_based';
+  collectiveBuildingOwnership: boolean;
+  maxPrivateWealth?: number;
+}
+
+export interface FeudalConfig {
+  lordVassalEnabled: boolean;
+  tributePercentage: number;  // % of production to lord
+  tithesEnabled: boolean;
+  tithePercentage: number;  // % to religious institutions
+  nobleLandAllocation: {
+    minPlotsPerNoble: number;
+    serfsPerPlot: number;
+  };
+}
+
+export interface EconomicSystemConfig {
+  version: string;
+  defaultSystem: EconomicSystemType;
+  systems: {
+    capitalist: CapitalistConfig;
+    collectivist: CollectivistConfig;
+    feudal: FeudalConfig;
+  };
+}
+
+// ============================================================================
+// Housing Configuration Types
+// ============================================================================
+
+export interface HousingConfig {
+  capacity: number;  // Max occupants
+  unitsCount?: number;  // Number of separate units (for apartments/tenements)
+  housingQuality: number;  // 0.0 to 1.0
+  qualityTier: QualityTier;
+  rentPerOccupant: number;  // Gold per cycle
+  targetClasses: string[];  // Ideal classes for this housing
+  acceptableClasses?: string[];  // Classes that can live here (broader)
+  upgradeableTo?: string;  // Building type ID for upgrade path
+  upgradeCost?: {
+    materials: Record<string, number>;
+    gold: number;
+    cycles: number;
+  };
+}
+
+// Extended BuildingType with housing support
+export interface BuildingTypeWithHousing extends BuildingType {
+  housingConfig?: HousingConfig;
+  fulfillmentVector?: {
+    coarse: number[];
+    fine: Record<string, number>;
+  };
+}
+
+// ============================================================================
+// Building Fulfillment Vectors Types
+// ============================================================================
+
+export interface BuildingFulfillment {
+  id: string;
+  fulfillmentVector: {
+    coarse: number[];
+    fine: Record<string, number>;
+  };
+  tags: string[];
+  qualityMultipliers: Record<string, number>;
+  notes?: string;
+}
+
+export interface BuildingFulfillmentVectorsData {
+  version: string;
+  buildings: Record<string, BuildingFulfillment>;
+}
+
+// Extended FulfillmentVectorsData with buildings
+export interface FulfillmentVectorsDataV2 extends FulfillmentVectorsData {
+  buildings?: Record<string, BuildingFulfillment>;
+}
+
+// ============================================================================
+// Relationship Types
+// ============================================================================
+
+export type RelationshipType =
+  | 'spouse' | 'parent' | 'child' | 'sibling'
+  | 'employer' | 'employee'
+  | 'landlord' | 'tenant'
+  | 'business_partner'
+  | 'friend' | 'rival'
+  | 'colleague' | 'neighbour';
+
+export interface RelationshipTypeConfig {
+  id: RelationshipType;
+  name: string;
+  description: string;
+  bidirectional: boolean;  // true = both parties have same relationship
+  inverseType?: RelationshipType;  // For non-bidirectional (e.g., parent -> child)
+  satisfactionBonus: number;  // Bonus to satisfaction when relationship active
+  autoCreateRules?: {
+    sameWorkplace?: boolean;  // Auto-create colleague
+    adjacentPlot?: boolean;  // Auto-create neighbour
+    sameHousing?: boolean;  // Auto-create for roommates
+  };
+}
+
+export interface RelationshipTypesData {
+  version: string;
+  relationships: RelationshipTypeConfig[];
+}
+
+// ============================================================================
+// Immigration Configuration Types
+// ============================================================================
+
+export interface RoleImmigrationConfig {
+  landRequired: number;  // Plots required (0 = can rent)
+  minWealth: number;  // Minimum starting wealth
+  housingRequired: boolean;  // Must have housing available
+  minHousingQuality?: number;  // Min housing quality (0.0-1.0)
+  familySize?: {
+    min: number;
+    max: number;
+  };
+}
+
+export interface ImmigrationConfigData {
+  version: string;
+  roleRequirements: Record<IntendedRole, RoleImmigrationConfig>;
+  queueSettings: {
+    maxQueueSize: number;
+    maxWaitCycles: number;  // Cycles before leaving queue
+    processingRate: number;  // Max immigrants per cycle
+  };
+  attractionFactors: {
+    housingAvailability: number;  // Weight
+    averageSatisfaction: number;  // Weight
+    jobAvailability: number;  // Weight
+    wealthOpportunity: number;  // Weight
+  };
+}
+
+// ============================================================================
+// Pre-Computed Commodity Cache Types
+// ============================================================================
+
+export interface CommodityCacheEntry {
+  id: string;
+  value: number;
+}
+
+export interface DimensionCache {
+  available: CommodityCacheEntry[];
+  sortedByValue: string[];  // Just commodity IDs, pre-sorted by value descending
+}
+
+export interface SubstitutionGroupCache {
+  members: string[];
+  available: string[];
+}
+
+export interface PreComputedCommodityCache {
+  version: string;
+  generatedAt: string;
+  sourceDataHashes: {
+    fulfillmentVectors: string;
+    dimensionDefinitions: string;
+    substitutionRules: string;
+  };
+  byCoarseDimension: Record<string, DimensionCache>;
+  byFineDimension: Record<string, DimensionCache>;
+  substitutionGroups: Record<string, SubstitutionGroupCache>;
+  metadata: {
+    coarseCacheCount: number;
+    fineCacheCount: number;
+    substitutionGroupCount: number;
+    totalCommodities: number;
+  };
 }

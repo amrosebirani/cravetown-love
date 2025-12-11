@@ -1,7 +1,7 @@
 # CraveTown Alpha - Implementation Status & TODO
 
-**Document Version:** 1.0
-**Last Updated:** 2025-12-07
+**Document Version:** 1.3
+**Last Updated:** 2025-12-10
 **Reference:** `chain-of-thought/game_ui_flow_specification.md`
 
 ---
@@ -22,7 +22,7 @@ This document tracks the implementation status of all features specified in the 
 | NEW GAME button | Implemented | Opens New Game Setup flow |
 | CONTINUE button | Implemented | Loads quicksave if available |
 | LOAD GAME button | Implemented | Opens SaveLoadModal |
-| SETTINGS button | Partially | Button exists, panel not built |
+| SETTINGS button | Implemented | Opens Settings Panel |
 | CREDITS button | Stub | Prints to console only |
 | QUIT button | Implemented | Returns to launcher |
 | Version display | Implemented | Shows v0.1.0 |
@@ -55,7 +55,6 @@ This document tracks the implementation status of all features specified in the 
 
 **Deviations:**
 - World view is top-down, not isometric (spec allows both)
-- Quick access buttons in top bar not all implemented (Analytics, Trade, Policy missing)
 - Housing capacity not shown next to population
 
 ### 4. Save/Load System (Section 11.1)
@@ -71,24 +70,26 @@ This document tracks the implementation status of all features specified in the 
 | Last save timestamps | Implemented | Displayed in modal |
 
 ### 5. Keyboard Shortcuts (Section 13.1-13.2)
-**Status:** PARTIALLY IMPLEMENTED
+**Status:** IMPLEMENTED
 
 | Spec Feature | Implementation Status | Notes |
 |--------------|----------------------|-------|
 | SPACE - Pause/Resume | Implemented | Works |
-| 1/2/3 - Speed 1x/2x/5x | Implemented | 4 for 10x also works |
+| 1/2/3/4 - Speed 1x/2x/5x/10x | Implemented | All speeds work |
 | B - Build menu | Implemented | Opens build modal |
-| C - Citizens panel | Not Implemented | Spec feature |
-| I - Inventory | Not Implemented | Spec feature |
-| A - Analytics | Not Implemented | Spec feature |
-| T - Trade | Not Implemented | Spec feature |
-| P - Policy | Not Implemented | Spec feature |
+| C - Citizens panel | Implemented | Opens citizens overview |
+| I - Inventory | Implemented | Opens inventory panel |
+| P - Production Analytics | Implemented | Opens production panel |
+| S - Settings | Implemented | Opens settings panel |
+| A - Analytics | Implemented | Placeholder panel |
 | M - Immigration | Implemented | Opens immigration modal |
-| ESC - Close panel | Implemented | Works for modals |
+| ESC - Close panel | Implemented | Works for all modals |
 | F5/F9 - Save/Load | Implemented | Quicksave/load |
 | H - Help overlay | Implemented | Shows keyboard shortcuts |
 | WASD/Arrows - Pan | Implemented | Camera movement |
 | Scroll - Zoom | Implemented | Mouse wheel zoom |
+| R - Resource overlay | Implemented | Toggle resource view |
+| L - Save/Load menu | Implemented | Opens save/load modal |
 
 ### 6. River/Forest/Natural Resources
 **Status:** IMPLEMENTED
@@ -126,84 +127,244 @@ This document tracks the implementation status of all features specified in the 
 | Output generation | Implemented | Produced goods added to inventory |
 | Efficiency calculation | Implemented | Based on workers, resources, location |
 
+### 9. Citizens Overview Panel (Section 7.1)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| View modes (Grid/List) | Implemented | Toggle between views |
+| Class filter | Implemented | All/Elite/Upper/Middle/Lower |
+| Status filter | Implemented | All/Happy/Neutral/Stressed/Critical/Protesting |
+| Sorting | Implemented | Satisfaction/Name/Class/Age/Vocation |
+| Pagination | Implemented | Page X of Y with Prev/Next |
+| Citizen cards | Implemented | Shows name, class, vocation, status, satisfaction |
+| Workplace display | Implemented | Shows assigned workplace |
+| Summary statistics | Implemented | Average satisfaction, counts by status |
+
+**Location:** `code/AlphaUI.lua` (RenderCitizensPanel)
+
+### 10. Inventory Panel (Section 8.1)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Category tabs | Implemented | Dynamic from commodity data |
+| Scrollable category list | Implemented | With mouse wheel support |
+| Commodity list | Implemented | Shows quantities per category |
+| All categories view | Implemented | Shows everything |
+| Filter by category | Implemented | Click category to filter |
+
+**Location:** `code/AlphaUI.lua` (RenderInventoryPanel)
+
+### 11. Production Analytics Panel
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Commodities tab | Implemented | Production rates, consumption, net, stock |
+| Buildings tab | Implemented | Efficiency rankings with status |
+| Worker utilization | Implemented | Shows employment percentage |
+| Commodity detail view | Implemented | Depletion estimates, status |
+| Building efficiency bars | Implemented | Color-coded by efficiency level |
+| Keyboard shortcut (P) | Implemented | Toggle panel |
+
+**Location:** `code/AlphaUI.lua` (RenderProductionAnalyticsPanel)
+
+### 12. Free Agency System (Workplace Selection)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Autonomous workplace selection | Implemented | Citizens choose based on preferences |
+| Vocation-based matching | Implemented | Matches worker types to work categories |
+| Skill compatibility | Implemented | Citizens prefer matching workplaces |
+| Daily job seeking | Implemented | Unemployed citizens seek work each day |
+
+**Design Note:** This is a deliberate deviation from spec's manual worker assignment - uses emergent gameplay model.
+
+**Location:** `code/FreeAgencySystem.lua`
+
+### 13. Settings Panel (Section 11.2)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Gameplay Tab | Implemented | Auto-pause, tutorial hints, autosave settings |
+| Display Tab | Implemented | Fullscreen, vsync, UI scale, color blind mode |
+| Audio Tab | Implemented | Placeholder with volume sliders |
+| Accessibility Tab | Implemented | Larger text, high contrast, reduced motion |
+| Reset to Defaults | Implemented | Per-tab reset button |
+| Settings persistence | Implemented | Saves to JSON file |
+| Keyboard shortcut (S) | Implemented | Toggle panel |
+
+**Location:** `code/AlphaUI.lua` (RenderSettingsPanel), `code/GameSettings.lua`
+
+### 14. Immigration System Enhancements (Section 5.2-5.3)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Town Attractiveness Display | Implemented | Progress bar with color coding |
+| Compatibility Score breakdown | Implemented | Housing, Job, Social, Needs scores |
+| Bulk Actions | Implemented | Accept 70%+, Accept All, Reject All |
+| Primary Needs display | Implemented | Top 4 cravings shown |
+| Traits as chips | Implemented | Styled trait display |
+| Family member cards | Implemented | With dependent indicators |
+| Scrollable detail panel | Implemented | Mouse wheel support |
+| Initial applicants | Implemented | 5-8 generated at game start |
+
+**Location:** `code/AlphaUI.lua` (RenderImmigrationModal), `code/ImmigrationSystem.lua`
+
+### 15. Build Menu Improvements (Section 6.1)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Search bar | Implemented | Text input with real-time filtering |
+| Category tabs | Implemented | All/Housing/Production/Agriculture/Extraction/Services |
+| Grid layout | Implemented | Card-based layout with scroll support |
+| Building cards | Implemented | Shows name, cost, capacity, workers |
+| Affordability indicator | Implemented | Cards dimmed when can't afford |
+| Scroll support | Implemented | Mouse wheel scrolling in grid |
+
+**Location:** `code/AlphaUI.lua` (RenderBuildMenuModal)
+
+### 16. Character Detail Modal (Section 7.2)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| 49-Dimension View | Implemented | Expandable coarse→fine dimensions |
+| Top Current Cravings | Implemented | Top 10 most urgent cravings |
+| Commodity Fatigue display | Implemented | Effectiveness bars per commodity |
+| Possessions section | Implemented | Durables with remaining cycles |
+| Consumption History | Implemented | Last 20 cycles with success/failure |
+| Economy & Wealth | Implemented | Wealth, income, expenses, rank, class |
+| Housing section | Implemented | Current residence, rent, satisfaction |
+| Status & Risks | Implemented | Emigration/protest risk, productivity |
+
+**Location:** `code/CharacterDetailPanel.lua`
+
+### 17. Land Ownership System (Phase 8)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Land grid overlay | Implemented | Toggle with L key |
+| Land overlay legend | Implemented | Toggle with SHIFT+L |
+| Plot ownership display | Implemented | Color-coded by owner |
+| Hover tooltips | Implemented | Shows plot details, price, owner |
+| Land registry panel | Implemented | Full registry management |
+| Building ownership | Implemented | Track owner per building |
+
+**Location:** `code/LandOverlay.lua`, `code/LandSystem.lua`, `code/LandRegistryPanel.lua`
+
+### 18. Housing System (Phase 8)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Housing overview panel | Implemented | Toggle with G key |
+| Housing assignments | Implemented | Citizens assigned to residences |
+| Rent tracking | Implemented | Per-occupant rent |
+| Housing satisfaction | Implemented | Quality, space, location factors |
+| Housing assignment modal | Implemented | Manage assignments |
+
+**Location:** `code/HousingSystem.lua`, `code/HousingOverviewPanel.lua`, `code/HousingAssignmentModal.lua`
+
+### 19. Save/Load Migration (Phase 9)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Save land ownership | Implemented | Serializes LandSystem state |
+| Save character economics | Implemented | Wealth, income, expenses |
+| Save housing assignments | Implemented | Housing system state |
+| Save relationships | Implemented | Character relationships |
+| Backwards compatibility | Implemented | Migrates old saves to v0.2.0 |
+| Version comparison | Implemented | Semantic version migration |
+
+**Location:** `code/SaveManager.lua`
+
+### 20. Building Detail Enhancements (Section 6.3)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Upgrade system | Implemented | Level indicator, cost display, upgrade button |
+| Priority setting | Implemented | High/Normal/Low cycling button |
+| Pause Production | Implemented | Toggle button with visual feedback |
+| Demolish button | Implemented | With salvage value display |
+
+**Location:** `code/AlphaUI.lua` (RenderBuildingModal)
+
+### 21. Notifications System (Section 12)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Toast notifications | Implemented | Top-right corner with slide-in animations |
+| Critical (red) | Implemented | Auto-pause on critical events |
+| Warning (orange) | Implemented | Attention-needed alerts |
+| Info (blue) | Implemented | General information |
+| Success (green) | Implemented | Positive feedback |
+| Action buttons | Implemented | Clickable actions per notification |
+| Sound feedback | Implemented | Optional notification sounds |
+
+**Location:** `code/NotificationSystem.lua`
+
+### 22. Visual Indicators (Section 4.4)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Building status glows | Implemented | Green/yellow/red/orange based on status |
+| Speech bubbles | Implemented | !, ?, || indicators on buildings |
+| Citizen satisfaction circles | Implemented | Green/yellow/red outer ring |
+| Emigration risk glow | Implemented | Pulsing red aura for at-risk citizens |
+| Protest indicators | Implemented | X symbol for protesting citizens |
+| Searching indicators | Implemented | ? symbol for job seekers |
+
+**Location:** `code/AlphaUI.lua` (RenderBuilding, RenderCitizen)
+
+### 23. Mini-map Enhancements (Section 4.3)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Clickable navigation | Implemented | Click to pan camera |
+| Legend hint | Implemented | "Click to navigate" text |
+| Forests shown | Implemented | Forest regions on minimap |
+| Resource deposits | Implemented | Color-coded by resource type |
+| Citizen satisfaction | Implemented | Green/yellow/red dots |
+| Paused building indicators | Implemented | Different color for paused |
+
+**Location:** `code/AlphaUI.lua` (RenderMiniMap, HandleMinimapClick)
+
+### 24. Tutorial System (Section 3.3)
+**Status:** IMPLEMENTED
+
+| Feature | Implementation Status | Notes |
+|---------|----------------------|-------|
+| Step-by-step guidance | Implemented | 7 tutorial steps for first 30 cycles |
+| Highlight system | Implemented | Pulsing highlights on UI elements |
+| Welcome/Camera step | Implemented | Cycles 1-3 |
+| Citizen selection step | Implemented | Cycles 4-6 |
+| Satisfaction explanation | Implemented | Cycles 7-10 |
+| Building tutorial | Implemented | Cycles 11-15 |
+| Production tutorial | Implemented | Cycles 16-20 |
+| Immigration tutorial | Implemented | Cycles 21-25 |
+| Save reminder | Implemented | Cycles 26-30 |
+| Skip/Next buttons | Implemented | User control over tutorial progress |
+| Save/Load serialization | Implemented | Tutorial progress persists |
+
+**Location:** `code/TutorialSystem.lua`
+
 ---
 
 ## PENDING FEATURES (TODO)
 
-### 1. Settings Panel (Section 11.2)
-**Priority:** HIGH
-**Status:** NOT IMPLEMENTED
-
-Required tabs:
-- [ ] **Gameplay Tab**
-  - [ ] Simulation speed options display
-  - [ ] Auto-pause on events (Critical/Warning/Info checkboxes)
-  - [ ] Tutorial hints toggle
-  - [ ] Notification frequency dropdown
-  - [ ] Autosave interval setting
-
-- [ ] **Display Tab**
-  - [ ] Resolution dropdown
-  - [ ] Fullscreen toggle
-  - [ ] UI Scale slider
-  - [ ] Show character names option (Always/Hover/Never)
-  - [ ] Show production numbers toggle
-  - [ ] Color blind mode dropdown
-
-- [ ] **Audio Tab**
-  - [ ] Master volume slider
-  - [ ] Music volume slider
-  - [ ] SFX volume slider
-  - [ ] Notification sounds toggle
-
-- [ ] **Controls Tab** (Optional)
-  - [ ] Key rebinding interface
-
-- [ ] **Accessibility Tab**
-  - [ ] Larger text option
-  - [ ] High contrast mode
-
----
-
-### 2. Immigration System Enhancements (Section 5.2-5.3)
-**Priority:** HIGH
-**Status:** PARTIALLY IMPLEMENTED - Basic immigration works, needs enhancements
-
-Current state: Basic immigration modal with accept/reject/defer
-
-Missing features:
-- [ ] **Town Attractiveness Display**
-  - [ ] Overall attractiveness score (0-100)
-  - [ ] Per-class appeal breakdown with descriptions
-
-- [ ] **Compatibility Score** per applicant
-  - [ ] Visual percentage bar
-  - [ ] Text explanation of compatibility
-
-- [ ] **Applicant Card Enhancements**
-  - [ ] "What they offer" section (skills, wealth, family)
-  - [ ] "What they seek" section (top needs)
-  - [ ] Star indicator for rare/skilled workers
-
-- [ ] **Bulk Actions**
-  - [ ] "Accept All Compatible (>70%)" button
-  - [ ] "Reject All Low (<40%)" button
-  - [ ] Auto-Accept toggle
-
-- [ ] **Immigration Policies**
-  - [ ] Open Borders / Selective / Restrictive / Closed options
-  - [ ] Class preference sliders (who to attract more)
-
-- [ ] **Full Profile Modal** (Section 5.3)
-  - [ ] Detailed origin story
-  - [ ] Family members list
-  - [ ] 9-dimension need breakdown
-  - [ ] Predicted satisfaction percentage
-  - [ ] Emigration risk percentage
-
----
-
-### 3. Emigration Warning Panel (Section 5.4)
+### 1. Emigration Warning Panel (Section 5.4)
 **Priority:** MEDIUM
 **Status:** NOT IMPLEMENTED
 
@@ -221,168 +382,7 @@ Required features:
 
 ---
 
-### 4. Build Menu Improvements (Section 6.1)
-**Priority:** MEDIUM
-**Status:** PARTIALLY IMPLEMENTED - Basic build menu exists
-
-Missing features:
-- [ ] **Search bar** for buildings
-- [ ] **Category tabs**: All / Housing / Production / Services / Infrastructure / Decorative
-- [ ] **Grid layout** with building images (currently list-based)
-- [ ] **Building cards** showing:
-  - [ ] Visual image/icon
-  - [ ] Capacity (for housing)
-  - [ ] Class requirement (for housing)
-  - [ ] Worker range (min-max)
-  - [ ] Input requirements preview
-- [ ] **"Show more" expansion** for each category
-
----
-
-### 5. Building Detail Enhancements (Section 6.3)
-**Priority:** MEDIUM
-**Status:** PARTIALLY IMPLEMENTED - Basic details shown
-
-Missing features:
-- [ ] **Upgrade system**
-  - [ ] Level indicator
-  - [ ] Upgrade button with cost
-  - [ ] Benefits preview
-
-- [ ] **Efficiency breakdown**
-  - [ ] Location fertility contribution
-  - [ ] Worker skill average contribution
-  - [ ] Staffing level contribution
-  - [ ] Lifetime production counter
-
-- [ ] **Priority setting** (High/Medium/Low)
-- [ ] **Pause Production** toggle
-- [ ] **Demolish** button with salvage value display
-
----
-
-### 6. Workplace Selection System
-**Priority:** MEDIUM
-**Status:** DESIGN DEVIATION - Free Agency Model
-
-**Important Note:** The spec describes a "Worker Assignment Modal" where the player assigns workers to buildings. However, CraveTown uses a **Free Agency Model** where:
-- **Citizens choose their own workplace** based on their preferences, skills, and satisfaction
-- **Players influence** workplace selection through building placement, job availability, and town policies
-- **Citizens may change jobs** based on satisfaction, skill match, and opportunities
-
-This is a **deliberate design choice** for more emergent gameplay.
-
-Current implementation:
-- [x] Citizens autonomously select workplaces
-- [x] Skill matching affects citizen preferences
-- [x] Citizens can be unemployed if no suitable work
-
-Potential enhancements (without breaking free agency):
-- [ ] **Workplace Preferences panel** in character detail
-  - [ ] Show which buildings citizen prefers
-  - [ ] Show skill compatibility scores
-- [ ] **Job Posting system** for buildings
-  - [ ] Buildings can "advertise" open positions
-  - [ ] Higher wages attract better workers
-- [ ] **Workplace satisfaction factors** display
-  - [ ] Why citizen chose current workplace
-  - [ ] What would make them switch
-
----
-
-### 7. Citizens Overview Panel (Section 7.1)
-**Priority:** HIGH
-**Status:** NOT IMPLEMENTED (Shortcut 'C' not active)
-
-Required features:
-- [ ] **View modes**: Grid / List / Compact toggle
-- [ ] **Filters**: Class / Status / Vocation / Satisfaction dropdowns
-- [ ] **Sorting**: Satisfaction / Name / Class / Age / Priority
-- [ ] **Search bar** for citizen names
-- [ ] **Citizen cards** in grid view showing:
-  - [ ] Satisfaction color indicator
-  - [ ] Class label
-  - [ ] Vocation
-  - [ ] Status (Working/Unemployed/Protesting/Critical)
-  - [ ] Possession icons
-- [ ] **Pagination** (Page X of Y, Prev/Next)
-- [ ] **Summary statistics bar**
-  - [ ] Average satisfaction
-  - [ ] Unemployment rate
-  - [ ] At-risk count
-- [ ] **Mass actions dropdown**
-  - [ ] Export data
-  - [ ] Prioritize selected
-
----
-
-### 8. Character Detail Modal Enhancements (Section 7.2)
-**Priority:** MEDIUM
-**Status:** PARTIALLY IMPLEMENTED - Basic modal exists
-
-Missing features:
-- [ ] **49-Dimension View** toggle
-  - [ ] Expand each coarse category to show fine dimensions
-  - [ ] Top 10 urgent cravings list
-
-- [ ] **Commodity Fatigue display**
-  - [ ] Effectiveness percentage per commodity
-  - [ ] "Tired of X" indicators
-  - [ ] Variety tip message
-
-- [ ] **Possessions section**
-  - [ ] Durable goods owned with condition bars
-  - [ ] Remaining cycle counters
-  - [ ] Effectiveness percentages
-
-- [ ] **Consumption History**
-  - [ ] Last 20 cycles log
-  - [ ] Success/failure indicators
-  - [ ] Satisfaction delta per consumption
-
-- [ ] **Economy & Wealth section**
-  - [ ] Current wealth
-  - [ ] Income/expenses per cycle
-  - [ ] Net savings
-  - [ ] Wealth rank in town
-
-- [ ] **Status & Risks section**
-  - [ ] Priority rank
-  - [ ] Productivity percentage
-  - [ ] Consecutive failures count
-  - [ ] Emigration risk percentage
-  - [ ] Protest risk percentage
-
----
-
-### 9. Inventory Panel (Section 8.1)
-**Priority:** HIGH
-**Status:** NOT IMPLEMENTED (Shortcut 'I' not active)
-
-Required features:
-- [ ] **Category tabs**: All / Food / Materials / Goods / Luxury / Durables
-- [ ] **Sorting**: Quantity / Name / Value / Demand / Trend
-- [ ] **Table view** with columns:
-  - [ ] Item name with icon
-  - [ ] Quantity
-  - [ ] Trend arrow (up/down/stable)
-  - [ ] Production rate per cycle
-  - [ ] Consumption rate per cycle
-  - [ ] Status indicator (Surplus/Balanced/Shortage)
-- [ ] **Treasury section**
-  - [ ] Current gold
-  - [ ] Income per cycle
-  - [ ] Expenses per cycle
-  - [ ] Net per cycle
-- [ ] **Quick actions**
-  - [ ] Import goods button
-  - [ ] Export surplus button
-  - [ ] Auto-trade rules
-  - [ ] View trade log
-
----
-
-### 10. Trade System (Section 8.2)
+### 2. Trade System (Section 8.2)
 **Priority:** LOW
 **Status:** NOT IMPLEMENTED
 
@@ -409,9 +409,9 @@ Required features:
 
 ---
 
-### 11. Analytics Dashboard (Section 9.1)
+### 3. Analytics Dashboard (Section 9.1)
 **Priority:** MEDIUM
-**Status:** NOT IMPLEMENTED (Shortcut 'A' not active)
+**Status:** NOT IMPLEMENTED (Placeholder exists)
 
 Required tabs:
 - [ ] **Overview Tab**
@@ -431,11 +431,6 @@ Required tabs:
   - [ ] Wealth distribution by class
   - [ ] Gini coefficient
 
-- [ ] **Production Tab**
-  - [ ] Per-commodity production rates
-  - [ ] Building efficiency rankings
-  - [ ] Supply/demand balance
-
 - [ ] **Demographics Tab**
   - [ ] Class distribution pie chart
   - [ ] Age distribution histogram
@@ -443,115 +438,73 @@ Required tabs:
 
 ---
 
-### 12. Allocation Policy Panel (Section 9.2)
+### 4. Allocation Policy Panel (Section 9.2)
 **Priority:** MEDIUM
-**Status:** NOT IMPLEMENTED (Shortcut 'P' not active)
+**Status:** IMPLEMENTED IN PROTOTYPE - Needs porting to main game
 
-Required features:
-- [ ] **Economic Model selection**
-  - [ ] Communist Allocation
-  - [ ] Mixed Economy
-  - [ ] Market Economy
+**Current Implementation (ConsumptionPrototype):**
+The allocation system has been redesigned with these key changes:
+- **Class-based priority REMOVED** - Priority is now purely desperation-based (lowest satisfaction = highest priority)
+- **Class advantage through consumption budgets** - Wealthier classes consume more items per cycle (Elite=10, Upper=7, Middle=5, Working=3, Poor=2)
+- **No class weights for allocation order** - All citizens compete equally based on need
 
-- [ ] **Priority Mode selection** (Communist/Mixed only)
-  - [ ] Need-Based
-  - [ ] Balanced
-  - [ ] Egalitarian
+**Existing features in ConsumptionPrototype (`code/ConsumptionPrototype.lua`):**
+- [x] Priority Mode selection (need_based, equality)
+- [x] Fairness Enable toggle
+- [x] Class Consumption Budgets (items per cycle per class)
+- [x] Dimension Priorities (9 coarse dimensions)
+- [x] Substitution Aggressiveness slider
+- [x] Reserve Threshold setting
+- [x] Quick Presets (Egalitarian, Class-Stratified, Rawlsian, Utilitarian)
+- [x] Scrollable modal with proper UI
 
-- [ ] **Class Weights sliders**
-  - [ ] Elite/Upper/Middle/Lower/Poor multipliers
-
-- [ ] **Fairness Settings**
-  - [ ] History penalty slider
-  - [ ] Critical threshold input
-
-- [ ] **Budget per class** inputs
-- [ ] **Quick Presets** buttons
-- [ ] **Preview** showing top 10 priority characters
+**To port to main game (AlphaUI):**
+- [ ] Create AllocationPolicyPanel.lua module
+- [ ] Integrate with AlphaWorld's allocation system
+- [ ] Add keyboard shortcut (suggested: O for pOlicy)
+- [ ] Sync with economic system selected at game start
 
 ---
 
-### 13. Governance Panel (Section 9.3)
+### 5. Governance Panel (Section 9.3)
 **Priority:** LOW
-**Status:** NOT IMPLEMENTED
+**Status:** PARTIALLY IMPLEMENTED - Data exists, needs UI
 
-Required features:
-- [ ] **Government Type display** (initially locked)
-  - [ ] Benevolent Dictatorship (starting)
-  - [ ] Council Rule / Merchant Guild / Theocracy / Democracy (unlockable)
+**Current Implementation:**
+Economic systems are defined in `data/alpha/economic_systems.json` with three systems:
+- **Capitalist** (Free Market) - Private ownership, market wages, full taxation
+- **Collectivist** (Collective Ownership) - State ownership, state wages, no private property
+- **Feudal** (Feudal Hierarchy) - Land-based hierarchy, titles, tribute system
 
-- [ ] **Taxation sliders**
-  - [ ] Income tax with effect preview
-  - [ ] Trade tax with effect preview
-  - [ ] Luxury tax with effect preview
+**Existing data structures:**
+- [x] Ownership rules (private allowed, land/building ownership, inheritance)
+- [x] Income systems (market/state/traditional wages, profit distribution)
+- [x] Taxation by class (income tax, capital gains, property tax, trade tax)
+- [x] Class mobility settings
+- [x] Feudal titles and obligations
 
-- [ ] **Laws & Edicts toggles**
+**UI features still needed:**
+- [ ] **Economic System Display** (read-only, set at game start)
+  - [ ] Show current system name and description
+  - [ ] Show ownership rules
+  - [ ] Show taxation rates
+
+- [ ] **Taxation Adjustment** (if system allows)
+  - [ ] Income tax sliders by class
+  - [ ] Trade tax slider
+  - [ ] Property tax slider
+
+- [ ] **Laws & Edicts toggles** (future feature)
   - [ ] Mandatory Work
   - [ ] Rationing
   - [ ] Free Education
   - [ ] Closed Borders
-  - [ ] Effect descriptions for each
+
+**Note:** Government type unlocking (Democracy, Council, etc.) is a future feature not currently in scope.
 
 ---
 
-### 14. Notifications System (Section 12)
-**Priority:** MEDIUM
-**Status:** PARTIALLY IMPLEMENTED - Event log exists, no toast notifications
-
-Missing features:
-- [ ] **Toast notifications** in corner
-  - [ ] Critical (red) with auto-pause
-  - [ ] Warning (orange)
-  - [ ] Info (green)
-  - [ ] Success (checkmark)
-
-- [ ] **Auto-pause on critical events** option
-- [ ] **Notification toast format**
-  - [ ] Icon + title
-  - [ ] Brief description
-  - [ ] Action buttons
-
-- [ ] **Event History Modal**
-  - [ ] Filterable by type
-  - [ ] Range selector (last X cycles)
-  - [ ] Export to file
-  - [ ] Clear old events
-
----
-
-### 15. Visual Indicators (Section 4.4)
-**Priority:** LOW
-**Status:** NOT IMPLEMENTED
-
-Missing features:
-- [ ] **Building status glows**
-  - [ ] Green = Producing efficiently
-  - [ ] Yellow = Understaffed or shortage
-  - [ ] Red = Stopped/blocked
-
-- [ ] **Speech bubbles** on buildings for events
-- [ ] **Citizen satisfaction circles**
-  - [ ] Green (>70%)
-  - [ ] Yellow (40-70%)
-  - [ ] Red (<40%)
-
-- [ ] **Protest/Searching indicators** (! and ? icons)
-
----
-
-### 16. Mini-map Enhancements (Section 4.3)
-**Priority:** LOW
-**Status:** PARTIALLY IMPLEMENTED - Basic mini-map with river
-
-Missing features:
-- [ ] **Clickable navigation** - Click to pan camera
-- [ ] **Legend** showing icon meanings
-- [ ] **Forests shown** (currently only river)
-- [ ] **Resource deposit indicators**
-
----
-
-### 17. Information System Tabs (Section 10)
+### 6. Information System Tabs (Section 10)
 **Priority:** LOW
 **Status:** PARTIALLY IMPLEMENTED - Recipes exist
 
@@ -573,49 +526,31 @@ Missing features:
 
 ---
 
-### 18. Tutorial System (Section 3.3)
-**Priority:** LOW
-**Status:** NOT IMPLEMENTED
-
-Required features:
-- [ ] **Step-by-step guidance** for first 30 cycles
-- [ ] **Highlight system** for UI elements
-- [ ] **Tutorial steps**:
-  - [ ] Cycles 1-3: Welcome, camera pan
-  - [ ] Cycles 4-6: Click a citizen
-  - [ ] Cycles 7-10: Satisfaction bars explanation
-  - [ ] Cycles 11-15: Build a farm
-  - [ ] Cycles 16-20: Assign workers
-  - [ ] Cycles 21-25: Watch production
-  - [ ] Cycles 26-30: Handle immigration
-
----
-
 ## PRIORITY ORDER
 
-### Phase 1 - Core Gameplay (HIGH PRIORITY)
-1. Settings Panel
-2. Citizens Overview Panel (C key)
-3. Inventory Panel (I key)
-4. Immigration System Enhancements
+### Phase 1 - Core Gameplay (HIGH PRIORITY) - COMPLETE
+1. ~~Settings Panel~~ DONE
+2. ~~Immigration System Enhancements~~ DONE
+3. ~~Build Menu Improvements~~ DONE
+4. ~~Character Detail Modal Enhancements~~ DONE
+5. ~~Land Ownership System~~ DONE
+6. ~~Housing System~~ DONE
+7. ~~Save/Load Migration~~ DONE
 
-### Phase 2 - Management (MEDIUM PRIORITY)
-5. Analytics Dashboard (A key)
-6. Allocation Policy Panel (P key)
-7. Emigration Warning Panel
-8. Build Menu Improvements
-9. Building Detail Enhancements
-10. Worker Assignment Modal
-11. Character Detail Modal Enhancements
-12. Notifications System
+### Phase 2 - Management (MEDIUM PRIORITY) - PARTIALLY COMPLETE
+1. ~~Building Detail Enhancements~~ DONE
+2. ~~Notifications System~~ DONE
+3. ~~Visual Indicators~~ DONE
+4. ~~Mini-map Enhancements~~ DONE
+5. ~~Tutorial System~~ DONE
+6. Analytics Dashboard (A key - full implementation)
+7. Allocation Policy Panel (port from ConsumptionPrototype)
+8. Emigration Warning Panel
 
 ### Phase 3 - Polish (LOW PRIORITY)
-13. Trade System (T key)
-14. Governance Panel
-15. Visual Indicators
-16. Mini-map Enhancements
-17. Information System Tabs
-18. Tutorial System
+1. Trade System (T key)
+2. Governance Panel (UI for existing economic_systems.json)
+3. Information System Tabs
 
 ---
 
@@ -625,12 +560,40 @@ Required features:
 | Key | Feature | Status |
 |-----|---------|--------|
 | B | Build Menu | IMPLEMENTED |
-| C | Citizens Panel | NOT IMPLEMENTED |
-| I | Inventory | NOT IMPLEMENTED |
-| A | Analytics | NOT IMPLEMENTED |
-| T | Trade | NOT IMPLEMENTED |
-| P | Policy | NOT IMPLEMENTED |
+| C | Citizens Panel | IMPLEMENTED |
+| I | Inventory | IMPLEMENTED |
+| P | Production Analytics | IMPLEMENTED |
+| S | Settings | IMPLEMENTED |
+| A | Analytics | IMPLEMENTED (placeholder) |
 | M | Immigration | IMPLEMENTED |
+| R | Resource Overlay | IMPLEMENTED |
+| L | Land Overlay | IMPLEMENTED |
+| SHIFT+L | Land Registry Panel | IMPLEMENTED |
+| G | Housing Overview | IMPLEMENTED |
+| D | Character Details | IMPLEMENTED |
+| H | Help Overlay | IMPLEMENTED |
+| F5 | Quicksave | IMPLEMENTED |
+| F6 | Save/Load Menu | IMPLEMENTED |
+| F9 | Quickload | IMPLEMENTED |
+
+### Allocation System Design (Updated)
+
+The allocation system has been redesigned with these principles:
+
+1. **Desperation-Based Priority** - Citizens with lowest satisfaction get allocated first (no class-based priority order)
+
+2. **Class Advantage Through Consumption Budgets** - Wealthier classes can consume more items per cycle:
+   - Elite: 10 items/cycle
+   - Upper: 7 items/cycle
+   - Middle: 5 items/cycle
+   - Working: 3 items/cycle
+   - Poor: 2 items/cycle
+
+3. **No Class Weights** - The old "class_based" priority mode was removed. All citizens compete equally for allocation based on need.
+
+4. **Fairness Mode** - Optional mode that adjusts priority based on recent consumption history
+
+5. **Dimension Priorities** - Can adjust which of the 9 coarse satisfaction dimensions are prioritized
 
 ### Color Scheme Reference (from spec Section 14)
 - Background: #1a1a2e

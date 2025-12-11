@@ -160,6 +160,34 @@
       "notes": "20 minutes. 30 yarn produces 20 cloth."
     },
     {
+      "buildingType": "textile_mill",
+      "name": "Textile Mill",
+      "recipeName": "Linen Weaving",
+      "category": "Merchandise",
+      "productionTime": 2400,
+      "inputs": {
+        "flax": 30
+      },
+      "outputs": {
+        "linen": 15
+      },
+      "notes": "40 minutes. 30 kg flax produces 15 meters linen."
+    },
+    {
+      "buildingType": "textile_mill",
+      "name": "Textile Mill",
+      "recipeName": "Wool Spinning",
+      "category": "Merchandise",
+      "productionTime": 1800,
+      "inputs": {
+        "wool": 20
+      },
+      "outputs": {
+        "yarn": 30
+      },
+      "notes": "30 minutes. 20 kg wool produces 30 yarn."
+    },
+    {
       "buildingType": "tailor_shop",
       "name": "Tailor Shop",
       "recipeName": "Clothing Production",
@@ -234,6 +262,130 @@
         "coat": 2
       },
       "notes": "30 minutes. 20 cloth, 10 thread, and 5 wool produces 2 coats."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Simple Clothes Making",
+      "category": "Merchandise",
+      "productionTime": 1800,
+      "inputs": {
+        "cloth": 10,
+        "thread": 8
+      },
+      "outputs": {
+        "simple_clothes": 4
+      },
+      "notes": "30 minutes. Cloth and thread produces 4 simple clothes."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Work Clothes Making",
+      "category": "Merchandise",
+      "productionTime": 2400,
+      "inputs": {
+        "cloth": 15,
+        "thread": 10,
+        "leather": 3
+      },
+      "outputs": {
+        "work_clothes": 3
+      },
+      "notes": "40 minutes. Reinforced work clothes with leather patches."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Fine Clothes Making",
+      "category": "Merchandise",
+      "productionTime": 3000,
+      "inputs": {
+        "linen": 12,
+        "thread": 10
+      },
+      "outputs": {
+        "fine_clothes": 3
+      },
+      "notes": "50 minutes. Fine linen clothes."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Luxury Clothes Making",
+      "category": "Merchandise",
+      "productionTime": 5400,
+      "inputs": {
+        "silk": 8,
+        "thread": 15,
+        "gold": 1
+      },
+      "outputs": {
+        "luxury_clothes": 2
+      },
+      "notes": "1.5 hours. Luxurious silk clothing with gold trim."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Winter Coat Making",
+      "category": "Merchandise",
+      "productionTime": 3600,
+      "inputs": {
+        "wool": 20,
+        "cloth": 10,
+        "thread": 12
+      },
+      "outputs": {
+        "winter_coat": 2
+      },
+      "notes": "1 hour. Warm wool winter coats."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Boots Making",
+      "category": "Merchandise",
+      "productionTime": 2400,
+      "inputs": {
+        "leather": 15,
+        "thread": 8,
+        "nails": 10
+      },
+      "outputs": {
+        "boots": 4
+      },
+      "notes": "40 minutes. Sturdy leather boots."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Hat Making",
+      "category": "Merchandise",
+      "productionTime": 1200,
+      "inputs": {
+        "cloth": 8,
+        "thread": 5
+      },
+      "outputs": {
+        "hat": 6
+      },
+      "notes": "20 minutes. Fabric hats."
+    },
+    {
+      "buildingType": "tailor_shop",
+      "name": "Tailor Shop",
+      "recipeName": "Wool Hat Making",
+      "category": "Merchandise",
+      "productionTime": 1500,
+      "inputs": {
+        "wool": 10,
+        "thread": 4
+      },
+      "outputs": {
+        "hat": 5
+      },
+      "notes": "25 minutes. Warm wool hats."
     },
     {
       "buildingType": "brickyard",
@@ -441,6 +593,21 @@
         "cotton_seed": 15
       },
       "notes": "2 hours. 10 seeds produces 80 cotton."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Flax Farming",
+      "category": "Production",
+      "productionTime": 6300,
+      "inputs": {
+        "flax_seed": 15
+      },
+      "outputs": {
+        "flax": 80,
+        "flax_seed": 25
+      },
+      "notes": "1.75 hours. 15 seeds produces 80 kg flax and 25 seeds."
     },
     {
       "buildingType": "farm",
@@ -1171,6 +1338,123 @@
       "notes": "12 minutes. Makes 8 shovels."
     },
     {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Axe Forging",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "iron": 15,
+        "wood": 10
+      },
+      "outputs": {
+        "axe": 5
+      },
+      "notes": "30 minutes. Iron and wood produces 5 axes."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Saw Forging",
+      "category": "Production",
+      "productionTime": 2100,
+      "inputs": {
+        "iron": 20,
+        "wood": 8
+      },
+      "outputs": {
+        "saw": 4
+      },
+      "notes": "35 minutes. Iron and wood produces 4 saws."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Pickaxe Forging",
+      "category": "Production",
+      "productionTime": 2100,
+      "inputs": {
+        "iron": 18,
+        "wood": 12
+      },
+      "outputs": {
+        "pickaxe": 4
+      },
+      "notes": "35 minutes. Iron and wood produces 4 pickaxes."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Hoe Forging",
+      "category": "Production",
+      "productionTime": 1500,
+      "inputs": {
+        "iron": 12,
+        "wood": 10
+      },
+      "outputs": {
+        "hoe": 6
+      },
+      "notes": "25 minutes. Iron and wood produces 6 hoes."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Scythe Forging",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "iron": 20,
+        "wood": 15
+      },
+      "outputs": {
+        "scythe": 3
+      },
+      "notes": "40 minutes. Iron and wood produces 3 scythes."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Chisel Forging",
+      "category": "Production",
+      "productionTime": 900,
+      "inputs": {
+        "iron": 8
+      },
+      "outputs": {
+        "chisel": 10
+      },
+      "notes": "15 minutes. Iron produces 10 chisels."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Needle Making",
+      "category": "Production",
+      "productionTime": 600,
+      "inputs": {
+        "iron": 3
+      },
+      "outputs": {
+        "needle": 50
+      },
+      "notes": "10 minutes. Small amount of iron produces 50 needles."
+    },
+    {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Nail Making",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "iron": 10
+      },
+      "outputs": {
+        "nails": 100
+      },
+      "notes": "20 minutes. Iron produces 100 nails."
+    },
+    {
       "buildingType": "mine",
       "name": "Mine",
       "recipeName": "Iron Ore Mining",
@@ -1673,6 +1957,37 @@
         "milk": 50
       },
       "notes": "1 hour. Produces 50 liters of fresh milk."
+    },
+    {
+      "buildingType": "sheep_farm",
+      "name": "Sheep Farm",
+      "recipeName": "Sheep Breeding",
+      "category": "Production",
+      "productionTime": 259200,
+      "inputs": {
+        "sheep": 4
+      },
+      "outputs": {
+        "sheep": 6,
+        "wool": 30,
+        "mutton": 15
+      },
+      "notes": "3 days. 4 sheep breeds to 6 sheep, plus wool and some meat."
+    },
+    {
+      "buildingType": "sheep_farm",
+      "name": "Sheep Farm",
+      "recipeName": "Wool Shearing",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {
+        "sheep": 10
+      },
+      "outputs": {
+        "wool": 40,
+        "sheep": 10
+      },
+      "notes": "1 day. Shear 10 sheep for 40 kg wool. Non-destructive."
     },
     {
       "buildingType": "dairy",
@@ -2424,6 +2739,1058 @@
         "rubber": 20
       },
       "notes": "1 hour. 30L latex produces 20 kg vulcanized rubber."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Feed Production",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "wheat": 20,
+        "maize": 20
+      },
+      "outputs": {
+        "feed": 50
+      },
+      "notes": "30 minutes. Wheat and maize produces animal feed."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Indigo Farming",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "indigo_seed": 10
+      },
+      "outputs": {
+        "indigo": 60,
+        "indigo_seed": 15
+      },
+      "notes": "2 hours. 10 seeds produces 60 kg indigo and 15 seeds."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Flower Farming",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "flower_seed": 20
+      },
+      "outputs": {
+        "flowers": 100,
+        "flower_seed": 30
+      },
+      "notes": "1.5 hours. 20 seeds produces 100 flowers and 30 seeds."
+    },
+    {
+      "buildingType": "poultry_farm",
+      "name": "Poultry Farm",
+      "recipeName": "Egg Collection",
+      "category": "Production",
+      "productionTime": 86400,
+      "inputs": {
+        "hen": 20,
+        "feed": 10
+      },
+      "outputs": {
+        "eggs": 80,
+        "hen": 20
+      },
+      "notes": "1 day. 20 hens produce 80 eggs. Non-destructive."
+    },
+    {
+      "buildingType": "poultry_farm",
+      "name": "Poultry Farm",
+      "recipeName": "Chicken Raising",
+      "category": "Production",
+      "productionTime": 172800,
+      "inputs": {
+        "hen": 10,
+        "feed": 20
+      },
+      "outputs": {
+        "hen": 12,
+        "chicken": 15,
+        "eggs": 30
+      },
+      "notes": "2 days. 10 hens breed to 12 hens plus 15 chicken meat and 30 eggs."
+    },
+    {
+      "buildingType": "apiary",
+      "name": "Apiary",
+      "recipeName": "Honey Production",
+      "category": "Production",
+      "productionTime": 259200,
+      "inputs": {
+        "bee_colony": 5
+      },
+      "outputs": {
+        "honey": 30,
+        "beeswax": 10,
+        "bee_colony": 6
+      },
+      "notes": "3 days. 5 colonies produce 30 honey, 10 beeswax, and grow to 6 colonies."
+    },
+    {
+      "buildingType": "dye_workshop",
+      "name": "Dye Workshop",
+      "recipeName": "Red Dye Production",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "berries": 30
+      },
+      "outputs": {
+        "red_dye": 10
+      },
+      "notes": "40 minutes. 30 kg berries produces 10 kg red dye."
+    },
+    {
+      "buildingType": "dye_workshop",
+      "name": "Dye Workshop",
+      "recipeName": "Blue Dye Production",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "indigo": 20
+      },
+      "outputs": {
+        "blue_dye": 12
+      },
+      "notes": "1 hour. 20 kg indigo produces 12 kg blue dye."
+    },
+    {
+      "buildingType": "dye_workshop",
+      "name": "Dye Workshop",
+      "recipeName": "Yellow Dye Production",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "flowers": 40
+      },
+      "outputs": {
+        "yellow_dye": 10
+      },
+      "notes": "40 minutes. 40 flowers produces 10 kg yellow dye."
+    },
+    {
+      "buildingType": "dye_workshop",
+      "name": "Dye Workshop",
+      "recipeName": "Black Dye Production",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "charcoal": 15
+      },
+      "outputs": {
+        "black_dye": 20
+      },
+      "notes": "30 minutes. 15 kg charcoal produces 20 kg black dye."
+    },
+    {
+      "buildingType": "dye_workshop",
+      "name": "Dye Workshop",
+      "recipeName": "Green Dye Production",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "blue_dye": 5,
+        "yellow_dye": 5
+      },
+      "outputs": {
+        "green_dye": 8
+      },
+      "notes": "20 minutes. Mixing blue and yellow dyes."
+    },
+    {
+      "buildingType": "dye_workshop",
+      "name": "Dye Workshop",
+      "recipeName": "Purple Dye Production",
+      "category": "Production",
+      "productionTime": 1500,
+      "inputs": {
+        "red_dye": 5,
+        "blue_dye": 5
+      },
+      "outputs": {
+        "purple_dye": 6
+      },
+      "notes": "25 minutes. Mixing red and blue dyes. Rare and valuable."
+    },
+    {
+      "buildingType": "dye_workshop",
+      "name": "Dye Workshop",
+      "recipeName": "Orange Dye Production",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "red_dye": 5,
+        "yellow_dye": 5
+      },
+      "outputs": {
+        "orange_dye": 8
+      },
+      "notes": "20 minutes. Mixing red and yellow dyes."
+    },
+    {
+      "buildingType": "tannery",
+      "name": "Tannery",
+      "recipeName": "Basic Leather Tanning",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "raw_hide": 10
+      },
+      "outputs": {
+        "leather": 8
+      },
+      "notes": "2 hours. 10 raw hides produces 8 leather."
+    },
+    {
+      "buildingType": "tannery",
+      "name": "Tannery",
+      "recipeName": "Fine Leather Tanning",
+      "category": "Production",
+      "productionTime": 14400,
+      "inputs": {
+        "raw_hide": 10
+      },
+      "outputs": {
+        "tanned_leather": 6
+      },
+      "notes": "4 hours. 10 raw hides produces 6 fine tanned leather."
+    },
+    {
+      "buildingType": "paper_mill",
+      "name": "Paper Mill",
+      "recipeName": "Wood Pulp Production",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "timber": 10
+      },
+      "outputs": {
+        "wood_pulp": 30
+      },
+      "notes": "1 hour. 10 timber produces 30 kg wood pulp."
+    },
+    {
+      "buildingType": "paper_mill",
+      "name": "Paper Mill",
+      "recipeName": "Paper Making",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "wood_pulp": 20
+      },
+      "outputs": {
+        "paper": 40
+      },
+      "notes": "40 minutes. 20 kg wood pulp produces 40 sheets paper."
+    },
+    {
+      "buildingType": "paper_mill",
+      "name": "Paper Mill",
+      "recipeName": "Fine Paper Making",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "wood_pulp": 25,
+        "cloth": 5
+      },
+      "outputs": {
+        "fine_paper": 20
+      },
+      "notes": "1 hour. Wood pulp with cloth produces fine paper."
+    },
+    {
+      "buildingType": "dye_workshop",
+      "name": "Dye Workshop",
+      "recipeName": "Ink Production",
+      "category": "Production",
+      "productionTime": 1200,
+      "inputs": {
+        "black_dye": 5,
+        "oil": 2
+      },
+      "outputs": {
+        "ink": 15
+      },
+      "notes": "20 minutes. Black dye and oil produces writing ink."
+    },
+    {
+      "buildingType": "scriptorium",
+      "name": "Scriptorium",
+      "recipeName": "Book Binding",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "paper": 20,
+        "leather": 2,
+        "thread": 5,
+        "ink": 3
+      },
+      "outputs": {
+        "book": 2
+      },
+      "notes": "2 hours. Paper, leather, thread, and ink produces 2 books."
+    },
+    {
+      "buildingType": "scriptorium",
+      "name": "Scriptorium",
+      "recipeName": "Illuminated Manuscript",
+      "category": "Production",
+      "productionTime": 14400,
+      "inputs": {
+        "fine_paper": 15,
+        "ink": 5,
+        "gold": 2,
+        "blue_dye": 2,
+        "red_dye": 2
+      },
+      "outputs": {
+        "manuscript": 1
+      },
+      "notes": "4 hours. Fine paper with gold and colored inks creates illuminated manuscript."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
+      "recipeName": "Herb Farming",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "herb_seed": 15
+      },
+      "outputs": {
+        "medicinal_herbs": 50,
+        "herb_seed": 25
+      },
+      "notes": "1.5 hours. 15 seeds produces 50 kg medicinal herbs and 25 seeds."
+    },
+    {
+      "buildingType": "apothecary",
+      "name": "Apothecary",
+      "recipeName": "Basic Medicine",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "medicinal_herbs": 20
+      },
+      "outputs": {
+        "medicine": 10
+      },
+      "notes": "1 hour. 20 kg medicinal herbs produces 10 medicine."
+    },
+    {
+      "buildingType": "apothecary",
+      "name": "Apothecary",
+      "recipeName": "Herbal Remedy",
+      "category": "Production",
+      "productionTime": 2700,
+      "inputs": {
+        "medicinal_herbs": 15,
+        "honey": 5
+      },
+      "outputs": {
+        "medicine": 12
+      },
+      "notes": "45 minutes. Herbs with honey produces enhanced medicine."
+    },
+    {
+      "buildingType": "apothecary",
+      "name": "Apothecary",
+      "recipeName": "Healing Salve",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "medicinal_herbs": 10,
+        "oil": 5,
+        "beeswax": 3
+      },
+      "outputs": {
+        "healing_salve": 8
+      },
+      "notes": "40 minutes. Herbs, oil, and beeswax produces healing salve."
+    },
+    {
+      "buildingType": "apothecary",
+      "name": "Apothecary",
+      "recipeName": "Tonic Making",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "medicinal_herbs": 15,
+        "wine": 5
+      },
+      "outputs": {
+        "tonic": 10
+      },
+      "notes": "30 minutes. Herbs infused in wine creates tonic."
+    },
+    {
+      "buildingType": "chandlery",
+      "name": "Chandlery",
+      "recipeName": "Tallow Rendering",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "beef": 10
+      },
+      "outputs": {
+        "tallow": 8
+      },
+      "notes": "30 minutes. Beef fat rendered into tallow."
+    },
+    {
+      "buildingType": "chandlery",
+      "name": "Chandlery",
+      "recipeName": "Tallow Candle Making",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "tallow": 10,
+        "thread": 5
+      },
+      "outputs": {
+        "candle": 20
+      },
+      "notes": "40 minutes. Tallow and wicks produces 20 candles."
+    },
+    {
+      "buildingType": "chandlery",
+      "name": "Chandlery",
+      "recipeName": "Beeswax Candle Making",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "beeswax": 8,
+        "thread": 5
+      },
+      "outputs": {
+        "beeswax_candle": 15
+      },
+      "notes": "40 minutes. Premium clean-burning beeswax candles."
+    },
+    {
+      "buildingType": "chandlery",
+      "name": "Chandlery",
+      "recipeName": "Lye Production",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "wood": 20
+      },
+      "outputs": {
+        "lye": 15
+      },
+      "notes": "1 hour. Wood ash processed into lye."
+    },
+    {
+      "buildingType": "chandlery",
+      "name": "Chandlery",
+      "recipeName": "Soap Making",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "oil": 10,
+        "lye": 8
+      },
+      "outputs": {
+        "soap": 15
+      },
+      "notes": "2 hours. Oil and lye produces soap (requires curing)."
+    },
+    {
+      "buildingType": "perfumery",
+      "name": "Perfumery",
+      "recipeName": "Flower Water Distillation",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "flowers": 50
+      },
+      "outputs": {
+        "flower_water": 30
+      },
+      "notes": "1 hour. Flowers distilled into fragrant water."
+    },
+    {
+      "buildingType": "perfumery",
+      "name": "Perfumery",
+      "recipeName": "Basic Perfume",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "flower_water": 20,
+        "oil": 5
+      },
+      "outputs": {
+        "perfume": 8
+      },
+      "notes": "40 minutes. Flower water and oil creates perfume."
+    },
+    {
+      "buildingType": "perfumery",
+      "name": "Perfumery",
+      "recipeName": "Fine Perfume",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "flower_water": 15,
+        "medicinal_herbs": 10,
+        "oil": 5
+      },
+      "outputs": {
+        "perfume": 6
+      },
+      "notes": "1 hour. Enhanced perfume with aromatic herbs."
+    },
+    {
+      "buildingType": "dye_house",
+      "name": "Dye House",
+      "recipeName": "Red Cloth Dyeing",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "cloth": 10,
+        "red_dye": 5
+      },
+      "outputs": {
+        "red_cloth": 10
+      },
+      "notes": "40 minutes. Cloth dyed vibrant red."
+    },
+    {
+      "buildingType": "dye_house",
+      "name": "Dye House",
+      "recipeName": "Blue Cloth Dyeing",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "cloth": 10,
+        "blue_dye": 5
+      },
+      "outputs": {
+        "blue_cloth": 10
+      },
+      "notes": "40 minutes. Cloth dyed deep blue."
+    },
+    {
+      "buildingType": "dye_house",
+      "name": "Dye House",
+      "recipeName": "Yellow Cloth Dyeing",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "cloth": 10,
+        "yellow_dye": 5
+      },
+      "outputs": {
+        "yellow_cloth": 10
+      },
+      "notes": "40 minutes. Cloth dyed bright yellow."
+    },
+    {
+      "buildingType": "dye_house",
+      "name": "Dye House",
+      "recipeName": "Green Cloth Dyeing",
+      "category": "Production",
+      "productionTime": 2700,
+      "inputs": {
+        "cloth": 10,
+        "green_dye": 5
+      },
+      "outputs": {
+        "green_cloth": 10
+      },
+      "notes": "45 minutes. Cloth dyed forest green."
+    },
+    {
+      "buildingType": "dye_house",
+      "name": "Dye House",
+      "recipeName": "Purple Cloth Dyeing",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "cloth": 10,
+        "purple_dye": 5
+      },
+      "outputs": {
+        "purple_cloth": 10
+      },
+      "notes": "1 hour. Rare purple cloth for nobility."
+    },
+    {
+      "buildingType": "dye_house",
+      "name": "Dye House",
+      "recipeName": "Black Cloth Dyeing",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "cloth": 10,
+        "black_dye": 5
+      },
+      "outputs": {
+        "black_cloth": 10
+      },
+      "notes": "40 minutes. Cloth dyed deep black."
+    },
+    {
+      "buildingType": "dye_house",
+      "name": "Dye House",
+      "recipeName": "Orange Cloth Dyeing",
+      "category": "Production",
+      "productionTime": 2700,
+      "inputs": {
+        "cloth": 10,
+        "orange_dye": 5
+      },
+      "outputs": {
+        "orange_cloth": 10
+      },
+      "notes": "45 minutes. Cloth dyed bright orange."
+    },
+    {
+      "buildingType": "dye_house",
+      "name": "Dye House",
+      "recipeName": "Linen Dyeing",
+      "category": "Production",
+      "productionTime": 3000,
+      "inputs": {
+        "linen": 8,
+        "blue_dye": 4
+      },
+      "outputs": {
+        "dyed_linen": 8
+      },
+      "notes": "50 minutes. Fine linen dyed in rich colors."
+    },
+    {
+      "buildingType": "dye_house",
+      "name": "Dye House",
+      "recipeName": "Embroidered Linen",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "dyed_linen": 5,
+        "thread": 10,
+        "gold": 2
+      },
+      "outputs": {
+        "embroidered_linen": 5
+      },
+      "notes": "2 hours. Luxury embroidered linen with gold thread."
+    },
+    {
+      "buildingType": "tailor",
+      "name": "Tailor",
+      "recipeName": "Formal Attire",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "fine_clothes": 2,
+        "blue_cloth": 3,
+        "thread": 5
+      },
+      "outputs": {
+        "formal_attire": 2
+      },
+      "notes": "1.5 hours. High-end formal clothing."
+    },
+    {
+      "buildingType": "tailor",
+      "name": "Tailor",
+      "recipeName": "Ceremonial Robes",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {
+        "silk": 5,
+        "purple_dye": 3,
+        "gold": 2,
+        "thread": 10
+      },
+      "outputs": {
+        "ceremonial_robes": 1
+      },
+      "notes": "3 hours. Extremely valuable ceremonial garments."
+    },
+    {
+      "buildingType": "tailor",
+      "name": "Tailor",
+      "recipeName": "Uniform Making",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "work_clothes": 3,
+        "black_dye": 2,
+        "thread": 5
+      },
+      "outputs": {
+        "uniform": 3
+      },
+      "notes": "1 hour. Standardized work uniforms."
+    },
+    {
+      "buildingType": "tailor",
+      "name": "Tailor",
+      "recipeName": "Leather Gloves",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "leather": 4,
+        "thread": 3
+      },
+      "outputs": {
+        "gloves": 4
+      },
+      "notes": "40 minutes. Leather hand protection."
+    },
+    {
+      "buildingType": "tailor",
+      "name": "Tailor",
+      "recipeName": "Wool Gloves",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "wool": 3,
+        "thread": 2
+      },
+      "outputs": {
+        "wool_gloves": 4
+      },
+      "notes": "30 minutes. Warm wool gloves."
+    },
+    {
+      "buildingType": "tailor",
+      "name": "Tailor",
+      "recipeName": "Wool Hat Making",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "wool": 2,
+        "thread": 2
+      },
+      "outputs": {
+        "wool_hat": 3
+      },
+      "notes": "30 minutes. Warm wool hats."
+    },
+    {
+      "buildingType": "gemstone_mine",
+      "name": "Gemstone Mine",
+      "recipeName": "Gemstone Mining",
+      "category": "Extraction",
+      "productionTime": 7200,
+      "inputs": {},
+      "outputs": {
+        "gemstone": 3
+      },
+      "notes": "2 hours. Extract precious gemstones from the earth."
+    },
+    {
+      "buildingType": "jewelry_workshop",
+      "name": "Jewelry Workshop",
+      "recipeName": "Silver Ring Crafting",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "silver": 3
+      },
+      "outputs": {
+        "silver_ring": 4
+      },
+      "notes": "40 minutes. Simple silver rings."
+    },
+    {
+      "buildingType": "jewelry_workshop",
+      "name": "Jewelry Workshop",
+      "recipeName": "Gold Ring Crafting",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "gold": 3
+      },
+      "outputs": {
+        "gold_ring": 3
+      },
+      "notes": "1 hour. Elegant gold rings."
+    },
+    {
+      "buildingType": "jewelry_workshop",
+      "name": "Jewelry Workshop",
+      "recipeName": "Silver Necklace Crafting",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "silver": 5,
+        "thread": 2
+      },
+      "outputs": {
+        "silver_necklace": 3
+      },
+      "notes": "1 hour. Silver chain necklaces."
+    },
+    {
+      "buildingType": "jewelry_workshop",
+      "name": "Jewelry Workshop",
+      "recipeName": "Gold Necklace Crafting",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "gold": 5,
+        "thread": 2
+      },
+      "outputs": {
+        "gold_necklace": 2
+      },
+      "notes": "1.5 hours. Elegant gold necklaces."
+    },
+    {
+      "buildingType": "jewelry_workshop",
+      "name": "Jewelry Workshop",
+      "recipeName": "Gemstone Jewelry Crafting",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "gold": 4,
+        "gemstone": 3
+      },
+      "outputs": {
+        "gemstone_jewelry": 2
+      },
+      "notes": "2 hours. Gold jewelry set with precious gemstones."
+    },
+    {
+      "buildingType": "jewelry_workshop",
+      "name": "Jewelry Workshop",
+      "recipeName": "Crown Crafting",
+      "category": "Production",
+      "productionTime": 21600,
+      "inputs": {
+        "gold": 20,
+        "gemstone": 10
+      },
+      "outputs": {
+        "crown": 1
+      },
+      "notes": "6 hours. Royal crown of gold and gemstones."
+    },
+    {
+      "buildingType": "art_workshop",
+      "name": "Art Workshop",
+      "recipeName": "Painting",
+      "category": "Production",
+      "productionTime": 7200,
+      "inputs": {
+        "cloth": 3,
+        "red_dye": 2,
+        "blue_dye": 2,
+        "yellow_dye": 2
+      },
+      "outputs": {
+        "painting": 1
+      },
+      "notes": "2 hours. Basic painting on canvas."
+    },
+    {
+      "buildingType": "art_workshop",
+      "name": "Art Workshop",
+      "recipeName": "Portrait Painting",
+      "category": "Production",
+      "productionTime": 14400,
+      "inputs": {
+        "cloth": 4,
+        "red_dye": 3,
+        "blue_dye": 3,
+        "yellow_dye": 3,
+        "gold": 2
+      },
+      "outputs": {
+        "portrait": 1
+      },
+      "notes": "4 hours. Commissioned portrait with gold accents."
+    },
+    {
+      "buildingType": "art_workshop",
+      "name": "Art Workshop",
+      "recipeName": "Clay Figurine",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "clay": 5
+      },
+      "outputs": {
+        "figurine": 3
+      },
+      "notes": "1 hour. Small decorative clay figures."
+    },
+    {
+      "buildingType": "art_workshop",
+      "name": "Art Workshop",
+      "recipeName": "Bronze Sculpture",
+      "category": "Production",
+      "productionTime": 10800,
+      "inputs": {
+        "bronze": 15
+      },
+      "outputs": {
+        "bronze_sculpture": 1
+      },
+      "notes": "3 hours. Cast bronze artwork."
+    },
+    {
+      "buildingType": "art_workshop",
+      "name": "Art Workshop",
+      "recipeName": "Marble Sculpture",
+      "category": "Production",
+      "productionTime": 14400,
+      "inputs": {
+        "marble": 25,
+        "chisel": 1
+      },
+      "outputs": {
+        "sculpture": 1
+      },
+      "notes": "4 hours. Carved marble sculpture (chisel has chance of wear)."
+    },
+    {
+      "buildingType": "art_workshop",
+      "name": "Art Workshop",
+      "recipeName": "Glassware Creation",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "glass": 8
+      },
+      "outputs": {
+        "glassware": 6
+      },
+      "notes": "1 hour. Glass cups, bowls, and decorative items."
+    },
+    {
+      "buildingType": "weaving_workshop",
+      "name": "Weaving Workshop",
+      "recipeName": "Tapestry Weaving",
+      "category": "Production",
+      "productionTime": 21600,
+      "inputs": {
+        "wool": 30,
+        "thread": 20,
+        "red_dye": 5,
+        "blue_dye": 5
+      },
+      "outputs": {
+        "tapestry": 1
+      },
+      "notes": "6 hours. Large decorative woven wall hanging."
+    },
+    {
+      "buildingType": "lime_kiln",
+      "name": "Lime Kiln",
+      "recipeName": "Limestone Quarrying",
+      "category": "Extraction",
+      "productionTime": 3600,
+      "inputs": {},
+      "outputs": {
+        "limestone": 50
+      },
+      "notes": "1 hour. Extract limestone from quarry."
+    },
+    {
+      "buildingType": "lime_kiln",
+      "name": "Lime Kiln",
+      "recipeName": "Quicklime Production",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "limestone": 40,
+        "coal": 10
+      },
+      "outputs": {
+        "quickite": 30
+      },
+      "notes": "1.5 hours. Burn limestone to produce quicklime."
+    },
+    {
+      "buildingType": "cement_works",
+      "name": "Cement Works",
+      "recipeName": "Cement Production",
+      "category": "Production",
+      "productionTime": 5400,
+      "inputs": {
+        "quickite": 20,
+        "clay": 10,
+        "coal": 10
+      },
+      "outputs": {
+        "cement": 40
+      },
+      "notes": "1.5 hours. Produce cement from quicklime and clay."
+    },
+    {
+      "buildingType": "cement_works",
+      "name": "Cement Works",
+      "recipeName": "Mortar Mixing",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "cement": 15,
+        "sand": 30
+      },
+      "outputs": {
+        "mortar": 40
+      },
+      "notes": "40 minutes. Mix cement and sand into mortar."
+    },
+    {
+      "buildingType": "cement_works",
+      "name": "Cement Works",
+      "recipeName": "Concrete Production",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "cement": 20,
+        "sand": 30,
+        "stone": 40
+      },
+      "outputs": {
+        "concrete": 80
+      },
+      "notes": "1 hour. Strong concrete for construction."
+    },
+    {
+      "buildingType": "cement_works",
+      "name": "Cement Works",
+      "recipeName": "Plaster Production",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "quickite": 15,
+        "sand": 20
+      },
+      "outputs": {
+        "plaster": 30
+      },
+      "notes": "40 minutes. Wall finishing material."
+    },
+    {
+      "buildingType": "cement_works",
+      "name": "Cement Works",
+      "recipeName": "Stucco Production",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "plaster": 20,
+        "marble": 5
+      },
+      "outputs": {
+        "stucco": 20
+      },
+      "notes": "1 hour. Decorative exterior coating."
     }
   ]
 }

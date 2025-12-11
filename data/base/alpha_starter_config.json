@@ -47,7 +47,7 @@
   "starterGold": 1000,
 
   "workerAssignment": {
-    "autoAssignLowerClasses": true,
+    "autoAssignLowerClasses": false,
     "farmWorkers": 2,
     "bakeryWorkers": 1
   }

@@ -314,10 +314,16 @@ function Character:FulfillCraving(commodity, quantity, currentCycle)
     return true, totalGain, commodityMultiplier
 end
 
--- Check if character accepts a quality level (simplified for now)
+-- Check if character accepts a given quality level
+-- Phase 5: Class-based quality acceptance from behavior templates
+-- TODO: Define quality tiers properly at commodity level, production level, and inventory level
 function Character:AcceptsQuality(quality)
-    -- For now, all characters accept all qualities
-    -- TODO: Implement class-based quality acceptance
+    if not quality then
+        return true  -- No quality specified = accept
+    end
+
+    -- Character V1 doesn't have _CharacterClasses loaded, accept all for now
+    -- Full implementation in CharacterV2/V3
     return true
 end
 
@@ -325,8 +331,8 @@ end
 function Character:CalculatePriority(currentCycle)
     local config = ConsumptionMechanics.priorityCalculation
 
-    -- Base class weight
-    local classWeight = config.classWeights[self.class]
+    -- Phase 5: Priority is based purely on desperation (unfulfilled cravings)
+    -- Class is NOT used for priority - only for quality acceptance and consumption budgets
 
     -- Calculate desperation score
     local desperationScore = 0
@@ -350,8 +356,8 @@ function Character:CalculatePriority(currentCycle)
         desperationScore = desperationScore + (desperationMultiplier * cravingWeight)
     end
 
-    -- Calculate final priority
-    self.allocationPriority = classWeight * 100 + desperationScore
+    -- Priority is purely based on desperation (no class weight)
+    self.allocationPriority = desperationScore
 
     return self.allocationPriority
 end

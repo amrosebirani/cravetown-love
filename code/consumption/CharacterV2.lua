@@ -45,13 +45,21 @@ function Character.BuildDimensionMaps()
         Character.coarseNameToIndex[coarseDim.id] = coarseDim.index
     end
 
-    -- Map fine dimensions to their parent coarse
+    -- Map fine dimensions to their parent coarse and store aggregation weights
+    Character.fineAggregationWeights = {}  -- fineIndex -> aggregationWeight
+    Character.coarseWeightSums = {}  -- coarseIndex -> sum of weights for normalization
+
     for _, fineDim in ipairs(Character._DimensionDefinitions.fineDimensions) do
         Character.fineNames[fineDim.index] = fineDim.id
+        -- Store aggregation weight (default to 1.0 if not specified)
+        Character.fineAggregationWeights[fineDim.index] = fineDim.aggregationWeight or 1.0
+
         -- Convert parent coarse name to index
         local parentCoarseIndex = Character.coarseNameToIndex[fineDim.parentCoarse]
         if parentCoarseIndex then
             Character.fineToCoarseMap[fineDim.index] = parentCoarseIndex
+            -- Accumulate weight sums for each coarse dimension
+            Character.coarseWeightSums[parentCoarseIndex] = (Character.coarseWeightSums[parentCoarseIndex] or 0) + (fineDim.aggregationWeight or 1.0)
         else
             print("Warning: Unknown parent coarse '" .. tostring(fineDim.parentCoarse) .. "' for fine dimension " .. tostring(fineDim.index))
         end
@@ -673,13 +681,15 @@ function Character:AggregateCurrentCravingsToCoarse()
             for fineIndex = 0, 48 do
                 -- Fixed: compare coarseIndex (number) to fineToCoarseMap (number), not to coarseName (string)
                 if Character.fineToCoarseMap[fineIndex] == coarseIndex then
-                    local weight = 1.0  -- Could use aggregationWeight from dimension_definitions
+                    -- Use aggregationWeight from dimension definitions
+                    local weight = Character.fineAggregationWeights[fineIndex] or 1.0
                     total = total + (self.currentCravings[fineIndex] or 0) * weight
                     totalWeight = totalWeight + weight
                     count = count + 1
                 end
             end
 
+            -- Normalize by dividing by sum of weights
             coarseCravings[coarseName] = totalWeight > 0 and (total / totalWeight) or 0
         end
     end
@@ -698,8 +708,8 @@ function Character:CalculatePriority(currentCycle, allocationMode)
 
     local config = Character._ConsumptionMechanics.priorityCalculation
 
-    -- Base class weight
-    local classWeight = config.classWeights[self.class] or 1
+    -- Phase 5: Priority is based purely on desperation (unfulfilled cravings)
+    -- Class is NOT used for priority - only for quality acceptance and consumption budgets
 
     -- Aggregate current cravings to coarse for priority calculation
     local coarseCravings = self:AggregateCurrentCravingsToCoarse()
@@ -726,8 +736,8 @@ function Character:CalculatePriority(currentCycle, allocationMode)
         desperationScore = desperationScore + (desperationMultiplier * cravingWeight)
     end
 
-    -- Calculate base priority
-    local basePriority = classWeight * 100 + desperationScore
+    -- Priority is purely based on desperation (no class weight)
+    local basePriority = desperationScore
 
     -- Apply fairness penalty if in fairness mode
     local finalPriority = basePriority
@@ -740,10 +750,64 @@ function Character:CalculatePriority(currentCycle, allocationMode)
 end
 
 -- Check if character accepts a given quality level
+-- Phase 5: Class-based quality acceptance from behavior templates
+-- Uses emergent class for quality acceptance (not initial/template class)
+-- TODO: Define quality tiers properly at commodity level, production level, and inventory level
 function Character:AcceptsQuality(quality)
-    -- For now, all characters accept all qualities
-    -- TODO: Implement class-based quality acceptance (e.g., elite prefers luxury)
+    if not quality then
+        return true  -- No quality specified = accept
+    end
+
+    -- Phase 5: Use emergent class for quality acceptance
+    local effectiveClass = self:GetEffectiveClass()
+
+    -- Find class data for this character's emergent class
+    local classData = nil
+    if Character._CharacterClasses and Character._CharacterClasses.classes then
+        local classLower = string.lower(effectiveClass or "middle")
+        for _, c in ipairs(Character._CharacterClasses.classes) do
+            if string.lower(c.id) == classLower then
+                classData = c
+                break
+            end
+        end
+    end
+
+    -- If no class data found, accept all qualities
+    if not classData then
+        return true
+    end
+
+    local qualityLower = string.lower(quality)
+
+    -- Check rejected qualities first
+    if classData.rejectedQualityTiers then
+        for _, rejectedTier in ipairs(classData.rejectedQualityTiers) do
+            if string.lower(rejectedTier) == qualityLower then
+                return false  -- Quality is explicitly rejected
+            end
+        end
+    end
+
+    -- Check accepted qualities
+    if classData.acceptedQualityTiers and #classData.acceptedQualityTiers > 0 then
+        for _, acceptedTier in ipairs(classData.acceptedQualityTiers) do
+            if string.lower(acceptedTier) == qualityLower then
+                return true  -- Quality is explicitly accepted
+            end
+        end
+        -- Has accepted list but quality not in it = reject
+        return false
+    end
+
+    -- No accepted list = accept all (except rejected)
     return true
+end
+
+-- Get the current effective class (emergent if available, else assigned)
+-- CharacterV2 doesn't track emergent class, so returns assigned class
+function Character:GetEffectiveClass()
+    return self.emergentClass or self.class or "middle"
 end
 
 -- =============================================================================
