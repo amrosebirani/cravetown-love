@@ -2,7 +2,7 @@
   "version": "1.0.0",
   "dimensionCount": {
     "coarse": 10,
-    "fine": 65
+    "fine": 66
   },
   "coarseDimensions": [
     {
@@ -898,6 +898,18 @@
       ],
       "aggregationWeight": 0.2,
       "index": 64
+    },
+    {
+      "id": "touch_foot_care",
+      "name": "Foot Care",
+      "parentCoarse": "touch",
+      "tags": [
+        "foot",
+        "care",
+        "speed"
+      ],
+      "aggregationWeight": 0.2,
+      "index": 65
     }
   ],
   "metadata": {

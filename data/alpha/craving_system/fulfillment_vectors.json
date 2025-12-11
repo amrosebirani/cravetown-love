@@ -197,24 +197,25 @@
       "id": "wine",
       "fulfillmentVector": {
         "coarse": [
-          2,
+          3,
           0,
           3,
-          3,
-          5,
-          5,
-          10,
+          5.5,
+          8,
+          8,
+          5.5,
           0,
-          18
+          14,
+          0
         ],
         "fine": {
           "biological_hydration": 3,
-          "touch_sensory_luxury": 5,
-          "psychological_entertainment_arts": 5,
+          "touch_sensory_luxury": 3,
           "status_reputation_display": 8,
           "social_friendship_intimate": 8,
-          "exotic_food_imports": 15,
-          "vice_alcohol_spirits": 25
+          "exotic_food_imports": 5.5,
+          "vice_alcohol_spirits": 14,
+          "psychological_detstress_relax": 5.5
         }
       },
       "tags": [
@@ -225,18 +226,24 @@
       ],
       "durability": "consumable",
       "qualityMultipliers": {
+        "poor": 0.5,
+        "basic": 1,
         "good": 0.8,
         "luxury": 1.2,
         "masterwork": 1.8
-      }
+      },
+      "durationCycles": null,
+      "effectDecayRate": null,
+      "notes": "Bricks, planks, cement - used for building"
     },
     "simple_clothes": {
       "id": "simple_clothes",
       "fulfillmentVector": {
         "coarse": [
           0,
-          2,
-          8,
+          5,
+          9.5,
+          0,
           0,
           0,
           0,
@@ -246,8 +253,7 @@
         ],
         "fine": {
           "safety_shelter_warmth": 5,
-          "touch_clothing_everyday": 15,
-          "touch_textiles_bedding": 2
+          "touch_clothing_everyday": 9.5
         }
       },
       "tags": [
@@ -256,15 +262,16 @@
         "basic"
       ],
       "durability": "durable",
-      "durationCycles": 60,
-      "effectDecayRate": 0.01,
-      "category": "clothing_everyday",
-      "maxOwned": 1,
       "qualityMultipliers": {
         "poor": 0.5,
         "basic": 1,
-        "good": 1.3
-      }
+        "good": 1.3,
+        "luxury": 2.2,
+        "masterwork": 3
+      },
+      "durationCycles": 42,
+      "effectDecayRate": 0.02,
+      "notes": "Basic grain - staple food"
     },
     "luxury_clothes": {
       "id": "luxury_clothes",
@@ -469,9 +476,10 @@
       "id": "soap",
       "fulfillmentVector": {
         "coarse": [
-          8,
+          10,
           0,
-          5,
+          4,
+          0,
           0,
           0,
           0,
@@ -480,8 +488,8 @@
           0
         ],
         "fine": {
-          "biological_health_hygiene": 20,
-          "touch_sensory_luxury": 8
+          "biological_health_hygiene": 10,
+          "touch_sensory_luxury": 4
         }
       },
       "tags": [
@@ -489,13 +497,17 @@
         "cleanliness",
         "health"
       ],
-      "durability": "consumable",
+      "durability": "durable",
       "qualityMultipliers": {
         "poor": 0.6,
         "basic": 1,
         "good": 1.3,
-        "luxury": 1.7
-      }
+        "luxury": 1.7,
+        "masterwork": 3
+      },
+      "durationCycles": 10,
+      "effectDecayRate": 0.05,
+      "notes": "Basic grain - staple food"
     },
     "painting": {
       "id": "painting",
@@ -617,6 +629,7 @@
       "id": "rice",
       "fulfillmentVector": {
         "coarse": [
+          16.5,
           0,
           0,
           0,
@@ -630,7 +643,7 @@
         "fine": {
           "biological_nutrition_grain": 12,
           "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_energy_stimulation": 3.5
         }
       },
       "tags": [
@@ -647,6 +660,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Basic grain - staple food"
     },
     "barley": {
@@ -728,6 +743,7 @@
       "id": "rye",
       "fulfillmentVector": {
         "coarse": [
+          15.5,
           0,
           0,
           0,
@@ -741,7 +757,7 @@
         "fine": {
           "biological_nutrition_grain": 12,
           "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_energy_stimulation": 2.5
         }
       },
       "tags": [
@@ -758,6 +774,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Basic grain - staple food"
     },
     "house": {
@@ -838,18 +856,20 @@
         "coarse": [
           0,
           0,
-          8,
-          3,
+          10,
+          10.5,
           0,
-          5,
+          4.5,
+          0,
           0,
           0,
           0
         ],
         "fine": {
-          "touch_furniture_functional": 12,
+          "touch_furniture_functional": 10,
+          "psychological_education_books": 2.5,
           "psychological_purpose_work": 8,
-          "social_friendship_casual": 10
+          "social_friendship_casual": 4.5
         }
       },
       "tags": [
@@ -857,16 +877,16 @@
         "functional"
       ],
       "durability": "durable",
-      "durationCycles": 400,
-      "effectDecayRate": 0.001,
-      "category": "furniture_surface",
-      "maxOwned": 2,
       "qualityMultipliers": {
         "poor": 0.5,
         "basic": 1,
         "good": 1.3,
-        "luxury": 1.7
-      }
+        "luxury": 1.7,
+        "masterwork": 1.3
+      },
+      "durationCycles": 200,
+      "effectDecayRate": 0.001,
+      "notes": "Seeds for planting"
     },
     "tools": {
       "id": "tools",
@@ -875,17 +895,15 @@
           0,
           0,
           0,
-          8,
+          0,
+          0,
           0,
           0,
           0,
           0,
           0
         ],
-        "fine": {
-          "psychological_purpose_work": 20,
-          "psychological_purpose_achievement": 10
-        }
+        "fine": {}
       },
       "tags": [
         "tools",
@@ -893,16 +911,16 @@
         "functional"
       ],
       "durability": "durable",
-      "durationCycles": 150,
-      "effectDecayRate": 0.005,
-      "category": "tools",
-      "maxOwned": 3,
       "qualityMultipliers": {
         "poor": 0.6,
         "basic": 1,
         "good": 1.4,
-        "luxury": 1.8
-      }
+        "luxury": 1.8,
+        "masterwork": 3
+      },
+      "durationCycles": 150,
+      "effectDecayRate": 0.005,
+      "notes": "Paper, nails, etc"
     },
     "apple": {
       "id": "apple",
@@ -1550,12 +1568,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "aspirational_beauty_aesthetics": 5,
-          "touch_sensory_luxury": 3
-        }
+        "fine": {}
       },
       "tags": [
         "plant",
@@ -1570,6 +1586,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Flowers, decorative plants"
     },
     "wool": {
@@ -1584,13 +1602,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "biological_nutrition_protein": 20,
-          "biological_nutrition_grain": 2,
-          "touch_sensory_luxury": 3
-        }
+        "fine": {}
       },
       "tags": [
         "protein",
@@ -1605,6 +1620,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 75,
+      "effectDecayRate": 0.02,
       "notes": "Meat, dairy, eggs"
     },
     "sheep": {
@@ -1619,13 +1636,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
-        }
+        "fine": {}
       },
       "tags": [
         "grain",
@@ -1641,6 +1655,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": 55,
+      "effectDecayRate": 0.02,
       "notes": "Basic grain - staple food"
     },
     "feathers": {
@@ -1924,13 +1940,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "biological_nutrition_protein": 20,
-          "biological_nutrition_grain": 2,
-          "touch_sensory_luxury": 3
-        }
+        "fine": {}
       },
       "tags": [
         "protein",
@@ -1945,6 +1958,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Meat, dairy, eggs"
     },
     "tanned_leather": {
@@ -1959,13 +1974,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "biological_nutrition_protein": 20,
-          "biological_nutrition_grain": 2,
-          "touch_sensory_luxury": 3
-        }
+        "fine": {}
       },
       "tags": [
         "protein",
@@ -1980,6 +1992,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": 200,
+      "effectDecayRate": 0.001,
       "notes": "Meat, dairy, eggs"
     },
     "mutton": {
@@ -2196,6 +2210,7 @@
       "id": "sugar",
       "fulfillmentVector": {
         "coarse": [
+          5,
           0,
           0,
           0,
@@ -2203,14 +2218,13 @@
           0,
           0,
           0,
-          0,
+          6,
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 15,
-          "biological_nutrition_protein": 2,
-          "touch_sensory_luxury": 3,
-          "comfort_warmth_shelter": 2
+          "biological_nutrition_grain": 5,
+          "vice_indulgence_sweets": 3,
+          "vice_indulgence_excess": 3
         }
       },
       "tags": [
@@ -2226,6 +2240,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Processed food items like bread, pastries"
     },
     "honey": {
@@ -2272,21 +2288,25 @@
       "id": "pastries",
       "fulfillmentVector": {
         "coarse": [
+          30,
+          0,
+          3,
           0,
           0,
           0,
           0,
           0,
-          0,
-          0,
-          0,
+          3.5,
           0
         ],
         "fine": {
           "biological_nutrition_grain": 15,
           "biological_nutrition_protein": 2,
+          "biological_energy_stimulation": 5,
           "touch_sensory_luxury": 3,
-          "comfort_warmth_shelter": 2
+          "vice_indulgence_sweets": 2.5,
+          "vice_indulgence_excess": 1,
+          "biological_nutrition_fat": 8
         }
       },
       "tags": [
@@ -2302,6 +2322,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 45,
+      "effectDecayRate": 0.06,
       "notes": "Processed food items like bread, pastries"
     },
     "preserved_food": {
@@ -2352,12 +2374,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "aspirational_beauty_aesthetics": 8,
-          "touch_sensory_luxury": 5
-        }
+        "fine": {}
       },
       "tags": [
         "dye",
@@ -2372,6 +2392,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Coloring materials for textiles"
     },
     "blue_dye": {
@@ -2407,6 +2429,20 @@
     },
     "yellow_dye": {
       "id": "yellow_dye",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {}
+      },
       "tags": [
         "dye",
         "color",
@@ -2420,6 +2456,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 40,
+      "effectDecayRate": 0.03,
       "notes": "Coloring materials for textiles"
     },
     "black_dye": {
@@ -2498,12 +2536,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "aspirational_beauty_aesthetics": 8,
-          "touch_sensory_luxury": 5
-        }
+        "fine": {}
       },
       "tags": [
         "dye",
@@ -2518,6 +2554,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Coloring materials for textiles"
     },
     "orange_dye": {
@@ -2561,6 +2599,7 @@
           0,
           0,
           0,
+          18,
           0,
           0,
           0,
@@ -2569,9 +2608,12 @@
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "psychological_education_books": 3,
+          "psychological_education_formal": 3,
+          "psychological_entertainment_arts": 3,
+          "psychological_purpose_work": 3,
+          "psychological_purpose_religion": 3,
+          "psychological_detstress_relax": 3
         }
       },
       "tags": [
@@ -2588,6 +2630,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 45,
+      "effectDecayRate": 0.06,
       "notes": "Basic grain - staple food"
     },
     "wood_pulp": {
@@ -2602,13 +2646,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
-        }
+        "fine": {}
       },
       "tags": [
         "grain",
@@ -2624,6 +2665,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 75,
+      "effectDecayRate": 0.02,
       "notes": "Basic grain - staple food"
     },
     "fine_paper": {
@@ -2817,12 +2860,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "touch_sensory_luxury": 5,
-          "aspirational_beauty_aesthetics": 3
-        }
+        "fine": {}
       },
       "tags": [
         "textile",
@@ -2837,6 +2878,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 80,
+      "effectDecayRate": 0.02,
       "notes": "Cloth, linen, silk"
     },
     "cloth": {
@@ -2917,6 +2960,7 @@
         "coarse": [
           0,
           0,
+          12,
           0,
           0,
           0,
@@ -2926,8 +2970,8 @@
           0
         ],
         "fine": {
-          "touch_sensory_luxury": 5,
-          "aspirational_beauty_aesthetics": 3
+          "touch_textiles_bedding": 7,
+          "touch_sensory_luxury": 5
         }
       },
       "tags": [
@@ -2943,14 +2987,17 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": 70,
+      "effectDecayRate": 0.045,
       "notes": "Cloth, linen, silk"
     },
     "work_clothes": {
       "id": "work_clothes",
       "fulfillmentVector": {
         "coarse": [
+          0.5,
           0,
-          0,
+          6,
           0,
           0,
           0,
@@ -2960,10 +3007,9 @@
           0
         ],
         "fine": {
-          "biological_health_hygiene": 5,
-          "comfort_warmth_shelter": 12,
-          "comfort_safety_protection": 8,
-          "social_status_recognition": 2
+          "biological_health_hygiene": 0.5,
+          "touch_clothing_everyday": 1.5,
+          "touch_clothing_formal": 4.5
         }
       },
       "tags": [
@@ -2980,6 +3026,8 @@
         "luxury": 2,
         "masterwork": 2.8
       },
+      "durationCycles": 40,
+      "effectDecayRate": 0.03,
       "notes": "Simple clothes, work clothes"
     },
     "fine_clothes": {
@@ -3023,10 +3071,11 @@
       "id": "winter_coat",
       "fulfillmentVector": {
         "coarse": [
+          2.5,
+          4.5,
           0,
           0,
-          0,
-          0,
+          4.5,
           0,
           0,
           0,
@@ -3034,10 +3083,9 @@
           0
         ],
         "fine": {
-          "biological_health_hygiene": 5,
-          "comfort_warmth_shelter": 12,
-          "comfort_safety_protection": 8,
-          "social_status_recognition": 2
+          "biological_health_hygiene": 2.5,
+          "safety_shelter_warmth": 4.5,
+          "status_fashion_luxury": 4.5
         }
       },
       "tags": [
@@ -3054,14 +3102,17 @@
         "luxury": 2,
         "masterwork": 2.8
       },
+      "durationCycles": 75,
+      "effectDecayRate": 0.02,
       "notes": "Simple clothes, work clothes"
     },
     "shoes": {
       "id": "shoes",
       "fulfillmentVector": {
         "coarse": [
-          0,
-          0,
+          5,
+          4.5,
+          17,
           0,
           0,
           0,
@@ -3072,9 +3123,10 @@
         ],
         "fine": {
           "biological_health_hygiene": 5,
-          "comfort_warmth_shelter": 12,
-          "comfort_safety_protection": 8,
-          "social_status_recognition": 2
+          "safety_shelter_warmth": 4.5,
+          "touch_clothing_everyday": 4.5,
+          "touch_sensory_luxury": 2,
+          "touch_foot_care": 10.5
         }
       },
       "tags": [
@@ -3091,6 +3143,8 @@
         "luxury": 2,
         "masterwork": 2.8
       },
+      "durationCycles": 60,
+      "effectDecayRate": 0.035,
       "notes": "Simple clothes, work clothes"
     },
     "boots": {
@@ -3099,7 +3153,8 @@
         "coarse": [
           5,
           5,
-          6,
+          16,
+          0,
           0,
           0,
           0,
@@ -3111,7 +3166,8 @@
           "biological_health_hygiene": 5,
           "safety_shelter_warmth": 5,
           "touch_clothing_everyday": 4,
-          "touch_sensory_luxury": 2
+          "touch_sensory_luxury": 2,
+          "touch_foot_care": 10
         }
       },
       "tags": [
@@ -3128,6 +3184,8 @@
         "luxury": 2,
         "masterwork": 2.8
       },
+      "durationCycles": 60,
+      "effectDecayRate": 0.045,
       "notes": "Simple clothes, work clothes"
     },
     "hat": {
@@ -3251,12 +3309,11 @@
           0,
           0,
           0,
-          0
+          0,
+          2.5
         ],
         "fine": {
-          "comfort_safety_protection": 5,
-          "aspirational_achievement_purpose": 8,
-          "aspirational_growth_knowledge": 3
+          "utility_essential_tools": 2.5
         }
       },
       "tags": [
@@ -3272,6 +3329,8 @@
         "luxury": 1.4,
         "masterwork": 1.6
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Work tools, crafting implements"
     },
     "pickaxe": {
@@ -3286,12 +3345,11 @@
           0,
           0,
           0,
-          0
+          0,
+          5
         ],
         "fine": {
-          "comfort_safety_protection": 5,
-          "aspirational_achievement_purpose": 8,
-          "aspirational_growth_knowledge": 3
+          "utility_essential_tools": 5
         }
       },
       "tags": [
@@ -3307,6 +3365,8 @@
         "luxury": 1.4,
         "masterwork": 1.6
       },
+      "durationCycles": 50,
+      "effectDecayRate": 0.03,
       "notes": "Work tools, crafting implements"
     },
     "shovel": {
@@ -3321,12 +3381,11 @@
           0,
           0,
           0,
-          0
+          0,
+          4
         ],
         "fine": {
-          "comfort_safety_protection": 5,
-          "aspirational_achievement_purpose": 8,
-          "aspirational_growth_knowledge": 3
+          "utility_essential_tools": 4
         }
       },
       "tags": [
@@ -3342,6 +3401,8 @@
         "luxury": 1.4,
         "masterwork": 1.6
       },
+      "durationCycles": 60,
+      "effectDecayRate": 0.035,
       "notes": "Work tools, crafting implements"
     },
     "hoe": {
@@ -3385,6 +3446,7 @@
       "fulfillmentVector": {
         "coarse": [
           0,
+          6,
           0,
           0,
           0,
@@ -3392,12 +3454,11 @@
           0,
           0,
           0,
-          0
+          5
         ],
         "fine": {
-          "comfort_safety_protection": 5,
-          "aspirational_achievement_purpose": 8,
-          "aspirational_growth_knowledge": 3
+          "safety_security_defense": 6,
+          "utility_essential_tools": 5
         }
       },
       "tags": [
@@ -3413,6 +3474,8 @@
         "luxury": 1.4,
         "masterwork": 1.6
       },
+      "durationCycles": 55,
+      "effectDecayRate": 0.02,
       "notes": "Work tools, crafting implements"
     },
     "chisel": {
@@ -3527,6 +3590,7 @@
         "coarse": [
           0,
           0,
+          18,
           0,
           0,
           0,
@@ -3536,10 +3600,8 @@
           0
         ],
         "fine": {
-          "comfort_warmth_shelter": 10,
-          "comfort_rest_relaxation": 12,
-          "aspirational_beauty_aesthetics": 8,
-          "social_status_recognition": 5
+          "touch_furniture_functional": 4.5,
+          "touch_furniture_storage": 13.5
         }
       },
       "tags": [
@@ -3547,7 +3609,7 @@
         "comfort",
         "home"
       ],
-      "durability": "permanent",
+      "durability": "durable",
       "qualityMultipliers": {
         "poor": 0.6,
         "basic": 1,
@@ -3555,6 +3617,8 @@
         "luxury": 1.8,
         "masterwork": 2.5
       },
+      "durationCycles": 65,
+      "effectDecayRate": 0.025,
       "notes": "Chairs, tables, beds, cabinets"
     },
     "bench": {
@@ -3705,6 +3769,7 @@
         "coarse": [
           0,
           0,
+          8,
           0,
           0,
           0,
@@ -3714,10 +3779,8 @@
           0
         ],
         "fine": {
-          "comfort_warmth_shelter": 10,
-          "comfort_rest_relaxation": 12,
-          "aspirational_beauty_aesthetics": 8,
-          "social_status_recognition": 5
+          "touch_furniture_functional": 4,
+          "touch_furniture_storage": 4
         }
       },
       "tags": [
@@ -3725,7 +3788,7 @@
         "comfort",
         "home"
       ],
-      "durability": "permanent",
+      "durability": "durable",
       "qualityMultipliers": {
         "poor": 0.6,
         "basic": 1,
@@ -3733,6 +3796,8 @@
         "luxury": 1.8,
         "masterwork": 2.5
       },
+      "durationCycles": 60,
+      "effectDecayRate": 0.02,
       "notes": "Chairs, tables, beds, cabinets"
     },
     "cradle": {
@@ -4263,14 +4328,18 @@
           0,
           0,
           0,
+          10.5,
           0,
           0,
-          0,
+          13.5,
           0,
           0
         ],
         "fine": {
-          "social_status_recognition": 3
+          "status_reputation_display": 5.5,
+          "status_wealth_precious": 5,
+          "shiny_precious_silver": 10.5,
+          "shiny_precious_gems": 3
         }
       },
       "tags": [
@@ -4286,6 +4355,8 @@
         "luxury": 1.2,
         "masterwork": 1.3
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Iron, steel, gold, silver"
     },
     "bricks": {
@@ -4356,6 +4427,7 @@
         "coarse": [
           0,
           0,
+          3,
           0,
           0,
           0,
@@ -4364,14 +4436,16 @@
           0,
           0
         ],
-        "fine": {}
+        "fine": {
+          "touch_furniture_functional": 3
+        }
       },
       "tags": [
         "construction",
         "building",
         "raw_material"
       ],
-      "durability": "permanent",
+      "durability": "durable",
       "qualityMultipliers": {
         "poor": 0.5,
         "basic": 1,
@@ -4379,6 +4453,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": 30,
+      "effectDecayRate": 0.08,
       "notes": "Bricks, planks, cement - used for building"
     },
     "cement": {
@@ -4489,22 +4565,22 @@
       "id": "pottery",
       "fulfillmentVector": {
         "coarse": [
+          5,
+          0,
+          4.5,
           0,
           0,
           0,
           0,
-          0,
-          0,
-          0,
+          1,
           0,
           0
         ],
         "fine": {
-          "touch_sensory_luxury": 15,
-          "aspirational_beauty_aesthetics": 20,
-          "social_status_recognition": 18,
-          "aspirational_achievement_purpose": 8,
-          "psychological_entertainment_games": 5
+          "biological_hydration": 5,
+          "touch_furniture_decorative": 1,
+          "touch_sensory_luxury": 3.5,
+          "shiny_decorative_art": 1
         }
       },
       "tags": [
@@ -4521,6 +4597,8 @@
         "luxury": 2.5,
         "masterwork": 4
       },
+      "durationCycles": 30,
+      "effectDecayRate": 0.08,
       "notes": "Jewelry, paintings, sculptures"
     },
     "jewelry": {
@@ -4564,20 +4642,22 @@
         "coarse": [
           0,
           0,
+          4,
+          4.5,
+          9.5,
           0,
           0,
-          0,
-          0,
-          0,
+          4.5,
           0,
           0
         ],
         "fine": {
-          "touch_sensory_luxury": 15,
-          "aspirational_beauty_aesthetics": 20,
-          "social_status_recognition": 18,
-          "aspirational_achievement_purpose": 8,
-          "psychological_entertainment_games": 5
+          "touch_sensory_luxury": 4,
+          "psychological_entertainment_games": 2,
+          "psychological_purpose_religion": 2.5,
+          "status_reputation_display": 6,
+          "status_wealth_precious": 3.5,
+          "shiny_decorative_art": 4.5
         }
       },
       "tags": [
@@ -4586,7 +4666,7 @@
         "status",
         "wealth"
       ],
-      "durability": "permanent",
+      "durability": "durable",
       "qualityMultipliers": {
         "poor": 0.4,
         "basic": 1,
@@ -4594,6 +4674,8 @@
         "luxury": 2.5,
         "masterwork": 4
       },
+      "durationCycles": 80,
+      "effectDecayRate": 0.01,
       "notes": "Jewelry, paintings, sculptures"
     },
     "candle": {
@@ -4772,6 +4854,7 @@
       "id": "tonic",
       "fulfillmentVector": {
         "coarse": [
+          7.5,
           0,
           0,
           0,
@@ -4782,7 +4865,9 @@
           0,
           0
         ],
-        "fine": {}
+        "fine": {
+          "biological_health_medicine": 7.5
+        }
       },
       "tags": [
         "crafting",
@@ -4797,6 +4882,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Paper, nails, etc"
     },
     "tallow": {
@@ -4811,13 +4898,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "biological_nutrition_protein": 20,
-          "biological_nutrition_grain": 2,
-          "touch_sensory_luxury": 3
-        }
+        "fine": {}
       },
       "tags": [
         "protein",
@@ -4832,6 +4916,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 200,
+      "effectDecayRate": 0.001,
       "notes": "Meat, dairy, eggs"
     },
     "lye": {
@@ -5046,13 +5132,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
-        }
+        "fine": {}
       },
       "tags": [
         "grain",
@@ -5068,6 +5151,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Basic grain - staple food"
     },
     "wheat_seed": {
@@ -5301,13 +5386,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
-        }
+        "fine": {}
       },
       "tags": [
         "grain",
@@ -5323,6 +5405,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 150,
+      "effectDecayRate": 0.005,
       "notes": "Basic grain - staple food"
     },
     "lumber": {
@@ -5399,12 +5483,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "touch_sensory_luxury": 5,
-          "aspirational_beauty_aesthetics": 3
-        }
+        "fine": {}
       },
       "tags": [
         "textile",
@@ -5419,6 +5501,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 40,
+      "effectDecayRate": 0.03,
       "notes": "Cloth, linen, silk"
     },
     "clothing": {
@@ -5459,6 +5543,7 @@
         "coarse": [
           0,
           0,
+          3.5,
           0,
           0,
           0,
@@ -5468,10 +5553,7 @@
           0
         ],
         "fine": {
-          "biological_health_hygiene": 5,
-          "comfort_warmth_shelter": 12,
-          "comfort_safety_protection": 8,
-          "social_status_recognition": 2
+          "touch_clothing_everyday": 3.5
         }
       },
       "tags": [
@@ -5488,6 +5570,8 @@
         "luxury": 2,
         "masterwork": 2.8
       },
+      "durationCycles": 15,
+      "effectDecayRate": 0.04,
       "notes": "Simple clothes, work clothes"
     },
     "pants": {
@@ -5642,19 +5726,19 @@
         "coarse": [
           0,
           0,
+          1.5,
+          4.5,
           0,
           0,
           0,
           0,
-          0,
-          0,
+          13.5,
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 15,
-          "biological_nutrition_protein": 2,
-          "touch_sensory_luxury": 3,
-          "comfort_warmth_shelter": 2
+          "touch_sensory_luxury": 1.5,
+          "vice_alcohol_spirits": 13.5,
+          "psychological_detstress_relax": 4.5
         }
       },
       "tags": [
@@ -5670,6 +5754,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Processed food items like bread, pastries"
     },
     "knife": {
@@ -5713,6 +5799,7 @@
       "id": "ragi",
       "fulfillmentVector": {
         "coarse": [
+          22.5,
           0,
           0,
           0,
@@ -5725,8 +5812,9 @@
         ],
         "fine": {
           "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_nutrition_protein": 3,
+          "biological_energy_stimulation": 4,
+          "biological_taste_wholesome": 3.5
         }
       },
       "tags": [
@@ -5743,14 +5831,17 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Basic grain - staple food"
     },
     "watermelon": {
       "id": "watermelon",
       "fulfillmentVector": {
         "coarse": [
+          18,
           0,
-          0,
+          0.5,
           0,
           0,
           0,
@@ -5762,8 +5853,8 @@
         "fine": {
           "biological_nutrition_produce": 12,
           "biological_hydration": 5,
-          "touch_sensory_luxury": 4,
-          "biological_health_hygiene": 1
+          "biological_health_hygiene": 1,
+          "touch_sensory_luxury": 0.5
         }
       },
       "tags": [
@@ -5780,6 +5871,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Fresh fruits"
     },
     "date": {
@@ -6740,19 +6833,19 @@
       "fulfillmentVector": {
         "coarse": [
           0,
+          5,
           0,
           0,
           0,
           0,
           0,
           0,
-          0,
+          10,
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "safety_shelter_warmth": 5,
+          "vice_alcohol_spirits": 10
         }
       },
       "tags": [
@@ -6769,6 +6862,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Basic grain - staple food"
     },
     "candy": {
@@ -6819,13 +6914,10 @@
           0,
           0,
           0,
+          0,
           0
         ],
-        "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
-        }
+        "fine": {}
       },
       "tags": [
         "grain",
@@ -6841,6 +6933,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Basic grain - staple food"
     },
     "barrel": {
@@ -6979,20 +7073,20 @@
         "coarse": [
           0,
           0,
+          9,
+          3,
+          4.5,
           0,
           0,
-          0,
-          0,
-          0,
+          4.5,
           0,
           0
         ],
         "fine": {
-          "touch_sensory_luxury": 15,
-          "aspirational_beauty_aesthetics": 20,
-          "social_status_recognition": 18,
-          "aspirational_achievement_purpose": 8,
-          "psychological_entertainment_games": 5
+          "touch_sensory_luxury": 9,
+          "psychological_entertainment_games": 3,
+          "status_wealth_precious": 4.5,
+          "shiny_decorative_art": 4.5
         }
       },
       "tags": [
@@ -7001,7 +7095,7 @@
         "status",
         "wealth"
       ],
-      "durability": "permanent",
+      "durability": "durable",
       "qualityMultipliers": {
         "poor": 0.4,
         "basic": 1,
@@ -7009,6 +7103,8 @@
         "luxury": 2.5,
         "masterwork": 4
       },
+      "durationCycles": 80,
+      "effectDecayRate": 0.02,
       "notes": "Jewelry, paintings, sculptures"
     },
     "ceramics": {
@@ -7249,20 +7345,21 @@
         "coarse": [
           0,
           0,
+          1.5,
+          1.5,
+          10.5,
           0,
           0,
-          0,
-          0,
-          0,
+          5,
           0,
           0
         ],
         "fine": {
-          "touch_sensory_luxury": 15,
-          "aspirational_beauty_aesthetics": 20,
-          "social_status_recognition": 18,
-          "aspirational_achievement_purpose": 8,
-          "psychological_entertainment_games": 5
+          "touch_sensory_luxury": 1.5,
+          "psychological_entertainment_games": 1.5,
+          "status_reputation_display": 5.5,
+          "status_wealth_precious": 5,
+          "shiny_decorative_art": 5
         }
       },
       "tags": [
@@ -7279,6 +7376,8 @@
         "luxury": 2.5,
         "masterwork": 4
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Jewelry, paintings, sculptures"
     },
     "gravestone": {
@@ -7863,6 +7962,7 @@
       "id": "rice_flour",
       "fulfillmentVector": {
         "coarse": [
+          23,
           0,
           0,
           0,
@@ -7876,8 +7976,7 @@
         "fine": {
           "biological_nutrition_grain": 15,
           "biological_nutrition_protein": 2,
-          "touch_sensory_luxury": 3,
-          "comfort_warmth_shelter": 2
+          "biological_energy_stimulation": 6
         }
       },
       "tags": [
@@ -7893,6 +7992,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Processed food items like bread, pastries"
     },
     "cornmeal": {
@@ -8010,6 +8111,7 @@
       "id": "porridge",
       "fulfillmentVector": {
         "coarse": [
+          15.5,
           0,
           0,
           0,
@@ -8023,7 +8125,7 @@
         "fine": {
           "biological_nutrition_grain": 12,
           "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_energy_stimulation": 2.5
         }
       },
       "tags": [
@@ -8040,12 +8142,15 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 30,
+      "effectDecayRate": 0.08,
       "notes": "Basic grain - staple food"
     },
     "tortilla": {
       "id": "tortilla",
       "fulfillmentVector": {
         "coarse": [
+          15.5,
           0,
           0,
           0,
@@ -8059,7 +8164,7 @@
         "fine": {
           "biological_nutrition_grain": 12,
           "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_energy_stimulation": 2.5
         }
       },
       "tags": [
@@ -8076,12 +8181,15 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 150,
+      "effectDecayRate": 0.005,
       "notes": "Basic grain - staple food"
     },
     "roti": {
       "id": "roti",
       "fulfillmentVector": {
         "coarse": [
+          15.5,
           0,
           0,
           0,
@@ -8095,7 +8203,7 @@
         "fine": {
           "biological_nutrition_grain": 12,
           "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_energy_stimulation": 2.5
         }
       },
       "tags": [
@@ -8112,12 +8220,15 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Basic grain - staple food"
     },
     "paratha": {
       "id": "paratha",
       "fulfillmentVector": {
         "coarse": [
+          22,
           0,
           0,
           0,
@@ -8129,9 +8240,11 @@
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_nutrition_grain": 5,
+          "biological_nutrition_protein": 5,
+          "biological_nutrition_produce": 4.5,
+          "biological_energy_stimulation": 4,
+          "biological_nutrition_fat": 3.5
         }
       },
       "tags": [
@@ -8148,6 +8261,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 45,
+      "effectDecayRate": 0.06,
       "notes": "Basic grain - staple food"
     },
     "naan": {
@@ -8231,6 +8346,7 @@
       "id": "samosa",
       "fulfillmentVector": {
         "coarse": [
+          25,
           0,
           0,
           0,
@@ -8238,13 +8354,16 @@
           0,
           0,
           0,
-          0,
+          3,
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 12,
+          "biological_nutrition_grain": 7.5,
           "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_nutrition_produce": 6.5,
+          "biological_energy_stimulation": 2.5,
+          "vice_indulgence_excess": 3,
+          "biological_nutrition_fat": 7.5
         }
       },
       "tags": [
@@ -8261,6 +8380,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Basic grain - staple food"
     },
     "kachori": {
@@ -8351,6 +8472,7 @@
       "id": "vada",
       "fulfillmentVector": {
         "coarse": [
+          28,
           0,
           0,
           0,
@@ -8362,9 +8484,11 @@
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_nutrition_grain": 10.5,
+          "biological_nutrition_protein": 5.5,
+          "biological_energy_stimulation": 2.5,
+          "biological_nutrition_fat": 5,
+          "biological_taste_crunchy": 4.5
         }
       },
       "tags": [
@@ -8381,6 +8505,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Basic grain - staple food"
     },
     "idli": {
@@ -8585,6 +8711,7 @@
       "id": "pulao",
       "fulfillmentVector": {
         "coarse": [
+          16,
           0,
           0,
           0,
@@ -8597,8 +8724,8 @@
         ],
         "fine": {
           "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_nutrition_protein": 2,
+          "biological_energy_stimulation": 2
         }
       },
       "tags": [
@@ -8615,6 +8742,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 30,
+      "effectDecayRate": 0.08,
       "notes": "Basic grain - staple food"
     },
     "ladoo": {
@@ -8898,8 +9027,9 @@
       "id": "pickles",
       "fulfillmentVector": {
         "coarse": [
+          15,
           0,
-          0,
+          2,
           0,
           0,
           0,
@@ -8909,10 +9039,11 @@
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 15,
+          "biological_nutrition_grain": 3.5,
           "biological_nutrition_protein": 2,
-          "touch_sensory_luxury": 3,
-          "comfort_warmth_shelter": 2
+          "biological_nutrition_produce": 4.5,
+          "touch_sensory_luxury": 2,
+          "biological_taste_spicy": 5
         }
       },
       "tags": [
@@ -8928,12 +9059,15 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 50,
+      "effectDecayRate": 0.03,
       "notes": "Processed food items like bread, pastries"
     },
     "vegetable_soup": {
       "id": "vegetable_soup",
       "fulfillmentVector": {
         "coarse": [
+          15,
           0,
           0,
           0,
@@ -8945,9 +9079,10 @@
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 12,
+          "biological_nutrition_grain": 7.5,
           "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_nutrition_produce": 5,
+          "biological_energy_stimulation": 1.5
         }
       },
       "tags": [
@@ -8964,12 +9099,15 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Basic grain - staple food"
     },
     "salad": {
       "id": "salad",
       "fulfillmentVector": {
         "coarse": [
+          14,
           0,
           0,
           0,
@@ -8981,9 +9119,10 @@
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 12,
           "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_nutrition_produce": 5.5,
+          "biological_hydration": 5,
+          "biological_energy_stimulation": 2.5
         }
       },
       "tags": [
@@ -9000,6 +9139,8 @@
         "luxury": 1.6,
         "masterwork": 2
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Basic grain - staple food"
     },
     "tomato_sauce": {
@@ -9042,6 +9183,7 @@
       "id": "pie",
       "fulfillmentVector": {
         "coarse": [
+          19,
           0,
           0,
           0,
@@ -9054,8 +9196,9 @@
         ],
         "fine": {
           "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_nutrition_protein": 2,
+          "biological_nutrition_produce": 3,
+          "biological_energy_stimulation": 2
         }
       },
       "tags": [
@@ -9072,12 +9215,15 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": 50,
+      "effectDecayRate": 0.03,
       "notes": "Basic grain - staple food"
     },
     "stew": {
       "id": "stew",
       "fulfillmentVector": {
         "coarse": [
+          21.5,
           0,
           0,
           0,
@@ -9089,9 +9235,11 @@
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "biological_nutrition_grain": 6.5,
+          "biological_nutrition_protein": 3,
+          "biological_nutrition_produce": 5.5,
+          "biological_energy_stimulation": 2,
+          "biological_taste_wholesome": 4.5
         }
       },
       "tags": [
@@ -9108,6 +9256,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Basic grain - staple food"
     },
     "red_cloth": {
@@ -9116,6 +9266,7 @@
         "coarse": [
           0,
           0,
+          7.5,
           0,
           0,
           0,
@@ -9125,8 +9276,8 @@
           0
         ],
         "fine": {
-          "touch_sensory_luxury": 5,
-          "aspirational_beauty_aesthetics": 3
+          "touch_textiles_bedding": 4,
+          "touch_sensory_luxury": 3.5
         }
       },
       "tags": [
@@ -9142,6 +9293,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Cloth, linen, silk"
     },
     "blue_cloth": {
@@ -9253,6 +9406,7 @@
         "coarse": [
           0,
           0,
+          7,
           0,
           0,
           0,
@@ -9262,8 +9416,8 @@
           0
         ],
         "fine": {
-          "touch_sensory_luxury": 5,
-          "aspirational_beauty_aesthetics": 3
+          "touch_textiles_bedding": 2,
+          "touch_sensory_luxury": 5
         }
       },
       "tags": [
@@ -9279,6 +9433,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": 35,
+      "effectDecayRate": 0.05,
       "notes": "Cloth, linen, silk"
     },
     "black_cloth": {
@@ -9507,8 +9663,9 @@
       "id": "uniform",
       "fulfillmentVector": {
         "coarse": [
+          2.5,
           0,
-          0,
+          5.5,
           0,
           0,
           0,
@@ -9518,10 +9675,8 @@
           0
         ],
         "fine": {
-          "biological_health_hygiene": 5,
-          "comfort_warmth_shelter": 12,
-          "comfort_safety_protection": 8,
-          "social_status_recognition": 2
+          "biological_health_hygiene": 2.5,
+          "touch_clothing_everyday": 5.5
         }
       },
       "tags": [
@@ -9538,6 +9693,8 @@
         "luxury": 2,
         "masterwork": 2.8
       },
+      "durationCycles": 40,
+      "effectDecayRate": 0.03,
       "notes": "Simple clothes, work clothes"
     },
     "gloves": {
@@ -9583,9 +9740,10 @@
       "fulfillmentVector": {
         "coarse": [
           0,
+          5,
           0,
           0,
-          0,
+          2,
           0,
           0,
           0,
@@ -9593,10 +9751,8 @@
           0
         ],
         "fine": {
-          "biological_health_hygiene": 5,
-          "comfort_warmth_shelter": 12,
-          "comfort_safety_protection": 8,
-          "social_status_recognition": 2
+          "safety_shelter_warmth": 5,
+          "status_fashion_luxury": 2
         }
       },
       "tags": [
@@ -9613,6 +9769,8 @@
         "luxury": 2,
         "masterwork": 2.8
       },
+      "durationCycles": 75,
+      "effectDecayRate": 0.02,
       "notes": "Simple clothes, work clothes"
     },
     "wool_hat": {
@@ -9620,9 +9778,10 @@
       "fulfillmentVector": {
         "coarse": [
           0,
+          4.5,
+          1.5,
           0,
-          0,
-          0,
+          2,
           0,
           0,
           0,
@@ -9630,10 +9789,9 @@
           0
         ],
         "fine": {
-          "biological_health_hygiene": 5,
-          "comfort_warmth_shelter": 12,
-          "comfort_safety_protection": 8,
-          "social_status_recognition": 2
+          "safety_shelter_warmth": 4.5,
+          "touch_sensory_luxury": 1.5,
+          "status_fashion_luxury": 2
         }
       },
       "tags": [
@@ -9650,6 +9808,8 @@
         "luxury": 2,
         "masterwork": 2.8
       },
+      "durationCycles": 75,
+      "effectDecayRate": 0.02,
       "notes": "Simple clothes, work clothes"
     },
     "gemstone": {
@@ -9697,16 +9857,18 @@
           0,
           0,
           0,
+          6,
           0,
           0,
-          0,
+          7,
           0,
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "status_reputation_display": 3,
+          "status_wealth_precious": 3,
+          "shiny_precious_silver": 3,
+          "shiny_precious_gems": 4
         }
       },
       "tags": [
@@ -9715,7 +9877,7 @@
         "basic_food",
         "raw_material"
       ],
-      "durability": "consumable",
+      "durability": "permanent",
       "qualityMultipliers": {
         "poor": 0.5,
         "basic": 1,
@@ -9723,6 +9885,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Basic grain - staple food"
     },
     "gold_ring": {
@@ -9773,16 +9937,18 @@
           0,
           0,
           0,
+          8.5,
           0,
           0,
-          0,
+          12.5,
           0,
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 12,
-          "biological_nutrition_protein": 1,
-          "biological_energy_stimulation": 0.5
+          "status_reputation_display": 4.5,
+          "status_wealth_precious": 4,
+          "shiny_precious_silver": 5,
+          "shiny_precious_gems": 7.5
         }
       },
       "tags": [
@@ -9791,7 +9957,7 @@
         "basic_food",
         "raw_material"
       ],
-      "durability": "consumable",
+      "durability": "permanent",
       "qualityMultipliers": {
         "poor": 0.5,
         "basic": 1,
@@ -9799,6 +9965,8 @@
         "luxury": 2.2,
         "masterwork": 3
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Basic grain - staple food"
     },
     "gold_necklace": {
@@ -9921,8 +10089,9 @@
         "coarse": [
           0,
           0,
-          0,
-          0,
+          5,
+          7.5,
+          2,
           0,
           0,
           0,
@@ -9930,11 +10099,11 @@
           0
         ],
         "fine": {
-          "touch_sensory_luxury": 15,
-          "aspirational_beauty_aesthetics": 20,
-          "social_status_recognition": 18,
-          "aspirational_achievement_purpose": 8,
-          "psychological_entertainment_games": 5
+          "touch_sensory_luxury": 5,
+          "psychological_entertainment_arts": 2.5,
+          "psychological_entertainment_games": 2.5,
+          "psychological_purpose_religion": 2.5,
+          "status_reputation_display": 2
         }
       },
       "tags": [
@@ -9951,6 +10120,8 @@
         "luxury": 2.5,
         "masterwork": 4
       },
+      "durationCycles": 30,
+      "effectDecayRate": 0.08,
       "notes": "Jewelry, paintings, sculptures"
     },
     "tapestry": {
@@ -9959,20 +10130,21 @@
         "coarse": [
           0,
           0,
+          6.5,
+          3,
+          9.5,
           0,
           0,
-          0,
-          0,
-          0,
+          5,
           0,
           0
         ],
         "fine": {
-          "touch_sensory_luxury": 15,
-          "aspirational_beauty_aesthetics": 20,
-          "social_status_recognition": 18,
-          "aspirational_achievement_purpose": 8,
-          "psychological_entertainment_games": 5
+          "touch_sensory_luxury": 6.5,
+          "psychological_entertainment_games": 3,
+          "status_reputation_display": 5,
+          "status_wealth_precious": 4.5,
+          "shiny_decorative_art": 5
         }
       },
       "tags": [
@@ -9989,6 +10161,8 @@
         "luxury": 2.5,
         "masterwork": 4
       },
+      "durationCycles": null,
+      "effectDecayRate": null,
       "notes": "Jewelry, paintings, sculptures"
     },
     "bronze_sculpture": {
