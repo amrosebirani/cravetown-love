@@ -404,10 +404,10 @@ function AllocationEngineV2.GetBestCommodityForCraving(coarseCraving, character,
         return nil
     end
 
-    -- Get range of fine dimensions for this coarse dimension
-    local fineRange = CharacterV2.coarseToFineMap[coarseIndex]
-    if not fineRange then
-        print("Warning: No fine dimension range for coarse index " .. tostring(coarseIndex))
+    -- Get fine dimension indices for this coarse dimension
+    local fineIndices = CharacterV2.coarseToFineMap[coarseIndex]
+    if not fineIndices or #fineIndices == 0 then
+        print("Warning: No fine dimensions for coarse index " .. tostring(coarseIndex))
         return nil
     end
 
@@ -432,10 +432,7 @@ function AllocationEngineV2.GetBestCommodityForCraving(coarseCraving, character,
                 local totalPoints = 0
                 local count = 0
 
-                local fineStart = fineRange.start
-                local fineEnd = fineRange.finish
-
-                for fineIdx = fineStart, fineEnd do
+                for _, fineIdx in ipairs(fineIndices) do
                     -- Get the string name for this fine dimension (e.g., "biological_nutrition_grain")
                     local fineName = CharacterV2.fineNames[fineIdx]
                     if fineName then

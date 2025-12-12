@@ -37,11 +37,9 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
   const handleChange = (index: number, value: number | null) => {
     // Treat null as 0 (when user clears the input)
     const actualValue = value ?? 0;
-    console.log('handleChange called:', { index, value, actualValue });
 
     const newValues = [...localValues];
     newValues[index] = actualValue;
-    console.log('Setting localValues:', newValues[index], 'at index', index);
     setLocalValues(newValues);
     onChange(newValues);
   };
@@ -147,10 +145,7 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
               padding: '4px 8px',
               cursor: value === 0 ? 'not-allowed' : 'pointer',
             }}
-            onClick={() => {
-              console.log('Native button clicked for index:', index);
-              handleChange(index, 0);
-            }}
+            onClick={() => handleChange(index, 0)}
           >
             ×
           </button>

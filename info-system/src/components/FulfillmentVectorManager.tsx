@@ -177,7 +177,6 @@ const FulfillmentVectorManager: React.FC = () => {
         coarse: currentFulfillmentVector.coarse,
         fine: currentFulfillmentVector.fine
       };
-      console.log('handleModalOk - fulfillmentVector from state:', fulfillmentVector);
 
       const newCommodityData: CommodityFulfillment = {
         id: commodityId,
@@ -685,8 +684,6 @@ const FulfillmentVectorManager: React.FC = () => {
                 onChange={(values) => {
                   const fineObj = fineArrayToObject(values);
                   const coarseArr = calculateCoarseFromFine(values);
-                  console.log('VectorEditor onChange - fine object:', fineObj);
-                  console.log('VectorEditor onChange - coarse array:', coarseArr);
                   setCurrentFulfillmentVector({
                     coarse: coarseArr,
                     fine: fineObj,

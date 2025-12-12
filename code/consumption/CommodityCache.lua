@@ -464,9 +464,9 @@ function CommodityCache.RebuildCoarseDimensionCache(coarseName, inventory)
     local coarseIdx = CharacterV2.coarseNameToIndex[coarseName]
     if not coarseIdx then return end
 
-    -- Get fine dimension range for this coarse
-    local fineRange = CharacterV2.coarseToFineMap[coarseIdx]
-    if not fineRange then return end
+    -- Get fine dimension indices for this coarse
+    local fineIndices = CharacterV2.coarseToFineMap[coarseIdx]
+    if not fineIndices or #fineIndices == 0 then return end
 
     if FulfillmentVectors and FulfillmentVectors.commodities then
         for commodityId, commodityData in pairs(FulfillmentVectors.commodities) do
@@ -475,7 +475,7 @@ function CommodityCache.RebuildCoarseDimensionCache(coarseName, inventory)
                 if fineVector then
                     -- Sum up all fine values in this coarse dimension
                     local totalValue = 0
-                    for fineIdx = fineRange.start, fineRange.finish do
+                    for _, fineIdx in ipairs(fineIndices) do
                         local fineName = CharacterV2.fineNames[fineIdx]
                         if fineName and fineVector[fineName] then
                             totalValue = totalValue + fineVector[fineName]

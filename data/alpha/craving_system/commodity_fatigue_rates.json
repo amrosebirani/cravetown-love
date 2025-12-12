@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Commodity-specific fatigue rates and trait modifiers for variety-seeking behavior",
 
   "defaultFatigueRate": 0.12,
@@ -53,6 +53,13 @@
         "hedonist": 1.6
       }
     },
+    "ragi": {
+      "baseFatigueRate": 0.15,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "hedonist": 1.5
+      }
+    },
 
     "_comment_fruits": "Fruits - lower fatigue (variety in flavors keeps them interesting)",
     "apple": {
@@ -101,6 +108,27 @@
       "baseFatigueRate": 0.09,
       "fatigueModifiers": {
         "hedonist": 1.0
+      }
+    },
+    "watermelon": {
+      "baseFatigueRate": 0.08,
+      "fatigueModifiers": {
+        "hedonist": 0.8,
+        "glutton": 1.2
+      }
+    },
+    "date": {
+      "baseFatigueRate": 0.07,
+      "fatigueModifiers": {
+        "hedonist": 0.8,
+        "glutton": 1.1
+      }
+    },
+    "coconut": {
+      "baseFatigueRate": 0.09,
+      "fatigueModifiers": {
+        "hedonist": 0.9,
+        "glutton": 1.2
       }
     },
 
@@ -163,6 +191,35 @@
         "hedonist": 1.4
       }
     },
+    "broccoli": {
+      "baseFatigueRate": 0.13,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 1.5
+      }
+    },
+    "pepper": {
+      "baseFatigueRate": 0.10,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 1.2
+      }
+    },
+    "lentils": {
+      "baseFatigueRate": 0.14,
+      "fatigueModifiers": {
+        "frugal": 0.75,
+        "hedonist": 1.6,
+        "glutton": 1.2
+      }
+    },
+    "groundnut": {
+      "baseFatigueRate": 0.11,
+      "fatigueModifiers": {
+        "frugal": 0.85,
+        "hedonist": 1.3
+      }
+    },
 
     "_comment_protein": "Protein sources - moderate fatigue, varies by source",
     "meat": {
@@ -172,6 +229,30 @@
         "hedonist": 1.2,
         "glutton": 1.5,
         "ascetic": 1.8
+      }
+    },
+    "mutton": {
+      "baseFatigueRate": 0.11,
+      "fatigueModifiers": {
+        "frugal": 1.0,
+        "hedonist": 1.1,
+        "glutton": 1.4
+      }
+    },
+    "beef": {
+      "baseFatigueRate": 0.11,
+      "fatigueModifiers": {
+        "frugal": 1.0,
+        "hedonist": 1.1,
+        "glutton": 1.5
+      }
+    },
+    "chicken": {
+      "baseFatigueRate": 0.12,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 1.2,
+        "glutton": 1.4
       }
     },
     "eggs": {
@@ -206,6 +287,43 @@
         "glutton": 1.5
       }
     },
+    "ghee": {
+      "baseFatigueRate": 0.09,
+      "fatigueModifiers": {
+        "frugal": 1.1,
+        "hedonist": 1.0,
+        "glutton": 1.3
+      }
+    },
+    "curd": {
+      "baseFatigueRate": 0.12,
+      "fatigueModifiers": {
+        "frugal": 0.85,
+        "hedonist": 1.3
+      }
+    },
+    "paneer": {
+      "baseFatigueRate": 0.10,
+      "fatigueModifiers": {
+        "frugal": 0.95,
+        "hedonist": 1.1
+      }
+    },
+    "cream": {
+      "baseFatigueRate": 0.11,
+      "fatigueModifiers": {
+        "frugal": 1.2,
+        "hedonist": 0.9,
+        "glutton": 1.4
+      }
+    },
+    "buttermilk": {
+      "baseFatigueRate": 0.13,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "hedonist": 1.4
+      }
+    },
 
     "_comment_processed_food": "Processed foods - higher fatigue (novelty wears off)",
     "bread": {
@@ -219,6 +337,27 @@
     },
     "flour": {
       "baseFatigueRate": 0.16,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "hedonist": 1.5
+      }
+    },
+    "rice_flour": {
+      "baseFatigueRate": 0.16,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "hedonist": 1.5
+      }
+    },
+    "cornmeal": {
+      "baseFatigueRate": 0.16,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "hedonist": 1.5
+      }
+    },
+    "lentil_flour": {
+      "baseFatigueRate": 0.15,
       "fatigueModifiers": {
         "frugal": 0.8,
         "hedonist": 1.5
@@ -241,8 +380,182 @@
         "glutton": 1.2
       }
     },
+    "noodles": {
+      "baseFatigueRate": 0.14,
+      "fatigueModifiers": {
+        "frugal": 0.85,
+        "hedonist": 1.4
+      }
+    },
+    "porridge": {
+      "baseFatigueRate": 0.16,
+      "fatigueModifiers": {
+        "frugal": 0.7,
+        "hedonist": 1.7,
+        "ascetic": 0.6
+      }
+    },
+    "tortilla": {
+      "baseFatigueRate": 0.15,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "hedonist": 1.4
+      }
+    },
+    "roti": {
+      "baseFatigueRate": 0.15,
+      "fatigueModifiers": {
+        "frugal": 0.75,
+        "hedonist": 1.5
+      }
+    },
+    "paratha": {
+      "baseFatigueRate": 0.13,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 1.2,
+        "glutton": 1.3
+      }
+    },
+    "naan": {
+      "baseFatigueRate": 0.12,
+      "fatigueModifiers": {
+        "frugal": 0.95,
+        "hedonist": 1.1
+      }
+    },
+    "puri": {
+      "baseFatigueRate": 0.14,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 1.2,
+        "glutton": 1.3
+      }
+    },
+    "samosa": {
+      "baseFatigueRate": 0.12,
+      "fatigueModifiers": {
+        "frugal": 1.0,
+        "hedonist": 1.0,
+        "glutton": 1.3
+      }
+    },
+    "kachori": {
+      "baseFatigueRate": 0.12,
+      "fatigueModifiers": {
+        "frugal": 1.0,
+        "hedonist": 1.0,
+        "glutton": 1.3
+      }
+    },
+    "pakora": {
+      "baseFatigueRate": 0.13,
+      "fatigueModifiers": {
+        "frugal": 0.95,
+        "hedonist": 1.1,
+        "glutton": 1.2
+      }
+    },
+    "vada": {
+      "baseFatigueRate": 0.13,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 1.1,
+        "glutton": 1.2
+      }
+    },
+    "idli": {
+      "baseFatigueRate": 0.14,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "hedonist": 1.4
+      }
+    },
+    "dosa": {
+      "baseFatigueRate": 0.12,
+      "fatigueModifiers": {
+        "frugal": 0.85,
+        "hedonist": 1.2
+      }
+    },
+    "dal": {
+      "baseFatigueRate": 0.14,
+      "fatigueModifiers": {
+        "frugal": 0.75,
+        "hedonist": 1.5
+      }
+    },
+    "biryani": {
+      "baseFatigueRate": 0.08,
+      "fatigueModifiers": {
+        "frugal": 1.2,
+        "hedonist": 0.7,
+        "glutton": 0.8
+      }
+    },
+    "khichdi": {
+      "baseFatigueRate": 0.15,
+      "fatigueModifiers": {
+        "frugal": 0.7,
+        "hedonist": 1.6
+      }
+    },
+    "pulao": {
+      "baseFatigueRate": 0.11,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 1.1
+      }
+    },
+    "meal": {
+      "baseFatigueRate": 0.13,
+      "fatigueModifiers": {
+        "frugal": 0.85,
+        "hedonist": 1.3,
+        "glutton": 1.2
+      }
+    },
+    "vegetable_soup": {
+      "baseFatigueRate": 0.14,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "hedonist": 1.5
+      }
+    },
+    "salad": {
+      "baseFatigueRate": 0.13,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 1.4,
+        "ascetic": 0.7
+      }
+    },
+    "stew": {
+      "baseFatigueRate": 0.12,
+      "fatigueModifiers": {
+        "frugal": 0.85,
+        "hedonist": 1.2
+      }
+    },
+    "pie": {
+      "baseFatigueRate": 0.11,
+      "fatigueModifiers": {
+        "frugal": 1.1,
+        "hedonist": 0.9,
+        "glutton": 1.2
+      }
+    },
+    "cake": {
+      "baseFatigueRate": 0.18,
+      "fatigueModifiers": {
+        "frugal": 1.4,
+        "hedonist": 0.7,
+        "glutton": 0.6,
+        "ascetic": 1.8
+      }
+    },
 
-    "_comment_sweeteners": "Sweeteners - moderate fatigue",
+    "_comment_sweeteners": "Sweeteners and sweets - moderate fatigue",
     "sugar": {
       "baseFatigueRate": 0.13,
       "fatigueModifiers": {
@@ -261,8 +574,54 @@
         "ascetic": 1.2
       }
     },
+    "molasses": {
+      "baseFatigueRate": 0.14,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "hedonist": 1.3
+      }
+    },
+    "candy": {
+      "baseFatigueRate": 0.18,
+      "fatigueModifiers": {
+        "frugal": 1.4,
+        "hedonist": 0.7,
+        "glutton": 0.6
+      }
+    },
+    "ladoo": {
+      "baseFatigueRate": 0.15,
+      "fatigueModifiers": {
+        "frugal": 1.2,
+        "hedonist": 0.8,
+        "glutton": 0.7
+      }
+    },
+    "jalebi": {
+      "baseFatigueRate": 0.16,
+      "fatigueModifiers": {
+        "frugal": 1.3,
+        "hedonist": 0.75,
+        "glutton": 0.65
+      }
+    },
+    "halwa": {
+      "baseFatigueRate": 0.14,
+      "fatigueModifiers": {
+        "frugal": 1.2,
+        "hedonist": 0.8,
+        "glutton": 0.7
+      }
+    },
+    "jam": {
+      "baseFatigueRate": 0.12,
+      "fatigueModifiers": {
+        "frugal": 1.0,
+        "hedonist": 0.9
+      }
+    },
 
-    "_comment_beverages": "Alcoholic beverages - low fatigue (social/vice aspect)",
+    "_comment_beverages": "Beverages - low fatigue (social/vice aspect)",
     "wine": {
       "baseFatigueRate": 0.10,
       "fatigueModifiers": {
@@ -282,8 +641,85 @@
         "social_butterfly": 0.8
       }
     },
+    "whiskey": {
+      "baseFatigueRate": 0.08,
+      "fatigueModifiers": {
+        "ascetic": 2.0,
+        "hedonist": 0.6,
+        "addict": 0.4,
+        "social_butterfly": 0.75
+      }
+    },
+    "rum": {
+      "baseFatigueRate": 0.09,
+      "fatigueModifiers": {
+        "ascetic": 1.9,
+        "hedonist": 0.65,
+        "addict": 0.45,
+        "social_butterfly": 0.8
+      }
+    },
+    "cider": {
+      "baseFatigueRate": 0.11,
+      "fatigueModifiers": {
+        "ascetic": 1.6,
+        "hedonist": 0.8,
+        "frugal": 0.9
+      }
+    },
+    "fruit_juice": {
+      "baseFatigueRate": 0.12,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 1.1
+      }
+    },
 
-    "_comment_textiles": "Clothing - low fatigue (functional need + fashion)",
+    "_comment_preserved": "Preserved foods",
+    "dried_fruit": {
+      "baseFatigueRate": 0.11,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "hedonist": 1.2
+      }
+    },
+    "pickles": {
+      "baseFatigueRate": 0.10,
+      "fatigueModifiers": {
+        "frugal": 0.85,
+        "hedonist": 1.1
+      }
+    },
+    "tomato_sauce": {
+      "baseFatigueRate": 0.11,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 1.2
+      }
+    },
+
+    "_comment_textiles_raw": "Raw textile materials - very low fatigue (not consumed directly)",
+    "wool": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
+    "cotton": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
+    "flax": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
+    "silk": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
+    "thread": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
+    "yarn": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
+    "cloth": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
+    "linen": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
+
+    "_comment_dyed_cloth": "Dyed cloth - slightly higher fatigue (fashion element)",
+    "red_cloth": {"baseFatigueRate": 0.04, "fatigueModifiers": {"vain": 0.8}},
+    "blue_cloth": {"baseFatigueRate": 0.04, "fatigueModifiers": {"vain": 0.8}},
+    "yellow_cloth": {"baseFatigueRate": 0.04, "fatigueModifiers": {"vain": 0.8}},
+    "green_cloth": {"baseFatigueRate": 0.04, "fatigueModifiers": {"vain": 0.8}},
+    "purple_cloth": {"baseFatigueRate": 0.03, "fatigueModifiers": {"vain": 0.7, "ambitious": 0.8}},
+    "black_cloth": {"baseFatigueRate": 0.04, "fatigueModifiers": {"vain": 0.8}},
+    "orange_cloth": {"baseFatigueRate": 0.04, "fatigueModifiers": {"vain": 0.8}},
+    "dyed_linen": {"baseFatigueRate": 0.03, "fatigueModifiers": {"vain": 0.75}},
+    "embroidered_linen": {"baseFatigueRate": 0.03, "fatigueModifiers": {"vain": 0.7, "ambitious": 0.8}},
+
+    "_comment_clothing": "Clothing - low fatigue (functional need + fashion)",
     "simple_clothes": {
       "baseFatigueRate": 0.08,
       "fatigueModifiers": {
@@ -342,6 +778,85 @@
       "fatigueModifiers": {
         "frugal": 1.0,
         "vain": 0.8
+      }
+    },
+    "clothing": {
+      "baseFatigueRate": 0.08,
+      "fatigueModifiers": {
+        "frugal": 0.7,
+        "vain": 1.3
+      }
+    },
+    "shirt": {
+      "baseFatigueRate": 0.08,
+      "fatigueModifiers": {
+        "frugal": 0.7,
+        "vain": 1.3
+      }
+    },
+    "pants": {
+      "baseFatigueRate": 0.08,
+      "fatigueModifiers": {
+        "frugal": 0.7,
+        "vain": 1.3
+      }
+    },
+    "dress": {
+      "baseFatigueRate": 0.07,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "vain": 0.8
+      }
+    },
+    "coat": {
+      "baseFatigueRate": 0.06,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "vain": 1.1
+      }
+    },
+    "formal_attire": {
+      "baseFatigueRate": 0.05,
+      "fatigueModifiers": {
+        "frugal": 1.5,
+        "vain": 0.6,
+        "ambitious": 0.7
+      }
+    },
+    "ceremonial_robes": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 1.6,
+        "vain": 0.5,
+        "ambitious": 0.6
+      }
+    },
+    "uniform": {
+      "baseFatigueRate": 0.07,
+      "fatigueModifiers": {
+        "frugal": 0.7,
+        "vain": 1.2
+      }
+    },
+    "gloves": {
+      "baseFatigueRate": 0.06,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "vain": 1.1
+      }
+    },
+    "wool_gloves": {
+      "baseFatigueRate": 0.06,
+      "fatigueModifiers": {
+        "frugal": 0.75,
+        "vain": 1.2
+      }
+    },
+    "wool_hat": {
+      "baseFatigueRate": 0.06,
+      "fatigueModifiers": {
+        "frugal": 0.75,
+        "vain": 1.2
       }
     },
 
@@ -407,6 +922,40 @@
         "ambitious": 0.8
       }
     },
+    "stool": {
+      "baseFatigueRate": 0.05,
+      "fatigueModifiers": {
+        "frugal": 0.7,
+        "vain": 1.3
+      }
+    },
+    "shelf": {
+      "baseFatigueRate": 0.05,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "vain": 1.2
+      }
+    },
+    "cradle": {
+      "baseFatigueRate": 0.03,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "vain": 1.1
+      }
+    },
+    "chest": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "vain": 1.2
+      }
+    },
+    "door": {
+      "baseFatigueRate": 0.03,
+      "fatigueModifiers": {
+        "frugal": 0.8
+      }
+    },
 
     "_comment_precious_metals": "Wealth items - very low fatigue (status symbols)",
     "gold": {
@@ -427,6 +976,166 @@
         "ascetic": 1.8
       }
     },
+    "copper": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 1.1
+      }
+    },
+    "bronze": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 1.1
+      }
+    },
+    "gold_item": {
+      "baseFatigueRate": 0.02,
+      "fatigueModifiers": {
+        "frugal": 1.6,
+        "ambitious": 0.5,
+        "vain": 0.5,
+        "ascetic": 2.0
+      }
+    },
+
+    "_comment_jewelry": "Jewelry - very low fatigue (luxury status)",
+    "jewelry": {
+      "baseFatigueRate": 0.03,
+      "fatigueModifiers": {
+        "frugal": 1.8,
+        "vain": 0.5,
+        "ambitious": 0.6
+      }
+    },
+    "gemstone": {
+      "baseFatigueRate": 0.02,
+      "fatigueModifiers": {
+        "frugal": 1.8,
+        "vain": 0.5,
+        "ambitious": 0.5
+      }
+    },
+    "silver_ring": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 1.4,
+        "vain": 0.7
+      }
+    },
+    "gold_ring": {
+      "baseFatigueRate": 0.03,
+      "fatigueModifiers": {
+        "frugal": 1.6,
+        "vain": 0.6,
+        "ambitious": 0.7
+      }
+    },
+    "silver_necklace": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 1.4,
+        "vain": 0.65
+      }
+    },
+    "gold_necklace": {
+      "baseFatigueRate": 0.03,
+      "fatigueModifiers": {
+        "frugal": 1.6,
+        "vain": 0.55,
+        "ambitious": 0.65
+      }
+    },
+    "gemstone_jewelry": {
+      "baseFatigueRate": 0.02,
+      "fatigueModifiers": {
+        "frugal": 1.9,
+        "vain": 0.45,
+        "ambitious": 0.55
+      }
+    },
+    "crown": {
+      "baseFatigueRate": 0.01,
+      "fatigueModifiers": {
+        "frugal": 2.0,
+        "vain": 0.4,
+        "ambitious": 0.4
+      }
+    },
+
+    "_comment_art": "Art and decorations - low fatigue (cultural appreciation)",
+    "painting": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 1.5,
+        "vain": 0.7,
+        "intellectual": 0.7
+      }
+    },
+    "portrait": {
+      "baseFatigueRate": 0.03,
+      "fatigueModifiers": {
+        "frugal": 1.6,
+        "vain": 0.6
+      }
+    },
+    "sculpture": {
+      "baseFatigueRate": 0.03,
+      "fatigueModifiers": {
+        "frugal": 1.6,
+        "vain": 0.65,
+        "intellectual": 0.7
+      }
+    },
+    "bronze_sculpture": {
+      "baseFatigueRate": 0.03,
+      "fatigueModifiers": {
+        "frugal": 1.5,
+        "vain": 0.65
+      }
+    },
+    "statue": {
+      "baseFatigueRate": 0.02,
+      "fatigueModifiers": {
+        "frugal": 1.7,
+        "vain": 0.6,
+        "intellectual": 0.65
+      }
+    },
+    "tapestry": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 1.4,
+        "vain": 0.7
+      }
+    },
+    "figurine": {
+      "baseFatigueRate": 0.05,
+      "fatigueModifiers": {
+        "frugal": 1.2,
+        "vain": 0.8
+      }
+    },
+
+    "_comment_books": "Books and writing - low fatigue (intellectual)",
+    "book": {
+      "baseFatigueRate": 0.06,
+      "fatigueModifiers": {
+        "frugal": 1.0,
+        "intellectual": 0.5,
+        "ambitious": 0.8
+      }
+    },
+    "manuscript": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 1.3,
+        "intellectual": 0.4,
+        "ambitious": 0.7
+      }
+    },
+    "paper": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
+    "fine_paper": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
+    "ink": {"baseFatigueRate": 0.02, "fatigueModifiers": {}},
 
     "_comment_tools": "Tools - very low fatigue (utilitarian)",
     "axe": {"baseFatigueRate": 0.03, "fatigueModifiers": {"frugal": 0.7}},
@@ -437,21 +1146,240 @@
     "hoe": {"baseFatigueRate": 0.03, "fatigueModifiers": {"frugal": 0.7}},
     "scythe": {"baseFatigueRate": 0.03, "fatigueModifiers": {"frugal": 0.7}},
     "chisel": {"baseFatigueRate": 0.03, "fatigueModifiers": {"frugal": 0.7}},
-    "needle": {"baseFatigueRate": 0.04, "fatigueModifiers": {"frugal": 0.7}}
+    "needle": {"baseFatigueRate": 0.04, "fatigueModifiers": {"frugal": 0.7}},
+    "knife": {"baseFatigueRate": 0.03, "fatigueModifiers": {"frugal": 0.7}},
+
+    "_comment_lighting": "Lighting - low fatigue (essential utility)",
+    "candle": {
+      "baseFatigueRate": 0.05,
+      "fatigueModifiers": {
+        "frugal": 0.7
+      }
+    },
+    "beeswax_candle": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 0.9,
+        "hedonist": 0.9
+      }
+    },
+    "lamp_oil": {
+      "baseFatigueRate": 0.05,
+      "fatigueModifiers": {
+        "frugal": 0.7
+      }
+    },
+
+    "_comment_hygiene": "Hygiene products - moderate fatigue",
+    "soap": {
+      "baseFatigueRate": 0.08,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "vain": 1.2
+      }
+    },
+    "flower_water": {
+      "baseFatigueRate": 0.06,
+      "fatigueModifiers": {
+        "frugal": 1.2,
+        "vain": 0.7,
+        "hedonist": 0.8
+      }
+    },
+
+    "_comment_medicine": "Medicine - low fatigue (critical need)",
+    "medicinal_herbs": {"baseFatigueRate": 0.04, "fatigueModifiers": {}},
+    "medicine": {"baseFatigueRate": 0.03, "fatigueModifiers": {}},
+    "healing_salve": {"baseFatigueRate": 0.04, "fatigueModifiers": {}},
+    "tonic": {"baseFatigueRate": 0.05, "fatigueModifiers": {"hedonist": 1.2}},
+
+    "_comment_building_materials": "Building materials - no fatigue (not consumed personally)",
+    "wood": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "timber": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "lumber": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "planks": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "stone": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "cut_stone": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "marble": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "bricks": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "clay": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "sand": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "cement": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "concrete": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "mortar": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "plaster": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "stucco": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "limestone": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "quickite": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "nails": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "glass": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "window_pane": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "tiles": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "column": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "gravestone": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+
+    "_comment_pottery": "Pottery and glass - low fatigue (decorative/functional)",
+    "pottery": {
+      "baseFatigueRate": 0.05,
+      "fatigueModifiers": {
+        "frugal": 0.8,
+        "vain": 1.1
+      }
+    },
+    "ceramics": {
+      "baseFatigueRate": 0.05,
+      "fatigueModifiers": {
+        "frugal": 0.85,
+        "vain": 1.0
+      }
+    },
+    "terracotta": {
+      "baseFatigueRate": 0.05,
+      "fatigueModifiers": {
+        "frugal": 0.8
+      }
+    },
+    "clay_pipe": {
+      "baseFatigueRate": 0.06,
+      "fatigueModifiers": {
+        "frugal": 0.8
+      }
+    },
+    "glassware": {
+      "baseFatigueRate": 0.04,
+      "fatigueModifiers": {
+        "frugal": 1.1,
+        "vain": 0.9
+      }
+    },
+    "bottle": {
+      "baseFatigueRate": 0.05,
+      "fatigueModifiers": {
+        "frugal": 0.85
+      }
+    },
+    "mirror": {
+      "baseFatigueRate": 0.03,
+      "fatigueModifiers": {
+        "frugal": 1.3,
+        "vain": 0.6
+      }
+    },
+
+    "_comment_containers": "Containers - very low fatigue (utilitarian)",
+    "barrel": {"baseFatigueRate": 0.02, "fatigueModifiers": {"frugal": 0.7}},
+    "crate": {"baseFatigueRate": 0.02, "fatigueModifiers": {"frugal": 0.7}},
+
+    "_comment_fuels": "Fuels - no fatigue (not consumed for satisfaction)",
+    "coal": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "charcoal": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "firewood": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "oil": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+
+    "_comment_raw_materials": "Raw/industrial materials - no fatigue (not consumed personally)",
+    "iron": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "steel": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "iron_ore": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "copper_ore": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "gold_ore": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "silver_ore": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "tallow": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "lye": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "raw_hide": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "tanned_leather": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "leather": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "wood_pulp": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "sawdust": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "rubber": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "latex": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "beeswax": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+
+    "_comment_dyes": "Dyes - no fatigue (industrial input)",
+    "red_dye": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "blue_dye": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "yellow_dye": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "black_dye": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "green_dye": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "purple_dye": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "orange_dye": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "indigo": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "flowers": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "sugar_cane": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+
+    "_comment_seeds": "Seeds and saplings - no fatigue (agricultural input)",
+    "wheat_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "maize_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "rice_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "barley_seeds": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "oats_seeds": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "rye_seeds": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "ragi_seeds": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "indigo_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "flower_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "vegetable_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "fruit_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "cotton_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "flax_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "herb_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "mustard_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "sesame_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "groundnut_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "sunflower_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "lentil_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "potato_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "carrot_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "onion_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "cabbage_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "tomato_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "lettuce_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "bean_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "pumpkin_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "broccoli_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "pepper_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "watermelon_seed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "sugarcane_cutting": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "apple_sapling": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "mango_sapling": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "orange_sapling": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "grape_vine": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "berry_bush": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "peach_sapling": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "pear_sapling": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "date_palm_sapling": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "coconut_palm_sapling": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "rubber_tree_sapling": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "tree": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+
+    "_comment_animals": "Animals - no fatigue (not consumed directly for satisfaction)",
+    "sheep": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "hen": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "bee_colony": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "feathers": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
+    "feed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}}
   },
 
   "categoryDefaults": {
     "grain": 0.15,
     "fruit": 0.09,
     "vegetable": 0.13,
-    "protein": 0.12,
-    "processed_food": 0.17,
-    "beverage": 0.10,
-    "textile": 0.07,
+    "plant": 0.08,
+    "animal_product": 0.12,
+    "processed_food": 0.15,
+    "textile_raw": 0.02,
+    "textile": 0.03,
+    "clothing": 0.07,
+    "tools": 0.03,
     "furniture": 0.04,
-    "tool": 0.03,
-    "precious_metal": 0.02,
-    "building_material": 0.05,
-    "luxury": 0.06
+    "raw_mineral": 0.01,
+    "refined_metal": 0.01,
+    "construction": 0.01,
+    "fuel": 0.01,
+    "dye": 0.01,
+    "crafting": 0.02,
+    "luxury": 0.04,
+    "seed": 0.01,
+    "tree_product": 0.01,
+    "raw_resource": 0.01,
+    "misc": 0.05
   }
 }

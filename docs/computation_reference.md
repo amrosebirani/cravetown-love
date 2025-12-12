@@ -215,8 +215,11 @@ Craving reduction = 30 * 1.0 * 0.8 * 1 = 24 points
 **Formula:**
 ```
 For each coarse dimension (0-8):
-    fineRange = coarseToFineMap[coarseIdx]  -- e.g., {start: 0, finish: 6}
-    coarseCraving = sum(currentCravings[i] for i in fineRange)
+    fineIndices = coarseToFineMap[coarseIdx]  -- e.g., {0, 1, 5, 12} (array of indices)
+    coarseCraving = sum(currentCravings[i] for i in fineIndices)
+
+Note: coarseToFineMap stores an array of fine dimension indices (not a contiguous range)
+to correctly handle non-contiguous fine dimension assignments.
 ```
 
 ---

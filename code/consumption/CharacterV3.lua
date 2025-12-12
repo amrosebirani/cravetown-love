@@ -91,25 +91,16 @@ function CharacterV3.BuildDimensionMaps()
                       CharacterV3._DimensionDefinitions.dimensionCount.fine or
                       #CharacterV3._DimensionDefinitions.fineDimensions
 
-    -- Build coarse to fine range mapping
+    -- Build coarse to fine mapping (array of fine indices for each coarse)
+    -- This correctly handles non-contiguous fine dimension indices
     for coarseIdx = 0, coarseCount - 1 do
-        local fineStart = nil
-        local fineEnd = nil
+        CharacterV3.coarseToFineMap[coarseIdx] = {}
+    end
 
-        for fineIdx = 0, fineCount - 1 do
-            if CharacterV3.fineToCoarseMap[fineIdx] == coarseIdx then
-                if not fineStart then
-                    fineStart = fineIdx
-                end
-                fineEnd = fineIdx
-            end
-        end
-
-        if fineStart then
-            CharacterV3.coarseToFineMap[coarseIdx] = {
-                start = fineStart,
-                finish = fineEnd
-            }
+    for fineIdx = 0, fineCount - 1 do
+        local coarseIdx = CharacterV3.fineToCoarseMap[fineIdx]
+        if coarseIdx ~= nil then
+            table.insert(CharacterV3.coarseToFineMap[coarseIdx], fineIdx)
         end
     end
 
@@ -127,9 +118,9 @@ function CharacterV3.BuildDimensionMaps()
     print("  Coarse dimensions: " .. CharacterV3._coarseDimensionCount)
     print("  Fine dimensions: " .. CharacterV3._fineDimensionCount)
     print("  coarseToFineMap entries: " .. tostring(#CharacterV3.coarseToFineMap))
-    for idx, range in pairs(CharacterV3.coarseToFineMap) do
+    for idx, fineIndices in pairs(CharacterV3.coarseToFineMap) do
         local name = CharacterV3.coarseNames[idx] or "unknown"
-        print(string.format("    [%d] %s: fine %d-%d", idx, name, range.start, range.finish))
+        print(string.format("    [%d] %s: %d fine dimensions [%s]", idx, name, #fineIndices, table.concat(fineIndices, ", ")))
     end
 end
 

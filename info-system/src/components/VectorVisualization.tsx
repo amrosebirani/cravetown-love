@@ -1,6 +1,7 @@
 import { Card } from 'antd';
 import { Radar } from '@ant-design/plots';
 import type { CoarseDimension } from '../types';
+import { useMemo, useRef, useEffect } from 'react';
 
 interface VectorVisualizationProps {
   dimensions: CoarseDimension[];
@@ -17,39 +18,65 @@ const VectorVisualization: React.FC<VectorVisualizationProps> = ({
   comparisonValues = [],
   maxValue,
 }) => {
-  // Calculate dynamic max if not provided
-  const allValues = [...values, ...comparisonValues.flatMap(c => c.values)];
-  const calculatedMax = Math.max(...allValues, 1);
-  const effectiveMax = maxValue ?? Math.ceil(calculatedMax * 1.2); // 20% headroom
-  // Prepare data for radar chart
-  const prepareData = () => {
+  // Ref to hold chart instance for cleanup
+  const chartRef = useRef<any>(null);
+
+  // Ensure values and dimensions are arrays (handle null/undefined)
+  const safeValues = values ?? [];
+  const safeDimensions = dimensions ?? [];
+  const safeComparisonValues = comparisonValues ?? [];
+
+  // Cleanup chart on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (chartRef.current) {
+        try {
+          chartRef.current.destroy?.();
+        } catch (e) {
+          // Chart may already be destroyed
+        }
+        chartRef.current = null;
+      }
+    };
+  }, []);
+
+  // Calculate dynamic max if not provided - memoized
+  const effectiveMax = useMemo(() => {
+    const allValues = [...safeValues, ...safeComparisonValues.flatMap(c => c.values ?? [])];
+    const calculatedMax = Math.max(...allValues, 1);
+    return maxValue ?? Math.ceil(calculatedMax * 1.2); // 20% headroom
+  }, [safeValues, safeComparisonValues, maxValue]);
+
+  // Prepare data for radar chart - memoized to prevent unnecessary re-renders
+  const chartData = useMemo(() => {
     const data: any[] = [];
 
     // Main values
-    dimensions.forEach((dim, index) => {
+    safeDimensions.forEach((dim, index) => {
       data.push({
         dimension: dim.name,
-        value: values[index] || 0,
+        value: safeValues[index] || 0,
         category: 'Current',
       });
     });
 
     // Comparison values
-    comparisonValues.forEach((comparison) => {
-      dimensions.forEach((dim, index) => {
+    safeComparisonValues.forEach((comparison) => {
+      safeDimensions.forEach((dim, index) => {
         data.push({
           dimension: dim.name,
-          value: comparison.values[index] || 0,
+          value: (comparison.values ?? [])[index] || 0,
           category: comparison.label,
         });
       });
     });
 
     return data;
-  };
+  }, [safeDimensions, safeValues, safeComparisonValues]);
 
-  const config = {
-    data: prepareData(),
+  // Memoize config to prevent re-creating on every render
+  const config = useMemo(() => ({
+    data: chartData,
     xField: 'dimension',
     yField: 'value',
     seriesField: 'category',
@@ -103,7 +130,22 @@ const VectorVisualization: React.FC<VectorVisualizationProps> = ({
       },
     },
     legend: false,  // Hide legend for single series
-  };
+    // Get chart ref for cleanup
+    onReady: (chart: any) => {
+      chartRef.current = chart;
+    },
+  }), [chartData, effectiveMax]);
+
+  // Don't render chart if no dimensions
+  if (safeDimensions.length === 0) {
+    return (
+      <Card title={title} size="small">
+        <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
+          No dimensions available
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card title={title} size="small">

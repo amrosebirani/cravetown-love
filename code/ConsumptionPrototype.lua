@@ -1707,9 +1707,9 @@ function ConsumptionPrototype:RenderCharacterDetailModal()
         local coarseCurrentCraving = 0
         local coarseBaseCraving = 0
         local fineCount = 0
-        local fineRange = CharacterV2.coarseToFineMap and CharacterV2.coarseToFineMap[coarseIdx]
-        if fineRange then
-            for fineIdx = fineRange.start, fineRange.finish do
+        local fineIndices = CharacterV2.coarseToFineMap and CharacterV2.coarseToFineMap[coarseIdx]
+        if fineIndices then
+            for _, fineIdx in ipairs(fineIndices) do
                 coarseCurrentCraving = coarseCurrentCraving + (char.currentCravings and char.currentCravings[fineIdx] or 0)
                 coarseBaseCraving = coarseBaseCraving + (char.baseCravings and char.baseCravings[fineIdx] or 0)
                 fineCount = fineCount + 1

@@ -65,36 +65,30 @@ function Character.BuildDimensionMaps()
         end
     end
 
-    -- Build coarse to fine range mapping
-    for coarseIdx = 0, 8 do
-        local fineStart = nil
-        local fineEnd = nil
+    -- Build coarse to fine mapping (array of fine indices for each coarse)
+    -- This correctly handles non-contiguous fine dimension indices
+    local coarseCount = #Character._DimensionDefinitions.coarseDimensions
+    local fineCount = #Character._DimensionDefinitions.fineDimensions
 
-        for fineIdx = 0, 48 do
-            if Character.fineToCoarseMap[fineIdx] == coarseIdx then
-                if not fineStart then
-                    fineStart = fineIdx
-                end
-                fineEnd = fineIdx
-            end
-        end
+    for coarseIdx = 0, coarseCount - 1 do
+        Character.coarseToFineMap[coarseIdx] = {}
+    end
 
-        if fineStart then
-            Character.coarseToFineMap[coarseIdx] = {
-                start = fineStart,
-                finish = fineEnd
-            }
+    for fineIdx = 0, fineCount - 1 do
+        local coarseIdx = Character.fineToCoarseMap[fineIdx]
+        if coarseIdx ~= nil then
+            table.insert(Character.coarseToFineMap[coarseIdx], fineIdx)
         end
     end
 
     -- Debug output
     print("CharacterV2 dimension maps built:")
-    print("  Coarse dimensions: " .. #Character._DimensionDefinitions.coarseDimensions)
-    print("  Fine dimensions: " .. #Character._DimensionDefinitions.fineDimensions)
+    print("  Coarse dimensions: " .. coarseCount)
+    print("  Fine dimensions: " .. fineCount)
     print("  coarseToFineMap entries: " .. tostring(#Character.coarseToFineMap))
-    for idx, range in pairs(Character.coarseToFineMap) do
+    for idx, fineIndices in pairs(Character.coarseToFineMap) do
         local name = Character.coarseNames[idx] or "unknown"
-        print(string.format("    [%d] %s: fine %d-%d", idx, name, range.start, range.finish))
+        print(string.format("    [%d] %s: %d fine dimensions [%s]", idx, name, #fineIndices, table.concat(fineIndices, ", ")))
     end
 end
 

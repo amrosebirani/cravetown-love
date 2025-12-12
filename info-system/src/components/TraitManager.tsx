@@ -341,15 +341,17 @@ const TraitManager: React.FC = () => {
             </Card>
 
             <VectorVisualization
+              key={`viz-${viewing.id}`}
               dimensions={dimensions.coarseDimensions}
-              values={viewing.cravingMultipliers.coarse}
+              values={viewing.cravingMultipliers?.coarse ?? []}
               title="Coarse Craving Multipliers (9D)"
               maxValue={3}
             />
 
             <VectorHeatmap
+              key={`heatmap-${viewing.id}`}
               dimensions={dimensions.fineDimensions}
-              values={viewing.cravingMultipliers.fine}
+              values={viewing.cravingMultipliers?.fine ?? []}
               title="Fine Craving Multipliers (50D)"
               maxValue={3}
               colorScheme="purple"
