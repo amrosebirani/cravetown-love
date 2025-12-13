@@ -201,6 +201,18 @@ function AlphaPrototypeState:LoadWorldAsync()
         self:StartGameFromSave(saveData)
     end
 
+    -- Apply tutorial mode from game config
+    if self.mUI.tutorialSystem then
+        local tutorialMode = self.mGameConfig and self.mGameConfig.tutorialMode or "full"
+        if tutorialMode == "none" then
+            self.mUI.tutorialSystem:SetEnabled(false)
+        elseif tutorialMode == "hints" then
+            -- Hints-only mode: skip the step-by-step but keep enabled for hints
+            self.mUI.tutorialSystem:Skip()
+        end
+        -- "full" mode is the default (already enabled)
+    end
+
     -- Step 6: Setup starter content (75% - 95%)
     self.mLoadingScreen:SetProgress(0.75, "Setting up starter content...")
     yield()

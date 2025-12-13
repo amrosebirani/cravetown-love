@@ -99,7 +99,7 @@ Use depth="full" for detailed craving/fatigue data, "summary" for overview, "min
                     "include": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "State sections to include: all, town, camera, buildings, characters, inventory, ui_state, available_actions, events, metrics, controls, simulation, statistics, allocation_policy. Defaults to all."
+                        "description": "State sections to include: all, town, camera, buildings, characters/citizens, inventory, ui_state, available_actions, events, metrics, controls. Alpha-specific: time, statistics, housing, land, immigration, production. Consumption-specific: simulation, statistics, allocation_policy, history. Defaults to all."
                     },
                     "depth": {
                         "type": "string",
@@ -512,6 +512,25 @@ MAIN GAME EVENTS:
 - state_changed, mode_changed
 - grain_selected, modal_opened, modal_closed
 - error, warning
+
+ALPHA PROTOTYPE EVENTS:
+- alpha_paused: Game paused
+- alpha_resumed: Game resumed
+- alpha_placement_started: Started building placement
+- alpha_building_placed: Building placed successfully
+- alpha_worker_assigned: Worker assigned to building
+- alpha_worker_removed: Worker removed from building
+- alpha_recipe_assigned: Recipe assigned to station
+- alpha_housing_assigned: Citizen assigned to housing
+- alpha_housing_unassigned: Citizen removed from housing
+- alpha_immigrant_accepted: Immigrant accepted from queue
+- alpha_immigrant_rejected: Immigrant rejected
+- alpha_resource_added: Resource added to inventory
+- alpha_gold_added: Gold added
+- alpha_citizen_added: New citizen added
+- alpha_citizen_removed: Citizen removed
+- alpha_quick_saved: Game saved
+- alpha_quick_loaded: Game loaded
 
 CONSUMPTION PROTOTYPE EVENTS:
 - consumption_cycle_complete: A consumption cycle finished

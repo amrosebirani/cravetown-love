@@ -57,6 +57,7 @@ function TutorialSystem:Create(world)
     system.currentStep = 0
     system.completed = false
     system.skipped = false
+    system.manualMode = false  -- When true, player controls progression via Next button
 
     -- Step completion tracking
     system.stepCompleted = {}
@@ -71,7 +72,7 @@ function TutorialSystem:Create(world)
         {
             id = "welcome",
             title = "Welcome to CraveTown!",
-            message = "Use WASD or Arrow Keys to pan the camera around your town.\nScroll the mouse wheel to zoom in and out.",
+            message = "Use WASD or Arrow Keys to pan the camera around your town.\nExplore your new settlement!",
             cycleRange = {1, 3},
             highlight = "camera",
             completionCondition = "camera_moved",
@@ -201,34 +202,39 @@ function TutorialSystem:Update(dt)
         self.tooltipAlpha = math.min(1, self.tooltipAlpha + dt * 3)
     end
 
-    -- Check for step progression based on cycle
-    local currentCycle = self.world and self.world.cycleCount or 0
+    -- If player hasn't manually progressed yet, use cycle-based progression
+    -- Once they click "Next", we switch to manual mode and ignore cycles
+    if not self.manualMode then
+        -- Check for step progression based on cycle
+        -- Support both cycleCount and globalSlotCounter for compatibility
+        local currentCycle = self.world and (self.world.cycleCount or self.world.globalSlotCounter) or 0
 
-    -- Find appropriate step for current cycle
-    local targetStep = 0
-    for i, step in ipairs(self.steps) do
-        if currentCycle >= step.cycleRange[1] and currentCycle <= step.cycleRange[2] then
-            targetStep = i
-            break
-        elseif currentCycle > step.cycleRange[2] then
-            -- Past this step's range, mark as completed if not already
-            self.stepCompleted[i] = true
+        -- Find appropriate step for current cycle
+        local targetStep = 0
+        for i, step in ipairs(self.steps) do
+            if currentCycle >= step.cycleRange[1] and currentCycle <= step.cycleRange[2] then
+                targetStep = i
+                break
+            elseif currentCycle > step.cycleRange[2] then
+                -- Past this step's range, mark as completed if not already
+                self.stepCompleted[i] = true
+            end
         end
-    end
 
-    -- Progress to new step if needed
-    if targetStep > 0 and targetStep ~= self.currentStep then
-        self:SetStep(targetStep)
+        -- Progress to new step if needed
+        if targetStep > 0 and targetStep ~= self.currentStep then
+            self:SetStep(targetStep)
+        end
+
+        -- Check if all steps completed by cycle
+        if currentCycle > 30 then
+            self:Complete()
+        end
     end
 
     -- Check if current step is completed
     if self.currentStep > 0 then
         self:CheckStepCompletion()
-    end
-
-    -- Check if all steps completed
-    if currentCycle > 30 then
-        self:Complete()
     end
 end
 
@@ -517,6 +523,8 @@ function TutorialSystem:HandleClick(mx, my)
     if self.nextButton then
         local btn = self.nextButton
         if mx >= btn.x and mx <= btn.x + btn.w and my >= btn.y and my <= btn.y + btn.h then
+            -- Switch to manual mode so cycles don't override our progress
+            self.manualMode = true
             if self.currentStep < #self.steps then
                 self:SetStep(self.currentStep + 1)
             else
@@ -559,6 +567,7 @@ function TutorialSystem:Reset()
     self.currentStep = 0
     self.completed = false
     self.skipped = false
+    self.manualMode = false
     self.stepCompleted = {}
     self.cameraMoved = false
     self.citizenSelected = false
