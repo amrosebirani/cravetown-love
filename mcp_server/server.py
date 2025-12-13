@@ -52,7 +52,7 @@ async def list_tools() -> list[Tool]:
             description="""Get the current game state snapshot.
 
 Returns information about:
-- Game mode (version_select, launcher, main, test_cache/consumption_prototype)
+- Game mode (version_select, launcher, main, alpha, test_cache/consumption_prototype)
 - Town info (name, boundaries)
 - Camera position
 - Buildings (positions, types, workers, production)
@@ -60,6 +60,22 @@ Returns information about:
 - Inventory (all resources and quantities)
 - UI state (active menus, modals)
 - Available actions you can take
+
+=== ALPHA PROTOTYPE MODE ===
+When in alpha prototype mode (mode="alpha_prototype"), returns:
+- phase: Current game phase (splash, title, setup, loading, worldloading, game)
+- time: {is_paused, day, hour, time_string, current_slot, slot_progress, speed}
+- town: {name, gold, world_width, world_height, has_river, has_forest, has_mountains}
+- statistics: {total_population, average_satisfaction, housing_capacity, employed_count, unemployed_count, homeless_count}
+- buildings: Array of buildings with workers, stations, production state
+- citizens: Array of citizens with satisfaction, employment, housing status
+- inventory: Town commodity inventory and gold
+- housing: {total_capacity, total_occupied, vacancy_rate, homeless_count}
+- land: Land system grid info
+- immigration: {queue_size, applicants[]}
+- production: {buildings_producing, buildings_idle, buildings_no_materials, buildings_no_workers}
+- ui_state: {placement_mode, show_build_menu, show_inventory, etc.}
+- available_actions: Alpha-specific actions
 
 === CONSUMPTION PROTOTYPE MODE ===
 When in consumption prototype mode (mode="consumption_prototype"), returns:
@@ -170,6 +186,71 @@ PRODUCTION:
 - select_grain: Select grain type for farm (params: grain_type)
 - select_mine_resource: Select resource for mine (params: resource_type)
 
+=== ALPHA PROTOTYPE ACTIONS ===
+(Only available in alpha mode)
+
+PRE-GAME PHASE ACTIONS:
+- skip_splash: Skip the splash screen
+- new_game: Start a new game from title screen
+- continue_game: Continue from quicksave
+- load_game: Open load game dialog
+- cancel_setup: Cancel setup and return to title
+- start_game: Start game with config (params: town_name?, difficulty?, location?)
+
+TIME CONTROLS:
+- pause: Pause the game
+- resume: Resume the game
+- toggle_pause: Toggle pause state
+- set_speed: Set game speed (params: speed = 1, 2, 3, 4)
+
+BUILDING:
+- start_building_placement: Start placing (params: building_type)
+- place_building: Place at position (params: x, y, building_type?)
+- cancel_placement: Cancel building placement
+
+WORKER MANAGEMENT:
+- assign_worker: Assign citizen to building (params: citizen_id, building_id)
+- remove_worker: Remove citizen from job (params: citizen_id)
+
+RECIPE MANAGEMENT:
+- assign_recipe: Assign recipe to station (params: building_id, station_index?, recipe_id)
+
+HOUSING:
+- assign_housing: Assign citizen to housing (params: citizen_id, building_id)
+- unassign_housing: Remove housing assignment (params: citizen_id)
+
+IMMIGRATION:
+- accept_immigrant: Accept from queue (params: index?)
+- reject_immigrant: Reject from queue (params: index?)
+
+INVENTORY:
+- add_resource: Add to inventory (params: commodity_id, amount)
+- remove_resource: Remove from inventory (params: commodity_id, amount)
+- add_gold: Add gold (params: amount)
+
+SELECTION:
+- select_building: Select a building (params: building_id)
+- select_citizen: Select a citizen (params: citizen_id)
+- clear_selection: Clear current selection
+
+UI TOGGLES:
+- toggle_inventory: Toggle inventory panel
+- toggle_build_menu: Toggle build menu
+- toggle_citizens: Toggle citizens panel
+- toggle_immigration: Toggle immigration modal
+- toggle_help: Toggle help overlay
+- close_all_panels: Close all open panels
+
+SAVE/LOAD:
+- quick_save: Quick save game
+- quick_load: Quick load game
+
+DEBUG/TESTING:
+- add_citizen: Add citizen (params: class?, name?, traits?, vocation?)
+- remove_citizen: Remove citizen (params: citizen_id, reason?)
+- advance_time: Advance game time (params: ticks)
+- run_free_agency: Run free agency cycle
+
 === CONSUMPTION PROTOTYPE ACTIONS ===
 (Only available in consumption_prototype mode)
 
@@ -207,12 +288,27 @@ TESTING/DEBUG (for balance analysis):
                     "action": {
                         "type": "string",
                         "enum": [
+                            # Common actions
                             "start_building_placement", "place_building", "cancel_placement",
                             "move_camera", "move_camera_by", "zoom_camera",
                             "open_menu", "close_menu", "set_town_name",
                             "start_game", "return_to_launcher",
                             "select_grain", "select_mine_resource",
                             "advance_time",
+                            # Alpha prototype actions
+                            "skip_splash", "new_game", "continue_game", "load_game", "cancel_setup",
+                            "pause", "resume", "toggle_pause", "set_speed",
+                            "assign_worker", "remove_worker",
+                            "assign_recipe",
+                            "assign_housing", "unassign_housing",
+                            "accept_immigrant", "reject_immigrant",
+                            "add_resource", "remove_resource", "add_gold",
+                            "select_building", "select_citizen", "clear_selection",
+                            "toggle_inventory", "toggle_build_menu", "toggle_citizens",
+                            "toggle_immigration", "toggle_help", "close_all_panels",
+                            "quick_save", "quick_load",
+                            "add_citizen", "remove_citizen", "run_free_agency",
+                            # Consumption prototype actions
                             "pause_simulation", "resume_simulation", "set_simulation_speed", "skip_cycles",
                             "add_character", "add_random_characters", "remove_character",
                             "inject_resource", "set_inventory", "clear_inventory",
@@ -236,11 +332,24 @@ TESTING/DEBUG (for balance analysis):
                     "grain_type": {"type": "string", "description": "Grain type to select"},
                     "resource_type": {"type": "string", "description": "Mine resource type to select"},
                     "ticks": {"type": "integer", "description": "Number of game ticks to advance"},
-                    "speed": {"type": "number", "description": "Simulation speed multiplier (0.5, 1.0, 2.0, 5.0)"},
+                    "speed": {"type": "number", "description": "Simulation speed multiplier (0.5, 1.0, 2.0, 5.0) or speed level (1-4)"},
                     "count": {"type": "integer", "description": "Number of cycles to skip or characters to add"},
                     "character_id": {"type": "string", "description": "Character ID for targeted actions"},
+                    "citizen_id": {"type": "string", "description": "Citizen ID for alpha prototype actions"},
+                    "building_id": {"type": "string", "description": "Building ID for worker/housing assignment"},
+                    "station_index": {"type": "integer", "description": "Station index (1-based) for recipe assignment"},
+                    "recipe_id": {"type": "string", "description": "Recipe ID to assign to a station"},
+                    "index": {"type": "integer", "description": "Index in immigration queue (1-based)"},
+                    "commodity_id": {"type": "string", "description": "Commodity ID for inventory actions"},
                     "commodity": {"type": "string", "description": "Commodity type (e.g., 'bread', 'fish', 'water')"},
-                    "amount": {"type": "number", "description": "Amount of commodity to inject"},
+                    "amount": {"type": "number", "description": "Amount of commodity or gold"},
+                    "class": {"type": "string", "description": "Citizen class (lower, middle, upper)"},
+                    "traits": {"type": "array", "items": {"type": "string"}, "description": "Citizen traits"},
+                    "vocation": {"type": "string", "description": "Citizen vocation"},
+                    "reason": {"type": "string", "description": "Reason for removal (emigrated, died, etc.)"},
+                    "town_name": {"type": "string", "description": "Town name for new game"},
+                    "difficulty": {"type": "string", "description": "Game difficulty (easy, normal, hard)"},
+                    "location": {"type": "string", "description": "Starting location for new game"},
                     "inventory": {"type": "object", "description": "Inventory map {commodity: amount}"},
                     "priority_mode": {"type": "string", "enum": ["highest_craving", "lowest_satisfaction", "oldest_consumption", "round_robin"], "description": "Allocation priority mode"},
                     "fairness_weight": {"type": "number", "description": "Fairness weight 0.0-1.0"},
@@ -291,6 +400,36 @@ MAIN GAME QUERIES:
 - inventory_item: Check quantity of a specific item (id required)
 - available_actions: Get list of currently available actions
 
+=== ALPHA PROTOTYPE QUERIES ===
+(Only available in alpha mode)
+
+- building: Get detailed building data (params: id)
+  Returns workers, stations, production state, efficiency
+
+- citizen or character: Get detailed citizen data (params: id)
+  Returns satisfaction, employment, housing, traits
+
+- available_buildings: List all building types
+  Returns construction costs, can_afford status
+
+- available_recipes: List all production recipes
+  Returns inputs, outputs, production time, building type
+
+- commodities: List all commodities with inventory counts
+  Returns id, name, category, inventory count
+
+- time_slots: Get time slot definitions
+
+- production_stats: Get production metrics
+
+- building_efficiencies: Get all building efficiency data
+
+- housing_assignments: Get all housing assignment data
+
+- land_plots: Get land system grid info
+
+- immigration_queue: Get immigration applicant queue
+
 === CONSUMPTION PROTOTYPE QUERIES ===
 (Only available in consumption_prototype mode)
 
@@ -323,7 +462,13 @@ MAIN GAME QUERIES:
                     "query_type": {
                         "type": "string",
                         "enum": [
+                            # Common
                             "building", "available_buildings", "inventory_item", "available_actions",
+                            # Alpha prototype
+                            "citizen", "available_recipes", "commodities", "time_slots",
+                            "production_stats", "building_efficiencies", "housing_assignments",
+                            "land_plots", "immigration_queue",
+                            # Consumption prototype
                             "character", "character_cravings", "character_history",
                             "allocation_details", "consumption_stats", "satisfaction_distribution",
                             "craving_heatmap", "policy_comparison"
@@ -332,7 +477,7 @@ MAIN GAME QUERIES:
                     },
                     "id": {
                         "type": "string",
-                        "description": "Entity ID for specific queries (building ID or item name)"
+                        "description": "Entity ID for specific queries (building ID, citizen ID, or item name)"
                     },
                     "character_id": {
                         "type": "string",
@@ -341,7 +486,7 @@ MAIN GAME QUERIES:
                     "depth": {
                         "type": "string",
                         "enum": ["minimal", "summary", "full"],
-                        "description": "Detail level for character query"
+                        "description": "Detail level for character/citizen query"
                     },
                     "limit": {
                         "type": "integer",

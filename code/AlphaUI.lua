@@ -149,13 +149,42 @@ function AlphaUI:Create(world)
     ui.showLandRegistryPanel = false
     ui.landRegistryPanel = LandRegistryPanel:Create(world)
 
-    -- Housing overview panel state
-    ui.showHousingOverviewPanel = false
-    ui.housingOverviewPanel = HousingOverviewPanel:Create(world)
-
     -- Housing assignment modal state
     ui.showHousingAssignmentModal = false
-    ui.housingAssignmentModal = HousingAssignmentModal:Create(world)
+    ui.housingAssignmentModal = HousingAssignmentModal:Create(world,
+        function(citizenIds, buildingId)  -- onComplete callback
+            -- Assign all selected citizens to the building
+            if world.housingSystem and citizenIds and buildingId then
+                for _, citizenId in ipairs(citizenIds) do
+                    world.housingSystem:AssignHousing(citizenId, buildingId)
+                    print("[AlphaUI] Assigned citizen " .. citizenId .. " to housing " .. buildingId)
+                end
+            end
+            ui.showHousingAssignmentModal = false
+        end,
+        function()  -- onCancel callback
+            ui.showHousingAssignmentModal = false
+        end
+    )
+
+    -- Housing overview panel state
+    ui.showHousingOverviewPanel = false
+    ui.housingOverviewPanel = HousingOverviewPanel:Create(world,
+        function()  -- onAssignClick callback
+            print("[AlphaUI] onAssignClick callback triggered!")
+            print("[AlphaUI] ui.housingAssignmentModal = " .. tostring(ui.housingAssignmentModal))
+            ui.showHousingAssignmentModal = true
+            print("[AlphaUI] Set showHousingAssignmentModal = true")
+            if ui.housingAssignmentModal then
+                print("[AlphaUI] Calling housingAssignmentModal:Show()")
+                ui.housingAssignmentModal:Show()
+            end
+        end,
+        function()  -- onQueueClick callback
+            -- TODO: Show relocation queue modal
+            print("[AlphaUI] View Queue clicked - not yet implemented")
+        end
+    )
 
     -- Character detail panel state
     ui.characterDetailPanel = CharacterDetailPanel:Create(world)
@@ -276,11 +305,6 @@ function AlphaUI:Render()
 
     -- Render world view (center area)
     self:RenderWorldView()
-
-    -- Render land overlay (part of world view, before UI panels)
-    if self.showLandOverlay and self.landOverlay then
-        self.landOverlay:Render(self)  -- Pass self as camera
-    end
 
     -- Render UI panels (dimmed if in placement mode)
     if self.placementMode then
@@ -1050,9 +1074,18 @@ function AlphaUI:RenderImmigrationModal()
     love.graphics.print(string.format("%.0f%%", attractiveness), modalX + 155, modalY + 48)
     self:RenderProgressBar(modalX + 200, modalY + 50, 100, 12, attractiveness / 100, attractColor)
 
+    -- Housing and Jobs stats with separators
     love.graphics.setColor(self.colors.textDim)
-    love.graphics.print(string.format("Housing: %d available", vacantHousing), modalX + 290, modalY + 48)
-    love.graphics.print(string.format("Jobs: %d open", totalJobs), modalX + 420, modalY + 48)
+    love.graphics.print("|", modalX + 310, modalY + 48)
+    love.graphics.print("Housing:", modalX + 325, modalY + 48)
+    love.graphics.setColor(vacantHousing > 0 and self.colors.success or self.colors.danger)
+    love.graphics.print(string.format("%d available", vacantHousing), modalX + 385, modalY + 48)
+
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("|", modalX + 470, modalY + 48)
+    love.graphics.print("Jobs:", modalX + 485, modalY + 48)
+    love.graphics.setColor(totalJobs > 0 and self.colors.success or self.colors.warning)
+    love.graphics.print(string.format("%d open", totalJobs), modalX + 520, modalY + 48)
 
     -- Bulk action buttons
     local bulkBtnY = modalY + 44
@@ -1708,7 +1741,7 @@ function AlphaUI:RenderBuildingDetails(x, y, w)
     love.graphics.setColor(self.colors.textDim)
     love.graphics.print("Type: " .. (building.typeId or "?"), x + 10, y)
     y = y + 20
-    love.graphics.print("Level: " .. (building.level + 1), x + 10, y)
+    love.graphics.print("Level: " .. ((building.level or 0) + 1), x + 10, y)
     y = y + 30
 
     if isHousing then
@@ -2069,7 +2102,12 @@ function AlphaUI:RenderWorldView()
 
     -- Render land distribution overlay (if visible)
     if self.showLandOverlay and self.world.landSystem then
-        self:RenderLandOverlay(x, y, w, h)
+        -- Use the LandOverlay module if available (has better visuals with owner labels)
+        if self.landOverlay then
+            self.landOverlay:Render(self)
+        else
+            self:RenderLandOverlay(x, y, w, h)
+        end
     end
 
     -- Offset for camera - translate to world coordinates
@@ -2374,10 +2412,11 @@ function AlphaUI:RenderPaths(dayR, dayG, dayB)
         end
 
         if nearest then
-            local bx1 = self.leftPanelWidth + building.x + 30
-            local by1 = self.topBarHeight + building.y + 30
-            local bx2 = self.leftPanelWidth + nearest.x + 30
-            local by2 = self.topBarHeight + nearest.y + 30
+            -- Use world coordinates directly (we're inside the world rendering transform)
+            local bx1 = building.x + 30
+            local by1 = building.y + 30
+            local bx2 = nearest.x + 30
+            local by2 = nearest.y + 30
             love.graphics.line(bx1, by1, bx2, by2)
         end
 
@@ -2388,8 +2427,9 @@ function AlphaUI:RenderPaths(dayR, dayG, dayB)
 end
 
 function AlphaUI:RenderBuilding(building)
-    local bx = self.leftPanelWidth + building.x
-    local by = self.topBarHeight + building.y
+    -- Use world coordinates directly (we're inside the world rendering transform)
+    local bx = building.x
+    local by = building.y
     local bw = 60
     local bh = 60
 
@@ -2520,8 +2560,9 @@ function AlphaUI:RenderBuilding(building)
 end
 
 function AlphaUI:RenderCitizen(citizen)
-    local cx = self.leftPanelWidth + citizen.x
-    local cy = self.topBarHeight + citizen.y
+    -- Use world coordinates directly (we're inside the world rendering transform)
+    local cx = citizen.x
+    local cy = citizen.y
     local radius = 10
 
     -- Day/night tint
@@ -2657,7 +2698,7 @@ end
 -- PLACEMENT MODE
 -- =============================================================================
 
-function AlphaUI:EnterPlacementMode(buildingType)
+function AlphaUI:EnterPlacementMode(buildingType, restrictedPlots, ownerCitizen)
     self.placementMode = true
     self.placementBuildingType = buildingType
     self.placementValid = false
@@ -2665,6 +2706,10 @@ function AlphaUI:EnterPlacementMode(buildingType)
     self.placementBreakdown = {}
     self.placementErrors = {}
     self.showResourceOverlay = true  -- Auto-show resources during placement
+
+    -- Store restricted plots and owner for immigration-related placement
+    self.placementRestrictedPlots = restrictedPlots  -- nil means no restriction (normal build menu)
+    self.placementOwnerCitizen = ownerCitizen  -- The citizen who will own the building
 
     -- Show resource overlay panel with relevant resources enabled
     if self.resourceOverlay then
@@ -2674,15 +2719,84 @@ function AlphaUI:EnterPlacementMode(buildingType)
         self.resourceOverlay:showOverlay("ground_water")
     end
 
+    -- Enable land overlay if we have restricted plots (helps user see their plots)
+    if restrictedPlots and #restrictedPlots > 0 then
+        self.showLandOverlay = true
+
+        -- Focus camera on the restricted plots
+        self:FocusCameraOnPlots(restrictedPlots)
+
+        -- Debug: print restricted plots
+        print("[AlphaUI] EnterPlacementMode with " .. #restrictedPlots .. " restricted plots:")
+        for i, plotIdOrObj in ipairs(restrictedPlots) do
+            local plotId = type(plotIdOrObj) == "string" and plotIdOrObj or (plotIdOrObj.id or "unknown")
+            print("  - Plot " .. i .. ": " .. plotId)
+        end
+    end
+
     -- Pause the game during placement
     self.world:Pause()
 
-    print("Entered placement mode for: " .. (buildingType.name or buildingType.id))
+    local plotInfo = ""
+    if restrictedPlots and #restrictedPlots > 0 then
+        plotInfo = " (restricted to " .. #restrictedPlots .. " owned plots)"
+    end
+    print("Entered placement mode for: " .. (buildingType.name or buildingType.id) .. plotInfo)
+end
+
+-- Focus camera on a set of plots (centers view on them)
+function AlphaUI:FocusCameraOnPlots(plots)
+    if not plots or #plots == 0 then return end
+
+    local landSystem = self.world.landSystem
+    if not landSystem then return end
+
+    -- Calculate bounding box of all plots
+    local minX, minY = math.huge, math.huge
+    local maxX, maxY = -math.huge, -math.huge
+
+    for _, plotIdOrObj in ipairs(plots) do
+        local plotId = type(plotIdOrObj) == "string" and plotIdOrObj or (plotIdOrObj.id or nil)
+        if plotId then
+            local plot = landSystem:GetPlotById(plotId)
+            if plot then
+                minX = math.min(minX, plot.worldX)
+                minY = math.min(minY, plot.worldY)
+                maxX = math.max(maxX, plot.worldX + (plot.width or 100))
+                maxY = math.max(maxY, plot.worldY + (plot.height or 100))
+            end
+        end
+    end
+
+    if minX < math.huge then
+        -- Calculate center of the bounding box
+        local centerX = (minX + maxX) / 2
+        local centerY = (minY + maxY) / 2
+
+        -- Get the world view dimensions
+        local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+        local worldViewW = screenW - self.leftPanelWidth - self.rightPanelWidth
+        local worldViewH = screenH - self.topBarHeight - self.eventLogHeight
+
+        -- Set camera to center on the plots
+        self.cameraX = centerX - worldViewW / 2
+        self.cameraY = centerY - worldViewH / 2
+
+        -- Clamp to world bounds
+        local worldWidth = self.world.worldWidth or 2000
+        local worldHeight = self.world.worldHeight or 1500
+        self.cameraX = math.max(0, math.min(self.cameraX, worldWidth - worldViewW))
+        self.cameraY = math.max(0, math.min(self.cameraY, worldHeight - worldViewH))
+
+        print(string.format("[AlphaUI] Camera focused on plots at (%d, %d)", self.cameraX, self.cameraY))
+    end
 end
 
 function AlphaUI:ExitPlacementMode()
     self.placementMode = false
     self.placementBuildingType = nil
+    self.placementRestrictedPlots = nil
+    self.placementOwnerCitizen = nil
     self.showResourceOverlay = false
     self.showBuildMenuModal = false
 
@@ -2723,6 +2837,68 @@ function AlphaUI:UpdatePlacement(mouseX, mouseY)
     -- Validate placement
     self.placementValid, self.placementErrors, self.placementEfficiency, self.placementBreakdown =
         self.world:ValidateBuildingPlacement(self.placementBuildingType, self.placementX, self.placementY, buildingW, buildingH)
+
+    -- Additional validation: check if placement is within restricted plots (for immigration-related placement)
+    if self.placementRestrictedPlots and #self.placementRestrictedPlots > 0 then
+        local withinRestrictedPlot = self:IsPlacementWithinRestrictedPlots(self.placementX, self.placementY, buildingW, buildingH)
+        if not withinRestrictedPlot then
+            self.placementValid = false
+            table.insert(self.placementErrors, "Must build on your purchased land plots")
+        end
+    end
+end
+
+-- Check if the building placement is within any of the restricted plots
+function AlphaUI:IsPlacementWithinRestrictedPlots(x, y, w, h)
+    if not self.placementRestrictedPlots or #self.placementRestrictedPlots == 0 then
+        return true  -- No restriction
+    end
+
+    local landSystem = self.world.landSystem
+    if not landSystem then
+        return true  -- No land system, allow placement
+    end
+
+    -- Check each corner of the building
+    local corners = {
+        {x = x, y = y},
+        {x = x + w, y = y},
+        {x = x, y = y + h},
+        {x = x + w, y = y + h}
+    }
+
+    -- All corners must be within restricted plots
+    for _, corner in ipairs(corners) do
+        local plot = landSystem:GetPlotAtWorld(corner.x, corner.y)
+        if not plot then
+            return false  -- Corner is outside any plot
+        end
+
+        -- Check if this plot is in our restricted list
+        local isAllowed = false
+        for _, allowedPlot in ipairs(self.placementRestrictedPlots) do
+            -- Handle both plot ID strings and plot objects
+            local allowedPlotId
+            if type(allowedPlot) == "string" then
+                -- It's a plot ID string (e.g., "plot_3_4")
+                allowedPlotId = allowedPlot
+            elseif type(allowedPlot) == "table" then
+                -- It's a plot object
+                allowedPlotId = allowedPlot.id
+            end
+
+            if allowedPlotId and allowedPlotId == plot.id then
+                isAllowed = true
+                break
+            end
+        end
+
+        if not isAllowed then
+            return false  -- Corner is in a plot we don't own
+        end
+    end
+
+    return true
 end
 
 function AlphaUI:RenderPlacementGhost()
@@ -5703,8 +5879,8 @@ function AlphaUI:HandleClick(x, y, button)
     if x >= worldX and x < worldX + worldW and
        y >= worldY and y < worldY + worldH then
         -- Convert to world coordinates
-        local wx = x - worldX + self.cameraX - self.leftPanelWidth
-        local wy = y - worldY + self.cameraY - self.topBarHeight
+        local wx = (x - worldX) + self.cameraX
+        local wy = (y - worldY) + self.cameraY
 
         -- Check for citizen click
         local citizen = self.world:GetCitizenAt(wx, wy, 15)
@@ -5760,13 +5936,49 @@ function AlphaUI:HandlePlacementClick(x, y)
        y >= worldY and y < worldY + worldH then
 
         if self.placementValid then
-            -- Place the building
-            local building, errors = self.world:PlaceBuilding(self.placementBuildingType, self.placementX, self.placementY)
+            -- Check if this is an immigrant placement (has owner citizen and restricted plots)
+            local isImmigrantPlacement = self.placementOwnerCitizen ~= nil and self.placementRestrictedPlots ~= nil
+
+            local building, errors
+
+            if isImmigrantPlacement then
+                -- Immigrant pays for the building from their wealth
+                building, errors = self:PlaceBuildingForImmigrant(
+                    self.placementBuildingType,
+                    self.placementX,
+                    self.placementY,
+                    self.placementOwnerCitizen
+                )
+            else
+                -- Normal town placement
+                building, errors = self.world:PlaceBuilding(self.placementBuildingType, self.placementX, self.placementY)
+            end
+
             if building then
-                self.world:LogEvent("construction", "Built " .. (building.name or building.typeId), {})
-                self:ExitPlacementMode()
-                -- Select the new building
-                self.world:SelectEntity(building, "building")
+                local builderName = isImmigrantPlacement and self.placementOwnerCitizen.name or "Town"
+                self.world:LogEvent("construction", builderName .. " built " .. (building.name or building.typeId), {})
+
+                -- For immigrant placement, check if there are remaining plots and reopen modal
+                if isImmigrantPlacement then
+                    -- Remove the plot that was used from restricted plots
+                    local usedPlotId = self:GetPlotIdAtPosition(self.placementX, self.placementY)
+                    local remainingPlots = self:RemovePlotFromList(self.placementRestrictedPlots, usedPlotId)
+                    local ownerCitizen = self.placementOwnerCitizen
+
+                    self:ExitPlacementMode()
+
+                    -- If there are remaining plots, reopen the suggested buildings modal
+                    if remainingPlots and #remainingPlots > 0 then
+                        self:OpenSuggestedBuildingsModal(ownerCitizen, remainingPlots)
+                    else
+                        -- Select the new building
+                        self.world:SelectEntity(building, "building")
+                    end
+                else
+                    self:ExitPlacementMode()
+                    -- Select the new building
+                    self.world:SelectEntity(building, "building")
+                end
             else
                 -- Show error (placement failed)
                 print("Placement failed: " .. table.concat(errors or {}, ", "))
@@ -5776,6 +5988,82 @@ function AlphaUI:HandlePlacementClick(x, y)
     end
 
     return false
+end
+
+-- Place a building paid for by an immigrant citizen
+function AlphaUI:PlaceBuildingForImmigrant(buildingType, x, y, citizen)
+    -- Validate placement
+    local isValid, errors, efficiency, breakdown = self.world:ValidateBuildingPlacement(buildingType, x, y)
+    if not isValid then
+        return nil, errors
+    end
+
+    -- Check if citizen can afford the building
+    local cost = buildingType.constructionCost or {}
+    local goldCost = cost.gold or 0
+
+    -- Get citizen's wealth from economics system
+    local citizenWealth = 0
+    if self.world.economicsSystem then
+        citizenWealth = self.world.economicsSystem:GetWealth(citizen.id) or 0
+    end
+
+    if goldCost > citizenWealth then
+        return nil, {"Insufficient funds (need " .. goldCost .. " gold, have " .. math.floor(citizenWealth) .. ")"}
+    end
+
+    -- Deduct cost from citizen's wealth (not town gold)
+    if self.world.economicsSystem and goldCost > 0 then
+        self.world.economicsSystem:AddWealth(citizen.id, -goldCost)
+        print(string.format("[AlphaUI] Deducted %d gold from %s's wealth for building", goldCost, citizen.name))
+    end
+
+    -- For material costs, still check town inventory (immigrants use town materials for now)
+    for materialId, required in pairs(cost.materials or {}) do
+        local available = self.world.inventory[materialId] or 0
+        if available < required then
+            return nil, {"Missing material: " .. materialId}
+        end
+    end
+
+    -- Deduct materials from town inventory
+    for materialId, required in pairs(cost.materials or {}) do
+        self.world:RemoveFromInventory(materialId, required)
+    end
+
+    -- Create the building
+    local building = self.world:AddBuilding(buildingType.id, x, y)
+    if building then
+        building.resourceEfficiency = efficiency
+        building.efficiencyBreakdown = breakdown
+        building.ownerId = citizen.id  -- Set the citizen as owner
+        print(string.format("[AlphaUI] Building %s placed for %s (owner: %s)", buildingType.id, citizen.name, citizen.id))
+    end
+
+    return building, nil
+end
+
+-- Get plot ID at a world position
+function AlphaUI:GetPlotIdAtPosition(worldX, worldY)
+    local landSystem = self.world.landSystem
+    if not landSystem then return nil end
+
+    local plot = landSystem:GetPlotAtWorld(worldX, worldY)
+    return plot and plot.id or nil
+end
+
+-- Remove a plot from the list and return the remaining plots
+function AlphaUI:RemovePlotFromList(plots, plotIdToRemove)
+    if not plots or not plotIdToRemove then return plots end
+
+    local remaining = {}
+    for _, plotIdOrObj in ipairs(plots) do
+        local plotId = type(plotIdOrObj) == "string" and plotIdOrObj or (plotIdOrObj.id or nil)
+        if plotId ~= plotIdToRemove then
+            table.insert(remaining, plotIdOrObj)
+        end
+    end
+    return remaining
 end
 
 function AlphaUI:HandleInventoryPanelClick(x, y)
@@ -6288,11 +6576,12 @@ function AlphaUI:HandleImmigrationClick(x, y)
                     self:OpenPlotSelectionModal(self.selectedApplicant)
                 else
                     -- No land required, accept directly
-                    local success, _, err = immigrationSystem:AcceptApplicant(self.selectedApplicant, {})
+                    local success, resultOrErr = immigrationSystem:AcceptApplicant(self.selectedApplicant, {})
                     if success then
                         self.selectedApplicant = nil
                     else
-                        print("Could not accept: " .. (err or "unknown error"))
+                        -- On failure, second return value is the error message
+                        print("Could not accept: " .. (resultOrErr or "unknown error"))
                     end
                 end
                 return true
@@ -8348,9 +8637,12 @@ function AlphaUI:OnPlotSelectionComplete(selectedPlots, totalCost)
     end
 
     -- Accept the applicant with the selected plots
-    local success, citizen, err = immigrationSystem:AcceptApplicant(applicant, selectedPlots)
+    -- On success: returns true, citizen, nil
+    -- On failure: returns false, "error message"
+    local success, citizenOrErr, _ = immigrationSystem:AcceptApplicant(applicant, selectedPlots)
 
     if success then
+        local citizen = citizenOrErr  -- On success, second value is the citizen
         self.world:LogEvent("immigration", applicant.name .. " immigrated and purchased " .. #selectedPlots .. " plots for " .. totalCost .. " gold", {})
         self.selectedApplicant = nil
 
@@ -8375,6 +8667,7 @@ function AlphaUI:OnPlotSelectionComplete(selectedPlots, totalCost)
             end
         end
     else
+        local err = citizenOrErr  -- On failure, second value is the error message
         print("[AlphaUI] Failed to accept immigrant: " .. (err or "unknown error"))
         self.world:LogEvent("warning", "Immigration failed for " .. applicant.name .. ": " .. (err or "unknown"), {})
     end
@@ -8399,6 +8692,7 @@ end
 
 function AlphaUI:OpenSuggestedBuildingsModal(citizen, remainingPlots)
     self.suggestedBuildingsCitizen = citizen
+    self.suggestedBuildingsPlots = remainingPlots or {}  -- Store plots for placement restriction
 
     self.suggestedBuildingsModal = SuggestedBuildingsModal:Create(
         self.world,
@@ -8414,11 +8708,31 @@ function AlphaUI:OpenSuggestedBuildingsModal(citizen, remainingPlots)
 end
 
 function AlphaUI:OnSuggestedBuildingsClose(action, buildingTypeId)
+    print("[AlphaUI] OnSuggestedBuildingsClose called with action=" .. tostring(action) .. ", buildingTypeId=" .. tostring(buildingTypeId))
+
     if action == "build" and buildingTypeId then
-        -- Enter building placement mode for the selected building
-        self:CloseSuggestedBuildingsModal()
-        self:EnterPlacementMode(buildingTypeId)
-        self.world:LogEvent("info", "Starting placement for " .. buildingTypeId, {})
+        -- Look up the building type object from the ID
+        local buildingType = self.world.buildingTypesById[buildingTypeId]
+        if buildingType then
+            -- Store plots and citizen before closing modal
+            local restrictedPlots = self.suggestedBuildingsPlots
+            local ownerCitizen = self.suggestedBuildingsCitizen
+
+            print("[AlphaUI] restrictedPlots count: " .. (restrictedPlots and #restrictedPlots or 0))
+            print("[AlphaUI] ownerCitizen: " .. (ownerCitizen and ownerCitizen.name or "nil"))
+
+            -- Close ALL related modals first
+            self:CloseSuggestedBuildingsModal()
+            self.showImmigrationModal = false  -- Close immigration modal too
+            print("[AlphaUI] Modals closed, showSuggestedBuildingsModal=" .. tostring(self.showSuggestedBuildingsModal) .. ", showImmigrationModal=" .. tostring(self.showImmigrationModal))
+
+            -- Enter building placement mode with plot restriction
+            self:EnterPlacementMode(buildingType, restrictedPlots, ownerCitizen)
+            self.world:LogEvent("info", "Starting placement for " .. (buildingType.name or buildingTypeId), {})
+        else
+            print("[AlphaUI] Unknown building type: " .. tostring(buildingTypeId))
+            self:CloseSuggestedBuildingsModal()
+        end
     elseif action == "view_land" then
         -- Close modal and enable land overlay
         self:CloseSuggestedBuildingsModal()
@@ -8430,9 +8744,11 @@ function AlphaUI:OnSuggestedBuildingsClose(action, buildingTypeId)
 end
 
 function AlphaUI:CloseSuggestedBuildingsModal()
+    print("[AlphaUI] CloseSuggestedBuildingsModal called")
     self.showSuggestedBuildingsModal = false
     self.suggestedBuildingsModal = nil
     self.suggestedBuildingsCitizen = nil
+    self.suggestedBuildingsPlots = nil
 end
 
 -- =============================================================================

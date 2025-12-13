@@ -119,8 +119,12 @@
 local CharacterDetailPanel = {}
 CharacterDetailPanel.__index = CharacterDetailPanel
 
--- Import CharacterV2 for craving dimension mappings
+-- Import Character (CharacterV2) for craving dimension mappings
+-- Note: The module is named Character internally, not CharacterV2
 local CharacterV2 = require("code.consumption.CharacterV2")
+
+-- Also try CharacterV3 which is the newer version used in AlphaWorld
+local CharacterV3 = require("code.consumption.CharacterV3")
 
 function CharacterDetailPanel:Create(world)
     local panel = setmetatable({}, CharacterDetailPanel)
@@ -211,6 +215,9 @@ end
 
 function CharacterDetailPanel:Render()
     if not self.visible or not self.character then return end
+
+    -- Clear buttons at the start of each render (so clicks work correctly)
+    self.buttons = {}
 
     self:InitFonts()
 
@@ -403,10 +410,12 @@ function CharacterDetailPanel:RenderSatisfactionSection(x, y, w, char)
         local isExpanded = self.expandedDimensions[coarseIdx]
 
         -- Calculate coarse-level cravings
+        -- Try CharacterV3 first (used by AlphaWorld), then CharacterV2
         local coarseCurrentCraving = 0
         local coarseBaseCraving = 0
-        local fineIndices = CharacterV2.coarseToFineMap and CharacterV2.coarseToFineMap[coarseIdx]
-        if fineIndices then
+        local fineIndices = (CharacterV3 and CharacterV3.coarseToFineMap and CharacterV3.coarseToFineMap[coarseIdx])
+                         or (CharacterV2 and CharacterV2.coarseToFineMap and CharacterV2.coarseToFineMap[coarseIdx])
+        if fineIndices and type(fineIndices) == "table" then
             for _, fineIdx in ipairs(fineIndices) do
                 coarseCurrentCraving = coarseCurrentCraving + (char.currentCravings and char.currentCravings[fineIdx] or 0)
                 coarseBaseCraving = coarseBaseCraving + (char.baseCravings and char.baseCravings[fineIdx] or 0)
@@ -452,15 +461,18 @@ function CharacterDetailPanel:RenderSatisfactionSection(x, y, w, char)
         y = y + 14
 
         -- Show fine dimensions if expanded
-        if isExpanded and fineRange then
+        if isExpanded and fineIndices and type(fineIndices) == "table" and #fineIndices > 0 then
             love.graphics.setFont(self.fonts.tiny)
-            for fineIdx = fineRange.start, fineRange.finish do
-                local fineName = CharacterV2.fineNames and CharacterV2.fineNames[fineIdx] or ("fine_" .. fineIdx)
+            for _, fineIdx in ipairs(fineIndices) do
+                -- Get fine dimension name from CharacterV3 or CharacterV2
+                local fineName = (CharacterV3 and CharacterV3.fineNames and CharacterV3.fineNames[fineIdx])
+                              or (CharacterV2 and CharacterV2.fineNames and CharacterV2.fineNames[fineIdx])
+                              or ("fine_" .. fineIdx)
                 local fineValue = char.currentCravings and char.currentCravings[fineIdx] or 0
                 local baseCraving = char.baseCravings and char.baseCravings[fineIdx] or 0
 
-                -- Shorten name
-                local shortName = fineName:gsub("^%w+_", "")
+                -- Shorten name (remove prefix before first underscore)
+                local shortName = fineName:gsub("^[^_]+_", "")
 
                 love.graphics.setColor(0.5, 0.5, 0.55)
                 love.graphics.print("    " .. shortName, x + 30, y)
@@ -529,10 +541,19 @@ function CharacterDetailPanel:RenderTopCravingsSection(x, y, w, char)
     -- Get top 10 cravings
     local cravingsList = {}
     if char.currentCravings then
-        for i = 0, 48 do
+        -- Get the fine dimension count from CharacterV3 or use 66 (current default)
+        local fineCount = 66
+        if CharacterV3 and CharacterV3._DimensionDefinitions and CharacterV3._DimensionDefinitions.fineDimensions then
+            fineCount = #CharacterV3._DimensionDefinitions.fineDimensions
+        end
+
+        for i = 0, fineCount - 1 do
             local craving = char.currentCravings[i] or 0
             if craving > 0.1 then
-                local fineName = CharacterV2.fineNames and CharacterV2.fineNames[i] or ("dim_" .. i)
+                -- Get fine dimension name from CharacterV3 or CharacterV2
+                local fineName = (CharacterV3 and CharacterV3.fineNames and CharacterV3.fineNames[i])
+                              or (CharacterV2 and CharacterV2.fineNames and CharacterV2.fineNames[i])
+                              or ("dim_" .. i)
                 table.insert(cravingsList, {index = i, name = fineName, value = craving})
             end
         end
@@ -689,12 +710,14 @@ function CharacterDetailPanel:RenderHistorySection(x, y, w, char)
                 end
 
                 local actionText = isAcquired and "Acquired" or "Consumed"
+                local cycleNum = type(entry.cycle) == "number" and entry.cycle or 0
                 love.graphics.print(string.format("Cycle %d: %s %s (%.0f%% effective)",
-                    entry.cycle or 0, actionText, entry.commodity, effectiveness * 100), x + 12, y)
+                    cycleNum, actionText, entry.commodity or "unknown", effectiveness * 100), x + 12, y)
             else
                 love.graphics.setColor(self.colors.red)
                 love.graphics.print("x", x, y)
-                love.graphics.print(string.format("Cycle %d: FAILED (no allocation)", entry.cycle or 0), x + 12, y)
+                local cycleNum = type(entry.cycle) == "number" and entry.cycle or 0
+                love.graphics.print(string.format("Cycle %d: FAILED (no allocation)", cycleNum), x + 12, y)
             end
             y = y + 14
         end
@@ -962,11 +985,39 @@ function CharacterDetailPanel:RenderHousingSection(x, y, w, char)
     y = y + 22
 
     local housingSystem = self.world and self.world.housingSystem
-    local residence = char.residence or char.housingId
     local building = nil
 
-    if residence and self.world and self.world.buildings then
-        building = self.world.buildings[residence]
+    -- Try to get housing from HousingSystem first (preferred method)
+    if housingSystem then
+        local assignment = housingSystem:GetHousingAssignment(char.id)
+        if assignment and assignment.buildingId then
+            -- Find the building by ID
+            for _, b in ipairs(self.world.buildings or {}) do
+                if b.id == assignment.buildingId then
+                    building = b
+                    break
+                end
+            end
+        end
+    end
+
+    -- Fallback: check legacy residence field
+    if not building then
+        local residence = char.residence or char.housingId
+        if residence then
+            -- If residence is a building object
+            if type(residence) == "table" and residence.id then
+                building = residence
+            -- If residence is a building ID
+            elseif type(residence) == "string" or type(residence) == "number" then
+                for _, b in ipairs(self.world.buildings or {}) do
+                    if b.id == residence then
+                        building = b
+                        break
+                    end
+                end
+            end
+        end
     end
 
     love.graphics.setFont(self.fonts.normal)
@@ -1243,31 +1294,37 @@ function CharacterDetailPanel:GetSatisfactionColor(value)
 end
 
 function CharacterDetailPanel:GetClassColor(class)
+    -- Class colors matching class_thresholds.json: elite, upper, middle, lower
     local classColors = {
-        PEASANT = {0.6, 0.5, 0.4},
-        WORKER = {0.5, 0.6, 0.7},
-        ARTISAN = {0.6, 0.7, 0.5},
-        MERCHANT = {0.8, 0.7, 0.3},
-        WEALTHY = {0.7, 0.5, 0.8},
-        NOBLE = {0.9, 0.8, 0.4},
+        -- Primary classes from class_thresholds.json
+        elite = {0.9, 0.8, 0.4},       -- Gold
+        upper = {0.7, 0.5, 0.8},       -- Purple
+        middle = {0.5, 0.7, 0.5},      -- Green
+        lower = {0.6, 0.5, 0.4},       -- Brown
+        -- Uppercase variants (for compatibility)
+        Elite = {0.9, 0.8, 0.4},
+        Upper = {0.7, 0.5, 0.8},
+        Middle = {0.5, 0.7, 0.5},
+        Lower = {0.6, 0.5, 0.4},
     }
     return classColors[class] or {0.7, 0.7, 0.7}
 end
 
 function CharacterDetailPanel:CalculateEmergentClass(netWorth, capitalRatio)
-    -- Class thresholds (should match ClassThresholds.json)
-    if netWorth < 100 then
-        return "PEASANT"
-    elseif netWorth < 500 then
-        return "WORKER"
-    elseif netWorth < 1500 and capitalRatio < 30 then
-        return "ARTISAN"
-    elseif netWorth < 3000 or capitalRatio >= 30 then
-        return "MERCHANT"
-    elseif netWorth < 10000 then
-        return "WEALTHY"
+    -- Class thresholds matching class_thresholds.json
+    -- Elite: netWorth >= 10000 AND capitalRatio >= 80%
+    -- Upper: netWorth >= 3000 OR capitalRatio >= 50%
+    -- Middle: netWorth >= 500 OR capitalRatio >= 20%
+    -- Lower: default (below middle thresholds)
+
+    if netWorth >= 10000 and capitalRatio >= 80 then
+        return "Elite"
+    elseif netWorth >= 3000 or capitalRatio >= 50 then
+        return "Upper"
+    elseif netWorth >= 500 or capitalRatio >= 20 then
+        return "Middle"
     else
-        return "NOBLE"
+        return "Lower"
     end
 end
 

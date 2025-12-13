@@ -19,13 +19,19 @@ function Forest:Create(params)
         -- Store world dimensions for coordinate conversion
         -- River uses centered coords where (0,0) is world center
         mWorldWidth = (params.maxX or 2500) - (params.minX or 0),
-        mWorldHeight = (params.maxY or 2500) - (params.minY or 0)
+        mWorldHeight = (params.maxY or 2500) - (params.minY or 0),
+        -- Store zones if provided (zone-based generation)
+        mZones = params.zones
     }
 
     setmetatable(this, self)
 
-    -- Generate random forest regions
-    this:GenerateForestRegions(params)
+    -- Generate forest - either zone-based or random regions
+    if params.zones and #params.zones > 0 then
+        this:GenerateForestFromZones(params.zones)
+    else
+        this:GenerateForestRegions(params)
+    end
 
     return this
 end
@@ -54,6 +60,80 @@ function Forest:IsRegionNearRiver(centerX, centerY, radius)
     local minDistanceFromRiver = radius + 150  -- Larger buffer zone
 
     return distance < minDistanceFromRiver
+end
+
+-- Generate trees within pre-defined zones (from WorldZones)
+function Forest:GenerateForestFromZones(zones)
+    print("[Forest] Generating trees within " .. #zones .. " designated zones")
+
+    for i, zone in ipairs(zones) do
+        -- Create a region for each zone
+        local region = {
+            centerX = zone.x + zone.width / 2,
+            centerY = zone.y + zone.height / 2,
+            -- Use zone dimensions to calculate equivalent radius
+            radius = math.min(zone.width, zone.height) / 2,
+            density = 0.6 + math.random() * 0.4,  -- 0.6 to 1.0
+            irregularity = 0.3,
+            -- Store zone bounds for rectangular tree placement
+            zoneX = zone.x,
+            zoneY = zone.y,
+            zoneWidth = zone.width,
+            zoneHeight = zone.height
+        }
+
+        table.insert(self.mRegions, region)
+
+        -- Generate trees within this zone (rectangular, not circular)
+        self:GenerateTreesInZone(region)
+
+        print(string.format("[Forest] Zone %d: (%d,%d) %dx%d - %d trees",
+            i, zone.x, zone.y, zone.width, zone.height, #self.mTrees))
+    end
+
+    print("[Forest] Total trees generated: " .. #self.mTrees)
+end
+
+-- Generate trees within a rectangular zone
+function Forest:GenerateTreesInZone(region)
+    -- Calculate number of trees based on zone area and density
+    local area = region.zoneWidth * region.zoneHeight
+    local numTrees = math.floor(area * region.density / 600)  -- More trees per zone
+
+    local padding = 20  -- Keep trees away from zone edges
+
+    for i = 1, numTrees do
+        local maxAttempts = 15
+        local attempts = 0
+        local treeX, treeY, size
+
+        repeat
+            -- Random position within zone bounds
+            treeX = region.zoneX + padding + math.random() * (region.zoneWidth - padding * 2)
+            treeY = region.zoneY + padding + math.random() * (region.zoneHeight - padding * 2)
+
+            -- Calculate tree size
+            local baseSize = 8 + math.random() * 7  -- 8 to 15
+            -- Add some variation based on distance from center
+            local dx = treeX - region.centerX
+            local dy = treeY - region.centerY
+            local distFromCenter = math.sqrt(dx * dx + dy * dy)
+            local maxDist = math.max(region.zoneWidth, region.zoneHeight) / 2
+            local centeredness = 1 - math.min(1, distFromCenter / maxDist)
+            size = baseSize * (0.7 + centeredness * 0.4)
+
+            attempts = attempts + 1
+        until (attempts >= maxAttempts or not self:CheckTreeRiverCollision(treeX, treeY, size))
+
+        if attempts < maxAttempts then
+            table.insert(self.mTrees, {
+                x = treeX,
+                y = treeY,
+                size = size,
+                regionIndex = #self.mRegions
+            })
+        end
+    end
 end
 
 function Forest:GenerateForestRegions(params)

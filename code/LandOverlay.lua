@@ -150,28 +150,28 @@ function LandOverlay:Render(camera)
 
     -- Calculate visible range based on camera
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
-    local camX, camY = camera:GetPosition()
-    local camScale = camera:GetScale()
+
+    -- Get camera position directly (AlphaUI stores these as properties)
+    local camX = camera.cameraX or 0
+    local camY = camera.cameraY or 0
 
     -- Get the world view offset (accounts for UI panels)
-    -- AlphaUI uses top-left corner camera coordinates
-    local worldViewX = camera.leftPanelWidth or 200
-    local worldViewY = camera.topBarHeight or 50
-    local worldViewW = screenW - worldViewX - (camera.rightPanelWidth or 280)
-    local worldViewH = screenH - worldViewY - (camera.eventLogHeight or 140)
+    local viewX = camera.leftPanelWidth or 200
+    local viewY = camera.topBarHeight or 50
+    local viewW = screenW - viewX - (camera.rightPanelWidth or 280)
+    local viewH = screenH - viewY - (camera.bottomBarHeight or 140)
 
-    -- Calculate world coordinates of visible area
-    -- Camera position is top-left corner of the world view
-    local worldLeft = camX
-    local worldTop = camY
-    local worldRight = camX + worldViewW / camScale
-    local worldBottom = camY + worldViewH / camScale
+    -- Calculate grid range to render (matching AlphaUI:RenderLandOverlay style)
+    local startGridX = math.floor(camX / plotWidth)
+    local startGridY = math.floor(camY / plotHeight)
+    local endGridX = math.ceil((camX + viewW) / plotWidth)
+    local endGridY = math.ceil((camY + viewH) / plotHeight)
 
-    -- Calculate grid range to render
-    local startGridX = math.max(0, math.floor(worldLeft / plotWidth))
-    local startGridY = math.max(0, math.floor(worldTop / plotHeight))
-    local endGridX = math.min((landSystem.gridColumns or 32) - 1, math.ceil(worldRight / plotWidth))
-    local endGridY = math.min((landSystem.gridRows or 24) - 1, math.ceil(worldBottom / plotHeight))
+    -- Clamp to grid bounds
+    startGridX = math.max(0, startGridX)
+    startGridY = math.max(0, startGridY)
+    endGridX = math.min((landSystem.gridColumns or 32) - 1, endGridX)
+    endGridY = math.min((landSystem.gridRows or 24) - 1, endGridY)
 
     -- Render plot overlays
     for gx = startGridX, endGridX do
@@ -180,11 +180,11 @@ function LandOverlay:Render(camera)
             local plot = landSystem.plots and landSystem.plots[plotId]
 
             if plot then
-                -- Convert world position to screen position
-                local screenX = worldViewX + (gx * plotWidth - camX) * camScale
-                local screenY = worldViewY + (gy * plotHeight - camY) * camScale
-                local screenPW = plotWidth * camScale
-                local screenPH = plotHeight * camScale
+                -- Convert world position to screen position (matching AlphaUI style - no zoom)
+                local screenX = viewX + (gx * plotWidth) - camX
+                local screenY = viewY + (gy * plotHeight) - camY
+                local screenPW = plotWidth
+                local screenPH = plotHeight
 
                 -- Determine plot color
                 local color = self:GetPlotColor(plot)
@@ -206,12 +206,18 @@ function LandOverlay:Render(camera)
                 -- Owner indicator (if zoomed in enough)
                 if screenPW > 30 and plot.ownerId then
                     love.graphics.setFont(self.fonts.tiny)
-                    if plot.ownerId == "town" or plot.ownerId == 0 then
+                    if plot.ownerId == "TOWN" or plot.ownerId == "town" or plot.ownerId == 0 then
                         love.graphics.setColor(0.4, 0.6, 0.9)
                         love.graphics.print("T", screenX + 3, screenY + 2)
                     else
+                        -- Show first letter of citizen name or "C" as fallback
                         love.graphics.setColor(0.5, 0.8, 0.5)
-                        love.graphics.print("C", screenX + 3, screenY + 2)
+                        local label = "C"
+                        local citizen = self.world.citizensById and self.world.citizensById[plot.ownerId]
+                        if citizen and citizen.name then
+                            label = citizen.name:sub(1, 1):upper()
+                        end
+                        love.graphics.print(label, screenX + 3, screenY + 2)
                     end
                 end
             end
@@ -250,7 +256,7 @@ function LandOverlay:GetPlotColor(plot)
     end
 
     -- Owned by citizen
-    if plot.ownerId and plot.ownerId ~= "town" and plot.ownerId ~= 0 then
+    if plot.ownerId and plot.ownerId ~= "TOWN" and plot.ownerId ~= "town" and plot.ownerId ~= 0 then
         return self:GetCitizenColor(plot.ownerId)
     end
 
@@ -295,12 +301,15 @@ function LandOverlay:RenderTooltip()
     love.graphics.setFont(self.fonts.small)
     love.graphics.setColor(self.colors.textDim)
     local ownerText = "Owner: "
-    if not plot.ownerId or plot.ownerId == "town" or plot.ownerId == 0 then
+    if not plot.ownerId or plot.ownerId == "TOWN" or plot.ownerId == "town" or plot.ownerId == 0 then
         ownerText = ownerText .. "Town"
     else
         -- Try to get citizen name
-        local citizen = self.world.characters and self.world.characters[plot.ownerId]
-        ownerText = ownerText .. (citizen and citizen.name or ("Citizen #" .. plot.ownerId))
+        local citizen = self.world.citizensById and self.world.citizensById[plot.ownerId]
+        if not citizen then
+            citizen = self.world.characters and self.world.characters[plot.ownerId]
+        end
+        ownerText = ownerText .. (citizen and citizen.name or ("Citizen #" .. tostring(plot.ownerId)))
     end
     love.graphics.print(ownerText, tooltipX + padding, y)
     y = y + 14
@@ -391,18 +400,17 @@ function LandOverlay:UpdateHover(screenX, screenY, camera)
     self.hoverX = screenX
     self.hoverY = screenY
 
-    -- Convert screen to world coordinates
-    -- AlphaUI uses top-left corner camera coordinates
-    local camX, camY = camera:GetPosition()
-    local camScale = camera:GetScale()
+    -- Get camera position directly (AlphaUI stores these as properties)
+    local camX = camera.cameraX or 0
+    local camY = camera.cameraY or 0
 
     -- Get world view offset
-    local worldViewX = camera.leftPanelWidth or 200
-    local worldViewY = camera.topBarHeight or 50
+    local viewX = camera.leftPanelWidth or 200
+    local viewY = camera.topBarHeight or 50
 
-    -- Convert screen position to world position
-    local worldX = (screenX - worldViewX) / camScale + camX
-    local worldY = (screenY - worldViewY) / camScale + camY
+    -- Convert screen position to world position (no zoom/scale)
+    local worldX = (screenX - viewX) + camX
+    local worldY = (screenY - viewY) + camY
 
     -- Find plot at this position
     local plotWidth = landSystem.plotWidth or 100

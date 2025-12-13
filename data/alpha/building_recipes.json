@@ -434,7 +434,7 @@
       "name": "Farm",
       "recipeName": "Wheat Farming",
       "category": "Production",
-      "productionTime": 172800,
+      "productionTime": 7200,
       "inputs": {
         "wheat_seed": 20
       },
@@ -442,7 +442,7 @@
         "wheat": 10,
         "wheat_seed": 30
       },
-      "notes": "2 hours. 5 seeds produces 100 wheat."
+      "notes": "2 hours. 20 seeds produces 10 wheat and 30 seeds."
     },
     {
       "buildingType": "orchard",
@@ -614,7 +614,7 @@
       "name": "Farm",
       "recipeName": "Maize Farming",
       "category": "Production",
-      "productionTime": 172800,
+      "productionTime": 7200,
       "inputs": {
         "maize_seed": 20
       },
@@ -629,7 +629,7 @@
       "name": "Farm",
       "recipeName": "Rice Farming",
       "category": "Production",
-      "productionTime": 172800,
+      "productionTime": 7200,
       "inputs": {
         "rice_seed": 20
       },
@@ -644,7 +644,7 @@
       "name": "Farm",
       "recipeName": "Barley Farming",
       "category": "Production",
-      "productionTime": 172800,
+      "productionTime": 7200,
       "inputs": {
         "barley_seeds": 20
       },
@@ -659,7 +659,7 @@
       "name": "Farm",
       "recipeName": "Oats Farming",
       "category": "Production",
-      "productionTime": 172800,
+      "productionTime": 7200,
       "inputs": {
         "oats_seeds": 20
       },
@@ -674,7 +674,7 @@
       "name": "Farm",
       "recipeName": "Rye Farming",
       "category": "Production",
-      "productionTime": 172800,
+      "productionTime": 7200,
       "inputs": {
         "rye_seeds": 20
       },
@@ -689,7 +689,7 @@
       "name": "Farm",
       "recipeName": "Ragi Farming",
       "category": "Production",
-      "productionTime": 172800,
+      "productionTime": 7200,
       "inputs": {
         "ragi_seeds": 20
       },

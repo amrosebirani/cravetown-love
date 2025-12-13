@@ -1443,8 +1443,13 @@ function CharacterV3:RemoveOldestEffectInCategory(category)
 
     for i, effect in ipairs(self.activeEffects) do
         if effect.category == category then
-            if effect.acquiredCycle < oldestCycle then
-                oldestCycle = effect.acquiredCycle
+            -- Ensure acquiredCycle is a number (handle legacy data where it might be a table)
+            local cycle = effect.acquiredCycle
+            if type(cycle) ~= "number" then
+                cycle = 0  -- Treat invalid/legacy data as oldest
+            end
+            if cycle < oldestCycle then
+                oldestCycle = cycle
                 oldestIndex = i
             end
         end

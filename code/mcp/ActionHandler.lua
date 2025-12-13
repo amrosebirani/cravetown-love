@@ -24,6 +24,11 @@ function ActionHandler:execute(params)
         return self:executeConsumptionAction(action, actionParams)
     end
 
+    -- Check if we're in alpha prototype mode
+    if gMode == "alpha" and gAlphaPrototype then
+        return self:executeAlphaAction(action, actionParams)
+    end
+
     local handlers = {
         -- Building actions
         place_building = function() return self:placeBuilding(actionParams) end,
@@ -775,6 +780,805 @@ end
 function ActionHandler:consumptionClearProtests(proto)
     proto:ClearAllProtests()
     return {success = true, action = "protests_cleared"}
+end
+
+-- ============================================================================
+-- ALPHA PROTOTYPE ACTIONS
+-- For town building simulation with production and consumption
+-- ============================================================================
+
+function ActionHandler:executeAlphaAction(action, params)
+    local alpha = gAlphaPrototype
+    local phase = alpha.mPhase
+
+    -- Pre-game phase actions
+    if phase ~= "game" then
+        return self:executeAlphaPhaseAction(alpha, phase, action, params)
+    end
+
+    local world = alpha.mWorld
+    local ui = alpha.mUI
+
+    if not world then
+        return {success = false, error = "Alpha world not initialized"}
+    end
+
+    local handlers = {
+        -- Time controls
+        pause = function() return self:alphaPause(world) end,
+        resume = function() return self:alphaResume(world) end,
+        toggle_pause = function() return self:alphaTogglePause(world) end,
+        set_speed = function() return self:alphaSetSpeed(world, params) end,
+
+        -- Camera actions
+        move_camera = function() return self:alphaMoveCamera(ui, params) end,
+        move_camera_by = function() return self:alphaMoveCameraBy(ui, params) end,
+        zoom_camera = function() return self:alphaZoomCamera(ui, params) end,
+
+        -- Building actions
+        start_building_placement = function() return self:alphaStartBuildingPlacement(world, ui, params) end,
+        place_building = function() return self:alphaPlaceBuilding(world, ui, params) end,
+        cancel_placement = function() return self:alphaCancelPlacement(ui) end,
+
+        -- Worker management
+        assign_worker = function() return self:alphaAssignWorker(world, params) end,
+        remove_worker = function() return self:alphaRemoveWorker(world, params) end,
+
+        -- Recipe management
+        assign_recipe = function() return self:alphaAssignRecipe(world, params) end,
+
+        -- Housing management
+        assign_housing = function() return self:alphaAssignHousing(world, params) end,
+        unassign_housing = function() return self:alphaUnassignHousing(world, params) end,
+
+        -- Immigration
+        accept_immigrant = function() return self:alphaAcceptImmigrant(world, params) end,
+        reject_immigrant = function() return self:alphaRejectImmigrant(world, params) end,
+
+        -- Inventory management
+        add_resource = function() return self:alphaAddResource(world, params) end,
+        remove_resource = function() return self:alphaRemoveResource(world, params) end,
+        add_gold = function() return self:alphaAddGold(world, params) end,
+
+        -- Selection
+        select_building = function() return self:alphaSelectBuilding(world, params) end,
+        select_citizen = function() return self:alphaSelectCitizen(world, params) end,
+        clear_selection = function() return self:alphaClearSelection(world) end,
+
+        -- UI toggles
+        toggle_inventory = function() return self:alphaToggleInventory(ui) end,
+        toggle_build_menu = function() return self:alphaToggleBuildMenu(ui) end,
+        toggle_citizens = function() return self:alphaToggleCitizens(ui) end,
+        toggle_immigration = function() return self:alphaToggleImmigration(ui) end,
+        toggle_help = function() return self:alphaToggleHelp(ui) end,
+        close_all_panels = function() return self:alphaCloseAllPanels(ui) end,
+
+        -- Save/Load
+        quick_save = function() return self:alphaQuickSave(world) end,
+        quick_load = function() return self:alphaQuickLoad(alpha) end,
+
+        -- Testing/Debug actions
+        add_citizen = function() return self:alphaAddCitizen(world, params) end,
+        remove_citizen = function() return self:alphaRemoveCitizen(world, params) end,
+        advance_time = function() return self:alphaAdvanceTime(world, params) end,
+        run_free_agency = function() return self:alphaRunFreeAgency(world) end,
+
+        -- General actions that still work
+        return_to_launcher = function() return self:returnToLauncher(params) end,
+    }
+
+    local handler = handlers[action]
+    if handler then
+        local success, result = pcall(handler)
+        if success then
+            return result
+        else
+            return {success = false, error = "Alpha action error: " .. tostring(result)}
+        end
+    end
+
+    return {success = false, error = "Unknown alpha action: " .. tostring(action)}
+end
+
+-- Pre-game phase actions (splash, title, setup, loading)
+function ActionHandler:executeAlphaPhaseAction(alpha, phase, action, params)
+    if phase == "splash" then
+        if action == "skip_splash" then
+            -- Simulate key press to skip
+            if alpha.mSplash and alpha.mSplash.Skip then
+                alpha.mSplash:Skip()
+                return {success = true, action = "splash_skipped"}
+            end
+            alpha:OnSplashComplete()
+            return {success = true, action = "splash_skipped"}
+        end
+    elseif phase == "title" then
+        if action == "new_game" then
+            alpha:OnNewGame()
+            return {success = true, action = "new_game_started", phase = alpha.mPhase}
+        elseif action == "continue_game" then
+            alpha:OnContinue()
+            return {success = true, action = "continue_game"}
+        elseif action == "load_game" then
+            alpha:OnLoadGame()
+            return {success = true, action = "load_game_opened"}
+        elseif action == "quit" or action == "return_to_launcher" then
+            alpha:OnQuit()
+            return {success = true, action = "quit"}
+        end
+    elseif phase == "setup" then
+        if action == "cancel_setup" then
+            alpha:OnSetupCancel()
+            return {success = true, action = "setup_cancelled"}
+        elseif action == "start_game" then
+            -- Start with default config
+            local config = {
+                townName = params.town_name or "Cravetown",
+                difficulty = params.difficulty or "normal",
+                location = params.location or "fertile_plains"
+            }
+            alpha:OnSetupComplete(config)
+            return {success = true, action = "game_starting", config = config}
+        elseif action == "set_town_name" then
+            if alpha.mNewGameSetup then
+                alpha.mNewGameSetup.townName = params.name or "Cravetown"
+                return {success = true, town_name = alpha.mNewGameSetup.townName}
+            end
+        end
+    elseif phase == "loading" or phase == "worldloading" then
+        return {success = false, error = "Cannot perform actions while loading"}
+    end
+
+    return {success = false, error = "Unknown phase action: " .. tostring(action) .. " for phase: " .. phase}
+end
+
+-- Time controls
+function ActionHandler:alphaPause(world)
+    world:Pause()
+    self.bridge.eventLogger:log("alpha_paused", {})
+    return {success = true, paused = true}
+end
+
+function ActionHandler:alphaResume(world)
+    world:Resume()
+    self.bridge.eventLogger:log("alpha_resumed", {})
+    return {success = true, paused = false}
+end
+
+function ActionHandler:alphaTogglePause(world)
+    local isPaused = world:TogglePause()
+    return {success = true, paused = isPaused}
+end
+
+function ActionHandler:alphaSetSpeed(world, params)
+    local speed = params.speed or 1
+    -- Map speed values: 1 = normal, 2 = fast, 3 = very fast
+    local speedMap = {
+        [1] = 1,
+        [2] = 2,
+        [3] = 4,
+        [4] = 8
+    }
+    local actualSpeed = speedMap[speed] or speed
+    world:SetTimeScale(actualSpeed)
+    return {success = true, speed = actualSpeed}
+end
+
+-- Camera actions
+function ActionHandler:alphaMoveCamera(ui, params)
+    if not ui then return {success = false, error = "UI not available"} end
+
+    local x = params.x
+    local y = params.y
+
+    if not x or not y then
+        return {success = false, error = "x and y are required"}
+    end
+
+    ui.cameraX = x
+    ui.cameraY = y
+    return {success = true, x = x, y = y}
+end
+
+function ActionHandler:alphaMoveCameraBy(ui, params)
+    if not ui then return {success = false, error = "UI not available"} end
+
+    local dx = params.dx or 0
+    local dy = params.dy or 0
+
+    ui.cameraX = (ui.cameraX or 0) + dx
+    ui.cameraY = (ui.cameraY or 0) + dy
+
+    return {success = true, new_x = ui.cameraX, new_y = ui.cameraY}
+end
+
+function ActionHandler:alphaZoomCamera(ui, params)
+    if not ui then return {success = false, error = "UI not available"} end
+
+    local scale = params.scale or 1.0
+    ui.cameraZoom = math.max(0.25, math.min(4.0, scale))
+
+    return {success = true, zoom = ui.cameraZoom}
+end
+
+-- Building placement
+function ActionHandler:alphaStartBuildingPlacement(world, ui, params)
+    local buildingTypeId = params.building_type
+
+    if not buildingTypeId then
+        return {success = false, error = "building_type is required"}
+    end
+
+    -- Find building type
+    local buildingType = world.buildingTypesById[buildingTypeId]
+    if not buildingType then
+        return {success = false, error = "Unknown building type: " .. tostring(buildingTypeId)}
+    end
+
+    -- Check affordability
+    local canAfford, affordError = world:CanAffordBuilding(buildingType)
+    if not canAfford then
+        return {success = false, error = affordError}
+    end
+
+    -- Set placement mode in UI
+    if ui then
+        ui.placementMode = true
+        ui.placementBuildingType = buildingType
+        ui.placementX = ui.cameraX or 0
+        ui.placementY = ui.cameraY or 0
+        ui.placementValid = true
+    end
+
+    self.bridge.eventLogger:log("alpha_placement_started", {building_type = buildingTypeId})
+
+    return {success = true, building_type = buildingTypeId, mode = "placement"}
+end
+
+function ActionHandler:alphaPlaceBuilding(world, ui, params)
+    local x = params.x
+    local y = params.y
+
+    -- If in placement mode, use the selected building type
+    if ui and ui.placementMode and ui.placementBuildingType then
+        local buildingType = ui.placementBuildingType
+
+        -- Use provided coordinates or current placement position
+        x = x or ui.placementX
+        y = y or ui.placementY
+
+        if not x or not y then
+            return {success = false, error = "x and y are required"}
+        end
+
+        -- Validate and place
+        local building, errors = world:PlaceBuilding(buildingType, x, y)
+
+        -- Exit placement mode
+        ui.placementMode = false
+        ui.placementBuildingType = nil
+
+        if building then
+            self.bridge.eventLogger:log("alpha_building_placed", {
+                building_id = building.id,
+                building_type = buildingType.id,
+                x = x, y = y
+            })
+            return {
+                success = true,
+                building_id = building.id,
+                building_type = buildingType.id,
+                x = x, y = y,
+                efficiency = building.resourceEfficiency
+            }
+        else
+            return {success = false, error = table.concat(errors or {"Unknown placement error"}, ", ")}
+        end
+    end
+
+    -- Direct placement without UI mode
+    local buildingTypeId = params.building_type
+    if not buildingTypeId then
+        return {success = false, error = "building_type is required (not in placement mode)"}
+    end
+
+    local buildingType = world.buildingTypesById[buildingTypeId]
+    if not buildingType then
+        return {success = false, error = "Unknown building type: " .. tostring(buildingTypeId)}
+    end
+
+    if not x or not y then
+        return {success = false, error = "x and y are required"}
+    end
+
+    local building, errors = world:PlaceBuilding(buildingType, x, y)
+    if building then
+        self.bridge.eventLogger:log("alpha_building_placed", {
+            building_id = building.id,
+            building_type = buildingTypeId,
+            x = x, y = y
+        })
+        return {
+            success = true,
+            building_id = building.id,
+            building_type = buildingTypeId,
+            x = x, y = y,
+            efficiency = building.resourceEfficiency
+        }
+    else
+        return {success = false, error = table.concat(errors or {"Unknown placement error"}, ", ")}
+    end
+end
+
+function ActionHandler:alphaCancelPlacement(ui)
+    if not ui then return {success = false, error = "UI not available"} end
+
+    ui.placementMode = false
+    ui.placementBuildingType = nil
+
+    return {success = true, action = "placement_cancelled"}
+end
+
+-- Worker management
+function ActionHandler:alphaAssignWorker(world, params)
+    local citizenId = params.citizen_id
+    local buildingId = params.building_id
+
+    if not citizenId or not buildingId then
+        return {success = false, error = "citizen_id and building_id are required"}
+    end
+
+    -- Find citizen
+    local citizen = nil
+    for _, c in ipairs(world.citizens or {}) do
+        if c.id == citizenId then
+            citizen = c
+            break
+        end
+    end
+
+    if not citizen then
+        return {success = false, error = "Citizen not found: " .. tostring(citizenId)}
+    end
+
+    -- Find building
+    local building = nil
+    for _, b in ipairs(world.buildings or {}) do
+        if b.id == buildingId then
+            building = b
+            break
+        end
+    end
+
+    if not building then
+        return {success = false, error = "Building not found: " .. tostring(buildingId)}
+    end
+
+    -- Assign worker
+    local success = world:AssignWorkerToBuilding(citizen, building)
+    if success then
+        self.bridge.eventLogger:log("alpha_worker_assigned", {
+            citizen_id = citizenId,
+            building_id = buildingId
+        })
+        return {success = true, citizen_id = citizenId, building_id = buildingId}
+    else
+        return {success = false, error = "Failed to assign worker (building may be full)"}
+    end
+end
+
+function ActionHandler:alphaRemoveWorker(world, params)
+    local citizenId = params.citizen_id
+
+    if not citizenId then
+        return {success = false, error = "citizen_id is required"}
+    end
+
+    -- Find citizen
+    for _, citizen in ipairs(world.citizens or {}) do
+        if citizen.id == citizenId then
+            if citizen.workplace then
+                local oldWorkplace = citizen.workplace
+                -- Remove from workers list
+                for i, w in ipairs(oldWorkplace.workers or {}) do
+                    if w.id == citizenId then
+                        table.remove(oldWorkplace.workers, i)
+                        break
+                    end
+                end
+                citizen.workplace = nil
+                citizen.workStation = nil
+
+                self.bridge.eventLogger:log("alpha_worker_removed", {
+                    citizen_id = citizenId,
+                    building_id = oldWorkplace.id
+                })
+                return {success = true, citizen_id = citizenId, old_workplace = oldWorkplace.id}
+            else
+                return {success = false, error = "Citizen is not employed"}
+            end
+        end
+    end
+
+    return {success = false, error = "Citizen not found: " .. tostring(citizenId)}
+end
+
+-- Recipe management
+function ActionHandler:alphaAssignRecipe(world, params)
+    local buildingId = params.building_id
+    local stationIndex = params.station_index or 1
+    local recipeId = params.recipe_id
+
+    if not buildingId or not recipeId then
+        return {success = false, error = "building_id and recipe_id are required"}
+    end
+
+    -- Find building
+    local building = nil
+    for _, b in ipairs(world.buildings or {}) do
+        if b.id == buildingId then
+            building = b
+            break
+        end
+    end
+
+    if not building then
+        return {success = false, error = "Building not found: " .. tostring(buildingId)}
+    end
+
+    -- Assign recipe
+    local success = world:AssignRecipeToStation(building, stationIndex, recipeId)
+    if success then
+        self.bridge.eventLogger:log("alpha_recipe_assigned", {
+            building_id = buildingId,
+            station_index = stationIndex,
+            recipe_id = recipeId
+        })
+        return {success = true, building_id = buildingId, station_index = stationIndex, recipe_id = recipeId}
+    else
+        return {success = false, error = "Failed to assign recipe"}
+    end
+end
+
+-- Housing management
+function ActionHandler:alphaAssignHousing(world, params)
+    local citizenId = params.citizen_id
+    local buildingId = params.building_id
+
+    if not citizenId or not buildingId then
+        return {success = false, error = "citizen_id and building_id are required"}
+    end
+
+    if not world.housingSystem then
+        return {success = false, error = "Housing system not available"}
+    end
+
+    local success = world.housingSystem:AssignHousing(citizenId, buildingId)
+    if success then
+        self.bridge.eventLogger:log("alpha_housing_assigned", {
+            citizen_id = citizenId,
+            building_id = buildingId
+        })
+        return {success = true, citizen_id = citizenId, building_id = buildingId}
+    else
+        return {success = false, error = "Failed to assign housing (building may be full or incompatible)"}
+    end
+end
+
+function ActionHandler:alphaUnassignHousing(world, params)
+    local citizenId = params.citizen_id
+
+    if not citizenId then
+        return {success = false, error = "citizen_id is required"}
+    end
+
+    if not world.housingSystem then
+        return {success = false, error = "Housing system not available"}
+    end
+
+    local success = world.housingSystem:UnassignHousing(citizenId)
+    if success then
+        self.bridge.eventLogger:log("alpha_housing_unassigned", {citizen_id = citizenId})
+        return {success = true, citizen_id = citizenId}
+    else
+        return {success = false, error = "Failed to unassign housing"}
+    end
+end
+
+-- Immigration
+function ActionHandler:alphaAcceptImmigrant(world, params)
+    local index = params.index or 1
+
+    if not world.immigrationSystem then
+        return {success = false, error = "Immigration system not available"}
+    end
+
+    local queue = world.immigrationSystem.queue or {}
+    if #queue == 0 then
+        return {success = false, error = "No immigrants in queue"}
+    end
+
+    if index < 1 or index > #queue then
+        return {success = false, error = "Invalid index: " .. tostring(index)}
+    end
+
+    local applicant = queue[index]
+    table.remove(queue, index)
+
+    -- Create citizen from applicant
+    local citizen = world:AddCitizen(applicant.class, applicant.name, applicant.traits, {
+        vocation = applicant.vocation,
+        startingWealth = applicant.startingWealth or 0
+    })
+
+    if citizen then
+        world.stats.totalImmigrations = (world.stats.totalImmigrations or 0) + 1
+        self.bridge.eventLogger:log("alpha_immigrant_accepted", {
+            citizen_id = citizen.id,
+            name = citizen.name
+        })
+        return {success = true, citizen_id = citizen.id, name = citizen.name}
+    else
+        return {success = false, error = "Failed to create citizen"}
+    end
+end
+
+function ActionHandler:alphaRejectImmigrant(world, params)
+    local index = params.index or 1
+
+    if not world.immigrationSystem then
+        return {success = false, error = "Immigration system not available"}
+    end
+
+    local queue = world.immigrationSystem.queue or {}
+    if #queue == 0 then
+        return {success = false, error = "No immigrants in queue"}
+    end
+
+    if index < 1 or index > #queue then
+        return {success = false, error = "Invalid index: " .. tostring(index)}
+    end
+
+    local applicant = queue[index]
+    table.remove(queue, index)
+
+    self.bridge.eventLogger:log("alpha_immigrant_rejected", {name = applicant.name})
+    return {success = true, name = applicant.name, action = "rejected"}
+end
+
+-- Inventory management
+function ActionHandler:alphaAddResource(world, params)
+    local commodityId = params.commodity_id or params.commodity
+    local amount = params.amount or 1
+
+    if not commodityId then
+        return {success = false, error = "commodity_id is required"}
+    end
+
+    world:AddToInventory(commodityId, amount)
+
+    self.bridge.eventLogger:log("alpha_resource_added", {
+        commodity = commodityId,
+        amount = amount
+    })
+
+    return {success = true, commodity = commodityId, amount = amount, new_total = world.inventory[commodityId]}
+end
+
+function ActionHandler:alphaRemoveResource(world, params)
+    local commodityId = params.commodity_id or params.commodity
+    local amount = params.amount or 1
+
+    if not commodityId then
+        return {success = false, error = "commodity_id is required"}
+    end
+
+    local removed = world:RemoveFromInventory(commodityId, amount)
+
+    return {success = true, commodity = commodityId, amount_removed = removed, remaining = world.inventory[commodityId] or 0}
+end
+
+function ActionHandler:alphaAddGold(world, params)
+    local amount = params.amount or 100
+
+    world.gold = (world.gold or 0) + amount
+
+    self.bridge.eventLogger:log("alpha_gold_added", {amount = amount})
+
+    return {success = true, amount = amount, new_total = world.gold}
+end
+
+-- Selection
+function ActionHandler:alphaSelectBuilding(world, params)
+    local buildingId = params.building_id
+
+    if not buildingId then
+        return {success = false, error = "building_id is required"}
+    end
+
+    for _, building in ipairs(world.buildings or {}) do
+        if building.id == buildingId then
+            world:SelectEntity(building, "building")
+            return {success = true, selected = buildingId, type = "building"}
+        end
+    end
+
+    return {success = false, error = "Building not found: " .. tostring(buildingId)}
+end
+
+function ActionHandler:alphaSelectCitizen(world, params)
+    local citizenId = params.citizen_id
+
+    if not citizenId then
+        return {success = false, error = "citizen_id is required"}
+    end
+
+    for _, citizen in ipairs(world.citizens or {}) do
+        if citizen.id == citizenId then
+            world:SelectEntity(citizen, "citizen")
+            return {success = true, selected = citizenId, type = "citizen"}
+        end
+    end
+
+    return {success = false, error = "Citizen not found: " .. tostring(citizenId)}
+end
+
+function ActionHandler:alphaClearSelection(world)
+    world:ClearSelection()
+    return {success = true, action = "selection_cleared"}
+end
+
+-- UI toggles
+function ActionHandler:alphaToggleInventory(ui)
+    if not ui then return {success = false, error = "UI not available"} end
+    ui.showInventoryPanel = not ui.showInventoryPanel
+    return {success = true, show_inventory = ui.showInventoryPanel}
+end
+
+function ActionHandler:alphaToggleBuildMenu(ui)
+    if not ui then return {success = false, error = "UI not available"} end
+    ui.showBuildMenuModal = not ui.showBuildMenuModal
+    return {success = true, show_build_menu = ui.showBuildMenuModal}
+end
+
+function ActionHandler:alphaToggleCitizens(ui)
+    if not ui then return {success = false, error = "UI not available"} end
+    ui.showCitizensPanel = not ui.showCitizensPanel
+    return {success = true, show_citizens = ui.showCitizensPanel}
+end
+
+function ActionHandler:alphaToggleImmigration(ui)
+    if not ui then return {success = false, error = "UI not available"} end
+    ui.showImmigrationModal = not ui.showImmigrationModal
+    return {success = true, show_immigration = ui.showImmigrationModal}
+end
+
+function ActionHandler:alphaToggleHelp(ui)
+    if not ui then return {success = false, error = "UI not available"} end
+    ui.showHelpOverlay = not ui.showHelpOverlay
+    return {success = true, show_help = ui.showHelpOverlay}
+end
+
+function ActionHandler:alphaCloseAllPanels(ui)
+    if not ui then return {success = false, error = "UI not available"} end
+
+    ui.showInventoryPanel = false
+    ui.showBuildMenuModal = false
+    ui.showCitizensPanel = false
+    ui.showImmigrationModal = false
+    ui.showHelpOverlay = false
+    ui.showAnalyticsPanel = false
+    ui.showSettingsPanel = false
+    ui.placementMode = false
+
+    return {success = true, action = "all_panels_closed"}
+end
+
+-- Save/Load
+function ActionHandler:alphaQuickSave(world)
+    local saveData = world:Serialize()
+    local content = require("code.json").encode(saveData)
+    local success, err = love.filesystem.write("quicksave.json", content)
+
+    if success then
+        self.bridge.eventLogger:log("alpha_quick_saved", {})
+        return {success = true, action = "quick_saved"}
+    else
+        return {success = false, error = "Failed to save: " .. tostring(err)}
+    end
+end
+
+function ActionHandler:alphaQuickLoad(alpha)
+    local content = love.filesystem.read("quicksave.json")
+    if not content then
+        return {success = false, error = "No quicksave file found"}
+    end
+
+    local ok, saveData = pcall(function()
+        return require("code.json").decode(content)
+    end)
+
+    if ok and saveData then
+        alpha:StartGameFromSave(saveData)
+        self.bridge.eventLogger:log("alpha_quick_loaded", {})
+        return {success = true, action = "quick_loaded"}
+    else
+        return {success = false, error = "Failed to parse save file"}
+    end
+end
+
+-- Testing/Debug actions
+function ActionHandler:alphaAddCitizen(world, params)
+    local class = params.class or "middle"
+    local name = params.name
+    local traits = params.traits
+    local vocation = params.vocation
+
+    local citizen = world:AddCitizen(class, name, traits, {
+        vocation = vocation,
+        startingWealth = params.starting_wealth or 0
+    })
+
+    if citizen then
+        self.bridge.eventLogger:log("alpha_citizen_added", {
+            citizen_id = citizen.id,
+            name = citizen.name,
+            class = citizen.class
+        })
+        return {
+            success = true,
+            citizen_id = citizen.id,
+            name = citizen.name,
+            class = citizen.class
+        }
+    else
+        return {success = false, error = "Failed to add citizen"}
+    end
+end
+
+function ActionHandler:alphaRemoveCitizen(world, params)
+    local citizenId = params.citizen_id
+    local reason = params.reason or "removed"
+
+    if not citizenId then
+        return {success = false, error = "citizen_id is required"}
+    end
+
+    for _, citizen in ipairs(world.citizens or {}) do
+        if citizen.id == citizenId then
+            local success = world:RemoveCitizen(citizen, reason)
+            if success then
+                self.bridge.eventLogger:log("alpha_citizen_removed", {citizen_id = citizenId})
+                return {success = true, citizen_id = citizenId}
+            end
+        end
+    end
+
+    return {success = false, error = "Citizen not found: " .. tostring(citizenId)}
+end
+
+function ActionHandler:alphaAdvanceTime(world, params)
+    local ticks = params.ticks or 60  -- Default to 1 second at 60fps
+    local dt = 1/60
+
+    for i = 1, ticks do
+        world:Update(dt)
+    end
+
+    self.bridge.frameCount = self.bridge.frameCount + ticks
+
+    return {
+        success = true,
+        ticks_advanced = ticks,
+        day = world.timeManager:GetDay(),
+        hour = world.timeManager:GetHour(),
+        slot = world.timeManager:GetCurrentSlotId()
+    }
+end
+
+function ActionHandler:alphaRunFreeAgency(world)
+    world:RunFreeAgency()
+    return {success = true, action = "free_agency_completed"}
 end
 
 return ActionHandler

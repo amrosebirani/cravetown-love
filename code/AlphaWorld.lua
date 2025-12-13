@@ -16,6 +16,7 @@ local River = require("code.River")
 local Forest = require("code.Forest")
 local Mountain = require("code.Mountain")
 local ProductionStats = require("code.ProductionStats")
+local WorldZones = require("code.WorldZones")
 
 -- Ownership & Housing Systems
 local LandSystem = require("code.LandSystem")
@@ -26,16 +27,25 @@ local HousingSystem = require("code.HousingSystem")
 AlphaWorld = {}
 AlphaWorld.__index = AlphaWorld
 
-function AlphaWorld:Create(terrainConfig)
+function AlphaWorld:Create(terrainConfig, progressCallback)
     local world = setmetatable({}, AlphaWorld)
+
+    -- Progress reporting helper
+    local function reportProgress(progress, message)
+        if progressCallback then
+            progressCallback(progress, message)
+        end
+    end
 
     -- Store terrain config for later use
     world.terrainConfig = terrainConfig
 
     -- Load all game data
+    reportProgress(0.0, "Loading game data...")
     world:LoadData()
 
     -- Initialize consumption subsystems
+    reportProgress(0.1, "Initializing character system...")
     CharacterV3.Init(
         world.consumptionMechanics,
         world.fulfillmentVectors,
@@ -46,7 +56,9 @@ function AlphaWorld:Create(terrainConfig)
         world.enablementRules,
         world.classThresholds  -- Phase 3: for emergent class calculation
     )
+    reportProgress(0.15, "Initializing commodity cache...")
     CommodityCache.Init(world.fulfillmentVectors, world.dimensionDefinitions, world.substitutionRules, CharacterV3)
+    reportProgress(0.2, "Initializing allocation engine...")
     AllocationEngineV2.Init(world.consumptionMechanics, world.fulfillmentVectors, world.substitutionRules, CharacterV3, CommodityCache)
     -- Alpha: No consequences system (no emigration/riots/protests)
 
@@ -135,27 +147,50 @@ function AlphaWorld:Create(terrainConfig)
         seed = os.time()
     })
 
-    -- Create river based on terrain config
+    local tc = terrainConfig or {}  -- terrain config shorthand
     local halfW = world.worldWidth / 2
     local halfH = world.worldHeight / 2
-    local tc = terrainConfig or {}  -- terrain config shorthand
 
-    -- Determine if river should be created
-    local riverEnabled = tc.riverEnabled
-    if riverEnabled == nil then riverEnabled = true end  -- Default: enable river
+    -- ==========================================================================
+    -- ZONE-BASED WORLD GENERATION
+    -- First create WorldZones to define where each terrain type should go
+    -- ==========================================================================
+    reportProgress(0.3, "Planning world zones...")
 
-    if riverEnabled then
-        -- Determine river position
-        local riverCenterX
-        local riverPosition = tc.riverPosition or "center"
-        if riverPosition == "east" then
-            riverCenterX = halfW * 0.7
-        elseif riverPosition == "west" then
-            riverCenterX = -halfW * 0.3
-        else  -- "center" or default
-            riverCenterX = halfW * 0.5
-        end
+    -- Build location config for WorldZones
+    local locationConfig = {
+        riverPosition = tc.riverPosition or "east",
+        riverWidth = tc.riverWidth or 200,
+        mountainPosition = tc.mountainPosition or "none",
+        mountainDepth = tc.mountainDepth or 300,
+        forestCoverage = tc.forestDensity or 0.25
+    }
 
+    -- Disable river in zones if not enabled
+    if tc.riverEnabled == false then
+        locationConfig.riverPosition = "none"
+    end
+
+    -- Disable mountains in zones if not enabled
+    if not tc.mountainsEnabled then
+        locationConfig.mountainPosition = "none"
+    elseif tc.mountainPositions and #tc.mountainPositions > 0 then
+        -- Use first mountain position from config
+        locationConfig.mountainPosition = tc.mountainPositions[1] or "north"
+    end
+
+    -- Create world zones
+    world.worldZones = WorldZones:Create(world.worldWidth, world.worldHeight, locationConfig)
+
+    -- ==========================================================================
+    -- Create river based on zone definition
+    -- ==========================================================================
+    reportProgress(0.4, "Generating river...")
+
+    local riverZone = world.worldZones:GetRiverZone()
+    if riverZone then
+        -- Calculate river center from zone
+        local riverCenterX = (riverZone.x + riverZone.width / 2) - halfW
         local riverWidth = tc.riverWidth or 80
 
         world.river = River:Create({
@@ -170,31 +205,54 @@ function AlphaWorld:Create(terrainConfig)
         world.river = nil
     end
 
-    -- Create forest (avoids river) - density based on terrain config
-    local forestDensity = tc.forestDensity or 0.2  -- Default 20% density
-    local numRegions = math.floor(forestDensity * 40)  -- Scale regions by density
-    if numRegions < 4 then numRegions = 4 end
+    -- ==========================================================================
+    -- Create forest within designated forest zones
+    -- ==========================================================================
+    reportProgress(0.5, "Growing forests...")
 
+    local forestZones = world.worldZones:GetForestZones()
     world.forest = Forest:Create({
         minX = 0,
         minY = 0,
         maxX = world.worldWidth,
         maxY = world.worldHeight,
         river = world.river,
-        numRegions = numRegions
+        zones = forestZones  -- Pass zone boundaries instead of numRegions
     })
 
-    -- Create mountains if enabled in terrain config
+    -- ==========================================================================
+    -- Create mountains within designated mountain zones
+    -- ==========================================================================
+    reportProgress(0.6, "Raising mountains...")
+
     world.mountains = nil
-    if tc.mountainsEnabled and tc.mountainPositions and #tc.mountainPositions > 0 then
-        world.mountains = Mountain.CreateTerrain({
-            minX = 0,
-            minY = 0,
-            maxX = world.worldWidth,
-            maxY = world.worldHeight,
-            positions = tc.mountainPositions
-        })
-        print("[AlphaWorld] Created mountains: " .. world.mountains:GetRangeCount() .. " ranges")
+    local mountainZones = world.worldZones:GetMountainZones()
+    if mountainZones and #mountainZones > 0 then
+        -- Convert zone positions to mountain positions for backward compatibility
+        local mountainPositions = {}
+        for _, mz in ipairs(mountainZones) do
+            -- Determine position based on zone location
+            if mz.y < halfH / 2 then
+                table.insert(mountainPositions, "north")
+            elseif mz.y > halfH * 1.5 then
+                table.insert(mountainPositions, "south")
+            elseif mz.x < halfW / 2 then
+                table.insert(mountainPositions, "west")
+            else
+                table.insert(mountainPositions, "east")
+            end
+        end
+
+        if #mountainPositions > 0 then
+            world.mountains = Mountain.CreateTerrain({
+                minX = 0,
+                minY = 0,
+                maxX = world.worldWidth,
+                maxY = world.worldHeight,
+                positions = mountainPositions
+            })
+            print("[AlphaWorld] Created mountains: " .. world.mountains:GetRangeCount() .. " ranges")
+        end
     end
 
     -- Store ground and water colors from terrain config
@@ -202,15 +260,18 @@ function AlphaWorld:Create(terrainConfig)
     world.waterColor = tc.waterColor or {0.2, 0.4, 0.7}
 
     -- Now set the river reference and generate resources
+    reportProgress(0.7, "Generating natural resources...")
     world.naturalResources.mRiver = world.river
     world.naturalResources:generateAll()
 
     -- Post-process resources to mask out water and forest areas
+    reportProgress(0.75, "Processing terrain...")
     world:MaskResourcesInBlockedAreas()
 
     -- ==========================================================================
     -- OWNERSHIP & HOUSING SYSTEMS
     -- ==========================================================================
+    reportProgress(0.8, "Setting up land system...")
 
     -- Land System - manages plot grid and ownership
     world.landSystem = LandSystem:Create({
@@ -219,17 +280,22 @@ function AlphaWorld:Create(terrainConfig)
     })
 
     -- Mark blocked terrain in land system (water, mountains)
+    reportProgress(0.85, "Marking terrain plots...")
     world:InitializeLandTerrain()
 
     -- Ownership Manager - tracks building/land ownership
+    reportProgress(0.9, "Initializing ownership system...")
     world.ownershipManager = OwnershipManager:Create(world.landSystem, nil)
 
     -- Economics System - per-character finances and emergent class
+    reportProgress(0.93, "Setting up economics...")
     world.economicsSystem = EconomicsSystem:Create(world.ownershipManager)
 
     -- Housing System - housing assignment and satisfaction
+    reportProgress(0.97, "Configuring housing system...")
     world.housingSystem = HousingSystem:Create(nil, world.economicsSystem, nil)
 
+    reportProgress(1.0, "World ready!")
     return world
 end
 
@@ -789,12 +855,14 @@ function AlphaWorld:AddCitizen(class, name, traits, options)
         end
     end
 
-    -- Position for visual display (random within town bounds, avoiding water and trees)
-    -- Prefer left side of map where river isn't (river is on right side)
+    -- Position for visual display (random within building area, avoiding water and trees)
     local maxAttempts = 100
     local attempt = 0
     local x, y
     local validPosition = false
+
+    -- Get building area from WorldZones if available
+    local buildingArea = self.worldZones and self.worldZones:GetBuildingArea()
 
     -- Helper to check if position is valid
     local function isValidPos(px, py)
@@ -804,22 +872,32 @@ function AlphaWorld:AddCitizen(class, name, traits, options)
     end
 
     while attempt < maxAttempts and not validPosition do
-        -- First try the left half of the map (away from river)
-        if attempt < 50 then
-            x = math.random(50, math.min(450, self.worldWidth / 2))
+        if buildingArea then
+            -- Spawn within the designated building area
+            x = buildingArea.x + math.random(20, buildingArea.width - 40)
+            y = buildingArea.y + math.random(20, buildingArea.height - 40)
         else
-            -- Then try anywhere
-            x = math.random(50, self.worldWidth - 50)
+            -- Fallback: left side of map (original behavior)
+            if attempt < 50 then
+                x = math.random(50, math.min(450, self.worldWidth / 2))
+            else
+                x = math.random(50, self.worldWidth - 50)
+            end
+            y = math.random(50, self.worldHeight - 50)
         end
-        y = math.random(50, self.worldHeight - 50)
         validPosition = isValidPos(x, y)
         attempt = attempt + 1
     end
 
-    -- Fallback: if still invalid, force to left side (less likely to have trees)
+    -- Fallback: if still invalid, use building area center or left side
     if not validPosition then
-        x = math.random(50, 200)
-        y = math.random(50, self.worldHeight - 50)
+        if buildingArea then
+            x = buildingArea.x + buildingArea.width / 2
+            y = buildingArea.y + buildingArea.height / 2
+        else
+            x = math.random(50, 200)
+            y = math.random(50, self.worldHeight - 50)
+        end
     end
 
     citizen.x = x
@@ -1356,12 +1434,17 @@ function AlphaWorld:ValidateBuildingPlacement(buildingType, x, y, width, height)
         table.insert(errors, "Out of bounds")
     end
 
+    -- Check if within designated building area (zone-based validation)
+    if self.worldZones and not self.worldZones:IsInBuildingArea(x, y, width, height) then
+        table.insert(errors, "Outside building area")
+    end
+
     -- Check collision with river/water
     if self:IsBuildingInWater(x, y, width, height) then
         table.insert(errors, "Cannot build on water")
     end
 
-    -- Check collision with forest/trees
+    -- Check collision with forest/trees (backup check in case trees exist outside zones)
     if self.forest and self.forest:CheckRectCollision(x, y, width, height) then
         table.insert(errors, "Cannot build on trees")
     end
@@ -1461,10 +1544,14 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
                 station.state = "NO_WORKER"
             else
                 -- Check if we have materials
+                -- Recipe inputs can be dictionary format {commodityId: quantity} or array format [{commodityId, quantity}]
                 local hasMaterials = true
-                for _, input in ipairs(station.recipe.inputs or {}) do
-                    local available = self:GetInventoryCount(input.commodityId)
-                    if available < input.quantity then
+                for commodityId, quantity in pairs(station.recipe.inputs or {}) do
+                    -- Handle both dictionary format and array format
+                    local inputId = type(commodityId) == "string" and commodityId or (quantity.commodityId or commodityId)
+                    local inputQty = type(quantity) == "number" and quantity or (quantity.quantity or 1)
+                    local available = self:GetInventoryCount(inputId)
+                    if available < inputQty then
                         hasMaterials = false
                         break
                     end
@@ -1487,20 +1574,24 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
                         station.progress = 0
 
                         -- Consume inputs and record stats
-                        for _, input in ipairs(station.recipe.inputs or {}) do
-                            self:RemoveFromInventory(input.commodityId, input.quantity)
+                        for commodityId, quantity in pairs(station.recipe.inputs or {}) do
+                            local inputId = type(commodityId) == "string" and commodityId or (quantity.commodityId or commodityId)
+                            local inputQty = type(quantity) == "number" and quantity or (quantity.quantity or 1)
+                            self:RemoveFromInventory(inputId, inputQty)
                             -- Record consumption in production stats
                             if self.productionStats then
-                                self.productionStats:recordConsumption(input.commodityId, input.quantity)
+                                self.productionStats:recordConsumption(inputId, inputQty)
                             end
                         end
 
                         -- Produce outputs and record stats
-                        for _, output in ipairs(station.recipe.outputs or {}) do
-                            self:AddToInventory(output.commodityId, output.quantity)
+                        for commodityId, quantity in pairs(station.recipe.outputs or {}) do
+                            local outputId = type(commodityId) == "string" and commodityId or (quantity.commodityId or commodityId)
+                            local outputQty = type(quantity) == "number" and quantity or (quantity.quantity or 1)
+                            self:AddToInventory(outputId, outputQty)
                             -- Record production in production stats
                             if self.productionStats then
-                                self.productionStats:recordProduction(output.commodityId, output.quantity, building.id)
+                                self.productionStats:recordProduction(outputId, outputQty, building.id)
                             end
                         end
 
@@ -1529,7 +1620,11 @@ end
 
 function AlphaWorld:ProcessSlotConsumption()
     -- Run allocation engine at end of each slot
-    local currentCycle = self.timeManager:GetCurrentSlot()
+    -- Calculate cycle number: (day - 1) * slotsPerDay + currentSlotIndex
+    local day = self.timeManager:GetDay() or 1
+    local slotIndex = self.timeManager.currentSlotIndex or 1
+    local slotsPerDay = #(self.timeManager.timeSlots or {}) or 6
+    local currentCycle = (day - 1) * slotsPerDay + slotIndex
     local allocations = AllocationEngineV2.AllocateCycle(self.citizens, self.inventory, currentCycle, "need_based", {
         fairnessEnabled = true
     })
@@ -1646,6 +1741,12 @@ end
 
 function AlphaWorld:UpdateCitizenPositions(dt)
     for _, citizen in ipairs(self.citizens) do
+        -- Initialize target position if not set
+        if not citizen.targetX or not citizen.targetY then
+            citizen.targetX = citizen.x or 100
+            citizen.targetY = citizen.y or 100
+        end
+
         -- Simple wandering behavior
         if math.random() < 0.01 then
             -- Find a valid target that doesn't collide with river
@@ -1699,6 +1800,9 @@ function AlphaWorld:UpdateCitizenPositions(dt)
 end
 
 function AlphaWorld:UpdateStats()
+    -- Update population count
+    self.stats.totalPopulation = #self.citizens
+
     local totalSat = 0
     local classSat = {}
     local classCount = {}
@@ -1709,8 +1813,14 @@ function AlphaWorld:UpdateStats()
         local sat = citizen:GetAverageSatisfaction() or 50
         totalSat = totalSat + sat
 
-        -- Track by class
-        local class = citizen.class or "Middle"
+        -- Track by class (normalize to match characterClasses IDs: elite, upper, middle, lower)
+        local rawClass = (citizen.emergentClass or citizen.class or "middle"):lower()
+        -- Map legacy class names to current system (Working/Poor -> lower)
+        local classMap = {
+            working = "lower",
+            poor = "lower",
+        }
+        local class = classMap[rawClass] or rawClass
         classSat[class] = (classSat[class] or 0) + sat
         classCount[class] = (classCount[class] or 0) + 1
 

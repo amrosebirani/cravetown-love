@@ -118,14 +118,25 @@ end
 
 function HousingAssignmentModal:RefreshData()
     local housingSystem = self.world.housingSystem
-    local characters = self.world.characters or {}
+    local worldCitizens = self.world.citizens or {}
 
     -- Gather citizens
     self.citizens = {}
-    for charId, char in pairs(characters) do
-        local class = (char.emergentClass or char.class or "middle"):lower()
-        local hasHousing = char.housingId ~= nil
-        local wantsRelocation = char.wantsRelocation or false
+    for _, citizen in ipairs(worldCitizens) do
+        local charId = citizen.id
+        local class = (citizen.emergentClass or citizen.class or "middle"):lower()
+
+        -- Check housing assignments - first check housingSystem, then citizen.housingId as fallback
+        local housingId = nil
+        if housingSystem and housingSystem.housingAssignments then
+            housingId = housingSystem.housingAssignments[charId]
+        end
+        if not housingId then
+            housingId = citizen.housingId
+        end
+
+        local hasHousing = housingId ~= nil
+        local wantsRelocation = citizen.wantsRelocation or false
 
         local status = "housed"
         if not hasHousing then
@@ -136,13 +147,13 @@ function HousingAssignmentModal:RefreshData()
 
         table.insert(self.citizens, {
             id = charId,
-            name = char.name or ("Citizen #" .. charId),
+            name = citizen.name or ("Citizen #" .. charId),
             class = class,
-            vocation = char.vocation or char.workerType or "Worker",
+            vocation = citizen.vocation or citizen.workerType or "Worker",
             status = status,
-            currentHousing = hasHousing and char.housingId or nil,
-            housingQualityPref = char.housingQualityPref or 0.5,
-            canAffordRent = char.canAffordRent ~= false
+            currentHousing = housingId,
+            housingQualityPref = citizen.housingQualityPref or 0.5,
+            canAffordRent = citizen.canAffordRent ~= false
         })
     end
 
@@ -155,30 +166,50 @@ function HousingAssignmentModal:RefreshData()
         return a.name < b.name
     end)
 
-    -- Gather housing buildings
+    -- Gather housing buildings from buildingOccupancy
     self.buildings = {}
     if housingSystem then
-        for buildingId, building in pairs(housingSystem.housingBuildings or {}) do
-            local capacity = building.capacity or 4
-            local occupancy = building.currentOccupancy or 0
+        for buildingId, buildingData in pairs(housingSystem.buildingOccupancy or {}) do
+            local capacity = buildingData.capacity or 4
+            local occupants = buildingData.occupants or {}
+            local occupancy = #occupants
             local available = capacity - occupancy
 
-            if available > 0 then
-                table.insert(self.buildings, {
-                    id = buildingId,
-                    typeId = building.typeId or "lodge",
-                    name = building.name or (building.typeId or "Lodge") .. " #" .. buildingId,
-                    owner = building.ownerId == "town" and "Town" or ("Citizen #" .. (building.ownerId or "?")),
-                    capacity = capacity,
-                    occupancy = occupancy,
-                    available = available,
-                    quality = building.quality or 0.5,
-                    qualityTier = self:GetQualityTier(building.quality or 0.5),
-                    rentRate = building.rentRate or 10,
-                    targetClasses = building.targetClasses or {"lower", "middle"},
-                    stars = self:GetStars(building.quality or 0.5)
-                })
+            -- Get building name from world.buildings if available
+            local buildingName = nil
+            local buildingTypeId = buildingData.typeId or "lodge"
+            if self.world.buildings then
+                local building = self.world.buildings[buildingId]
+                if building then
+                    buildingName = building.name
+                    buildingTypeId = building.typeId or buildingTypeId
+                end
             end
+            buildingName = buildingName or (buildingTypeId:sub(1,1):upper() .. buildingTypeId:sub(2) .. " #" .. buildingId)
+
+            -- Get housing config
+            local housingConfig = buildingData.housingConfig or {}
+            local quality = housingConfig.quality or 0.5
+            local rentRate = housingConfig.rentRate or 10
+            local targetClasses = housingConfig.targetClasses or {"lower", "middle"}
+            local ownerId = buildingData.ownerId or "town"
+
+            -- Include all buildings, but only allow selection of ones with space
+            table.insert(self.buildings, {
+                id = buildingId,
+                typeId = buildingTypeId,
+                name = buildingName,
+                owner = ownerId == "town" and "Town" or ("Citizen #" .. ownerId),
+                capacity = capacity,
+                occupancy = occupancy,
+                available = available,
+                quality = quality,
+                qualityTier = self:GetQualityTier(quality),
+                rentRate = rentRate,
+                targetClasses = targetClasses,
+                stars = self:GetStars(quality),
+                isFull = available <= 0
+            })
         end
     end
 
@@ -270,6 +301,31 @@ function HousingAssignmentModal:CheckFit(citizen, building)
     else
         return "poor", "Poor fit"
     end
+end
+
+function HousingAssignmentModal:Show(building)
+    -- Refresh data when modal is shown
+    self:RefreshData()
+
+    -- Reset selection state
+    self.selectedCitizens = {}
+    self.citizenScroll = 0
+    self.buildingScroll = 0
+
+    -- If a specific building was passed, select it
+    if building then
+        self.selectedBuilding = building.id or building
+    else
+        self.selectedBuilding = nil
+    end
+end
+
+function HousingAssignmentModal:Hide()
+    -- Reset state when hidden
+    self.selectedCitizens = {}
+    self.selectedBuilding = nil
+    self.hoverCitizen = nil
+    self.hoverBuilding = nil
 end
 
 function HousingAssignmentModal:Update(dt)
@@ -476,10 +532,16 @@ function HousingAssignmentModal:RenderCitizensPanel(x, y, w, h)
 end
 
 function HousingAssignmentModal:RenderBuildingsPanel(x, y, w, h)
+    -- Count available buildings (with space)
+    local availableCount = 0
+    for _, b in ipairs(self.buildings) do
+        if not b.isFull then availableCount = availableCount + 1 end
+    end
+
     -- Panel header
     love.graphics.setFont(self.fonts.normal)
     love.graphics.setColor(self.colors.text)
-    love.graphics.print("HOUSING BUILDINGS (" .. #self.buildings .. " available)", x, y)
+    love.graphics.print("HOUSING BUILDINGS (" .. availableCount .. "/" .. #self.buildings .. " with space)", x, y)
 
     -- List area
     local listY = y + 22
@@ -498,9 +560,12 @@ function HousingAssignmentModal:RenderBuildingsPanel(x, y, w, h)
 
         local isSelected = self.selectedBuilding == building.id
         local isHovered = self.hoverBuilding == building.id
+        local isFull = building.isFull
 
-        -- Card background
-        if isSelected then
+        -- Card background - grey out full buildings
+        if isFull then
+            love.graphics.setColor(0.15, 0.15, 0.17, 0.7)
+        elseif isSelected then
             love.graphics.setColor(self.colors.cardSelected)
         elseif isHovered then
             love.graphics.setColor(self.colors.cardHover)
@@ -510,26 +575,40 @@ function HousingAssignmentModal:RenderBuildingsPanel(x, y, w, h)
         love.graphics.rectangle("fill", x, cardY, w, cardH, 4, 4)
 
         -- Selection indicator
-        if isSelected then
+        if isSelected and not isFull then
             love.graphics.setColor(self.colors.success)
             love.graphics.setLineWidth(2)
             love.graphics.rectangle("line", x, cardY, w, cardH, 4, 4)
             love.graphics.setLineWidth(1)
         end
 
-        -- Stars and name
+        -- Full indicator border for full buildings
+        if isFull then
+            love.graphics.setColor(0.4, 0.4, 0.4)
+            love.graphics.setLineWidth(1)
+            love.graphics.rectangle("line", x, cardY, w, cardH, 4, 4)
+        end
+
+        -- Stars and name - dimmed for full buildings
         love.graphics.setFont(self.fonts.small)
-        love.graphics.setColor(self.colors.star)
+        love.graphics.setColor(isFull and {0.5, 0.45, 0.2} or self.colors.star)
         local starStr = string.rep("★", building.stars)
         love.graphics.print(starStr, x + 8, cardY + 6)
 
         love.graphics.setFont(self.fonts.normal)
-        love.graphics.setColor(self.colors.text)
+        love.graphics.setColor(isFull and self.colors.textMuted or self.colors.text)
         love.graphics.print(building.name, x + 8 + building.stars * 12, cardY + 5)
+
+        -- "FULL" badge for full buildings
+        if isFull then
+            love.graphics.setFont(self.fonts.tiny)
+            love.graphics.setColor(0.7, 0.3, 0.3)
+            love.graphics.print("[FULL]", x + w - 40, cardY + 8)
+        end
 
         -- Owner
         love.graphics.setFont(self.fonts.small)
-        love.graphics.setColor(self.colors.textDim)
+        love.graphics.setColor(isFull and self.colors.textMuted or self.colors.textDim)
         love.graphics.print("Owner: " .. building.owner, x + 8, cardY + 24)
 
         -- Capacity bar
@@ -541,20 +620,24 @@ function HousingAssignmentModal:RenderBuildingsPanel(x, y, w, h)
 
         love.graphics.setColor(0.2, 0.2, 0.25)
         love.graphics.rectangle("fill", barX, barY, barW, barH, 2, 2)
-        love.graphics.setColor(fillPct > 0.8 and self.colors.warning or self.colors.success)
+        if isFull then
+            love.graphics.setColor(0.7, 0.3, 0.3)
+        else
+            love.graphics.setColor(fillPct > 0.8 and self.colors.warning or self.colors.success)
+        end
         love.graphics.rectangle("fill", barX, barY, barW * fillPct, barH, 2, 2)
 
         love.graphics.setFont(self.fonts.tiny)
-        love.graphics.setColor(1, 1, 1)
+        love.graphics.setColor(1, 1, 1, isFull and 0.6 or 1)
         local capText = string.format("%d/%d (%d%% full)", building.occupancy, building.capacity, math.floor(fillPct * 100))
         love.graphics.print(capText, barX + 4, barY + 1)
 
         -- Quality and rent
         love.graphics.setFont(self.fonts.small)
-        love.graphics.setColor(self.colors.textDim)
+        love.graphics.setColor(isFull and self.colors.textMuted or self.colors.textDim)
         love.graphics.print("Quality: " .. building.qualityTier .. string.format(" (%.1f)", building.quality), x + 8, cardY + 58)
 
-        love.graphics.setColor(self.colors.gold)
+        love.graphics.setColor(isFull and {0.5, 0.45, 0.2} or self.colors.gold)
         love.graphics.print("Rent: " .. building.rentRate .. "g/cycle", x + 180, cardY + 58)
 
         -- Suitable classes
@@ -563,7 +646,8 @@ function HousingAssignmentModal:RenderBuildingsPanel(x, y, w, h)
         local suitableStr = "Suitable for: " .. table.concat(building.targetClasses, ", ")
         love.graphics.print(suitableStr, x + 8, cardY + 74)
 
-        self.buildingCards[i] = {x = x, y = cardY, w = w, h = cardH, building = building}
+        -- Only add to clickable cards if not full
+        self.buildingCards[i] = {x = x, y = cardY, w = w, h = cardH, building = building, isFull = isFull}
         ::continue::
     end
 
@@ -734,7 +818,10 @@ function HousingAssignmentModal:HandleClick(screenX, screenY, button)
         for _, card in ipairs(self.buildingCards) do
             if card and screenX >= card.x and screenX < card.x + card.w and
                screenY >= card.y and screenY < card.y + card.h then
-                self.selectedBuilding = card.building.id
+                -- Only allow selecting buildings that have space
+                if not card.isFull then
+                    self.selectedBuilding = card.building.id
+                end
                 return true
             end
         end

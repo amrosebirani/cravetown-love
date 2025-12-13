@@ -34,6 +34,11 @@ function GameStateCapture:capture(params)
         return self:captureConsumptionPrototype(params, includeAll, depth)
     end
 
+    -- Special handling for alpha prototype mode
+    if gMode == "alpha" and gAlphaPrototype then
+        return self:captureAlphaPrototype(params, includeAll, depth)
+    end
+
     -- Screen info
     if includeAll or self:hasInclude(include, "screen") then
         state.screen = self:captureScreen()
@@ -562,6 +567,11 @@ function GameStateCapture:query(params)
         return self:queryConsumptionPrototype(queryType, id, params)
     end
 
+    -- Alpha prototype queries
+    if gMode == "alpha" and gAlphaPrototype then
+        return self:queryAlphaPrototype(queryType, id, params)
+    end
+
     return {error = "Unknown query type: " .. tostring(queryType)}
 end
 
@@ -915,6 +925,687 @@ function GameStateCapture:queryConsumptionPrototype(queryType, id, params)
     end
 
     return {error = "Unknown consumption query type: " .. tostring(queryType)}
+end
+
+-- ============================================================================
+-- ALPHA PROTOTYPE STATE CAPTURE
+-- For town building simulation with production and consumption
+-- ============================================================================
+
+function GameStateCapture:captureAlphaPrototype(params, includeAll, depth)
+    local include = params.include or {"all"}
+    local alpha = gAlphaPrototype
+    local phase = alpha.mPhase
+
+    local state = {
+        frame = self.bridge.frameCount,
+        timestamp = love.timer.getTime(),
+        mode = "alpha_prototype",
+        phase = phase  -- splash, title, setup, loading, worldloading, game
+    }
+
+    -- Only include full game state when in "game" phase
+    if phase ~= "game" then
+        state.available_actions = self:captureAlphaPhaseActions(phase)
+        return state
+    end
+
+    local world = alpha.mWorld
+    local ui = alpha.mUI
+
+    if not world then
+        state.error = "World not initialized"
+        return state
+    end
+
+    -- Time state
+    if includeAll or self:hasInclude(include, "time") or self:hasInclude(include, "simulation") then
+        state.time = self:captureAlphaTime(world)
+    end
+
+    -- Town info
+    if includeAll or self:hasInclude(include, "town") then
+        state.town = self:captureAlphaTown(world)
+    end
+
+    -- Statistics
+    if includeAll or self:hasInclude(include, "statistics") or self:hasInclude(include, "stats") then
+        state.statistics = self:captureAlphaStats(world)
+    end
+
+    -- Camera state
+    if includeAll or self:hasInclude(include, "camera") then
+        state.camera = self:captureAlphaCamera(ui)
+    end
+
+    -- Buildings
+    if includeAll or self:hasInclude(include, "buildings") then
+        state.buildings = self:captureAlphaBuildings(world, depth)
+    end
+
+    -- Citizens/Characters
+    if includeAll or self:hasInclude(include, "characters") or self:hasInclude(include, "citizens") then
+        state.citizens = self:captureAlphaCitizens(world, depth)
+    end
+
+    -- Inventory
+    if includeAll or self:hasInclude(include, "inventory") then
+        state.inventory = world.inventory or {}
+        state.gold = world.gold or 0
+    end
+
+    -- Housing system
+    if includeAll or self:hasInclude(include, "housing") then
+        state.housing = self:captureAlphaHousing(world)
+    end
+
+    -- Land system
+    if includeAll or self:hasInclude(include, "land") then
+        state.land = self:captureAlphaLand(world)
+    end
+
+    -- Immigration
+    if includeAll or self:hasInclude(include, "immigration") then
+        state.immigration = self:captureAlphaImmigration(world)
+    end
+
+    -- UI state
+    if includeAll or self:hasInclude(include, "ui_state") then
+        state.ui_state = self:captureAlphaUIState(ui)
+    end
+
+    -- Event log
+    if includeAll or self:hasInclude(include, "events") then
+        state.event_log = self:captureAlphaEventLog(world, params.max_events or 50)
+    end
+
+    -- Production metrics
+    if includeAll or self:hasInclude(include, "production") then
+        state.production = self:captureAlphaProduction(world)
+    end
+
+    -- Available actions
+    if includeAll or self:hasInclude(include, "available_actions") then
+        state.available_actions = self:captureAlphaActions(world, ui)
+    end
+
+    -- Controls reference
+    if self:hasInclude(include, "controls") then
+        state.controls = self:getAlphaControlsReference()
+    end
+
+    -- Metrics
+    if includeAll or self:hasInclude(include, "metrics") then
+        state.metrics = {
+            fps = love.timer.getFPS(),
+            memory_kb = collectgarbage("count"),
+            citizen_count = #(world.citizens or {}),
+            building_count = #(world.buildings or {})
+        }
+    end
+
+    return state
+end
+
+function GameStateCapture:captureAlphaTime(world)
+    local tm = world.timeManager
+    if not tm then return nil end
+
+    return {
+        is_paused = world.isPaused,
+        day = tm:GetDay(),
+        hour = tm:GetHour(),
+        time_string = tm:GetTimeString(),
+        current_slot = tm:GetCurrentSlot() and tm:GetCurrentSlot().name or "Unknown",
+        current_slot_id = tm:GetCurrentSlotId(),
+        slot_progress = tm:GetSlotProgress(),
+        speed = tm.currentSpeed or 1,
+        global_slot_counter = world.globalSlotCounter or 1
+    }
+end
+
+function GameStateCapture:captureAlphaTown(world)
+    return {
+        name = world.townName or "Unknown",
+        gold = world.gold or 0,
+        world_width = world.worldWidth,
+        world_height = world.worldHeight,
+        has_river = world.river ~= nil,
+        has_forest = world.forest ~= nil,
+        has_mountains = world.mountains ~= nil
+    }
+end
+
+function GameStateCapture:captureAlphaStats(world)
+    local stats = world.stats or {}
+    return {
+        total_population = stats.totalPopulation or #(world.citizens or {}),
+        average_satisfaction = stats.averageSatisfaction or 0,
+        satisfaction_by_class = stats.satisfactionByClass or {},
+        housing_capacity = stats.housingCapacity or 0,
+        employed_count = stats.employedCount or 0,
+        unemployed_count = stats.unemployedCount or 0,
+        homeless_count = stats.homelessCount or 0,
+        housed_count = stats.housedCount or 0,
+        total_emigrations = stats.totalEmigrations or 0,
+        total_immigrations = stats.totalImmigrations or 0,
+        productivity_multiplier = stats.productivityMultiplier or 1.0,
+        current_slot_name = stats.currentSlotName or "Unknown"
+    }
+end
+
+function GameStateCapture:captureAlphaCamera(ui)
+    if not ui then return nil end
+
+    return {
+        x = ui.cameraX or 0,
+        y = ui.cameraY or 0,
+        zoom = ui.cameraZoom or 1.0,
+        world_width = ui.worldWidth,
+        world_height = ui.worldHeight
+    }
+end
+
+function GameStateCapture:captureAlphaBuildings(world, depth)
+    local buildings = {}
+
+    for i, building in ipairs(world.buildings or {}) do
+        local b = {
+            id = building.id,
+            index = i,
+            type_id = building.typeId,
+            name = building.name,
+            x = building.x,
+            y = building.y,
+            level = building.level or 0
+        }
+
+        if depth ~= "minimal" then
+            -- Worker info
+            b.workers = {}
+            b.worker_count = #(building.workers or {})
+            b.max_workers = building.maxWorkers or 0
+            for _, worker in ipairs(building.workers or {}) do
+                table.insert(b.workers, {
+                    id = worker.id,
+                    name = worker.name
+                })
+            end
+
+            -- Station/production info
+            b.stations = {}
+            for si, station in ipairs(building.stations or {}) do
+                table.insert(b.stations, {
+                    id = station.id or si,
+                    state = station.state or "IDLE",
+                    progress = station.progress or 0,
+                    recipe = station.recipe and station.recipe.name or nil,
+                    recipe_id = station.recipe and station.recipe.id or nil
+                })
+            end
+
+            -- Housing info
+            if building.capacity and building.capacity > 0 then
+                b.is_housing = true
+                b.capacity = building.capacity
+                b.residents = #(building.residents or {})
+                b.housing_class = building.housingClass
+            end
+
+            -- Efficiency
+            b.resource_efficiency = building.resourceEfficiency or 1.0
+
+            -- Storage
+            b.storage_capacity = building.storageCapacity or 0
+        end
+
+        if depth == "full" then
+            -- Building type info
+            if building.type then
+                b.category = building.type.category
+                b.construction_cost = building.type.constructionCost
+            end
+            b.efficiency_breakdown = building.efficiencyBreakdown
+        end
+
+        table.insert(buildings, b)
+    end
+
+    return buildings
+end
+
+function GameStateCapture:captureAlphaCitizens(world, depth)
+    local citizens = {}
+
+    for i, citizen in ipairs(world.citizens or {}) do
+        local c = {
+            id = citizen.id,
+            index = i,
+            name = citizen.name,
+            class = citizen.class,
+            age = citizen.age,
+            vocation = citizen.vocation
+        }
+
+        if depth ~= "minimal" then
+            -- Position
+            c.x = citizen.x
+            c.y = citizen.y
+
+            -- Satisfaction
+            if citizen.GetAverageSatisfaction then
+                c.average_satisfaction = citizen:GetAverageSatisfaction()
+            end
+
+            -- Employment
+            c.workplace = citizen.workplace and citizen.workplace.name or nil
+            c.workplace_id = citizen.workplace and citizen.workplace.id or nil
+            c.is_employed = citizen.workplace ~= nil
+
+            -- Housing (get from housing system if available)
+            if world.housingSystem then
+                local assignment = world.housingSystem:GetHousingAssignment(citizen.id)
+                if assignment then
+                    c.housing_id = assignment.buildingId
+                    c.is_housed = assignment.buildingId ~= nil
+                else
+                    c.is_housed = false
+                end
+            end
+
+            -- Traits
+            c.traits = citizen.traits or {}
+
+            -- Status indicators
+            if citizen.GetCriticalCravingCount then
+                c.critical_cravings = citizen:GetCriticalCravingCount()
+            end
+        end
+
+        if depth == "full" then
+            -- Detailed satisfaction breakdown
+            if citizen.satisfaction then
+                c.satisfaction_breakdown = {}
+                for dim, value in pairs(citizen.satisfaction) do
+                    c.satisfaction_breakdown[dim] = value
+                end
+            end
+
+            -- Cravings
+            if citizen.AggregateCurrentCravingsToCoarse then
+                c.coarse_cravings = citizen:AggregateCurrentCravingsToCoarse()
+            end
+
+            -- Wealth (from economics system)
+            if world.economicsSystem then
+                c.wealth = world.economicsSystem:GetWealth(citizen.id) or 0
+            end
+
+            -- Possessions
+            c.possessions = citizen.possessions or {}
+        end
+
+        table.insert(citizens, c)
+    end
+
+    return citizens
+end
+
+function GameStateCapture:captureAlphaHousing(world)
+    if not world.housingSystem then return nil end
+
+    local hs = world.housingSystem
+    return {
+        total_capacity = hs:GetTotalCapacity(),
+        total_occupied = hs:GetTotalOccupied(),
+        vacancy_rate = hs:GetVacancyRate(),
+        homeless_count = hs:GetHomelessCount(),
+        relocation_queue_size = hs:GetRelocationQueueSize()
+    }
+end
+
+function GameStateCapture:captureAlphaLand(world)
+    if not world.landSystem then return nil end
+
+    local ls = world.landSystem
+    return {
+        grid_columns = ls.gridColumns,
+        grid_rows = ls.gridRows,
+        plot_width = ls.plotWidth,
+        plot_height = ls.plotHeight,
+        total_plots = ls.gridColumns * ls.gridRows
+    }
+end
+
+function GameStateCapture:captureAlphaImmigration(world)
+    if not world.immigrationSystem then return nil end
+
+    local is = world.immigrationSystem
+    local queue = is.queue or {}
+
+    local applicants = {}
+    for i, app in ipairs(queue) do
+        table.insert(applicants, {
+            index = i,
+            name = app.name,
+            class = app.class,
+            vocation = app.vocation,
+            traits = app.traits
+        })
+    end
+
+    return {
+        queue_size = #queue,
+        applicants = applicants
+    }
+end
+
+function GameStateCapture:captureAlphaUIState(ui)
+    if not ui then return nil end
+
+    return {
+        -- Placement mode
+        placement_mode = ui.placementMode or false,
+        placement_building_type = ui.placementBuildingType and ui.placementBuildingType.id or nil,
+        placement_valid = ui.placementValid,
+        placement_efficiency = ui.placementEfficiency,
+
+        -- Modals
+        show_build_menu = ui.showBuildMenuModal or false,
+        show_inventory = ui.showInventoryPanel or false,
+        show_citizens_panel = ui.showCitizensPanel or false,
+        show_analytics = ui.showAnalyticsPanel or false,
+        show_immigration = ui.showImmigrationModal or false,
+        show_land_registry = ui.showLandRegistryPanel or false,
+        show_housing_overview = ui.showHousingOverviewPanel or false,
+        show_help = ui.showHelpOverlay or false,
+        show_settings = ui.showSettingsPanel or false,
+
+        -- Resource overlay
+        show_resource_overlay = ui.showResourceOverlay or false,
+
+        -- Selected entity
+        selected_entity_type = ui.world and ui.world.selectedEntityType or nil,
+        selected_entity_id = ui.world and ui.world.selectedEntity and ui.world.selectedEntity.id or nil
+    }
+end
+
+function GameStateCapture:captureAlphaEventLog(world, maxEvents)
+    local events = {}
+    local log = world.eventLog or {}
+    local startIdx = math.max(1, #log - maxEvents + 1)
+
+    for i = startIdx, #log do
+        local e = log[i]
+        if e then
+            table.insert(events, {
+                time = e.time,
+                day = e.day,
+                slot = e.slot,
+                type = e.type,
+                message = e.message,
+                details = e.details
+            })
+        end
+    end
+
+    return events
+end
+
+function GameStateCapture:captureAlphaProduction(world)
+    local production = {
+        buildings_producing = 0,
+        buildings_idle = 0,
+        buildings_no_materials = 0,
+        buildings_no_workers = 0
+    }
+
+    for _, building in ipairs(world.buildings or {}) do
+        for _, station in ipairs(building.stations or {}) do
+            if station.state == "PRODUCING" then
+                production.buildings_producing = production.buildings_producing + 1
+            elseif station.state == "IDLE" then
+                production.buildings_idle = production.buildings_idle + 1
+            elseif station.state == "NO_MATERIALS" then
+                production.buildings_no_materials = production.buildings_no_materials + 1
+            elseif station.state == "NO_WORKER" then
+                production.buildings_no_workers = production.buildings_no_workers + 1
+            end
+        end
+    end
+
+    -- Get production stats if available
+    if world.productionStats then
+        local metrics = world:GetProductionMetrics()
+        if metrics then
+            production.metrics = metrics
+        end
+    end
+
+    return production
+end
+
+function GameStateCapture:captureAlphaPhaseActions(phase)
+    local actions = {}
+
+    if phase == "splash" then
+        table.insert(actions, {action = "skip_splash", description = "Press any key to skip splash"})
+    elseif phase == "title" then
+        table.insert(actions, {action = "new_game", description = "Start a new game"})
+        table.insert(actions, {action = "continue_game", description = "Continue from quicksave"})
+        table.insert(actions, {action = "load_game", description = "Load a saved game"})
+        table.insert(actions, {action = "quit", description = "Return to launcher"})
+    elseif phase == "setup" then
+        table.insert(actions, {action = "configure_game", description = "Configure new game settings"})
+        table.insert(actions, {action = "cancel_setup", description = "Cancel and return to title"})
+    elseif phase == "loading" or phase == "worldloading" then
+        table.insert(actions, {action = "wait", description = "Loading in progress..."})
+    end
+
+    return actions
+end
+
+function GameStateCapture:captureAlphaActions(world, ui)
+    local actions = {}
+
+    -- Time controls
+    if world.isPaused then
+        table.insert(actions, {action = "resume", description = "Press SPACE to resume"})
+    else
+        table.insert(actions, {action = "pause", description = "Press SPACE to pause"})
+    end
+    table.insert(actions, {action = "set_speed", description = "Press 1/2/3 to change speed"})
+
+    -- Building placement
+    if ui and ui.placementMode then
+        table.insert(actions, {action = "place_building", description = "Click to place building"})
+        table.insert(actions, {action = "cancel_placement", description = "Right-click or ESC to cancel"})
+    else
+        table.insert(actions, {action = "start_building_placement", description = "Select building type to place"})
+    end
+
+    -- Camera
+    table.insert(actions, {action = "move_camera", description = "WASD or arrow keys to move camera"})
+    table.insert(actions, {action = "zoom_camera", description = "Mouse wheel to zoom"})
+
+    -- Selection
+    table.insert(actions, {action = "select_entity", description = "Click building or citizen to select"})
+
+    -- UI toggles
+    table.insert(actions, {action = "toggle_inventory", description = "Toggle inventory panel"})
+    table.insert(actions, {action = "toggle_build_menu", description = "Open build menu"})
+    table.insert(actions, {action = "toggle_citizens", description = "Toggle citizens panel"})
+
+    -- Worker management
+    table.insert(actions, {action = "assign_worker", description = "Assign worker to building"})
+    table.insert(actions, {action = "remove_worker", description = "Remove worker from building"})
+
+    -- Recipe management
+    table.insert(actions, {action = "assign_recipe", description = "Assign recipe to building station"})
+
+    -- Housing
+    table.insert(actions, {action = "assign_housing", description = "Assign citizen to housing"})
+
+    -- Immigration
+    table.insert(actions, {action = "accept_immigrant", description = "Accept immigrant from queue"})
+    table.insert(actions, {action = "reject_immigrant", description = "Reject immigrant from queue"})
+
+    -- Save/Load
+    table.insert(actions, {action = "quick_save", description = "Quick save the game"})
+    table.insert(actions, {action = "quick_load", description = "Quick load the game"})
+
+    return actions
+end
+
+function GameStateCapture:getAlphaControlsReference()
+    return {
+        time = {
+            SPACE = "Pause/Resume game",
+            ["1"] = "Normal speed",
+            ["2"] = "Fast speed (2x)",
+            ["3"] = "Very fast speed (4x)"
+        },
+        camera = {
+            W = "Move camera up",
+            A = "Move camera left",
+            S = "Move camera down",
+            D = "Move camera right",
+            ["Mouse wheel"] = "Zoom in/out"
+        },
+        building = {
+            ["Left click"] = "Place building / Select entity",
+            ["Right click"] = "Cancel placement",
+            B = "Open build menu"
+        },
+        panels = {
+            I = "Toggle inventory",
+            C = "Toggle citizens panel",
+            H = "Toggle help overlay",
+            Escape = "Close panel / Return to title"
+        },
+        saving = {
+            F5 = "Quick save",
+            F9 = "Quick load"
+        }
+    }
+end
+
+function GameStateCapture:queryAlphaPrototype(queryType, id, params)
+    local alpha = gAlphaPrototype
+    local world = alpha.mWorld
+
+    if not world then
+        return {error = "Alpha world not initialized"}
+    end
+
+    if queryType == "building" and id then
+        -- Find building by ID or index
+        for i, building in ipairs(world.buildings or {}) do
+            if building.id == id or i == tonumber(id) then
+                return self:captureAlphaBuildings({buildings = {building}}, "full")[1]
+            end
+        end
+        return {error = "Building not found: " .. tostring(id)}
+    end
+
+    if queryType == "citizen" or queryType == "character" then
+        if id then
+            -- Find citizen by ID or name
+            for i, citizen in ipairs(world.citizens or {}) do
+                if citizen.id == id or citizen.name == id or i == tonumber(id) then
+                    return self:captureAlphaCitizens({citizens = {citizen}}, "full")[1]
+                end
+            end
+            return {error = "Citizen not found: " .. tostring(id)}
+        end
+    end
+
+    if queryType == "available_buildings" then
+        local types = {}
+        for _, bt in ipairs(world.buildingTypes or {}) do
+            local canAfford, affordError = world:CanAffordBuilding(bt)
+            table.insert(types, {
+                id = bt.id,
+                name = bt.name,
+                category = bt.category,
+                description = bt.description,
+                construction_cost = bt.constructionCost,
+                can_afford = canAfford,
+                afford_error = affordError
+            })
+        end
+        return {building_types = types}
+    end
+
+    if queryType == "available_recipes" then
+        local recipes = {}
+        for _, recipe in ipairs(world.buildingRecipes or {}) do
+            table.insert(recipes, {
+                id = recipe.id,
+                name = recipe.name,
+                building_type = recipe.buildingType,
+                inputs = recipe.inputs,
+                outputs = recipe.outputs,
+                production_time = recipe.productionTime
+            })
+        end
+        return {recipes = recipes}
+    end
+
+    if queryType == "commodities" then
+        local commodities = {}
+        for _, c in ipairs(world.commodities or {}) do
+            table.insert(commodities, {
+                id = c.id,
+                name = c.name,
+                category = c.category,
+                inventory_count = world.inventory[c.id] or 0
+            })
+        end
+        return {commodities = commodities}
+    end
+
+    if queryType == "time_slots" then
+        return {time_slots = world.timeSlots or {}}
+    end
+
+    if queryType == "production_stats" then
+        return world:GetProductionMetrics() or {error = "No production stats available"}
+    end
+
+    if queryType == "building_efficiencies" then
+        return {efficiencies = world:GetBuildingEfficiencies()}
+    end
+
+    if queryType == "housing_assignments" then
+        if world.housingSystem then
+            return world.housingSystem:GetAllAssignments()
+        end
+        return {error = "Housing system not available"}
+    end
+
+    if queryType == "land_plots" then
+        if world.landSystem then
+            -- Return summary of land ownership
+            return {
+                grid_columns = world.landSystem.gridColumns,
+                grid_rows = world.landSystem.gridRows,
+                plot_width = world.landSystem.plotWidth,
+                plot_height = world.landSystem.plotHeight
+            }
+        end
+        return {error = "Land system not available"}
+    end
+
+    if queryType == "immigration_queue" then
+        return self:captureAlphaImmigration(world)
+    end
+
+    if queryType == "available_actions" then
+        return self:captureAlphaActions(world, alpha.mUI)
+    end
+
+    return {error = "Unknown alpha query type: " .. tostring(queryType)}
 end
 
 return GameStateCapture

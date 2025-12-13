@@ -245,27 +245,30 @@ function ImmigrationSystem:AcceptApplicant(applicant, selectedPlots)
         self.world.gold = self.world.gold + totalPlotCost
     end
 
-    -- Find housing using HousingSystem if available
+    -- Find housing
     local housing = nil
-    if self.world.housingSystem then
-        local availableHousing = self.world.housingSystem:GetAvailableHousing(applicant.class)
-        if #availableHousing > 0 then
-            housing = { id = availableHousing[1].buildingId }
+
+    -- For wealthy/merchant who bought land, they build their own housing on their purchased plots
+    -- This takes priority over finding existing housing
+    if landReqs.minPlots and landReqs.minPlots > 0 and selectedPlots and #selectedPlots > 0 then
+        -- Auto-setup for elites: place a house on their first plot
+        housing = self:AutoSetupEliteHousing(applicant, selectedPlots)
+    end
+
+    -- If no housing built yet, find existing housing
+    if not housing then
+        if self.world.housingSystem then
+            local availableHousing = self.world.housingSystem:GetAvailableHousing(applicant.class)
+            if #availableHousing > 0 then
+                housing = { id = availableHousing[1].buildingId }
+            end
+        else
+            housing = self:FindHousingForClass(applicant.class)
         end
-    else
-        housing = self:FindHousingForClass(applicant.class)
     end
 
     if not housing then
-        -- For wealthy/merchant who bought land, they can build their own housing
-        if landReqs.minPlots and landReqs.minPlots > 0 and selectedPlots and #selectedPlots > 0 then
-            -- Auto-setup for elites: place a house on their first plot
-            housing = self:AutoSetupEliteHousing(applicant, selectedPlots)
-        end
-
-        if not housing then
-            return false, "No suitable housing available"
-        end
+        return false, "No suitable housing available"
     end
 
     -- Create citizen from applicant
@@ -339,22 +342,32 @@ function ImmigrationSystem:AcceptApplicant(applicant, selectedPlots)
     local landNote = (selectedPlots and #selectedPlots > 0) and (" and purchased " .. #selectedPlots .. " plots") or ""
     self.world:LogEvent("immigration", applicant.name .. " has joined the town!" .. familyNote .. landNote, {})
 
+    -- Update world stats to reflect new population
+    self.world:UpdateStats()
+
     return true, citizen, nil
 end
 
 -- Auto-setup housing for elite immigrants (Phase 4)
 function ImmigrationSystem:AutoSetupEliteHousing(applicant, selectedPlots)
     if not selectedPlots or #selectedPlots == 0 then
+        print("[ImmigrationSystem] AutoSetupEliteHousing: No plots provided")
         return nil
     end
 
     -- Get the first plot to build on
     local firstPlotId = selectedPlots[1]
+    print("[ImmigrationSystem] AutoSetupEliteHousing: First plot ID = " .. tostring(firstPlotId))
+
     local plot = self.world.landSystem and self.world.landSystem:GetPlotById(firstPlotId)
 
     if not plot then
+        print("[ImmigrationSystem] AutoSetupEliteHousing: Plot not found for ID " .. tostring(firstPlotId))
         return nil
     end
+
+    print(string.format("[ImmigrationSystem] AutoSetupEliteHousing: Plot found at world(%d, %d) grid(%d, %d)",
+        plot.worldX or 0, plot.worldY or 0, plot.gridX or 0, plot.gridY or 0))
 
     -- Determine housing type based on intended role
     local housingType = "house"  -- default
@@ -373,18 +386,32 @@ function ImmigrationSystem:AutoSetupEliteHousing(applicant, selectedPlots)
         housingType = "house"  -- fallback
     end
 
+    -- Center the building within the plot (add small offset from plot corner)
+    local buildingSize = 60  -- Standard building size
+    local plotWidth = plot.width or 100
+    local plotHeight = plot.height or 100
+    local offsetX = math.max(5, (plotWidth - buildingSize) / 2)
+    local offsetY = math.max(5, (plotHeight - buildingSize) / 2)
+
+    local buildingX = plot.worldX + offsetX
+    local buildingY = plot.worldY + offsetY
+
+    print(string.format("[ImmigrationSystem] AutoSetupEliteHousing: Placing %s at (%d, %d)",
+        housingType, buildingX, buildingY))
+
     -- Create the building
-    local building = self.world:AddBuilding(housingType, plot.worldX, plot.worldY, {
+    local building = self.world:AddBuilding(housingType, buildingX, buildingY, {
         ownerId = applicant.name,  -- Will be updated to citizen.id after creation
         purchasePrice = 0  -- They already own the land
     })
 
     if building then
-        print(string.format("[ImmigrationSystem] Auto-placed %s for %s on plot %s",
-            housingType, applicant.name, firstPlotId))
+        print(string.format("[ImmigrationSystem] Auto-placed %s for %s on plot %s at (%d, %d)",
+            housingType, applicant.name, firstPlotId, buildingX, buildingY))
         return building
     end
 
+    print("[ImmigrationSystem] AutoSetupEliteHousing: Failed to create building")
     return nil
 end
 
@@ -915,6 +942,22 @@ end
 function ImmigrationSystem:GetVacantHousingByClass()
     local vacant = {Elite = 0, Upper = 0, Middle = 0, Working = 0, Poor = 0}
 
+    -- Use HousingSystem if available (preferred - accurate occupancy tracking)
+    if self.world.housingSystem then
+        local stats = self.world.housingSystem:GetHousingStatistics()
+        -- Get available housing for each class
+        for _, class in ipairs({"Elite", "Upper", "Middle", "Working", "Poor"}) do
+            local available = self.world.housingSystem:GetAvailableHousing(class)
+            local totalSlots = 0
+            for _, housing in ipairs(available) do
+                totalSlots = totalSlots + (housing.availableSlots or 0)
+            end
+            vacant[class] = totalSlots
+        end
+        return vacant
+    end
+
+    -- Fallback: use building data directly (legacy)
     for _, building in ipairs(self.world.buildings or {}) do
         if building.type and building.type.category == "housing" then
             local capacity = building.capacity or 4
@@ -922,26 +965,19 @@ function ImmigrationSystem:GetVacantHousingByClass()
             local free = capacity - residents
 
             if free > 0 then
-                -- Determine housing class (simplified)
-                local housingClass = building.housingClass or "Middle"
+                -- Determine housing class from housingConfig
+                local housingClass = "Middle"
+                if building.type.housingConfig and building.type.housingConfig.targetClasses then
+                    local targetClasses = building.type.housingConfig.targetClasses
+                    if #targetClasses > 0 then
+                        -- Map lowercase to our class names
+                        local classMap = {lower = "Working", middle = "Middle", upper = "Upper", elite = "Elite"}
+                        housingClass = classMap[targetClasses[1]] or "Middle"
+                    end
+                end
                 vacant[housingClass] = (vacant[housingClass] or 0) + free
             end
         end
-    end
-
-    -- Also count general housing capacity
-    local totalCapacity = 0
-    local totalResidents = #(self.world.citizens or {})
-    for _, building in ipairs(self.world.buildings or {}) do
-        if building.type and building.type.category == "housing" then
-            totalCapacity = totalCapacity + (building.capacity or 4)
-        end
-    end
-
-    -- Simplified: distribute remaining to Middle class
-    local remaining = totalCapacity - totalResidents
-    if remaining > 0 then
-        vacant.Middle = (vacant.Middle or 0) + remaining
     end
 
     return vacant

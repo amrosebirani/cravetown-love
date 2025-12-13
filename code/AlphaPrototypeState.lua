@@ -9,19 +9,22 @@ local NewGameSetup = require("code/NewGameSetup")
 local AlphaWorld = require("code/AlphaWorld")
 local AlphaUI = require("code/AlphaUI")
 local DataLoader = require("code/DataLoader")
+local LoadingScreen = require("code/LoadingScreen")
 
 AlphaPrototypeState = {}
 AlphaPrototypeState.__index = AlphaPrototypeState
 
 function AlphaPrototypeState:Create()
     local this = {
-        mPhase = "splash",  -- splash, title, setup, game
+        mPhase = "splash",  -- splash, title, setup, worldloading, game
         mSplash = nil,
         mTitleScreen = nil,
         mNewGameSetup = nil,
         mWorld = nil,
         mUI = nil,
-        mGameConfig = nil  -- Configuration from new game setup
+        mGameConfig = nil,  -- Configuration from new game setup
+        mLoadingScreen = nil,  -- Loading screen during world generation
+        mLoadingCoroutine = nil  -- Coroutine for async loading
     }
 
     setmetatable(this, self)
@@ -29,11 +32,8 @@ function AlphaPrototypeState:Create()
 end
 
 function AlphaPrototypeState:Enter()
-    -- Create the birthday splash with callback
-    self.mSplash = BirthdaySplash:Create(function()
-        self:OnSplashComplete()
-    end)
-    self.mPhase = "splash"
+    -- Skip birthday splash for now, go directly to title screen
+    self:OnSplashComplete()
 end
 
 function AlphaPrototypeState:OnSplashComplete()
@@ -134,51 +134,343 @@ function AlphaPrototypeState:OnQuit()
 end
 
 function AlphaPrototypeState:StartGame()
-    self.mPhase = "game"
+    -- Switch to loading phase
+    self.mPhase = "worldloading"
     self.mTitleScreen = nil
 
-    -- Load starting location based on game config
+    -- Create and show loading screen
+    self.mLoadingScreen = LoadingScreen:Create()
+    self.mLoadingScreen:Show()
+
+    -- Create coroutine for async loading
+    self.mLoadingCoroutine = coroutine.create(function()
+        self:LoadWorldAsync()
+    end)
+end
+
+-- Async world loading with progress updates
+function AlphaPrototypeState:LoadWorldAsync()
+    local yield = coroutine.yield
+
+    -- Step 1: Load configuration (5%)
+    self.mLoadingScreen:SetProgress(0.05, "Loading configuration...")
+    yield()
+
     local locationId = self.mGameConfig and self.mGameConfig.location or "fertile_plains"
     local startingLocation = DataLoader.getStartingLocationById(locationId)
-
-    -- Store the starting location for SetupStarterContent
     self.mStartingLocation = startingLocation
 
-    -- Get terrain config from starting location
     local terrainConfig = nil
     if startingLocation and startingLocation.terrain then
         terrainConfig = startingLocation.terrain
     end
 
-    -- Initialize the alpha world with terrain config
-    self.mWorld = AlphaWorld:Create(terrainConfig)
+    -- Step 2: Create world zones (15%)
+    self.mLoadingScreen:SetProgress(0.15, "Generating world zones...")
+    yield()
 
-    -- Apply game config if available
+    -- Step 3: Initialize world (25%)
+    self.mLoadingScreen:SetProgress(0.25, "Creating world...", "Initializing terrain")
+    yield()
+
+    self.mWorld = AlphaWorld:Create(terrainConfig, function(progress, message)
+        -- Callback from AlphaWorld for progress updates (25% - 60%)
+        local scaledProgress = 0.25 + progress * 0.35
+        self.mLoadingScreen:SetProgress(scaledProgress, "Creating world...", message)
+    end)
+
+    -- Step 4: Apply configuration (65%)
+    self.mLoadingScreen:SetProgress(0.65, "Applying configuration...")
+    yield()
+
     if self.mGameConfig then
         self.mWorld.townName = self.mGameConfig.townName or "Prosperityville"
-        -- Store other config for use in setup
         self.mWorld.gameConfig = self.mGameConfig
     end
 
-    -- Store production modifiers from starting location
     if startingLocation and startingLocation.productionModifiers then
         self.mWorld.productionModifiers = startingLocation.productionModifiers
-        print("[AlphaPrototypeState] Applied production modifiers from location: " .. locationId)
     end
 
-    -- Initialize UI
-    self.mUI = AlphaUI:Create(self.mWorld)
+    -- Step 5: Initialize UI (70%)
+    self.mLoadingScreen:SetProgress(0.70, "Initializing interface...")
+    yield()
 
-    -- Set up load callback for in-game save/load
+    self.mUI = AlphaUI:Create(self.mWorld)
     self.mUI.onLoadGame = function(saveData)
         self:StartGameFromSave(saveData)
     end
 
-    -- Set up starter content
-    self:SetupStarterContent()
+    -- Step 6: Setup starter content (75% - 95%)
+    self.mLoadingScreen:SetProgress(0.75, "Setting up starter content...")
+    yield()
+
+    self:SetupStarterContentAsync()
+
+    -- Step 7: Finalize (100%)
+    self.mLoadingScreen:SetProgress(1.0, "Ready!")
+    yield()
 
     -- Start paused so player can observe
     self.mWorld.isPaused = true
+
+    -- Small delay to show 100%
+    self.mLoadingComplete = true
+end
+
+-- Async version of SetupStarterContent with progress updates
+function AlphaPrototypeState:SetupStarterContentAsync()
+    -- Use starting location if available, otherwise fall back to alpha_starter_config
+    local config
+    if self.mStartingLocation then
+        config = {
+            starterBuildings = self.mStartingLocation.starterBuildings or {},
+            starterResources = self.mStartingLocation.starterResources or {},
+            starterGold = self.mStartingLocation.starterGold or 1000,
+            population = self.mStartingLocation.population or nil,
+            starterCitizens = self.mStartingLocation.starterCitizens or nil,
+            starterLandPlots = self.mStartingLocation.starterLandPlots or {}
+        }
+        print("[SetupStarterContent] Using starting location: " .. (self.mStartingLocation.id or "unknown"))
+    else
+        config = DataLoader.loadAlphaStarterConfig()
+        if not config then
+            config = {
+                starterBuildings = {},
+                starterResources = {},
+                starterGold = 1000
+            }
+        end
+        print("[SetupStarterContent] Using fallback alpha_starter_config")
+    end
+
+    -- Apply difficulty modifiers
+    if self.mGameConfig then
+        if self.mGameConfig.difficulty == "relaxed" then
+            config.starterGold = (config.starterGold or 1000) * 2
+            for _, res in ipairs(config.starterResources or {}) do
+                res.quantity = math.floor(res.quantity * 1.5)
+            end
+        elseif self.mGameConfig.difficulty == "challenging" then
+            config.starterGold = math.floor((config.starterGold or 1000) * 0.5)
+        elseif self.mGameConfig.difficulty == "survival" then
+            config.starterGold = math.floor((config.starterGold or 1000) * 0.25)
+            config.starterResources = {}
+        end
+    end
+
+    -- Track created buildings
+    local buildingsByIndex = {}
+    local usedPositions = {}
+    local buildingArea = self.mWorld.worldZones and self.mWorld.worldZones:GetBuildingArea()
+
+    -- Add starter buildings
+    local starterBuildings = config.starterBuildings or {}
+    local totalBuildings = #starterBuildings
+
+    for buildingIndex, buildingConfig in ipairs(starterBuildings) do
+        -- Update progress (75% to 85%)
+        local buildingProgress = 0.75 + (buildingIndex / totalBuildings) * 0.10
+        self.mLoadingScreen:SetProgress(buildingProgress, "Placing buildings...",
+            string.format("Building %d of %d: %s", buildingIndex, totalBuildings, buildingConfig.typeId or "unknown"))
+
+        local x, y = buildingConfig.x, buildingConfig.y
+
+        local function isValidPosition(px, py)
+            if buildingArea then
+                if px < buildingArea.x or py < buildingArea.y or
+                   px + 60 > buildingArea.x + buildingArea.width or
+                   py + 60 > buildingArea.y + buildingArea.height then
+                    return false
+                end
+            end
+            if self.mWorld:IsBuildingInWater(px, py, 60, 60) then return false end
+            if self.mWorld.forest and self.mWorld.forest:CheckRectCollision(px, py, 60, 60) then return false end
+            if self.mWorld.mountains and self.mWorld.mountains:CheckRectCollision(px, py, 60, 60) then return false end
+            for _, pos in ipairs(usedPositions) do
+                if math.abs(px - pos.x) < 70 and math.abs(py - pos.y) < 70 then return false end
+            end
+            for _, building in ipairs(self.mWorld.buildings) do
+                if px < building.x + 70 and px + 60 > building.x and
+                   py < building.y + 70 and py + 60 > building.y then
+                    return false
+                end
+            end
+            return true
+        end
+
+        if not isValidPosition(x, y) then
+            local found = false
+            local searchMinX, searchMaxX, searchMinY, searchMaxY
+            if buildingArea then
+                searchMinX = buildingArea.x + 10
+                searchMaxX = buildingArea.x + buildingArea.width - 70
+                searchMinY = buildingArea.y + 10
+                searchMaxY = buildingArea.y + buildingArea.height - 70
+            else
+                searchMinX, searchMaxX, searchMinY, searchMaxY = 100, 1200, 100, 1200
+            end
+
+            for tryX = searchMinX, searchMaxX, 70 do
+                for tryY = searchMinY, searchMaxY, 70 do
+                    if isValidPosition(tryX, tryY) then
+                        x, y = tryX, tryY
+                        found = true
+                        break
+                    end
+                end
+                if found then break end
+            end
+        end
+
+        table.insert(usedPositions, {x = x, y = y})
+
+        local building = self.mWorld:AddBuilding(buildingConfig.typeId, x, y)
+        if building then
+            buildingsByIndex[buildingIndex - 1] = building
+            if buildingConfig.autoAssignRecipe then
+                for _, recipe in ipairs(self.mWorld.buildingRecipes) do
+                    if recipe.buildingType == buildingConfig.typeId then
+                        self.mWorld:AssignRecipeToStation(building, 1, recipe.id)
+                        break
+                    end
+                end
+            end
+        end
+    end
+
+    -- Spawn citizens
+    local citizensByIndex = {}
+    local starterCitizens = config.starterCitizens or {}
+    local totalCitizens = #starterCitizens
+
+    if totalCitizens > 0 then
+        self.mLoadingScreen:SetProgress(0.85, "Spawning citizens...",
+            string.format("0 of %d citizens", totalCitizens))
+
+        for citizenIndex, citizenConfig in ipairs(starterCitizens) do
+            local citizenProgress = 0.85 + (citizenIndex / totalCitizens) * 0.08
+            self.mLoadingScreen:SetProgress(citizenProgress, "Spawning citizens...",
+                string.format("Citizen %d of %d: %s", citizenIndex, totalCitizens, citizenConfig.name or "Unknown"))
+
+            local classId = "middle"
+            if citizenConfig.intendedRole == "wealthy" then classId = "upper"
+            elseif citizenConfig.intendedRole == "merchant" then classId = "middle"
+            elseif citizenConfig.intendedRole == "craftsman" then classId = "middle"
+            elseif citizenConfig.intendedRole == "laborer" then classId = "lower"
+            end
+
+            local citizen = self.mWorld:AddCitizen(classId, citizenConfig.name, nil, {
+                startingWealth = citizenConfig.startingWealth or 0,
+                vocation = citizenConfig.vocation
+            })
+
+            if citizen then
+                citizensByIndex[citizenIndex - 1] = citizen
+            end
+        end
+    elseif config.population then
+        -- Fallback to population config
+        local totalPop = (config.population.middle or 0) + (config.population.lower or 0) + (config.population.upper or 0)
+        local spawned = 0
+        for classId, count in pairs(config.population) do
+            for i = 1, count do
+                spawned = spawned + 1
+                local progress = 0.85 + (spawned / totalPop) * 0.08
+                self.mLoadingScreen:SetProgress(progress, "Spawning citizens...",
+                    string.format("Citizen %d of %d", spawned, totalPop))
+                self.mWorld:AddCitizen(classId)
+            end
+        end
+    end
+
+    -- Assign land plots
+    self.mLoadingScreen:SetProgress(0.93, "Assigning land plots...")
+    for _, plotConfig in ipairs(config.starterLandPlots or {}) do
+        local plotId = plotConfig.plotId
+        local ownerCitizen = citizensByIndex[plotConfig.ownerCitizenIndex]
+        if plotId and ownerCitizen then
+            self.mWorld.landSystem:TransferOwnership(plotId, ownerCitizen.id, 0, 1)
+        end
+    end
+
+    -- Assign building ownership
+    self.mLoadingScreen:SetProgress(0.95, "Assigning building ownership...")
+    for buildingIndex, buildingConfig in ipairs(starterBuildings) do
+        if buildingConfig.ownerCitizenIndex ~= nil then
+            local building = buildingsByIndex[buildingIndex - 1]
+            local ownerCitizen = citizensByIndex[buildingConfig.ownerCitizenIndex]
+            if building and ownerCitizen and self.mWorld.ownershipManager then
+                self.mWorld.ownershipManager:TransferBuilding(building.id, ownerCitizen.id, 0, 1)
+            end
+        end
+    end
+
+    -- Assign housing (supports both initialOccupants on buildings and housingBuildingIndex on citizens)
+    self.mLoadingScreen:SetProgress(0.96, "Assigning housing...")
+
+    -- First: process initialOccupants from buildings
+    for buildingIndex, buildingConfig in ipairs(starterBuildings) do
+        local building = buildingsByIndex[buildingIndex - 1]
+        if building and self.mWorld.housingSystem then
+            -- Support both 'assignedCitizens' and 'initialOccupants' field names
+            local occupants = buildingConfig.assignedCitizens or buildingConfig.initialOccupants
+            if occupants then
+                for _, citizenIdx in ipairs(occupants) do
+                    local citizen = citizensByIndex[citizenIdx]
+                    if citizen then
+                        self.mWorld.housingSystem:AssignHousing(citizen.id, building.id)
+                    end
+                end
+            end
+        end
+    end
+
+    -- Second: process housingBuildingIndex from citizen configs (if not already assigned)
+    for citizenIndex, citizenConfig in ipairs(starterCitizens) do
+        if citizenConfig.housingBuildingIndex ~= nil then
+            local citizen = citizensByIndex[citizenIndex - 1]
+            local housingBuilding = buildingsByIndex[citizenConfig.housingBuildingIndex]
+            if citizen and housingBuilding and self.mWorld.housingSystem then
+                -- Check if citizen is not already assigned
+                local currentAssignment = self.mWorld.housingSystem:GetHousingAssignment(citizen.id)
+                if not currentAssignment or not currentAssignment.buildingId then
+                    self.mWorld.housingSystem:AssignHousing(citizen.id, housingBuilding.id)
+                end
+            end
+        end
+    end
+
+    -- Assign workplaces from workplaceIndex
+    self.mLoadingScreen:SetProgress(0.97, "Assigning workplaces...")
+    for citizenIndex, citizenConfig in ipairs(starterCitizens) do
+        if citizenConfig.workplaceIndex ~= nil then
+            local citizen = citizensByIndex[citizenIndex - 1]
+            local workplace = buildingsByIndex[citizenConfig.workplaceIndex]
+            if citizen and workplace then
+                self.mWorld:AssignWorkerToBuilding(citizen, workplace)
+            end
+        end
+    end
+
+    -- Add starter resources
+    self.mLoadingScreen:SetProgress(0.98, "Adding starter resources...")
+    for _, resource in ipairs(config.starterResources or {}) do
+        self.mWorld:AddToInventory(resource.commodityId, resource.quantity)
+    end
+
+    if config.starterGold then
+        self.mWorld.gold = config.starterGold
+    end
+
+    -- Finalize
+    self.mLoadingScreen:SetProgress(0.99, "Finalizing...")
+    self.mWorld:UpdateStats()
+    self.mWorld:RunFreeAgency()
+
+    local townName = self.mWorld.townName or "CraveTown"
+    self.mWorld:LogEvent("info", "Welcome to " .. townName .. "! Press SPACE to start.", {})
+    self.mWorld:LogEvent("info", "Use 1/2/3 to change game speed, H for help.", {})
 end
 
 function AlphaPrototypeState:StartGameFromSave(saveData)
@@ -214,261 +506,6 @@ function AlphaPrototypeState:LoadSaveFile(filename)
     return nil
 end
 
-function AlphaPrototypeState:SetupStarterContent()
-    -- Use starting location if available, otherwise fall back to alpha_starter_config
-    local config
-    if self.mStartingLocation then
-        -- Use starting location data
-        config = {
-            population = self.mStartingLocation.population or {
-                initialCount = 15,
-                classDistribution = DataLoader.getDefaultClassDistribution()
-            },
-            starterBuildings = self.mStartingLocation.starterBuildings or {},
-            starterResources = self.mStartingLocation.starterResources or {},
-            starterGold = self.mStartingLocation.starterGold or 1000,
-            starterCitizens = self.mStartingLocation.starterCitizens or nil,
-            starterLandPlots = self.mStartingLocation.starterLandPlots or {}
-        }
-        print("[SetupStarterContent] Using starting location: " .. (self.mStartingLocation.id or "unknown"))
-    else
-        -- Fallback to alpha_starter_config
-        config = DataLoader.loadAlphaStarterConfig()
-        if not config then
-            config = {
-                population = {
-                    initialCount = 15,
-                    classDistribution = DataLoader.getDefaultClassDistribution()
-                },
-                starterBuildings = {},
-                starterResources = {},
-                starterGold = 1000
-            }
-        end
-        print("[SetupStarterContent] Using fallback alpha_starter_config")
-    end
-
-    -- Apply game config overrides if available
-    if self.mGameConfig then
-        if self.mGameConfig.startingPopulation and not config.starterCitizens then
-            config.population = config.population or {}
-            config.population.initialCount = self.mGameConfig.startingPopulation
-        end
-
-        -- Apply difficulty modifiers
-        if self.mGameConfig.difficulty == "story" then
-            config.starterGold = (config.starterGold or 1000) * 2
-            for _, res in ipairs(config.starterResources or {}) do
-                res.quantity = math.floor(res.quantity * 1.5)
-            end
-        elseif self.mGameConfig.difficulty == "challenging" then
-            config.starterGold = math.floor((config.starterGold or 1000) * 0.5)
-        elseif self.mGameConfig.difficulty == "survival" then
-            config.starterGold = math.floor((config.starterGold or 1000) * 0.25)
-            config.starterResources = {}
-        end
-    end
-
-    -- Track created buildings by index for citizen assignment
-    local buildingsByIndex = {}
-
-    -- Add starter buildings from config FIRST (before citizens, so we can assign housing)
-    -- Validate positions to avoid water, trees, and other buildings
-    local usedPositions = {}  -- Track positions already used
-
-    for buildingIndex, buildingConfig in ipairs(config.starterBuildings or {}) do
-        local x, y = buildingConfig.x, buildingConfig.y
-
-        -- Helper to check if position is valid (not in water, trees, mountains, or overlapping other buildings)
-        local function isValidPosition(px, py)
-            -- Check water
-            if self.mWorld:IsBuildingInWater(px, py, 60, 60) then
-                return false
-            end
-            -- Check trees
-            if self.mWorld.forest and self.mWorld.forest:CheckRectCollision(px, py, 60, 60) then
-                return false
-            end
-            -- Check mountains
-            if self.mWorld.mountains and self.mWorld.mountains:CheckRectCollision(px, py, 60, 60) then
-                return false
-            end
-            -- Check already used positions
-            for _, pos in ipairs(usedPositions) do
-                if math.abs(px - pos.x) < 70 and math.abs(py - pos.y) < 70 then
-                    return false
-                end
-            end
-            -- Check existing buildings
-            for _, building in ipairs(self.mWorld.buildings) do
-                if px < building.x + 70 and px + 60 > building.x and
-                   py < building.y + 70 and py + 60 > building.y then
-                    return false
-                end
-            end
-            return true
-        end
-
-        -- Check if position collides with water or trees and find alternative if needed
-        if not isValidPosition(x, y) then
-            -- Try to find a valid position nearby (on the left side of the world, away from river)
-            local found = false
-            -- Search in a larger area for the bigger world (3200x2400)
-            for tryX = 100, 1200, 70 do
-                for tryY = 100, 1200, 70 do
-                    if isValidPosition(tryX, tryY) then
-                        x, y = tryX, tryY
-                        found = true
-                        break
-                    end
-                end
-                if found then break end
-            end
-        end
-
-        -- Record this position as used
-        table.insert(usedPositions, {x = x, y = y})
-
-        local building = self.mWorld:AddBuilding(
-            buildingConfig.typeId,
-            x,
-            y
-        )
-        if building then
-            -- Store by 0-based index (to match JSON format)
-            buildingsByIndex[buildingIndex - 1] = building
-
-            -- Auto-assign first matching recipe if configured
-            if buildingConfig.autoAssignRecipe then
-                for _, recipe in ipairs(self.mWorld.buildingRecipes) do
-                    if recipe.buildingType == buildingConfig.typeId then
-                        self.mWorld:AssignRecipeToStation(building, 1, recipe.id)
-                        break
-                    end
-                end
-            end
-        end
-    end
-
-    -- Spawn citizens - either from starterCitizens or population config
-    local citizensByIndex = {}  -- Track citizens by their index for building/land assignment
-
-    if config.starterCitizens and #config.starterCitizens > 0 then
-        -- Use detailed starter citizens from starting_locations.json
-        print("[SetupStarterContent] Spawning " .. #config.starterCitizens .. " starter citizens")
-        for citizenIndex, citizenConfig in ipairs(config.starterCitizens) do
-            -- Determine class based on intendedRole
-            local classId = "middle"  -- default
-            if citizenConfig.intendedRole == "wealthy" then
-                classId = "upper"
-            elseif citizenConfig.intendedRole == "merchant" then
-                classId = "middle"
-            elseif citizenConfig.intendedRole == "craftsman" then
-                classId = "middle"
-            elseif citizenConfig.intendedRole == "laborer" then
-                classId = "lower"
-            end
-
-            local citizen = self.mWorld:AddCitizen(classId, citizenConfig.name, nil, {
-                startingWealth = citizenConfig.startingWealth or 0,
-                vocation = citizenConfig.vocation
-            })
-
-            if citizen then
-                -- Store by 0-based index
-                citizensByIndex[citizenIndex - 1] = citizen
-
-                -- Assign to workplace if specified
-                if citizenConfig.workplaceIndex ~= nil then
-                    local workplace = buildingsByIndex[citizenConfig.workplaceIndex]
-                    if workplace then
-                        self.mWorld:AssignWorkerToBuilding(citizen, workplace)
-                    end
-                end
-
-                -- Assign to housing if specified
-                if citizenConfig.housingBuildingIndex ~= nil and self.mWorld.housingSystem then
-                    local housingBuilding = buildingsByIndex[citizenConfig.housingBuildingIndex]
-                    if housingBuilding then
-                        self.mWorld.housingSystem:AssignHousing(citizen.id, housingBuilding.id)
-                    end
-                end
-            end
-        end
-    else
-        -- Fallback: Spawn initial population from config (legacy method)
-        local popConfig = config.population or {}
-        local count = popConfig.initialCount or 15
-        local distribution = popConfig.classDistribution or DataLoader.getDefaultClassDistribution()
-        self.mWorld:SpawnInitialPopulation(count, distribution)
-    end
-
-    -- Assign starter land plots to citizens
-    if self.mWorld.landSystem then
-        for _, plotConfig in ipairs(config.starterLandPlots or {}) do
-            local plotId = self.mWorld.landSystem:GetPlotId(plotConfig.gridX, plotConfig.gridY)
-            local ownerCitizen = citizensByIndex[plotConfig.ownerCitizenIndex]
-            if plotId and ownerCitizen then
-                self.mWorld.landSystem:TransferOwnership(plotId, ownerCitizen.id, 0, 1)
-                print("[SetupStarterContent] Assigned plot " .. plotId .. " to " .. ownerCitizen.name)
-            end
-        end
-    end
-
-    -- Assign building ownership for buildings with ownerCitizenIndex
-    for buildingIndex, buildingConfig in ipairs(config.starterBuildings or {}) do
-        if buildingConfig.ownerCitizenIndex ~= nil then
-            local building = buildingsByIndex[buildingIndex - 1]
-            local ownerCitizen = citizensByIndex[buildingConfig.ownerCitizenIndex]
-            if building and ownerCitizen and self.mWorld.ownershipManager then
-                self.mWorld.ownershipManager:TransferBuilding(building.id, ownerCitizen.id, 0, 1)
-                print("[SetupStarterContent] Assigned building " .. building.name .. " to " .. ownerCitizen.name)
-            end
-        end
-    end
-
-    -- Assign housing occupants for housing buildings with initialOccupants
-    for buildingIndex, buildingConfig in ipairs(config.starterBuildings or {}) do
-        if buildingConfig.initialOccupants and #buildingConfig.initialOccupants > 0 then
-            local building = buildingsByIndex[buildingIndex - 1]
-            if building and self.mWorld.housingSystem then
-                for _, occupantIndex in ipairs(buildingConfig.initialOccupants) do
-                    local citizen = citizensByIndex[occupantIndex]
-                    if citizen then
-                        local success, err = self.mWorld.housingSystem:AssignHousing(citizen.id, building.id)
-                        if success then
-                            print("[SetupStarterContent] Assigned " .. citizen.name .. " to housing: " .. building.name)
-                        else
-                            print("[SetupStarterContent] Failed to assign " .. citizen.name .. " to " .. building.name .. ": " .. (err or "unknown"))
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    -- Add starter resources from config
-    for _, resource in ipairs(config.starterResources or {}) do
-        self.mWorld:AddToInventory(resource.commodityId, resource.quantity)
-    end
-
-    -- Set starter gold
-    if config.starterGold then
-        self.mWorld.gold = config.starterGold
-    end
-
-    -- Update stats
-    self.mWorld:UpdateStats()
-
-    -- Run free agency to assign any remaining workers based on their vocations
-    self.mWorld:RunFreeAgency()
-
-    -- Log initial setup with town name
-    local townName = self.mWorld.townName or "CraveTown"
-    self.mWorld:LogEvent("info", "Welcome to " .. townName .. "! Press SPACE to start.", {})
-    self.mWorld:LogEvent("info", "Use 1/2/3 to change game speed, H for help.", {})
-end
-
 function AlphaPrototypeState:Update(dt)
     if self.mPhase == "splash" then
         if self.mSplash then
@@ -488,6 +525,31 @@ function AlphaPrototypeState:Update(dt)
     elseif self.mPhase == "loading" then
         if self.mLoadModal then
             self.mLoadModal:Update(dt)
+        end
+    elseif self.mPhase == "worldloading" then
+        -- Update loading screen animation
+        if self.mLoadingScreen then
+            self.mLoadingScreen:Update(dt)
+        end
+
+        -- Resume coroutine if still running
+        if self.mLoadingCoroutine and coroutine.status(self.mLoadingCoroutine) ~= "dead" then
+            local ok, err = coroutine.resume(self.mLoadingCoroutine)
+            if not ok then
+                print("[LoadingError] " .. tostring(err))
+                -- On error, jump to game phase anyway
+                self.mPhase = "game"
+            end
+        elseif self.mLoadingComplete then
+            -- Loading finished, wait a moment then transition to game
+            self.mLoadingCompleteTimer = (self.mLoadingCompleteTimer or 0) + dt
+            if self.mLoadingCompleteTimer > 0.5 then
+                self.mPhase = "game"
+                self.mLoadingScreen = nil
+                self.mLoadingCoroutine = nil
+                self.mLoadingComplete = nil
+                self.mLoadingCompleteTimer = nil
+            end
         end
     elseif self.mPhase == "game" then
         if self.mWorld then
@@ -523,6 +585,11 @@ function AlphaPrototypeState:Render()
         end
         if self.mLoadModal then
             self.mLoadModal:Render()
+        end
+    elseif self.mPhase == "worldloading" then
+        -- Render loading screen
+        if self.mLoadingScreen then
+            self.mLoadingScreen:Render()
         end
     elseif self.mPhase == "game" then
         if self.mUI then

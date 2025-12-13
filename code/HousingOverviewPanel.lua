@@ -54,12 +54,14 @@ local HousingOverviewPanel = {}
 HousingOverviewPanel.__index = HousingOverviewPanel
 
 function HousingOverviewPanel:Create(world, onAssignClick, onQueueClick)
+    print("[HousingOverviewPanel] Create called with onAssignClick=" .. tostring(onAssignClick) .. " onQueueClick=" .. tostring(onQueueClick))
     local panel = setmetatable({}, HousingOverviewPanel)
 
     panel.world = world
     panel.onAssignClick = onAssignClick
     panel.onQueueClick = onQueueClick
     panel.visible = false
+    print("[HousingOverviewPanel] panel.onAssignClick set to " .. tostring(panel.onAssignClick))
 
     -- Panel positioning (right side)
     panel.width = 320
@@ -141,7 +143,7 @@ end
 
 function HousingOverviewPanel:RefreshData()
     local housingSystem = self.world.housingSystem
-    local characters = self.world.characters or {}
+    local citizens = self.world.citizens or {}
 
     -- Reset statistics
     self.statistics = {
@@ -230,10 +232,22 @@ function HousingOverviewPanel:RefreshData()
     -- Calculate vacant slots
     self.statistics.vacantSlots = self.statistics.totalCapacity - self.statistics.currentPop
 
-    -- Process characters for class-based stats
-    for charId, char in pairs(characters) do
-        local class = (char.emergentClass or char.class or "middle"):lower()
-        local hasHousing = char.housingId ~= nil
+    -- Process citizens for class-based stats
+    local charCount = 0
+    for _, citizen in ipairs(citizens) do
+        charCount = charCount + 1
+        local charId = citizen.id
+        local class = (citizen.emergentClass or citizen.class or "middle"):lower()
+
+        -- Check housing assignment from housingSystem or citizen property
+        local hasHousing = false
+        if housingSystem and housingSystem.housingAssignments then
+            hasHousing = housingSystem.housingAssignments[charId] ~= nil
+        end
+        -- Also check citizen's own housingId as fallback
+        if not hasHousing and citizen.housingId then
+            hasHousing = true
+        end
 
         if classData[class] then
             if hasHousing then
@@ -250,6 +264,7 @@ function HousingOverviewPanel:RefreshData()
             end
         end
     end
+    print("[HousingOverviewPanel] RefreshData: charCount=" .. charCount .. " classData elite=" .. classData.elite.housed .. "/" .. classData.elite.homeless .. " upper=" .. classData.upper.housed .. "/" .. classData.upper.homeless .. " middle=" .. classData.middle.housed .. "/" .. classData.middle.homeless .. " lower=" .. classData.lower.housed .. "/" .. classData.lower.homeless)
 
     -- Convert tier data to sorted array (by quality descending)
     self.qualityTiers = {}
@@ -557,13 +572,16 @@ function HousingOverviewPanel:RenderActions(x, y, w)
 end
 
 function HousingOverviewPanel:HandleClick(screenX, screenY, button)
+    print("[HousingOverviewPanel] HandleClick called at " .. tostring(screenX) .. "," .. tostring(screenY) .. " visible=" .. tostring(self.visible))
     if not self.visible then return false end
 
     -- Check if click is within panel bounds
     if screenX < self.x or screenX > self.x + self.width or
        screenY < self.y or screenY > self.y + self.height then
+        print("[HousingOverviewPanel] Click outside panel bounds")
         return false
     end
+    print("[HousingOverviewPanel] Click inside panel bounds")
 
     -- Close button
     if self.closeBtn then
@@ -588,9 +606,14 @@ function HousingOverviewPanel:HandleClick(screenX, screenY, button)
     -- Assign Housing button
     if self.assignBtn then
         local btn = self.assignBtn
+        print("[HousingOverviewPanel] Checking assign button: btn=" .. tostring(btn.x) .. "," .. tostring(btn.y) .. " mouse=" .. tostring(screenX) .. "," .. tostring(screenY))
         if screenX >= btn.x and screenX < btn.x + btn.w and
            screenY >= btn.y and screenY < btn.y + btn.h then
-            if self.onAssignClick then self.onAssignClick() end
+            print("[HousingOverviewPanel] Assign button clicked! onAssignClick=" .. tostring(self.onAssignClick))
+            if self.onAssignClick then
+                print("[HousingOverviewPanel] Calling onAssignClick callback")
+                self.onAssignClick()
+            end
             return true
         end
     end

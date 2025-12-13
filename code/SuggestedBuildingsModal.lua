@@ -90,10 +90,20 @@ function SuggestedBuildingsModal:GenerateSuggestions()
 
     -- Filter available buildings and categorize
     for _, bType in ipairs(buildingTypes) do
+        -- Extract gold cost from constructionCost table
+        local goldCost = 100  -- default
+        local costData = bType.baseCost or bType.constructionCost
+        if type(costData) == "table" then
+            goldCost = costData.gold or costData.Gold or 100
+        elseif type(costData) == "number" then
+            goldCost = costData
+        end
+
         local suggestion = {
             typeId = bType.id,
             name = bType.name,
-            cost = bType.baseCost or bType.constructionCost or 100,
+            cost = goldCost,
+            fullCost = costData,  -- Keep full cost table for reference
             description = bType.description or "",
             category = bType.category or "other"
         }

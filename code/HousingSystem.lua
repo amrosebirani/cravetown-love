@@ -279,17 +279,38 @@ function HousingSystem:GetBuildingOccupants(buildingId)
     return {}
 end
 
+-- Helper to normalize class names for comparison
+-- Maps various class names to standardized lowercase versions
+local function normalizeClass(class)
+    if not class then return nil end
+    local lowerClass = class:lower()
+
+    -- Map immigration class names to housing class names
+    local classMap = {
+        elite = "elite",
+        upper = "upper",
+        middle = "middle",
+        working = "lower",  -- Working class maps to lower
+        poor = "lower",     -- Poor class maps to lower
+        lower = "lower"
+    }
+
+    return classMap[lowerClass] or lowerClass
+end
+
 function HousingSystem:GetAvailableHousing(targetClass)
     local available = {}
+    local normalizedTarget = normalizeClass(targetClass)
 
     for buildingId, occupancy in pairs(self.buildingOccupancy) do
         if #occupancy.occupants < occupancy.capacity then
-            -- Check if class is appropriate
+            -- Check if class is appropriate (case-insensitive comparison)
             local classMatch = true
-            if targetClass and #occupancy.targetClasses > 0 then
+            if normalizedTarget and #occupancy.targetClasses > 0 then
                 classMatch = false
                 for _, tc in ipairs(occupancy.targetClasses) do
-                    if tc == targetClass then
+                    local normalizedTc = normalizeClass(tc)
+                    if normalizedTc == normalizedTarget then
                         classMatch = true
                         break
                     end

@@ -142,6 +142,11 @@ function LandRegistryPanel:IsVisible()
     return self.visible
 end
 
+-- Helper to check if an owner ID represents the town
+local function isTownOwner(ownerId)
+    return ownerId == nil or ownerId == "TOWN" or ownerId == "town" or ownerId == 0
+end
+
 function LandRegistryPanel:RefreshData()
     local landSystem = self.world.landSystem
     if not landSystem then return end
@@ -167,11 +172,12 @@ function LandRegistryPanel:RefreshData()
             local price = plot.purchasePrice or 100
             self.statistics.totalValue = self.statistics.totalValue + price
 
-            local ownerId = plot.ownerId or "town"
-            if ownerId == 0 then ownerId = "town" end
+            local ownerId = plot.ownerId
+            local isTown = isTownOwner(ownerId)
 
-            if ownerId == "town" then
+            if isTown then
                 self.statistics.townOwned = self.statistics.townOwned + 1
+                ownerId = "TOWN"  -- Normalize to single town ID
             else
                 self.statistics.citizenOwned = self.statistics.citizenOwned + 1
             end
@@ -180,21 +186,23 @@ function LandRegistryPanel:RefreshData()
                 self.statistics.forSale = self.statistics.forSale + 1
             end
 
-            -- Track per-owner
-            if not ownerData[ownerId] then
-                ownerData[ownerId] = {
-                    ownerId = ownerId,
-                    plots = {},
-                    totalValue = 0,
-                    rentIncome = 0
-                }
+            -- Track per-owner (skip town from landowners list - shown in stats)
+            if not isTown then
+                if not ownerData[ownerId] then
+                    ownerData[ownerId] = {
+                        ownerId = ownerId,
+                        plots = {},
+                        totalValue = 0,
+                        rentIncome = 0
+                    }
+                end
+                table.insert(ownerData[ownerId].plots, plot)
+                ownerData[ownerId].totalValue = ownerData[ownerId].totalValue + price
             end
-            table.insert(ownerData[ownerId].plots, plot)
-            ownerData[ownerId].totalValue = ownerData[ownerId].totalValue + price
         end
     end
 
-    -- Convert to array and add owner info
+    -- Convert to array and add owner info (citizens only, town shown in stats)
     self.landowners = {}
     for ownerId, data in pairs(ownerData) do
         local owner = {
@@ -205,26 +213,33 @@ function LandRegistryPanel:RefreshData()
             plots = data.plots
         }
 
-        if ownerId == "town" then
-            owner.name = "Town of " .. (self.world.townName or "Millbrook")
-            owner.type = "town"
-            owner.class = nil
+        -- Get citizen data (citizens are stored in an array, not a dictionary)
+        local citizen = nil
+        -- First try citizensById if available
+        if self.world.citizensById and self.world.citizensById[ownerId] then
+            citizen = self.world.citizensById[ownerId]
         else
-            -- Get citizen data
-            local citizen = self.world.characters and self.world.characters[ownerId]
-            if citizen then
-                owner.name = citizen.name or ("Citizen #" .. ownerId)
-                owner.class = citizen.emergentClass or citizen.class
-            else
-                owner.name = "Citizen #" .. ownerId
-                owner.class = nil
+            -- Otherwise search the citizens array
+            for _, c in ipairs(self.world.citizens or {}) do
+                if c.id == ownerId then
+                    citizen = c
+                    break
+                end
             end
-            owner.type = "citizen"
-
-            -- Calculate rent income from buildings on their land
-            -- (Simplified - would need building system integration)
-            owner.rentIncome = math.floor(owner.plotCount * 3)  -- Placeholder
         end
+
+        if citizen then
+            owner.name = citizen.name or ("Citizen #" .. ownerId)
+            owner.class = citizen.emergentClass or citizen.class
+        else
+            owner.name = "Citizen #" .. ownerId
+            owner.class = nil
+        end
+        owner.type = "citizen"
+
+        -- Calculate rent income from buildings on their land
+        -- (Simplified - would need building system integration)
+        owner.rentIncome = math.floor(owner.plotCount * 3)  -- Placeholder
 
         table.insert(self.landowners, owner)
     end
@@ -238,10 +253,6 @@ function LandRegistryPanel:SortLandowners()
     local ascending = self.sortAsc
 
     table.sort(self.landowners, function(a, b)
-        -- Town always first
-        if a.type == "town" and b.type ~= "town" then return true end
-        if b.type == "town" and a.type ~= "town" then return false end
-
         local valA, valB
         if sortKey == "plots" then
             valA, valB = a.plotCount, b.plotCount
@@ -266,14 +277,10 @@ function LandRegistryPanel:GetFilteredLandowners()
     local searchLower = self.searchText:lower()
 
     for _, owner in ipairs(self.landowners) do
-        local matchesFilter = (self.filterType == "all") or
-                             (self.filterType == "town" and owner.type == "town") or
-                             (self.filterType == "citizens" and owner.type == "citizen")
-
         local matchesSearch = searchLower == "" or
                              owner.name:lower():find(searchLower, 1, true)
 
-        if matchesFilter and matchesSearch then
+        if matchesSearch then
             table.insert(result, owner)
         end
     end
@@ -391,24 +398,13 @@ function LandRegistryPanel:RenderStatistics(x, y, w)
 end
 
 function LandRegistryPanel:RenderFilterBar(x, y, w)
-    -- Filter dropdown
+    -- Sort label
     love.graphics.setFont(self.fonts.small)
     love.graphics.setColor(self.colors.textDim)
-    love.graphics.print("Filter:", x, y + 4)
-
-    -- Filter button
-    local filterBtnX = x + 45
-    love.graphics.setColor(self.colors.button)
-    love.graphics.rectangle("fill", filterBtnX, y, 80, 22, 3, 3)
-    love.graphics.setColor(self.colors.text)
-
-    local filterText = self.filterType == "all" and "All" or
-                      self.filterType == "town" and "Town" or "Citizens"
-    love.graphics.print(filterText .. " ▾", filterBtnX + 8, y + 4)
-    self.filterBtn = {x = filterBtnX, y = y, w = 80, h = 22}
+    love.graphics.print("Sort by:", x, y + 4)
 
     -- Sort button
-    local sortBtnX = x + 135
+    local sortBtnX = x + 50
     love.graphics.setColor(self.colors.button)
     love.graphics.rectangle("fill", sortBtnX, y, 80, 22, 3, 3)
     love.graphics.setColor(self.colors.text)
@@ -432,7 +428,7 @@ function LandRegistryPanel:RenderLandownersList(x, y, w, h)
     -- List header
     love.graphics.setFont(self.fonts.small)
     love.graphics.setColor(self.colors.textDim)
-    love.graphics.print("LANDOWNERS", x, y)
+    love.graphics.print("CITIZEN LANDOWNERS", x, y)
 
     -- Clip region for scrolling
     local listY = y + 18
@@ -466,16 +462,10 @@ function LandRegistryPanel:RenderLandownersList(x, y, w, h)
         end
         love.graphics.rectangle("fill", x, cardY, w, cardH, 4, 4)
 
-        -- Owner icon
-        if owner.type == "town" then
-            love.graphics.setColor(self.colors.town)
-            love.graphics.setFont(self.fonts.header)
-            love.graphics.print("★", x + 8, cardY + 6)
-        else
-            love.graphics.setColor(self.colors.citizen)
-            love.graphics.setFont(self.fonts.header)
-            love.graphics.print("◆", x + 8, cardY + 6)
-        end
+        -- Owner icon (citizen)
+        love.graphics.setColor(self.colors.citizen)
+        love.graphics.setFont(self.fonts.header)
+        love.graphics.print("◆", x + 8, cardY + 6)
 
         -- Owner name and class
         love.graphics.setFont(self.fonts.normal)
@@ -492,8 +482,8 @@ function LandRegistryPanel:RenderLandownersList(x, y, w, h)
         love.graphics.print(string.format("%d plots | %s value",
             owner.plotCount, self:FormatNumber(owner.totalValue) .. "g"), x + 25, cardY + 25)
 
-        -- Rent income (for citizens)
-        if owner.type == "citizen" and owner.rentIncome > 0 then
+        -- Rent income
+        if owner.rentIncome > 0 then
             love.graphics.setColor(self.colors.gold)
             love.graphics.print(string.format("Rent income: %dg/cycle", owner.rentIncome), x + 25, cardY + 40)
         end
@@ -546,23 +536,6 @@ function LandRegistryPanel:HandleClick(screenX, screenY, button)
         if screenX >= btn.x and screenX < btn.x + btn.w and
            screenY >= btn.y and screenY < btn.y + btn.h then
             self:Hide()
-            return true
-        end
-    end
-
-    -- Filter button
-    if self.filterBtn then
-        local btn = self.filterBtn
-        if screenX >= btn.x and screenX < btn.x + btn.w and
-           screenY >= btn.y and screenY < btn.y + btn.h then
-            -- Cycle through filters
-            if self.filterType == "all" then
-                self.filterType = "town"
-            elseif self.filterType == "town" then
-                self.filterType = "citizens"
-            else
-                self.filterType = "all"
-            end
             return true
         end
     end
