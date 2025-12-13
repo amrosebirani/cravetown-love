@@ -17,8 +17,16 @@
         "mountainsEnabled": false,
         "mountainCount": 0,
         "mountainPositions": [],
-        "groundColor": [0.35, 0.55, 0.25],
-        "waterColor": [0.2, 0.4, 0.7]
+        "groundColor": [
+          0.35,
+          0.55,
+          0.25
+        ],
+        "waterColor": [
+          0.2,
+          0.4,
+          0.7
+        ]
       },
       "productionModifiers": {
         "farming": 1.2,
@@ -26,16 +34,75 @@
         "water_access": 1.5
       },
       "starterBuildings": [
-        {"typeId": "farm", "x": 100, "y": 100, "autoAssignRecipe": true},
-        {"typeId": "bakery", "x": 200, "y": 150, "autoAssignRecipe": true},
-        {"typeId": "tailor_shop", "x": 300, "y": 150, "autoAssignRecipe": true, "ownerCitizenIndex": 0},
-        {"typeId": "cottage", "x": 400, "y": 100, "autoAssignRecipe": false, "initialOccupants": [0, 1, 2]},
-        {"typeId": "lodge", "x": 500, "y": 100, "autoAssignRecipe": false, "initialOccupants": [3, 4, 5, 6, 7]}
+        {
+          "typeId": "farm",
+          "x": 100,
+          "y": 100,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "bakery",
+          "x": 200,
+          "y": 150,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "tailor_shop",
+          "x": 300,
+          "y": 150,
+          "autoAssignRecipe": true,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "typeId": "cottage",
+          "x": 400,
+          "y": 100,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "typeId": "lodge",
+          "x": 500,
+          "y": 100,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+        }
       ],
       "starterResources": [
-        {"commodityId": "wheat", "quantity": 40},
-        {"commodityId": "flour", "quantity": 30},
-        {"commodityId": "bread", "quantity": 20}
+        {"commodityId": "wheat_seed", "quantity": 50},
+        {"commodityId": "potato_seed", "quantity": 30},
+        {"commodityId": "carrot_seed", "quantity": 30},
+        {"commodityId": "cabbage_seed", "quantity": 20},
+        {"commodityId": "onion_seed", "quantity": 20},
+        {"commodityId": "tomato_seed", "quantity": 15},
+        {"commodityId": "flax_seed", "quantity": 20},
+        {"commodityId": "cotton_seed", "quantity": 25},
+        {"commodityId": "herb_seed", "quantity": 15},
+        {"commodityId": "apple_sapling", "quantity": 8},
+        {"commodityId": "water", "quantity": 100},
+        {"commodityId": "wheat", "quantity": 50},
+        {"commodityId": "bread", "quantity": 40},
+        {"commodityId": "potato", "quantity": 30},
+        {"commodityId": "carrot", "quantity": 25},
+        {"commodityId": "apple", "quantity": 20},
+        {"commodityId": "beef", "quantity": 20},
+        {"commodityId": "fish", "quantity": 30},
+        {"commodityId": "timber", "quantity": 30},
+        {"commodityId": "lumber", "quantity": 40},
+        {"commodityId": "firewood", "quantity": 50},
+        {"commodityId": "cotton", "quantity": 30},
+        {"commodityId": "cloth", "quantity": 20},
+        {"commodityId": "thread", "quantity": 15}
       ],
       "starterGold": 1000,
       "startingTreasury": 500,
@@ -56,7 +123,10 @@
           "vocation": "Baker",
           "workplaceIndex": 1,
           "housingBuildingIndex": 3,
-          "familyRelation": {"type": "spouse", "targetIndex": 0}
+          "familyRelation": {
+            "type": "spouse",
+            "targetIndex": 0
+          }
         },
         {
           "name": "Karl Mueller",
@@ -65,7 +135,10 @@
           "vocation": "Apprentice",
           "workplaceIndex": 2,
           "housingBuildingIndex": 3,
-          "familyRelation": {"type": "child", "targetIndex": 0}
+          "familyRelation": {
+            "type": "child",
+            "targetIndex": 0
+          }
         },
         {
           "name": "Hans Weber",
@@ -109,8 +182,16 @@
         }
       ],
       "starterLandPlots": [
-        {"gridX": 3, "gridY": 1, "ownerCitizenIndex": 0},
-        {"gridX": 4, "gridY": 1, "ownerCitizenIndex": 0}
+        {
+          "gridX": 3,
+          "gridY": 1,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "gridX": 4,
+          "gridY": 1,
+          "ownerCitizenIndex": 0
+        }
       ],
       "population": {
         "initialCount": 8,
@@ -132,15 +213,53 @@
         "mountainsEnabled": true,
         "mountainCount": 6,
         "mountainPositions": [
-          {"x": 200, "y": 100, "width": 180, "height": 120},
-          {"x": 2800, "y": 150, "width": 200, "height": 150},
-          {"x": 150, "y": 2000, "width": 160, "height": 100},
-          {"x": 2700, "y": 2100, "width": 190, "height": 130},
-          {"x": 1500, "y": 100, "width": 150, "height": 110},
-          {"x": 1400, "y": 2200, "width": 170, "height": 120}
+          {
+            "x": 200,
+            "y": 100,
+            "width": 180,
+            "height": 120
+          },
+          {
+            "x": 2800,
+            "y": 150,
+            "width": 200,
+            "height": 150
+          },
+          {
+            "x": 150,
+            "y": 2000,
+            "width": 160,
+            "height": 100
+          },
+          {
+            "x": 2700,
+            "y": 2100,
+            "width": 190,
+            "height": 130
+          },
+          {
+            "x": 1500,
+            "y": 100,
+            "width": 150,
+            "height": 110
+          },
+          {
+            "x": 1400,
+            "y": 2200,
+            "width": 170,
+            "height": 120
+          }
         ],
-        "groundColor": [0.45, 0.40, 0.35],
-        "waterColor": [0.3, 0.4, 0.5]
+        "groundColor": [
+          0.45,
+          0.4,
+          0.35
+        ],
+        "waterColor": [
+          0.3,
+          0.4,
+          0.5
+        ]
       },
       "productionModifiers": {
         "mining": 1.3,
@@ -149,17 +268,73 @@
         "farming": 0.8
       },
       "starterBuildings": [
-        {"typeId": "mine", "x": 300, "y": 200, "autoAssignRecipe": true},
-        {"typeId": "farm", "x": 150, "y": 400, "autoAssignRecipe": true},
-        {"typeId": "forge", "x": 400, "y": 200, "autoAssignRecipe": true, "ownerCitizenIndex": 0},
-        {"typeId": "cottage", "x": 250, "y": 350, "autoAssignRecipe": false, "initialOccupants": [0, 1]},
-        {"typeId": "lodge", "x": 350, "y": 350, "autoAssignRecipe": false, "initialOccupants": [2, 3, 4, 5, 6, 7]}
+        {
+          "typeId": "mine",
+          "x": 300,
+          "y": 200,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "farm",
+          "x": 150,
+          "y": 400,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "forge",
+          "x": 400,
+          "y": 200,
+          "autoAssignRecipe": true,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "typeId": "cottage",
+          "x": 250,
+          "y": 350,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            0,
+            1
+          ]
+        },
+        {
+          "typeId": "lodge",
+          "x": 350,
+          "y": 350,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            2,
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+        }
       ],
       "starterResources": [
-        {"commodityId": "iron_ore", "quantity": 40},
-        {"commodityId": "stone", "quantity": 50},
-        {"commodityId": "wheat", "quantity": 30},
-        {"commodityId": "coal", "quantity": 30}
+        {"commodityId": "wheat_seed", "quantity": 50},
+        {"commodityId": "potato_seed", "quantity": 30},
+        {"commodityId": "carrot_seed", "quantity": 30},
+        {"commodityId": "cabbage_seed", "quantity": 20},
+        {"commodityId": "cotton_seed", "quantity": 25},
+        {"commodityId": "water", "quantity": 100},
+        {"commodityId": "wheat", "quantity": 50},
+        {"commodityId": "bread", "quantity": 40},
+        {"commodityId": "potato", "quantity": 30},
+        {"commodityId": "carrot", "quantity": 25},
+        {"commodityId": "apple", "quantity": 20},
+        {"commodityId": "beef", "quantity": 20},
+        {"commodityId": "timber", "quantity": 30},
+        {"commodityId": "lumber", "quantity": 40},
+        {"commodityId": "firewood", "quantity": 50},
+        {"commodityId": "cotton", "quantity": 30},
+        {"commodityId": "cloth", "quantity": 20},
+        {"commodityId": "thread", "quantity": 15},
+        {"commodityId": "iron_ore", "quantity": 80},
+        {"commodityId": "copper_ore", "quantity": 50},
+        {"commodityId": "coal", "quantity": 100},
+        {"commodityId": "stone", "quantity": 120}
       ],
       "starterGold": 1200,
       "startingTreasury": 600,
@@ -180,7 +355,10 @@
           "vocation": "Blacksmith",
           "workplaceIndex": 2,
           "housingBuildingIndex": 3,
-          "familyRelation": {"type": "spouse", "targetIndex": 0}
+          "familyRelation": {
+            "type": "spouse",
+            "targetIndex": 0
+          }
         },
         {
           "name": "Otto Berg",
@@ -232,8 +410,16 @@
         }
       ],
       "starterLandPlots": [
-        {"gridX": 4, "gridY": 2, "ownerCitizenIndex": 0},
-        {"gridX": 5, "gridY": 2, "ownerCitizenIndex": 0}
+        {
+          "gridX": 4,
+          "gridY": 2,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "gridX": 5,
+          "gridY": 2,
+          "ownerCitizenIndex": 0
+        }
       ],
       "population": {
         "initialCount": 8,
@@ -255,8 +441,16 @@
         "mountainsEnabled": false,
         "mountainCount": 0,
         "mountainPositions": [],
-        "groundColor": [0.4, 0.6, 0.3],
-        "waterColor": [0.25, 0.45, 0.65]
+        "groundColor": [
+          0.4,
+          0.6,
+          0.3
+        ],
+        "waterColor": [
+          0.25,
+          0.45,
+          0.65
+        ]
       },
       "productionModifiers": {
         "farming": 1.2,
@@ -265,18 +459,85 @@
         "ore_extraction": 0.9
       },
       "starterBuildings": [
-        {"typeId": "farm", "x": 100, "y": 100, "autoAssignRecipe": true},
-        {"typeId": "bakery", "x": 200, "y": 100, "autoAssignRecipe": true},
-        {"typeId": "farm", "x": 300, "y": 150, "autoAssignRecipe": true},
-        {"typeId": "butcher", "x": 400, "y": 100, "autoAssignRecipe": true, "ownerCitizenIndex": 0},
-        {"typeId": "cottage", "x": 200, "y": 250, "autoAssignRecipe": false, "initialOccupants": [0, 1, 2]},
-        {"typeId": "lodge", "x": 320, "y": 250, "autoAssignRecipe": false, "initialOccupants": [3, 4, 5, 6, 7, 8]}
+        {
+          "typeId": "farm",
+          "x": 100,
+          "y": 100,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "bakery",
+          "x": 200,
+          "y": 100,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "farm",
+          "x": 300,
+          "y": 150,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "butcher",
+          "x": 400,
+          "y": 100,
+          "autoAssignRecipe": true,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "typeId": "cottage",
+          "x": 200,
+          "y": 250,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "typeId": "lodge",
+          "x": 320,
+          "y": 250,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        }
       ],
       "starterResources": [
+        {"commodityId": "wheat_seed", "quantity": 80},
+        {"commodityId": "barley_seeds", "quantity": 30},
+        {"commodityId": "potato_seed", "quantity": 40},
+        {"commodityId": "carrot_seed", "quantity": 40},
+        {"commodityId": "cabbage_seed", "quantity": 25},
+        {"commodityId": "onion_seed", "quantity": 25},
+        {"commodityId": "tomato_seed", "quantity": 20},
+        {"commodityId": "lettuce_seed", "quantity": 25},
+        {"commodityId": "cotton_seed", "quantity": 30},
+        {"commodityId": "flax_seed", "quantity": 20},
+        {"commodityId": "apple_sapling", "quantity": 10},
+        {"commodityId": "pear_sapling", "quantity": 8},
+        {"commodityId": "water", "quantity": 100},
         {"commodityId": "wheat", "quantity": 60},
-        {"commodityId": "bread", "quantity": 40},
-        {"commodityId": "beef", "quantity": 25},
-        {"commodityId": "carrot", "quantity": 30}
+        {"commodityId": "bread", "quantity": 50},
+        {"commodityId": "potato", "quantity": 40},
+        {"commodityId": "carrot", "quantity": 35},
+        {"commodityId": "apple", "quantity": 25},
+        {"commodityId": "beef", "quantity": 30},
+        {"commodityId": "milk", "quantity": 20},
+        {"commodityId": "eggs", "quantity": 30},
+        {"commodityId": "timber", "quantity": 30},
+        {"commodityId": "lumber", "quantity": 40},
+        {"commodityId": "firewood", "quantity": 50},
+        {"commodityId": "cotton", "quantity": 35},
+        {"commodityId": "cloth", "quantity": 25},
+        {"commodityId": "thread", "quantity": 20}
       ],
       "starterGold": 1000,
       "startingTreasury": 500,
@@ -297,7 +558,10 @@
           "vocation": "Butcher",
           "workplaceIndex": 3,
           "housingBuildingIndex": 4,
-          "familyRelation": {"type": "spouse", "targetIndex": 0}
+          "familyRelation": {
+            "type": "spouse",
+            "targetIndex": 0
+          }
         },
         {
           "name": "Peter Fleischer",
@@ -306,7 +570,10 @@
           "vocation": "Apprentice",
           "workplaceIndex": 3,
           "housingBuildingIndex": 4,
-          "familyRelation": {"type": "child", "targetIndex": 0}
+          "familyRelation": {
+            "type": "child",
+            "targetIndex": 0
+          }
         },
         {
           "name": "Ernst Bauer",
@@ -358,8 +625,16 @@
         }
       ],
       "starterLandPlots": [
-        {"gridX": 4, "gridY": 1, "ownerCitizenIndex": 0},
-        {"gridX": 5, "gridY": 1, "ownerCitizenIndex": 0}
+        {
+          "gridX": 4,
+          "gridY": 1,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "gridX": 5,
+          "gridY": 1,
+          "ownerCitizenIndex": 0
+        }
       ],
       "population": {
         "initialCount": 9,
@@ -381,8 +656,16 @@
         "mountainsEnabled": false,
         "mountainCount": 0,
         "mountainPositions": [],
-        "groundColor": [0.3, 0.45, 0.25],
-        "waterColor": [0.2, 0.35, 0.5]
+        "groundColor": [
+          0.3,
+          0.45,
+          0.25
+        ],
+        "waterColor": [
+          0.2,
+          0.35,
+          0.5
+        ]
       },
       "productionModifiers": {
         "lumber": 1.3,
@@ -391,18 +674,81 @@
         "foraging": 1.2
       },
       "starterBuildings": [
-        {"typeId": "sawmill", "x": 150, "y": 120, "autoAssignRecipe": true, "ownerCitizenIndex": 0},
-        {"typeId": "hunting_lodge", "x": 280, "y": 150, "autoAssignRecipe": true},
-        {"typeId": "farm", "x": 400, "y": 200, "autoAssignRecipe": true},
-        {"typeId": "carpentry", "x": 150, "y": 220, "autoAssignRecipe": true},
-        {"typeId": "cottage", "x": 300, "y": 300, "autoAssignRecipe": false, "initialOccupants": [0, 1, 2]},
-        {"typeId": "lodge", "x": 420, "y": 300, "autoAssignRecipe": false, "initialOccupants": [3, 4, 5, 6, 7]}
+        {
+          "typeId": "sawmill",
+          "x": 150,
+          "y": 120,
+          "autoAssignRecipe": true,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "typeId": "hunting_lodge",
+          "x": 280,
+          "y": 150,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "farm",
+          "x": 400,
+          "y": 200,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "carpentry",
+          "x": 150,
+          "y": 220,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "cottage",
+          "x": 300,
+          "y": 300,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "typeId": "lodge",
+          "x": 420,
+          "y": 300,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            3,
+            4,
+            5,
+            6,
+            7
+          ]
+        }
       ],
       "starterResources": [
-        {"commodityId": "lumber", "quantity": 60},
-        {"commodityId": "timber", "quantity": 40},
-        {"commodityId": "wheat", "quantity": 35},
-        {"commodityId": "apple", "quantity": 20}
+        {"commodityId": "wheat_seed", "quantity": 50},
+        {"commodityId": "potato_seed", "quantity": 30},
+        {"commodityId": "carrot_seed", "quantity": 30},
+        {"commodityId": "cabbage_seed", "quantity": 20},
+        {"commodityId": "cotton_seed", "quantity": 25},
+        {"commodityId": "apple_sapling", "quantity": 15},
+        {"commodityId": "pear_sapling", "quantity": 10},
+        {"commodityId": "rubber_tree_sapling", "quantity": 10},
+        {"commodityId": "water", "quantity": 100},
+        {"commodityId": "wheat", "quantity": 50},
+        {"commodityId": "bread", "quantity": 40},
+        {"commodityId": "potato", "quantity": 30},
+        {"commodityId": "carrot", "quantity": 25},
+        {"commodityId": "apple", "quantity": 30},
+        {"commodityId": "beef", "quantity": 25},
+        {"commodityId": "chicken", "quantity": 20},
+        {"commodityId": "tree", "quantity": 20},
+        {"commodityId": "timber", "quantity": 80},
+        {"commodityId": "lumber", "quantity": 100},
+        {"commodityId": "firewood", "quantity": 80},
+        {"commodityId": "planks", "quantity": 40},
+        {"commodityId": "cotton", "quantity": 30},
+        {"commodityId": "cloth", "quantity": 20},
+        {"commodityId": "thread", "quantity": 15}
       ],
       "starterGold": 900,
       "startingTreasury": 450,
@@ -423,7 +769,10 @@
           "vocation": "Carpenter",
           "workplaceIndex": 3,
           "housingBuildingIndex": 4,
-          "familyRelation": {"type": "spouse", "targetIndex": 0}
+          "familyRelation": {
+            "type": "spouse",
+            "targetIndex": 0
+          }
         },
         {
           "name": "Felix Holz",
@@ -432,7 +781,10 @@
           "vocation": "Apprentice",
           "workplaceIndex": 0,
           "housingBuildingIndex": 4,
-          "familyRelation": {"type": "child", "targetIndex": 0}
+          "familyRelation": {
+            "type": "child",
+            "targetIndex": 0
+          }
         },
         {
           "name": "Dieter Jaeger",
@@ -476,8 +828,16 @@
         }
       ],
       "starterLandPlots": [
-        {"gridX": 1, "gridY": 1, "ownerCitizenIndex": 0},
-        {"gridX": 2, "gridY": 1, "ownerCitizenIndex": 0}
+        {
+          "gridX": 1,
+          "gridY": 1,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "gridX": 2,
+          "gridY": 1,
+          "ownerCitizenIndex": 0
+        }
       ],
       "population": {
         "initialCount": 8,
@@ -499,15 +859,41 @@
         "mountainsEnabled": true,
         "mountainCount": 3,
         "mountainPositions": [
-          {"x": 2600, "y": 300, "width": 200, "height": 140},
-          {"x": 2500, "y": 1800, "width": 180, "height": 120},
-          {"x": 200, "y": 1200, "width": 150, "height": 100}
+          {
+            "x": 2600,
+            "y": 300,
+            "width": 200,
+            "height": 140
+          },
+          {
+            "x": 2500,
+            "y": 1800,
+            "width": 180,
+            "height": 120
+          },
+          {
+            "x": 200,
+            "y": 1200,
+            "width": 150,
+            "height": 100
+          }
         ],
         "oasisEnabled": true,
-        "oasisPosition": {"x": 1600, "y": 1200},
+        "oasisPosition": {
+          "x": 1600,
+          "y": 1200
+        },
         "oasisRadius": 200,
-        "groundColor": [0.7, 0.6, 0.4],
-        "waterColor": [0.3, 0.5, 0.7]
+        "groundColor": [
+          0.7,
+          0.6,
+          0.4
+        ],
+        "waterColor": [
+          0.3,
+          0.5,
+          0.7
+        ]
       },
       "productionModifiers": {
         "trade": 1.3,
@@ -516,17 +902,75 @@
         "water_access": 0.7
       },
       "starterBuildings": [
-        {"typeId": "market", "x": 1550, "y": 1150, "autoAssignRecipe": false, "ownerCitizenIndex": 0},
-        {"typeId": "farm", "x": 1650, "y": 1100, "autoAssignRecipe": true},
-        {"typeId": "weaver", "x": 1450, "y": 1150, "autoAssignRecipe": true},
-        {"typeId": "cottage", "x": 1550, "y": 1250, "autoAssignRecipe": false, "initialOccupants": [0, 1]},
-        {"typeId": "lodge", "x": 1670, "y": 1250, "autoAssignRecipe": false, "initialOccupants": [2, 3, 4, 5, 6]}
+        {
+          "typeId": "market",
+          "x": 1550,
+          "y": 1150,
+          "autoAssignRecipe": false,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "typeId": "farm",
+          "x": 1650,
+          "y": 1100,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "weaver",
+          "x": 1450,
+          "y": 1150,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "cottage",
+          "x": 1550,
+          "y": 1250,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            0,
+            1
+          ]
+        },
+        {
+          "typeId": "lodge",
+          "x": 1670,
+          "y": 1250,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        }
       ],
       "starterResources": [
-        {"commodityId": "gold", "quantity": 50},
-        {"commodityId": "silk", "quantity": 15},
-        {"commodityId": "wheat", "quantity": 25},
-        {"commodityId": "cotton", "quantity": 30}
+        {"commodityId": "wheat_seed", "quantity": 50},
+        {"commodityId": "potato_seed", "quantity": 30},
+        {"commodityId": "carrot_seed", "quantity": 30},
+        {"commodityId": "cabbage_seed", "quantity": 20},
+        {"commodityId": "cotton_seed", "quantity": 40},
+        {"commodityId": "date_palm_sapling", "quantity": 10},
+        {"commodityId": "watermelon_seed", "quantity": 15},
+        {"commodityId": "mango_sapling", "quantity": 5},
+        {"commodityId": "water", "quantity": 150},
+        {"commodityId": "wheat", "quantity": 50},
+        {"commodityId": "bread", "quantity": 40},
+        {"commodityId": "potato", "quantity": 30},
+        {"commodityId": "carrot", "quantity": 25},
+        {"commodityId": "apple", "quantity": 20},
+        {"commodityId": "beef", "quantity": 20},
+        {"commodityId": "timber", "quantity": 30},
+        {"commodityId": "lumber", "quantity": 40},
+        {"commodityId": "firewood", "quantity": 50},
+        {"commodityId": "cotton", "quantity": 50},
+        {"commodityId": "cloth", "quantity": 30},
+        {"commodityId": "thread", "quantity": 20},
+        {"commodityId": "silk", "quantity": 20},
+        {"commodityId": "spices", "quantity": 25},
+        {"commodityId": "gold", "quantity": 30},
+        {"commodityId": "wine", "quantity": 15}
       ],
       "starterGold": 1500,
       "startingTreasury": 750,
@@ -547,7 +991,10 @@
           "vocation": "Weaver",
           "workplaceIndex": 2,
           "housingBuildingIndex": 3,
-          "familyRelation": {"type": "spouse", "targetIndex": 0}
+          "familyRelation": {
+            "type": "spouse",
+            "targetIndex": 0
+          }
         },
         {
           "name": "Yusuf Said",
@@ -591,9 +1038,21 @@
         }
       ],
       "starterLandPlots": [
-        {"gridX": 15, "gridY": 11, "ownerCitizenIndex": 0},
-        {"gridX": 15, "gridY": 12, "ownerCitizenIndex": 0},
-        {"gridX": 16, "gridY": 11, "ownerCitizenIndex": 0}
+        {
+          "gridX": 15,
+          "gridY": 11,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "gridX": 15,
+          "gridY": 12,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "gridX": 16,
+          "gridY": 11,
+          "ownerCitizenIndex": 0
+        }
       ],
       "population": {
         "initialCount": 7,
@@ -615,17 +1074,65 @@
         "mountainsEnabled": true,
         "mountainCount": 8,
         "mountainPositions": [
-          {"x": 300, "y": 200, "width": 140, "height": 100},
-          {"x": 800, "y": 150, "width": 160, "height": 110},
-          {"x": 1400, "y": 250, "width": 150, "height": 95},
-          {"x": 2200, "y": 180, "width": 170, "height": 115},
-          {"x": 400, "y": 1800, "width": 155, "height": 105},
-          {"x": 1100, "y": 2000, "width": 145, "height": 100},
-          {"x": 2000, "y": 1900, "width": 165, "height": 110},
-          {"x": 2600, "y": 1600, "width": 175, "height": 120}
+          {
+            "x": 300,
+            "y": 200,
+            "width": 140,
+            "height": 100
+          },
+          {
+            "x": 800,
+            "y": 150,
+            "width": 160,
+            "height": 110
+          },
+          {
+            "x": 1400,
+            "y": 250,
+            "width": 150,
+            "height": 95
+          },
+          {
+            "x": 2200,
+            "y": 180,
+            "width": 170,
+            "height": 115
+          },
+          {
+            "x": 400,
+            "y": 1800,
+            "width": 155,
+            "height": 105
+          },
+          {
+            "x": 1100,
+            "y": 2000,
+            "width": 145,
+            "height": 100
+          },
+          {
+            "x": 2000,
+            "y": 1900,
+            "width": 165,
+            "height": 110
+          },
+          {
+            "x": 2600,
+            "y": 1600,
+            "width": 175,
+            "height": 120
+          }
         ],
-        "groundColor": [0.5, 0.45, 0.38],
-        "waterColor": [0.35, 0.45, 0.55]
+        "groundColor": [
+          0.5,
+          0.45,
+          0.38
+        ],
+        "waterColor": [
+          0.35,
+          0.45,
+          0.55
+        ]
       },
       "productionModifiers": {
         "mining": 1.4,
@@ -635,19 +1142,83 @@
         "water_access": 0.6
       },
       "starterBuildings": [
-        {"typeId": "mine", "x": 500, "y": 400, "autoAssignRecipe": true},
-        {"typeId": "mine", "x": 700, "y": 350, "autoAssignRecipe": true},
-        {"typeId": "forge", "x": 600, "y": 500, "autoAssignRecipe": true, "ownerCitizenIndex": 0},
-        {"typeId": "smelter", "x": 700, "y": 500, "autoAssignRecipe": true},
-        {"typeId": "cottage", "x": 500, "y": 550, "autoAssignRecipe": false, "initialOccupants": [0, 1, 2]},
-        {"typeId": "lodge", "x": 600, "y": 600, "autoAssignRecipe": false, "initialOccupants": [3, 4, 5, 6, 7, 8, 9]}
+        {
+          "typeId": "mine",
+          "x": 500,
+          "y": 400,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "mine",
+          "x": 700,
+          "y": 350,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "forge",
+          "x": 600,
+          "y": 500,
+          "autoAssignRecipe": true,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "typeId": "smelter",
+          "x": 700,
+          "y": 500,
+          "autoAssignRecipe": true
+        },
+        {
+          "typeId": "cottage",
+          "x": 500,
+          "y": 550,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            0,
+            1,
+            2
+          ]
+        },
+        {
+          "typeId": "lodge",
+          "x": 600,
+          "y": 600,
+          "autoAssignRecipe": false,
+          "initialOccupants": [
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        }
       ],
       "starterResources": [
-        {"commodityId": "iron_ore", "quantity": 80},
-        {"commodityId": "copper_ore", "quantity": 50},
-        {"commodityId": "coal", "quantity": 60},
-        {"commodityId": "stone", "quantity": 70},
-        {"commodityId": "wheat", "quantity": 20}
+        {"commodityId": "wheat_seed", "quantity": 50},
+        {"commodityId": "potato_seed", "quantity": 30},
+        {"commodityId": "carrot_seed", "quantity": 30},
+        {"commodityId": "cabbage_seed", "quantity": 20},
+        {"commodityId": "cotton_seed", "quantity": 25},
+        {"commodityId": "water", "quantity": 120},
+        {"commodityId": "wheat", "quantity": 50},
+        {"commodityId": "bread", "quantity": 50},
+        {"commodityId": "potato", "quantity": 35},
+        {"commodityId": "carrot", "quantity": 30},
+        {"commodityId": "apple", "quantity": 25},
+        {"commodityId": "beef", "quantity": 25},
+        {"commodityId": "timber", "quantity": 30},
+        {"commodityId": "lumber", "quantity": 40},
+        {"commodityId": "firewood", "quantity": 50},
+        {"commodityId": "cotton", "quantity": 30},
+        {"commodityId": "cloth", "quantity": 20},
+        {"commodityId": "thread", "quantity": 15},
+        {"commodityId": "iron_ore", "quantity": 120},
+        {"commodityId": "copper_ore", "quantity": 80},
+        {"commodityId": "coal", "quantity": 120},
+        {"commodityId": "stone", "quantity": 100},
+        {"commodityId": "iron_bar", "quantity": 40},
+        {"commodityId": "copper_bar", "quantity": 25}
       ],
       "starterGold": 1100,
       "startingTreasury": 550,
@@ -668,7 +1239,10 @@
           "vocation": "Blacksmith",
           "workplaceIndex": 2,
           "housingBuildingIndex": 4,
-          "familyRelation": {"type": "spouse", "targetIndex": 0}
+          "familyRelation": {
+            "type": "spouse",
+            "targetIndex": 0
+          }
         },
         {
           "name": "Max Stahl",
@@ -677,7 +1251,10 @@
           "vocation": "Apprentice",
           "workplaceIndex": 2,
           "housingBuildingIndex": 4,
-          "familyRelation": {"type": "child", "targetIndex": 0}
+          "familyRelation": {
+            "type": "child",
+            "targetIndex": 0
+          }
         },
         {
           "name": "Bernd Kohle",
@@ -737,8 +1314,16 @@
         }
       ],
       "starterLandPlots": [
-        {"gridX": 6, "gridY": 5, "ownerCitizenIndex": 0},
-        {"gridX": 7, "gridY": 5, "ownerCitizenIndex": 0}
+        {
+          "gridX": 6,
+          "gridY": 5,
+          "ownerCitizenIndex": 0
+        },
+        {
+          "gridX": 7,
+          "gridY": 5,
+          "ownerCitizenIndex": 0
+        }
       ],
       "population": {
         "initialCount": 10,

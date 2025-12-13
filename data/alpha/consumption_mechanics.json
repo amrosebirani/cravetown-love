@@ -158,49 +158,50 @@
       "lower": 0.30
     },
     "startingSatisfactionRanges": {
+      "_comment": "Starting satisfaction ranges should give average 60-75% at game start",
       "elite": {
-        "biological": [60, 80],
-        "touch": [50, 70],
-        "psychological": [60, 80],
-        "safety": [70, 90],
-        "social_status": [70, 90],
-        "social_connection": [50, 70],
-        "exotic_goods": [50, 70],
-        "shiny_objects": [50, 70],
-        "vice": [30, 50]
+        "biological": [70, 85],
+        "touch": [65, 80],
+        "psychological": [70, 85],
+        "safety": [75, 90],
+        "social_status": [75, 90],
+        "social_connection": [65, 80],
+        "exotic_goods": [60, 75],
+        "shiny_objects": [60, 75],
+        "vice": [50, 65]
       },
       "upper": {
-        "biological": [50, 70],
-        "touch": [40, 60],
-        "psychological": [50, 70],
-        "safety": [60, 80],
-        "social_status": [50, 70],
-        "social_connection": [40, 60],
-        "exotic_goods": [30, 50],
-        "shiny_objects": [30, 50],
-        "vice": [20, 40]
+        "biological": [65, 80],
+        "touch": [60, 75],
+        "psychological": [65, 80],
+        "safety": [70, 85],
+        "social_status": [65, 80],
+        "social_connection": [60, 75],
+        "exotic_goods": [55, 70],
+        "shiny_objects": [55, 70],
+        "vice": [45, 60]
       },
       "middle": {
-        "biological": [30, 50],
-        "touch": [30, 50],
-        "psychological": [30, 50],
-        "safety": [40, 60],
-        "social_status": [30, 50],
-        "social_connection": [30, 50],
-        "exotic_goods": [10, 30],
-        "shiny_objects": [10, 30],
-        "vice": [10, 30]
+        "biological": [60, 75],
+        "touch": [55, 70],
+        "psychological": [55, 70],
+        "safety": [60, 75],
+        "social_status": [55, 70],
+        "social_connection": [55, 70],
+        "exotic_goods": [50, 65],
+        "shiny_objects": [50, 65],
+        "vice": [40, 55]
       },
       "lower": {
-        "biological": [20, 40],
-        "touch": [20, 40],
-        "psychological": [20, 40],
-        "safety": [30, 50],
-        "social_status": [10, 30],
-        "social_connection": [20, 40],
-        "exotic_goods": [5, 15],
-        "shiny_objects": [5, 15],
-        "vice": [5, 20]
+        "biological": [60, 75],
+        "touch": [55, 70],
+        "psychological": [55, 70],
+        "safety": [60, 75],
+        "social_status": [50, 65],
+        "social_connection": [55, 70],
+        "exotic_goods": [45, 60],
+        "shiny_objects": [45, 60],
+        "vice": [40, 55]
       }
     },
     "traits": {

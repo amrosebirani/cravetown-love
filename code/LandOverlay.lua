@@ -112,8 +112,28 @@ end
 function LandOverlay:GetCitizenColor(citizenId)
     if not citizenId then return self.colors.townOwned end
 
+    -- Handle both numeric and string citizen IDs
+    local numericId
+    if type(citizenId) == "number" then
+        numericId = citizenId
+    elseif type(citizenId) == "string" then
+        -- Try to extract number from string like "citizen_1" or hash the string
+        local num = citizenId:match("(%d+)")
+        if num then
+            numericId = tonumber(num)
+        else
+            -- Hash the string to get a consistent number
+            numericId = 0
+            for i = 1, #citizenId do
+                numericId = numericId + citizenId:byte(i)
+            end
+        end
+    else
+        return self.colors.townOwned
+    end
+
     -- Use consistent color based on citizen ID hash
-    local colorIndex = (citizenId % #self.citizenColors) + 1
+    local colorIndex = (numericId % #self.citizenColors) + 1
     return self.citizenColors[colorIndex]
 end
 
@@ -133,11 +153,19 @@ function LandOverlay:Render(camera)
     local camX, camY = camera:GetPosition()
     local camScale = camera:GetScale()
 
-    -- Calculate world coordinates of screen bounds
-    local worldLeft = camX - (screenW / 2) / camScale
-    local worldTop = camY - (screenH / 2) / camScale
-    local worldRight = camX + (screenW / 2) / camScale
-    local worldBottom = camY + (screenH / 2) / camScale
+    -- Get the world view offset (accounts for UI panels)
+    -- AlphaUI uses top-left corner camera coordinates
+    local worldViewX = camera.leftPanelWidth or 200
+    local worldViewY = camera.topBarHeight or 50
+    local worldViewW = screenW - worldViewX - (camera.rightPanelWidth or 280)
+    local worldViewH = screenH - worldViewY - (camera.eventLogHeight or 140)
+
+    -- Calculate world coordinates of visible area
+    -- Camera position is top-left corner of the world view
+    local worldLeft = camX
+    local worldTop = camY
+    local worldRight = camX + worldViewW / camScale
+    local worldBottom = camY + worldViewH / camScale
 
     -- Calculate grid range to render
     local startGridX = math.max(0, math.floor(worldLeft / plotWidth))
@@ -152,8 +180,9 @@ function LandOverlay:Render(camera)
             local plot = landSystem.plots and landSystem.plots[plotId]
 
             if plot then
-                local screenX = (gx * plotWidth - camX) * camScale + screenW / 2
-                local screenY = (gy * plotHeight - camY) * camScale + screenH / 2
+                -- Convert world position to screen position
+                local screenX = worldViewX + (gx * plotWidth - camX) * camScale
+                local screenY = worldViewY + (gy * plotHeight - camY) * camScale
                 local screenPW = plotWidth * camScale
                 local screenPH = plotHeight * camScale
 
@@ -363,12 +392,17 @@ function LandOverlay:UpdateHover(screenX, screenY, camera)
     self.hoverY = screenY
 
     -- Convert screen to world coordinates
-    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+    -- AlphaUI uses top-left corner camera coordinates
     local camX, camY = camera:GetPosition()
     local camScale = camera:GetScale()
 
-    local worldX = (screenX - screenW / 2) / camScale + camX
-    local worldY = (screenY - screenH / 2) / camScale + camY
+    -- Get world view offset
+    local worldViewX = camera.leftPanelWidth or 200
+    local worldViewY = camera.topBarHeight or 50
+
+    -- Convert screen position to world position
+    local worldX = (screenX - worldViewX) / camScale + camX
+    local worldY = (screenY - worldViewY) / camScale + camY
 
     -- Find plot at this position
     local plotWidth = landSystem.plotWidth or 100

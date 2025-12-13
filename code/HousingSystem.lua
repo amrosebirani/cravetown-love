@@ -100,7 +100,24 @@ function HousingSystem:LoadBuildingTypes()
         return DataLoader.loadJSON(filepath)
     end)
     if success and data then
-        return data
+        -- Handle both wrapped and unwrapped formats
+        local buildingTypesArray = data.buildingTypes or data
+        if type(buildingTypesArray) ~= "table" then
+            print("  WARNING: Invalid building types data format")
+            return {}
+        end
+
+        -- Convert array to map by ID for easy lookup
+        local byId = {}
+        local count = 0
+        for _, bt in ipairs(buildingTypesArray) do
+            if bt.id then
+                byId[bt.id] = bt
+                count = count + 1
+            end
+        end
+        print("[HousingSystem] Loaded " .. count .. " building types")
+        return byId
     else
         print("  WARNING: Could not load building types for HousingSystem")
         return {}
@@ -119,10 +136,17 @@ function HousingSystem:RegisterHousingBuilding(buildingId, buildingTypeId)
 
     local config = buildingType.housingConfig
 
+    -- Get capacity from housingConfig first, then fall back to upgradeLevels[0]
+    local capacity = config.capacity
+    if not capacity and buildingType.upgradeLevels and buildingType.upgradeLevels[1] then
+        capacity = buildingType.upgradeLevels[1].capacity
+    end
+    capacity = capacity or 1
+
     self.buildingOccupancy[buildingId] = {
         buildingTypeId = buildingTypeId,
         occupants = {},
-        capacity = config.capacity or 1,
+        capacity = capacity,
         housingQuality = config.housingQuality or 0.5,
         qualityTier = config.qualityTier or "basic",
         rentPerOccupant = config.rentPerOccupant or 0,
@@ -131,7 +155,7 @@ function HousingSystem:RegisterHousingBuilding(buildingId, buildingTypeId)
     }
 
     print(string.format("[HousingSystem] Registered housing building %s (%s) with capacity %d",
-        buildingId, buildingTypeId, config.capacity or 1))
+        buildingId, buildingTypeId, capacity))
 
     return true
 end

@@ -610,6 +610,8 @@ export interface StarterCitizenV2 {
   startingWealth: number;  // Gold amount to start with
   intendedRole: IntendedRole;  // Role determines starting wealth defaults
   housingBuildingIndex?: number;  // Index into starterBuildings for housing assignment
+  workplaceIndex?: number;  // Index into starterBuildings for workplace assignment
+  familyRelation?: { type: 'spouse' | 'child' | 'parent'; targetIndex: number };  // Family relationships
   // Legacy support
   classId?: string;  // Deprecated, kept for backwards compatibility
 }

@@ -159,6 +159,8 @@ const StartingLocationManager: React.FC = () => {
     setIsNew(false);
     setEditing(record);
 
+    const recordAny = record as any;
+
     // Set form values
     form.setFieldsValue({
       id: record.id,
@@ -168,7 +170,8 @@ const StartingLocationManager: React.FC = () => {
       bonus: record.bonus,
       challenge: record.challenge,
       starterGold: record.starterGold,
-      initialCount: record.population?.initialCount || 15
+      initialCount: record.population?.initialCount || 15,
+      startingTreasury: recordAny.startingTreasury
     });
 
     // Set nested state
@@ -184,27 +187,71 @@ const StartingLocationManager: React.FC = () => {
       waterColor: [0.2, 0.4, 0.7]
     });
     setProductionModifiers(record.productionModifiers || {});
-    setStarterBuildings(record.starterBuildings || []);
     setStarterResources(record.starterResources || []);
-    // Handle migration from old traitId to new traitIds format
-    const citizens = (record.population?.starterCitizens || []).map(c => ({
-      ...c,
-      traitIds: c.traitIds || ((c as any).traitId ? [(c as any).traitId] : [])
-    }));
-    setStarterCitizens(citizens);
 
-    // Load V2 fields
-    const recordV2 = record as any;
-    setStarterCitizensV2(recordV2.starterCitizensV2 || []);
-    setStarterBuildingsV2(recordV2.starterBuildingsV2 || []);
-    setStarterLandPlots(recordV2.starterLandPlots || []);
-    setEconomicSystem(recordV2.economicSystem || 'capitalist');
+    // Detect data format: Check if starterCitizens at root has V2-style fields (intendedRole, startingWealth)
+    const rootCitizens = recordAny.starterCitizens || [];
+    const rootBuildings = record.starterBuildings || [];
+    const hasV2StyleCitizens = rootCitizens.length > 0 && rootCitizens[0]?.intendedRole !== undefined;
+    const hasV2StyleBuildings = rootBuildings.length > 0 && (
+      rootBuildings[0]?.ownerCitizenIndex !== undefined ||
+      rootBuildings[0]?.initialOccupants !== undefined
+    );
+    const hasLandPlots = (recordAny.starterLandPlots?.length > 0);
+    const hasEconomicSystem = recordAny.economicSystem !== undefined;
 
-    // Detect V2 mode if V2 data exists
-    const hasV2Data = (recordV2.starterCitizensV2?.length > 0) ||
-                      (recordV2.starterBuildingsV2?.length > 0) ||
-                      (recordV2.starterLandPlots?.length > 0);
-    setUseV2Mode(hasV2Data);
+    // Determine if this is V2 format data
+    const isV2Format = hasV2StyleCitizens || hasV2StyleBuildings || hasLandPlots || hasEconomicSystem;
+
+    if (isV2Format) {
+      // Load as V2 data - citizens are at root with V2 fields
+      setStarterCitizensV2(rootCitizens.map((c: any) => ({
+        name: c.name,
+        vocationId: c.vocation || c.vocationId,
+        intendedRole: c.intendedRole || 'laborer',
+        startingWealth: c.startingWealth || 0,
+        traitIds: c.traitIds || [],
+        housingBuildingIndex: c.housingBuildingIndex,
+        workplaceIndex: c.workplaceIndex,
+        familyRelation: c.familyRelation
+      })));
+
+      // Load buildings as V2
+      setStarterBuildingsV2(rootBuildings.map((b: any) => ({
+        typeId: b.typeId,
+        x: b.x,
+        y: b.y,
+        autoAssignRecipe: b.autoAssignRecipe,
+        ownerCitizenIndex: b.ownerCitizenIndex,
+        initialOccupants: b.initialOccupants || [],
+        rentRate: b.rentRate
+      })));
+
+      setStarterLandPlots(recordAny.starterLandPlots || []);
+      setEconomicSystem(recordAny.economicSystem || 'capitalist');
+      setUseV2Mode(true);
+
+      // Clear legacy data
+      setStarterBuildings([]);
+      setStarterCitizens([]);
+    } else {
+      // Load as legacy data
+      setStarterBuildings(rootBuildings);
+
+      // Handle migration from old traitId to new traitIds format
+      const citizens = (record.population?.starterCitizens || []).map(c => ({
+        ...c,
+        traitIds: c.traitIds || ((c as any).traitId ? [(c as any).traitId] : [])
+      }));
+      setStarterCitizens(citizens);
+
+      // Clear V2 data
+      setStarterCitizensV2([]);
+      setStarterBuildingsV2([]);
+      setStarterLandPlots([]);
+      setEconomicSystem('capitalist');
+      setUseV2Mode(false);
+    }
 
     setIsModalVisible(true);
   };
@@ -225,38 +272,70 @@ const StartingLocationManager: React.FC = () => {
       const values = await form.validateFields();
       if (!data) return;
 
-      const newLocation: StartingLocation & {
-        starterCitizensV2?: StarterCitizenV2[];
-        starterBuildingsV2?: StarterBuildingV2[];
-        starterLandPlots?: StarterLandPlot[];
-        economicSystem?: EconomicSystemType;
-        startingTreasury?: number;
-      } = {
-        id: values.id,
-        name: values.name,
-        icon: values.icon || '*',
-        description: values.description || '',
-        bonus: values.bonus || '',
-        challenge: values.challenge || '',
-        terrain: terrain,
-        productionModifiers: productionModifiers,
-        starterBuildings: useV2Mode ? [] : starterBuildings,  // Use V2 buildings if V2 mode
-        starterResources: starterResources,
-        starterGold: values.starterGold || 1000,
-        population: {
-          initialCount: values.initialCount || 15,
-          classDistribution: {}, // Keep for backwards compatibility
-          starterCitizens: useV2Mode ? undefined : (starterCitizens.length > 0 ? starterCitizens : undefined)
-        },
-        // V2 fields
-        ...(useV2Mode && {
-          starterCitizensV2: starterCitizensV2.length > 0 ? starterCitizensV2 : undefined,
-          starterBuildingsV2: starterBuildingsV2.length > 0 ? starterBuildingsV2 : undefined,
-          starterLandPlots: starterLandPlots.length > 0 ? starterLandPlots : undefined,
+      // Build the location object based on mode
+      let newLocation: any;
+
+      if (useV2Mode) {
+        // V2 format: starterCitizens and starterBuildings at root level with V2 fields
+        newLocation = {
+          id: values.id,
+          name: values.name,
+          icon: values.icon || '*',
+          description: values.description || '',
+          bonus: values.bonus || '',
+          challenge: values.challenge || '',
+          terrain: terrain,
+          productionModifiers: productionModifiers,
+          starterBuildings: starterBuildingsV2.map(b => ({
+            typeId: b.typeId,
+            x: b.x,
+            y: b.y,
+            autoAssignRecipe: b.autoAssignRecipe,
+            ...(b.ownerCitizenIndex !== undefined && { ownerCitizenIndex: b.ownerCitizenIndex }),
+            ...(b.initialOccupants && b.initialOccupants.length > 0 && { initialOccupants: b.initialOccupants }),
+            ...(b.rentRate !== undefined && { rentRate: b.rentRate })
+          })),
+          starterResources: starterResources,
+          starterGold: values.starterGold || 1000,
+          startingTreasury: values.startingTreasury || 0,
           economicSystem: economicSystem,
-          startingTreasury: values.startingTreasury
-        })
-      };
+          starterCitizens: starterCitizensV2.map(c => ({
+            name: c.name,
+            startingWealth: c.startingWealth || 0,
+            intendedRole: c.intendedRole,
+            vocation: c.vocationId,
+            ...(c.workplaceIndex !== undefined && { workplaceIndex: c.workplaceIndex }),
+            ...(c.housingBuildingIndex !== undefined && { housingBuildingIndex: c.housingBuildingIndex }),
+            ...(c.familyRelation && { familyRelation: c.familyRelation }),
+            ...(c.traitIds && c.traitIds.length > 0 && { traitIds: c.traitIds })
+          })),
+          ...(starterLandPlots.length > 0 && { starterLandPlots: starterLandPlots }),
+          population: {
+            initialCount: starterCitizensV2.length || values.initialCount || 15,
+            classDistribution: {}
+          }
+        };
+      } else {
+        // Legacy format
+        newLocation = {
+          id: values.id,
+          name: values.name,
+          icon: values.icon || '*',
+          description: values.description || '',
+          bonus: values.bonus || '',
+          challenge: values.challenge || '',
+          terrain: terrain,
+          productionModifiers: productionModifiers,
+          starterBuildings: starterBuildings,
+          starterResources: starterResources,
+          starterGold: values.starterGold || 1000,
+          population: {
+            initialCount: values.initialCount || 15,
+            classDistribution: {},
+            ...(starterCitizens.length > 0 && { starterCitizens: starterCitizens })
+          }
+        };
+      }
 
       let newLocations: StartingLocation[];
 
@@ -1332,12 +1411,37 @@ const StartingLocationManager: React.FC = () => {
                 </Button>
 
                 {starterCitizensV2.map((citizen, index) => (
-                  <Row key={index} gutter={8} style={{ marginBottom: 12, padding: 8, background: '#fafafa', borderRadius: 4 }} align="top">
-                    <Col span={1}>
-                      <span style={{ color: '#888', lineHeight: '32px' }}>#{index + 1}</span>
-                    </Col>
-                    <Col span={4}>
-                      <Tooltip title="Intended role determines initial behaviors and default wealth">
+                  <Card
+                    key={index}
+                    size="small"
+                    style={{ marginBottom: 12 }}
+                    title={
+                      <Space>
+                        <span style={{ color: '#888' }}>#{index + 1}</span>
+                        <Tag color={ROLE_COLORS[citizen.intendedRole]}>{citizen.intendedRole}</Tag>
+                        {citizen.name && <span>{citizen.name}</span>}
+                      </Space>
+                    }
+                    extra={
+                      <Button
+                        type="link"
+                        danger
+                        icon={<MinusCircleOutlined />}
+                        onClick={() => removeStarterCitizenV2(index)}
+                      />
+                    }
+                  >
+                    <Row gutter={16}>
+                      <Col span={6}>
+                        <div style={{ marginBottom: 4, color: '#888', fontSize: 12 }}>Name:</div>
+                        <Input
+                          value={citizen.name}
+                          onChange={(e) => updateStarterCitizenV2(index, 'name', e.target.value)}
+                          placeholder="Citizen name"
+                        />
+                      </Col>
+                      <Col span={4}>
+                        <div style={{ marginBottom: 4, color: '#888', fontSize: 12 }}>Role:</div>
                         <Select
                           style={{ width: '100%' }}
                           value={citizen.intendedRole}
@@ -1350,10 +1454,9 @@ const StartingLocationManager: React.FC = () => {
                             </Select.Option>
                           ))}
                         </Select>
-                      </Tooltip>
-                    </Col>
-                    <Col span={4}>
-                      <Tooltip title="Starting gold - affects emergent class">
+                      </Col>
+                      <Col span={4}>
+                        <div style={{ marginBottom: 4, color: '#888', fontSize: 12 }}>Wealth:</div>
                         <InputNumber
                           style={{ width: '100%' }}
                           value={citizen.startingWealth}
@@ -1361,27 +1464,45 @@ const StartingLocationManager: React.FC = () => {
                           min={0}
                           prefix={<DollarOutlined />}
                         />
-                      </Tooltip>
-                    </Col>
-                    <Col span={5}>
-                      <Select
-                        style={{ width: '100%' }}
-                        value={citizen.vocationId}
-                        onChange={(value) => updateStarterCitizenV2(index, 'vocationId', value)}
-                        placeholder="Vocation"
-                        showSearch
-                        optionFilterProp="children"
-                        filterOption={(input, option) =>
-                          (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
-                        }
-                      >
-                        {workerTypes.map(wt => (
-                          <Select.Option key={wt.id} value={wt.id}>{wt.name}</Select.Option>
-                        ))}
-                      </Select>
-                    </Col>
-                    <Col span={4}>
-                      <Tooltip title="Housing building index (from Buildings tab)">
+                      </Col>
+                      <Col span={5}>
+                        <div style={{ marginBottom: 4, color: '#888', fontSize: 12 }}>Vocation:</div>
+                        <Select
+                          style={{ width: '100%' }}
+                          value={citizen.vocationId}
+                          onChange={(value) => updateStarterCitizenV2(index, 'vocationId', value)}
+                          placeholder="Vocation"
+                          showSearch
+                          optionFilterProp="children"
+                          filterOption={(input, option) =>
+                            (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
+                          }
+                        >
+                          {workerTypes.map(wt => (
+                            <Select.Option key={wt.id} value={wt.id}>{wt.name}</Select.Option>
+                          ))}
+                        </Select>
+                      </Col>
+                      <Col span={5}>
+                        <div style={{ marginBottom: 4, color: '#888', fontSize: 12 }}>Traits:</div>
+                        <Select
+                          mode="multiple"
+                          style={{ width: '100%' }}
+                          value={citizen.traitIds || []}
+                          onChange={(values) => updateStarterCitizenV2(index, 'traitIds', values)}
+                          placeholder="Traits"
+                          allowClear
+                          maxTagCount={1}
+                        >
+                          {characterTraits.map(trait => (
+                            <Select.Option key={trait.id} value={trait.id}>{trait.id}</Select.Option>
+                          ))}
+                        </Select>
+                      </Col>
+                    </Row>
+                    <Row gutter={16} style={{ marginTop: 12 }}>
+                      <Col span={6}>
+                        <div style={{ marginBottom: 4, color: '#888', fontSize: 12 }}>Housing:</div>
                         <Select
                           style={{ width: '100%' }}
                           value={citizen.housingBuildingIndex}
@@ -1401,32 +1522,31 @@ const StartingLocationManager: React.FC = () => {
                             return null;
                           }).filter(Boolean)}
                         </Select>
-                      </Tooltip>
-                    </Col>
-                    <Col span={4}>
-                      <Select
-                        mode="multiple"
-                        style={{ width: '100%' }}
-                        value={citizen.traitIds || []}
-                        onChange={(values) => updateStarterCitizenV2(index, 'traitIds', values)}
-                        placeholder="Traits"
-                        allowClear
-                        maxTagCount={1}
-                      >
-                        {characterTraits.map(trait => (
-                          <Select.Option key={trait.id} value={trait.id}>{trait.id}</Select.Option>
-                        ))}
-                      </Select>
-                    </Col>
-                    <Col span={2}>
-                      <Button
-                        type="link"
-                        danger
-                        icon={<MinusCircleOutlined />}
-                        onClick={() => removeStarterCitizenV2(index)}
-                      />
-                    </Col>
-                  </Row>
+                      </Col>
+                      <Col span={6}>
+                        <div style={{ marginBottom: 4, color: '#888', fontSize: 12 }}>Workplace:</div>
+                        <Select
+                          style={{ width: '100%' }}
+                          value={citizen.workplaceIndex}
+                          onChange={(value) => updateStarterCitizenV2(index, 'workplaceIndex', value)}
+                          placeholder="Workplace"
+                          allowClear
+                        >
+                          {starterBuildingsV2.map((b, bi) => {
+                            const bt = buildingTypes.find(t => t.id === b.typeId);
+                            if (bt?.category !== 'housing') {
+                              return (
+                                <Select.Option key={bi} value={bi}>
+                                  #{bi + 1} {b.typeId}
+                                </Select.Option>
+                              );
+                            }
+                            return null;
+                          }).filter(Boolean)}
+                        </Select>
+                      </Col>
+                    </Row>
+                  </Card>
                 ))}
 
                 <Divider />

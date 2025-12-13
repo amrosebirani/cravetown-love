@@ -427,6 +427,26 @@ function AlphaPrototypeState:SetupStarterContent()
         end
     end
 
+    -- Assign housing occupants for housing buildings with initialOccupants
+    for buildingIndex, buildingConfig in ipairs(config.starterBuildings or {}) do
+        if buildingConfig.initialOccupants and #buildingConfig.initialOccupants > 0 then
+            local building = buildingsByIndex[buildingIndex - 1]
+            if building and self.mWorld.housingSystem then
+                for _, occupantIndex in ipairs(buildingConfig.initialOccupants) do
+                    local citizen = citizensByIndex[occupantIndex]
+                    if citizen then
+                        local success, err = self.mWorld.housingSystem:AssignHousing(citizen.id, building.id)
+                        if success then
+                            print("[SetupStarterContent] Assigned " .. citizen.name .. " to housing: " .. building.name)
+                        else
+                            print("[SetupStarterContent] Failed to assign " .. citizen.name .. " to " .. building.name .. ": " .. (err or "unknown"))
+                        end
+                    end
+                end
+            end
+        end
+    end
+
     -- Add starter resources from config
     for _, resource in ipairs(config.starterResources or {}) do
         self.mWorld:AddToInventory(resource.commodityId, resource.quantity)

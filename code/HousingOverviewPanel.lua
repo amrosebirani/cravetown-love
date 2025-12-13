@@ -176,30 +176,34 @@ function HousingOverviewPanel:RefreshData()
         lower = {class = "Lower", housed = 0, homeless = 0},
     }
 
-    -- Process housing buildings
+    -- Process housing buildings from buildingOccupancy
     if housingSystem then
-        for buildingId, building in pairs(housingSystem.housingBuildings or {}) do
+        for buildingId, occupancy in pairs(housingSystem.buildingOccupancy or {}) do
             self.statistics.buildingCount = self.statistics.buildingCount + 1
 
-            local capacity = building.capacity or 4
-            local occupancy = building.currentOccupancy or 0
-            local rentRate = building.rentRate or 10
+            local capacity = occupancy.capacity or 4
+            local currentOccupancy = occupancy.occupants and #occupancy.occupants or 0
+            local rentRate = occupancy.rentPerOccupant or 10
 
             self.statistics.totalCapacity = self.statistics.totalCapacity + capacity
-            self.statistics.currentPop = self.statistics.currentPop + occupancy
+            self.statistics.currentPop = self.statistics.currentPop + currentOccupancy
 
             -- Calculate rent
-            local rent = occupancy * rentRate
+            local rent = currentOccupancy * rentRate
             self.statistics.totalRent = self.statistics.totalRent + rent
 
-            if building.ownerId == "town" or building.ownerId == 0 or not building.ownerId then
+            -- Check building owner from world.buildings
+            local building = self.world.buildings and self.world.buildings[buildingId]
+            local ownerId = building and building.ownerId
+
+            if ownerId == "town" or ownerId == "TOWN" or ownerId == 0 or not ownerId then
                 self.statistics.townRent = self.statistics.townRent + rent
             else
                 self.statistics.privateRent = self.statistics.privateRent + rent
             end
 
             -- Update tier data based on building type
-            local typeId = building.typeId or "lodge"
+            local typeId = occupancy.buildingTypeId or "lodge"
             local tierKey = typeId:lower():gsub("_", ""):gsub(" ", "")
 
             -- Map common building type IDs to tier keys
@@ -215,7 +219,7 @@ function HousingOverviewPanel:RefreshData()
 
             if tierData[tierKey] then
                 tierData[tierKey].capacity = tierData[tierKey].capacity + capacity
-                tierData[tierKey].occupancy = tierData[tierKey].occupancy + occupancy
+                tierData[tierKey].occupancy = tierData[tierKey].occupancy + currentOccupancy
             end
         end
 
@@ -602,6 +606,12 @@ function HousingOverviewPanel:HandleKeyPress(key)
         return true
     end
 
+    return false
+end
+
+function HousingOverviewPanel:HandleMouseWheel(y)
+    -- Panel doesn't scroll currently, but method needed to avoid nil error
+    if not self.visible then return false end
     return false
 end
 

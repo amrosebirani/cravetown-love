@@ -277,6 +277,11 @@ function AlphaUI:Render()
     -- Render world view (center area)
     self:RenderWorldView()
 
+    -- Render land overlay (part of world view, before UI panels)
+    if self.showLandOverlay and self.landOverlay then
+        self.landOverlay:Render(self)  -- Pass self as camera
+    end
+
     -- Render UI panels (dimmed if in placement mode)
     if self.placementMode then
         love.graphics.setColor(0.7, 0.7, 0.7)
@@ -322,11 +327,6 @@ function AlphaUI:Render()
     -- Render resource overlay panel (screen space, not world space)
     if self.showResourceOverlay and self.resourceOverlay then
         self.resourceOverlay:renderPanel()
-    end
-
-    -- Render land overlay (using new module)
-    if self.showLandOverlay and self.landOverlay then
-        self.landOverlay:Render(self)  -- Pass self as camera
     end
 
     -- Render land registry panel
@@ -1687,6 +1687,16 @@ end
 function AlphaUI:RenderBuildingDetails(x, y, w)
     local building = self.world.selectedEntity
 
+    -- Check if this is a housing building
+    local isHousing = false
+    local housingOccupancy = nil
+    if self.world.housingSystem and self.world.housingSystem.buildingOccupancy then
+        housingOccupancy = self.world.housingSystem.buildingOccupancy[building.id]
+        if housingOccupancy then
+            isHousing = true
+        end
+    end
+
     -- Header
     love.graphics.setFont(self.fonts.header)
     love.graphics.setColor(self.colors.text)
@@ -1701,6 +1711,108 @@ function AlphaUI:RenderBuildingDetails(x, y, w)
     love.graphics.print("Level: " .. (building.level + 1), x + 10, y)
     y = y + 30
 
+    if isHousing then
+        -- Housing-specific details
+        y = self:RenderHousingBuildingDetails(x, y, w, building, housingOccupancy)
+    else
+        -- Production building details
+        y = self:RenderProductionBuildingDetails(x, y, w, building)
+    end
+
+    y = y + 15
+
+    -- Action button (different text for housing vs production)
+    local btnW = w - 20
+    local btnH = 30
+    local btnX = x + 10
+    local btnY = y
+
+    love.graphics.setColor(0.3, 0.5, 0.7)
+    love.graphics.rectangle("fill", btnX, btnY, btnW, btnH, 5, 5)
+    love.graphics.setColor(0.4, 0.6, 0.8)
+    love.graphics.rectangle("line", btnX, btnY, btnW, btnH, 5, 5)
+
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.setColor(1, 1, 1)
+    local btnText = isHousing and "Manage Housing" or "Manage Building"
+    local textW = self.fonts.normal:getWidth(btnText)
+    love.graphics.print(btnText, btnX + (btnW - textW) / 2, btnY + 7)
+
+    -- Store button position for click handling
+    self.manageBuildingBtn = {x = btnX, y = btnY, w = btnW, h = btnH}
+    self.isHousingBuilding = isHousing
+end
+
+function AlphaUI:RenderHousingBuildingDetails(x, y, w, building, housingOccupancy)
+    -- Residents section
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.setColor(self.colors.text)
+    love.graphics.print("Residents", x + 10, y)
+    y = y + 20
+
+    love.graphics.setFont(self.fonts.small)
+    local occupants = housingOccupancy.occupants or {}
+    local residentCount = #occupants
+    local capacity = housingOccupancy.capacity or 1
+    local residentColor = residentCount >= capacity and self.colors.success or
+                        (residentCount > 0 and self.colors.warning or self.colors.danger)
+    love.graphics.setColor(residentColor)
+    love.graphics.print(residentCount .. " / " .. capacity, x + 10, y)
+    y = y + 20
+
+    -- List residents
+    for i, residentId in ipairs(occupants) do
+        if i > 5 then
+            love.graphics.setColor(self.colors.textDim)
+            love.graphics.print("  ... and " .. (residentCount - 5) .. " more", x + 15, y)
+            y = y + 14
+            break
+        end
+        local resident = self.world.characters and self.world.characters[residentId]
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("- " .. (resident and resident.name or "Resident"), x + 15, y)
+        y = y + 14
+    end
+
+    if residentCount == 0 then
+        love.graphics.setColor(self.colors.textMuted or {0.5, 0.5, 0.5})
+        love.graphics.print("No residents", x + 15, y)
+        y = y + 14
+    end
+
+    y = y + 15
+
+    -- Housing Quality
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.setColor(self.colors.text)
+    love.graphics.print("Housing Info", x + 10, y)
+    y = y + 20
+
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.textDim)
+
+    local qualityTier = housingOccupancy.qualityTier or "basic"
+    local quality = housingOccupancy.housingQuality or 0.5
+    love.graphics.print("Quality: " .. qualityTier .. " (" .. math.floor(quality * 100) .. "%)", x + 10, y)
+    y = y + 16
+
+    local rent = housingOccupancy.rentPerOccupant or 0
+    love.graphics.setColor(self.colors.gold or {0.98, 0.85, 0.37})
+    love.graphics.print("Rent: " .. rent .. "g per resident/cycle", x + 10, y)
+    y = y + 16
+
+    -- Target classes
+    local targetClasses = housingOccupancy.targetClasses or {}
+    if #targetClasses > 0 then
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("Target: " .. table.concat(targetClasses, ", "), x + 10, y)
+        y = y + 16
+    end
+
+    return y
+end
+
+function AlphaUI:RenderProductionBuildingDetails(x, y, w, building)
     -- Workers
     love.graphics.setFont(self.fonts.normal)
     love.graphics.setColor(self.colors.text)
@@ -1708,7 +1820,8 @@ function AlphaUI:RenderBuildingDetails(x, y, w)
     y = y + 20
 
     love.graphics.setFont(self.fonts.small)
-    local workerCount = #building.workers
+    local workers = building.workers or {}
+    local workerCount = #workers
     local maxWorkers = building.maxWorkers or 2
     local workerColor = workerCount >= maxWorkers and self.colors.success or
                         (workerCount > 0 and self.colors.warning or self.colors.danger)
@@ -1717,7 +1830,7 @@ function AlphaUI:RenderBuildingDetails(x, y, w)
     y = y + 20
 
     -- List workers
-    for i, worker in ipairs(building.workers) do
+    for i, worker in ipairs(workers) do
         love.graphics.setColor(self.colors.textDim)
         love.graphics.print("- " .. (worker.name or "Worker"), x + 15, y)
         y = y + 14
@@ -1725,30 +1838,33 @@ function AlphaUI:RenderBuildingDetails(x, y, w)
     y = y + 15
 
     -- Stations
-    love.graphics.setFont(self.fonts.normal)
-    love.graphics.setColor(self.colors.text)
-    love.graphics.print("Production", x + 10, y)
-    y = y + 20
+    local stations = building.stations or {}
+    if #stations > 0 then
+        love.graphics.setFont(self.fonts.normal)
+        love.graphics.setColor(self.colors.text)
+        love.graphics.print("Production", x + 10, y)
+        y = y + 20
 
-    love.graphics.setFont(self.fonts.small)
-    for i, station in ipairs(building.stations) do
-        local stateColor = station.state == "PRODUCING" and self.colors.success or
-                          (station.state == "IDLE" and self.colors.textDim or self.colors.warning)
-        love.graphics.setColor(stateColor)
-        local recipeName = station.recipe and station.recipe.name or "No recipe"
-        love.graphics.print("Station " .. i .. ": " .. recipeName, x + 10, y)
-        y = y + 14
-        love.graphics.setColor(self.colors.textDim)
-        love.graphics.print("  Status: " .. station.state, x + 10, y)
-        y = y + 14
-
-        if station.state == "PRODUCING" then
-            love.graphics.print(string.format("  Progress: %.0f%%", station.progress * 100), x + 10, y)
+        love.graphics.setFont(self.fonts.small)
+        for i, station in ipairs(stations) do
+            local stateColor = station.state == "PRODUCING" and self.colors.success or
+                              (station.state == "IDLE" and self.colors.textDim or self.colors.warning)
+            love.graphics.setColor(stateColor)
+            local recipeName = station.recipe and station.recipe.name or "No recipe"
+            love.graphics.print("Station " .. i .. ": " .. recipeName, x + 10, y)
             y = y + 14
-        end
-    end
+            love.graphics.setColor(self.colors.textDim)
+            love.graphics.print("  Status: " .. station.state, x + 10, y)
+            y = y + 14
 
-    y = y + 15
+            if station.state == "PRODUCING" then
+                love.graphics.print(string.format("  Progress: %.0f%%", station.progress * 100), x + 10, y)
+                y = y + 14
+            end
+        end
+
+        y = y + 15
+    end
 
     -- Resource Efficiency
     if building.resourceEfficiency then
@@ -1779,27 +1895,7 @@ function AlphaUI:RenderBuildingDetails(x, y, w)
         end
     end
 
-    y = y + 15
-
-    -- Manage Building button
-    local btnW = w - 20
-    local btnH = 30
-    local btnX = x + 10
-    local btnY = y
-
-    love.graphics.setColor(0.3, 0.5, 0.7)
-    love.graphics.rectangle("fill", btnX, btnY, btnW, btnH, 5, 5)
-    love.graphics.setColor(0.4, 0.6, 0.8)
-    love.graphics.rectangle("line", btnX, btnY, btnW, btnH, 5, 5)
-
-    love.graphics.setFont(self.fonts.normal)
-    love.graphics.setColor(1, 1, 1)
-    local btnText = "Manage Building"
-    local textW = self.fonts.normal:getWidth(btnText)
-    love.graphics.print(btnText, btnX + (btnW - textW) / 2, btnY + 7)
-
-    -- Store button position for click handling
-    self.manageBuildingBtn = {x = btnX, y = btnY, w = btnW, h = btnH}
+    return y
 end
 
 -- =============================================================================
@@ -7854,7 +7950,7 @@ function AlphaUI:CalculateEmigrationRisk(citizen, config)
         end
 
         -- Get critical cravings and suggest solutions
-        local criticalCravings = citizen:GetCriticalCravings and citizen:GetCriticalCravings() or {}
+        local criticalCravings = citizen.GetCriticalCravings and citizen:GetCriticalCravings() or {}
         for _, craving in ipairs(criticalCravings) do
             local solution = self:GetCravingSolution(craving, citizen)
             if solution then

@@ -120,7 +120,7 @@ local CharacterDetailPanel = {}
 CharacterDetailPanel.__index = CharacterDetailPanel
 
 -- Import CharacterV2 for craving dimension mappings
-local CharacterV2 = require("code.CharacterV2")
+local CharacterV2 = require("code.consumption.CharacterV2")
 
 function CharacterDetailPanel:Create(world)
     local panel = setmetatable({}, CharacterDetailPanel)

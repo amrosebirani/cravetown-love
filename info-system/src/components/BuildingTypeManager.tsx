@@ -12,6 +12,7 @@ const BUILDING_CATEGORIES = [
   'production',
   'agriculture',
   'extraction',
+  'housing',
   'residential',
   'medical',
   'education',
@@ -19,6 +20,9 @@ const BUILDING_CATEGORIES = [
   'resource',
   'services'
 ];
+
+// Categories that use storage (production buildings)
+const STORAGE_CATEGORIES = ['production', 'agriculture', 'extraction', 'commerce', 'resource'];
 
 const BuildingTypeManager = () => {
   const [buildingTypes, setBuildingTypes] = useState<BuildingType[]>([]);
@@ -664,38 +668,65 @@ const BuildingTypeManager = () => {
                     </Col>
                   </Row>
 
-                  <Divider style={{ margin: '12px 0' }}>Storage</Divider>
+                  {/* Storage section - only for production/commerce buildings */}
+                  {STORAGE_CATEGORIES.includes(form.getFieldValue('category')) && level.storage && (
+                    <>
+                      <Divider style={{ margin: '12px 0' }}>Storage</Divider>
 
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <div style={{ marginBottom: 8 }}>
-                        <strong>Input Capacity:</strong>
-                        <InputNumber
-                          value={level.storage.inputCapacity}
-                          onChange={(value) => handleUpdateUpgradeLevel(index, {
-                            storage: { ...level.storage, inputCapacity: value || 100 }
-                          })}
-                          min={0}
-                          max={10000}
-                          style={{ width: '100%' }}
-                        />
-                      </div>
-                    </Col>
-                    <Col span={12}>
-                      <div style={{ marginBottom: 8 }}>
-                        <strong>Output Capacity:</strong>
-                        <InputNumber
-                          value={level.storage.outputCapacity}
-                          onChange={(value) => handleUpdateUpgradeLevel(index, {
-                            storage: { ...level.storage, outputCapacity: value || 100 }
-                          })}
-                          min={0}
-                          max={10000}
-                          style={{ width: '100%' }}
-                        />
-                      </div>
-                    </Col>
-                  </Row>
+                      <Row gutter={16}>
+                        <Col span={12}>
+                          <div style={{ marginBottom: 8 }}>
+                            <strong>Input Capacity:</strong>
+                            <InputNumber
+                              value={level.storage?.inputCapacity}
+                              onChange={(value) => handleUpdateUpgradeLevel(index, {
+                                storage: { ...level.storage, inputCapacity: value || 100 }
+                              })}
+                              min={0}
+                              max={10000}
+                              style={{ width: '100%' }}
+                            />
+                          </div>
+                        </Col>
+                        <Col span={12}>
+                          <div style={{ marginBottom: 8 }}>
+                            <strong>Output Capacity:</strong>
+                            <InputNumber
+                              value={level.storage?.outputCapacity}
+                              onChange={(value) => handleUpdateUpgradeLevel(index, {
+                                storage: { ...level.storage, outputCapacity: value || 100 }
+                              })}
+                              min={0}
+                              max={10000}
+                              style={{ width: '100%' }}
+                            />
+                          </div>
+                        </Col>
+                      </Row>
+                    </>
+                  )}
+
+                  {/* Housing capacity - only for housing/residential buildings */}
+                  {(form.getFieldValue('category') === 'housing' || form.getFieldValue('category') === 'residential') && (
+                    <>
+                      <Divider style={{ margin: '12px 0' }}>Housing</Divider>
+
+                      <Row gutter={16}>
+                        <Col span={12}>
+                          <div style={{ marginBottom: 8 }}>
+                            <strong>Capacity (residents):</strong>
+                            <InputNumber
+                              value={level.capacity}
+                              onChange={(value) => handleUpdateUpgradeLevel(index, { capacity: value || 1 })}
+                              min={1}
+                              max={100}
+                              style={{ width: '100%' }}
+                            />
+                          </div>
+                        </Col>
+                      </Row>
+                    </>
+                  )}
 
                   <Divider style={{ margin: '12px 0' }}>
                     {level.level === 0 ? 'Construction Materials' : 'Upgrade Materials'}

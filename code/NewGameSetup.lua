@@ -47,8 +47,6 @@ function NewGameSetup:Create(onComplete, onCancel)
         townName = "Prosperityville",
         location = "fertile_plains",
         difficulty = "normal",
-        startingPopulation = 15,
-        classDistribution = "balanced",
         economicSystem = "communist",
         tutorialMode = "full"
     }
@@ -69,14 +67,6 @@ function NewGameSetup:Create(onComplete, onCancel)
         {id = "normal", name = "Normal", desc = "Balanced challenge"},
         {id = "challenging", name = "Challenging", desc = "Scarce resources, faster craving growth"},
         {id = "survival", name = "Survival", desc = "Minimal starting resources"}
-    }
-
-    -- Class distribution presets
-    setup.classPresets = {
-        {id = "balanced", name = "Balanced", desc = "Mix of all classes"},
-        {id = "working", name = "Working Class", desc = "Mostly workers, few elite"},
-        {id = "established", name = "Established", desc = "More upper/middle class"},
-        {id = "custom", name = "Custom", desc = "Set exact percentages"}
     }
 
     -- Economic systems
@@ -101,7 +91,6 @@ function NewGameSetup:Create(onComplete, onCancel)
     -- Selected indices for radio buttons
     setup.selectedLocation = 3  -- fertile_plains
     setup.selectedDifficulty = 2  -- normal
-    setup.selectedClassPreset = 1  -- balanced
     setup.selectedEconomic = 1  -- communist
     setup.selectedTutorial = 1  -- full
 
@@ -341,33 +330,6 @@ function NewGameSetup:RenderStep2(panelX, contentY, panelW, contentH)
 
     y = y + 10
 
-    -- Starting population slider
-    love.graphics.setColor(self.colors.text)
-    love.graphics.print("Starting Population: " .. self.config.startingPopulation, x, y)
-    y = y + 25
-
-    -- Slider
-    local sliderW = 200
-    local sliderX = x
-    local sliderY = y + 5
-    local minPop, maxPop = 5, 30
-    local sliderPos = (self.config.startingPopulation - minPop) / (maxPop - minPop)
-
-    love.graphics.setColor(self.colors.border)
-    love.graphics.rectangle("fill", sliderX, sliderY, sliderW, 8, 4, 4)
-    love.graphics.setColor(self.colors.accent)
-    love.graphics.rectangle("fill", sliderX, sliderY, sliderW * sliderPos, 8, 4, 4)
-    love.graphics.circle("fill", sliderX + sliderW * sliderPos, sliderY + 4, 10)
-
-    -- Min/max labels
-    love.graphics.setFont(self.fonts.small)
-    love.graphics.setColor(self.colors.textDim)
-    love.graphics.print(tostring(minPop), sliderX, sliderY + 15)
-    love.graphics.print(tostring(maxPop), sliderX + sliderW - 15, sliderY + 15)
-    love.graphics.setFont(self.fonts.normal)
-
-    y = y + 50
-
     -- Economic System
     love.graphics.setColor(self.colors.text)
     love.graphics.print("Economic System:", x, y)
@@ -598,7 +560,7 @@ function NewGameSetup:HandleClick(mx, my, button)
         end
 
         -- Economic system clicks
-        local econY = diffY + #self.difficulties * 40 + 60 + 25
+        local econY = diffY + #self.difficulties * 40 + 10 + 25
         for i = 1, #self.economicSystems do
             local radioY = econY + (i - 1) * 40
             if mx >= panelX + padding and mx <= panelX + padding + 400 and
@@ -607,18 +569,6 @@ function NewGameSetup:HandleClick(mx, my, button)
                 self.config.economicSystem = self.economicSystems[i].id
                 return true
             end
-        end
-
-        -- Population slider
-        local sliderY = diffY + #self.difficulties * 40 + 10 + 25 + 5
-        local sliderX = panelX + padding
-        local sliderW = 200
-        if mx >= sliderX and mx <= sliderX + sliderW and
-           my >= sliderY - 10 and my <= sliderY + 20 then
-            local pos = (mx - sliderX) / sliderW
-            self.config.startingPopulation = math.floor(5 + pos * 25 + 0.5)
-            self.config.startingPopulation = math.max(5, math.min(30, self.config.startingPopulation))
-            return true
         end
     end
 
