@@ -9,26 +9,41 @@ function PrototypeLauncher:Create()
     local this = {
         mPrototypes = {
             {
+                id = "alpha",
+                name = "Alpha Prototype (Birthday Edition)",
+                description = "Play the alpha prototype - A special birthday gift for Mansi!",
+                color = {0.9, 0.4, 0.6},
+                highlight = true
+            },
+            {
                 id = "main",
                 name = "Main Game",
                 description = "Full game with geography, buildings, and town management",
                 color = {0.2, 0.6, 0.9}
             },
             {
-                id = "prototype1",
-                name = "Prototype 1: Consumption Engine",
-                description = "Character behavior, craving systems, resource allocation",
-                color = {0.9, 0.5, 0.3}
-            },
-            {
                 id = "prototype2",
                 name = "Prototype 2: Production Engine",
                 description = "Building production, worker management, efficiency tracking",
                 color = {0.4, 0.8, 0.4}
+            },
+            {
+                id = "test_cache",
+                name = "Consumption System Test (Phase 5)",
+                description = "Complete system: cache, allocation, productivity, protest & riots",
+                color = {0.9, 0.6, 0.3}
             }
         },
         mHoveredIndex = nil,
-        mSelectedPrototype = nil
+        mSelectedPrototype = nil,
+        -- Create fonts once to avoid memory leak
+        mFonts = {
+            title = love.graphics.newFont(48),
+            cardTitle = love.graphics.newFont(24),
+            cardDesc = love.graphics.newFont(14),
+            hover = love.graphics.newFont(16),
+            footer = love.graphics.newFont(14)
+        }
     }
 
     setmetatable(this, self)
@@ -73,9 +88,9 @@ function PrototypeLauncher:Render()
 
     -- Title
     love.graphics.setColor(0.2, 0.2, 0.2)
-    love.graphics.setNewFont(48)
+    love.graphics.setFont(self.mFonts.title)
     local title = "CraveTown - Select Prototype"
-    local titleWidth = love.graphics.getFont():getWidth(title)
+    local titleWidth = self.mFonts.title:getWidth(title)
     love.graphics.print(title, (screenW - titleWidth) / 2, 80)
 
     -- Prototype cards
@@ -105,24 +120,24 @@ function PrototypeLauncher:Render()
 
         -- Card content
         love.graphics.setColor(1, 1, 1)
-        love.graphics.setNewFont(24)
+        love.graphics.setFont(self.mFonts.cardTitle)
         love.graphics.print(proto.name, startX + 20, y + 20)
 
         love.graphics.setColor(0.95, 0.95, 0.95)
-        love.graphics.setNewFont(14)
+        love.graphics.setFont(self.mFonts.cardDesc)
         love.graphics.printf(proto.description, startX + 20, y + 60, cardWidth - 40)
 
         -- Hover instruction
         if isHovered then
             love.graphics.setColor(1, 1, 1)
-            love.graphics.setNewFont(16)
+            love.graphics.setFont(self.mFonts.hover)
             love.graphics.print("Click to launch", startX + 20, y + cardHeight - 35)
         end
     end
 
     -- Footer
     love.graphics.setColor(0.5, 0.5, 0.5)
-    love.graphics.setNewFont(14)
+    love.graphics.setFont(self.mFonts.footer)
     local footer = "Press ESC to quit"
     love.graphics.print(footer, 20, screenH - 30)
 

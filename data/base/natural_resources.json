@@ -1,0 +1,275 @@
+{
+  "version": "1.0.0",
+  "naturalResources": [
+    {
+      "id": "ground_water",
+      "name": "Ground Water",
+      "category": "continuous",
+      "description": "Underground water table accessible for wells and irrigation",
+      "distribution": {
+        "type": "perlin_hybrid",
+        "perlinWeight": 1.0,
+        "hotspotWeight": 0.2,
+        "frequency": 0.005,
+        "octaves": 4,
+        "persistence": 0.5,
+        "hotspotCount": [4, 7],
+        "hotspotRadius": [250, 500],
+        "hotspotIntensity": [0.4, 0.8]
+      },
+      "riverInfluence": {
+        "enabled": true,
+        "range": 250,
+        "boost": 0.4
+      },
+      "visualization": {
+        "color": [0.2, 0.5, 0.9],
+        "opacity": 0.4,
+        "showThreshold": 0.01
+      }
+    },
+    {
+      "id": "fertility",
+      "name": "Land Fertility",
+      "category": "continuous",
+      "description": "Soil quality for agricultural production",
+      "distribution": {
+        "type": "perlin_hybrid",
+        "perlinWeight": 1.0,
+        "hotspotWeight": 0.2,
+        "frequency": 0.005,
+        "octaves": 4,
+        "persistence": 0.5,
+        "hotspotCount": [5, 8],
+        "hotspotRadius": [200, 450],
+        "hotspotIntensity": [0.3, 0.7]
+      },
+      "riverInfluence": {
+        "enabled": true,
+        "range": 150,
+        "boost": 0.2
+      },
+      "visualization": {
+        "color": [0.3, 0.6, 0.2],
+        "opacity": 0.4,
+        "showThreshold": 0.01
+      }
+    },
+    {
+      "id": "iron_ore",
+      "name": "Iron Ore",
+      "category": "discrete",
+      "description": "Iron ore deposits for metal production",
+      "distribution": {
+        "type": "regional_cluster",
+        "depositCount": [3, 5],
+        "depositRadius": [80, 150],
+        "centerRichness": [0.7, 1.0],
+        "falloffExponent": 2,
+        "noiseVariation": 0.1
+      },
+      "collisionRules": {
+        "riverDistance": 100,
+        "sameTypeDistance": 200,
+        "boundaryBuffer": 50
+      },
+      "visualization": {
+        "color": [0.6, 0.3, 0.2],
+        "opacity": 0.7,
+        "showThreshold": 0.2
+      }
+    },
+    {
+      "id": "copper_ore",
+      "name": "Copper Ore",
+      "category": "discrete",
+      "description": "Copper ore deposits for metal production",
+      "distribution": {
+        "type": "regional_cluster",
+        "depositCount": [2, 4],
+        "depositRadius": [60, 120],
+        "centerRichness": [0.6, 0.95],
+        "falloffExponent": 2,
+        "noiseVariation": 0.1
+      },
+      "collisionRules": {
+        "riverDistance": 100,
+        "sameTypeDistance": 180,
+        "boundaryBuffer": 50
+      },
+      "visualization": {
+        "color": [0.8, 0.5, 0.3],
+        "opacity": 0.7,
+        "showThreshold": 0.2
+      }
+    },
+    {
+      "id": "coal",
+      "name": "Coal",
+      "category": "discrete",
+      "description": "Coal deposits for fuel and industrial use",
+      "distribution": {
+        "type": "regional_cluster",
+        "depositCount": [2, 4],
+        "depositRadius": [100, 180],
+        "centerRichness": [0.7, 1.0],
+        "falloffExponent": 2,
+        "noiseVariation": 0.15
+      },
+      "collisionRules": {
+        "riverDistance": 80,
+        "sameTypeDistance": 220,
+        "boundaryBuffer": 50
+      },
+      "visualization": {
+        "color": [0.2, 0.2, 0.2],
+        "opacity": 0.7,
+        "showThreshold": 0.2
+      }
+    },
+    {
+      "id": "gold_ore",
+      "name": "Gold Ore",
+      "category": "discrete",
+      "description": "Rare gold ore deposits for precious metal production",
+      "distribution": {
+        "type": "regional_cluster",
+        "depositCount": [1, 2],
+        "depositRadius": [40, 80],
+        "centerRichness": [0.8, 1.0],
+        "falloffExponent": 2.5,
+        "noiseVariation": 0.05
+      },
+      "collisionRules": {
+        "riverDistance": 100,
+        "sameTypeDistance": 300,
+        "boundaryBuffer": 80
+      },
+      "visualization": {
+        "color": [0.9, 0.8, 0.2],
+        "opacity": 0.8,
+        "showThreshold": 0.3
+      }
+    },
+    {
+      "id": "silver_ore",
+      "name": "Silver Ore",
+      "category": "discrete",
+      "description": "Rare silver ore deposits for precious metal production",
+      "distribution": {
+        "type": "regional_cluster",
+        "depositCount": [1, 2],
+        "depositRadius": [40, 80],
+        "centerRichness": [0.75, 1.0],
+        "falloffExponent": 2.5,
+        "noiseVariation": 0.05
+      },
+      "collisionRules": {
+        "riverDistance": 100,
+        "sameTypeDistance": 300,
+        "boundaryBuffer": 80
+      },
+      "visualization": {
+        "color": [0.75, 0.75, 0.75],
+        "opacity": 0.8,
+        "showThreshold": 0.3
+      }
+    },
+    {
+      "id": "stone",
+      "name": "Stone",
+      "category": "discrete",
+      "description": "Stone quarry locations for construction materials",
+      "distribution": {
+        "type": "regional_cluster",
+        "depositCount": [4, 6],
+        "depositRadius": [80, 150],
+        "centerRichness": [0.6, 1.0],
+        "falloffExponent": 1.5,
+        "noiseVariation": 0.2
+      },
+      "collisionRules": {
+        "riverDistance": 60,
+        "sameTypeDistance": 150,
+        "boundaryBuffer": 40
+      },
+      "visualization": {
+        "color": [0.5, 0.5, 0.5],
+        "opacity": 0.6,
+        "showThreshold": 0.15
+      }
+    },
+    {
+      "id": "oil",
+      "name": "Oil",
+      "category": "discrete",
+      "description": "Very rare oil deposits for industrial fuel",
+      "distribution": {
+        "type": "regional_cluster",
+        "depositCount": [1, 2],
+        "depositRadius": [60, 100],
+        "centerRichness": [0.8, 1.0],
+        "falloffExponent": 3,
+        "noiseVariation": 0.05
+      },
+      "collisionRules": {
+        "riverDistance": 150,
+        "sameTypeDistance": 400,
+        "boundaryBuffer": 100
+      },
+      "visualization": {
+        "color": [0.1, 0.1, 0.1],
+        "opacity": 0.8,
+        "showThreshold": 0.4
+      }
+    },
+    {
+      "id": "natural_gas",
+      "name": "Natural Gas",
+      "category": "discrete",
+      "description": "Natural gas deposits, often found near oil",
+      "distribution": {
+        "type": "regional_cluster",
+        "depositCount": [1, 3],
+        "depositRadius": [50, 90],
+        "centerRichness": [0.7, 1.0],
+        "falloffExponent": 2.5,
+        "noiseVariation": 0.1
+      },
+      "collisionRules": {
+        "riverDistance": 120,
+        "sameTypeDistance": 250,
+        "boundaryBuffer": 80
+      },
+      "visualization": {
+        "color": [0.7, 0.9, 1.0],
+        "opacity": 0.7,
+        "showThreshold": 0.35
+      }
+    },
+    {
+      "id": "clay",
+      "name": "Clay",
+      "category": "discrete",
+      "description": "Clay deposits for brick and pottery production",
+      "distribution": {
+        "type": "regional_cluster",
+        "depositCount": [2, 4],
+        "depositRadius": [60, 100],
+        "centerRichness": [0.6, 0.95],
+        "falloffExponent": 2,
+        "noiseVariation": 0.15
+      },
+      "collisionRules": {
+        "riverDistance": 50,
+        "sameTypeDistance": 150,
+        "boundaryBuffer": 40
+      },
+      "visualization": {
+        "color": [0.8, 0.6, 0.4],
+        "opacity": 0.6,
+        "showThreshold": 0.2
+      }
+    }
+  ]
+}

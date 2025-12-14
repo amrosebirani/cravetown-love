@@ -1,0 +1,3403 @@
+{
+  "commodities": [
+    {
+      "id": "wheat",
+      "name": "Wheat",
+      "category": "grain",
+      "icon": "Wt",
+      "stackSize": 5000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "Basic grain crop - grown on farms",
+      "quality": "basic"
+    },
+    {
+      "id": "maize",
+      "name": "Maize",
+      "category": "grain",
+      "quality": "good",
+      "description": "Corn grain - grown on farms"
+    },
+    {
+      "id": "rice",
+      "name": "Rice",
+      "category": "grain",
+      "quality": "good",
+      "description": "Staple grain - grown on farms"
+    },
+    {
+      "id": "barley",
+      "name": "Barley",
+      "category": "grain",
+      "icon": "Ba",
+      "stackSize": 4000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "Brewing grain - grown on farms",
+      "quality": "basic"
+    },
+    {
+      "id": "oats",
+      "name": "Oats",
+      "category": "grain",
+      "icon": "Oa",
+      "stackSize": 4000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "Hearty grain - grown on farms",
+      "quality": "basic"
+    },
+    {
+      "id": "rye",
+      "name": "Rye",
+      "category": "grain",
+      "icon": "Ry",
+      "stackSize": 4000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "Hardy grain - grown on farms",
+      "quality": "basic"
+    },
+    {
+      "id": "apple",
+      "name": "Apple",
+      "category": "fruit",
+      "quality": "good",
+      "description": "Crisp fruit"
+    },
+    {
+      "id": "mango",
+      "name": "Mango",
+      "category": "fruit",
+      "quality": "luxury",
+      "description": "Tropical fruit"
+    },
+    {
+      "id": "orange",
+      "name": "Orange",
+      "category": "fruit",
+      "quality": "good",
+      "description": "Citrus fruit"
+    },
+    {
+      "id": "grapes",
+      "name": "Grapes",
+      "category": "fruit",
+      "quality": "luxury",
+      "description": "Wine grapes"
+    },
+    {
+      "id": "berries",
+      "name": "Berries",
+      "category": "fruit",
+      "quality": "good",
+      "description": "Mixed berries"
+    },
+    {
+      "id": "peach",
+      "name": "Peach",
+      "category": "fruit",
+      "icon": "Pc",
+      "stackSize": 600,
+      "baseValue": 5,
+      "isRaw": true,
+      "perishable": true,
+      "description": "Stone fruit",
+      "quality": "basic"
+    },
+    {
+      "id": "pear",
+      "name": "Pear",
+      "category": "fruit",
+      "icon": "Pr",
+      "stackSize": 800,
+      "baseValue": 4,
+      "isRaw": true,
+      "perishable": true,
+      "description": "Sweet fruit",
+      "quality": "basic"
+    },
+    {
+      "id": "potato",
+      "name": "Potato",
+      "category": "vegetable",
+      "icon": "Po",
+      "stackSize": 3000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "Root vegetable",
+      "quality": "basic"
+    },
+    {
+      "id": "carrot",
+      "name": "Carrot",
+      "category": "vegetable",
+      "icon": "Ca",
+      "stackSize": 2000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Orange root",
+      "quality": "basic"
+    },
+    {
+      "id": "onion",
+      "name": "Onion",
+      "category": "vegetable",
+      "icon": "On",
+      "stackSize": 2000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Aromatic bulb",
+      "quality": "basic"
+    },
+    {
+      "id": "cabbage",
+      "name": "Cabbage",
+      "category": "vegetable",
+      "icon": "Cb",
+      "stackSize": 1500,
+      "baseValue": 2,
+      "isRaw": true,
+      "perishable": true,
+      "description": "Leafy vegetable",
+      "quality": "basic"
+    },
+    {
+      "id": "tomato",
+      "name": "Tomato",
+      "category": "vegetable",
+      "quality": "good",
+      "description": "Red vegetable"
+    },
+    {
+      "id": "lettuce",
+      "name": "Lettuce",
+      "category": "vegetable",
+      "quality": "good",
+      "description": "Salad greens"
+    },
+    {
+      "id": "beans",
+      "name": "Beans",
+      "category": "vegetable",
+      "icon": "Bn",
+      "stackSize": 3000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Legumes",
+      "quality": "basic"
+    },
+    {
+      "id": "pumpkin",
+      "name": "Pumpkin",
+      "category": "vegetable",
+      "icon": "Pm",
+      "stackSize": 500,
+      "baseValue": 4,
+      "isRaw": true,
+      "description": "Large squash",
+      "quality": "basic"
+    },
+    {
+      "id": "flowers",
+      "name": "Flowers",
+      "category": "plant",
+      "quality": "good",
+      "description": "Colorful blooms for dyes and perfume"
+    },
+    {
+      "id": "indigo",
+      "name": "Indigo Plant",
+      "category": "plant",
+      "icon": "In",
+      "stackSize": 1200,
+      "baseValue": 8,
+      "isRaw": true,
+      "description": "Blue dye plant",
+      "quality": "basic"
+    },
+    {
+      "id": "sugar_cane",
+      "name": "Sugar Cane",
+      "category": "plant",
+      "quality": "good",
+      "description": "Sweet plant for sugar production"
+    },
+    {
+      "id": "wool",
+      "name": "Wool",
+      "category": "animal_product",
+      "quality": "good",
+      "description": "Sheep fiber"
+    },
+    {
+      "id": "sheep",
+      "name": "Sheep",
+      "category": "livestock",
+      "icon": "Sp",
+      "stackSize": 100,
+      "baseValue": 50,
+      "description": "Livestock for wool and meat production",
+      "quality": "luxury"
+    },
+    {
+      "id": "feathers",
+      "name": "Feathers",
+      "category": "animal_product",
+      "icon": "Fe",
+      "stackSize": 2000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Bird feathers - used for bedding, arrows, and decoration",
+      "quality": "basic"
+    },
+    {
+      "id": "milk",
+      "name": "Milk",
+      "category": "animal_product",
+      "icon": "Mi",
+      "stackSize": 500,
+      "baseValue": 3,
+      "perishable": true,
+      "isRaw": true,
+      "description": "Fresh dairy",
+      "quality": "basic"
+    },
+    {
+      "id": "eggs",
+      "name": "Eggs",
+      "category": "animal_product",
+      "icon": "Eg",
+      "stackSize": 600,
+      "baseValue": 4,
+      "perishable": true,
+      "isRaw": true,
+      "description": "Chicken eggs",
+      "quality": "basic"
+    },
+    {
+      "id": "chicken",
+      "name": "Chicken",
+      "category": "animal_product",
+      "quality": "good",
+      "description": "Poultry meat - common and affordable protein source"
+    },
+    {
+      "id": "hen",
+      "name": "Hen",
+      "category": "livestock",
+      "icon": "Hn",
+      "stackSize": 200,
+      "baseValue": 15,
+      "description": "Egg-laying chicken for poultry farming",
+      "quality": "basic"
+    },
+    {
+      "id": "feed",
+      "name": "Animal Feed",
+      "category": "animal_product",
+      "icon": "Fd",
+      "stackSize": 3000,
+      "baseValue": 3,
+      "description": "Mixed grain feed for livestock",
+      "quality": "basic"
+    },
+    {
+      "id": "bee_colony",
+      "name": "Bee Colony",
+      "category": "livestock",
+      "icon": "BC",
+      "stackSize": 50,
+      "baseValue": 40,
+      "description": "Active bee colony for honey production",
+      "quality": "good"
+    },
+    {
+      "id": "beeswax",
+      "name": "Beeswax",
+      "category": "animal_product",
+      "icon": "Bw",
+      "stackSize": 500,
+      "baseValue": 12,
+      "description": "Wax from beehives for candles and polish",
+      "quality": "basic"
+    },
+    {
+      "id": "raw_hide",
+      "name": "Raw Hide",
+      "category": "animal_product",
+      "icon": "RH",
+      "stackSize": 300,
+      "baseValue": 8,
+      "isRaw": true,
+      "description": "Unprocessed animal skin for tanning",
+      "quality": "basic"
+    },
+    {
+      "id": "tanned_leather",
+      "name": "Tanned Leather",
+      "category": "animal_product",
+      "icon": "TL",
+      "stackSize": 200,
+      "baseValue": 25,
+      "dependencies": [
+        "raw_hide"
+      ],
+      "description": "High quality tanned leather",
+      "quality": "good"
+    },
+    {
+      "id": "mutton",
+      "name": "Mutton",
+      "category": "animal_product",
+      "quality": "good",
+      "description": "Sheep meat - rich and flavorful"
+    },
+    {
+      "id": "beef",
+      "name": "Beef",
+      "category": "animal_product",
+      "quality": "good",
+      "description": "Cattle meat - hearty and nutritious"
+    },
+    {
+      "id": "leather",
+      "name": "Leather",
+      "category": "animal_product",
+      "icon": "Le",
+      "stackSize": 400,
+      "baseValue": 15,
+      "isRaw": true,
+      "description": "Tanned hide",
+      "quality": "basic"
+    },
+    {
+      "id": "cheese",
+      "name": "Cheese",
+      "category": "animal_product",
+      "quality": "good",
+      "description": "Aged dairy"
+    },
+    {
+      "id": "butter",
+      "name": "Butter",
+      "category": "animal_product",
+      "icon": "Bu",
+      "stackSize": 400,
+      "baseValue": 10,
+      "dependencies": [
+        "milk"
+      ],
+      "perishable": true,
+      "description": "Dairy fat",
+      "quality": "basic"
+    },
+    {
+      "id": "bread",
+      "name": "Bread",
+      "category": "processed_food",
+      "icon": "Bd",
+      "stackSize": 1000,
+      "baseValue": 5,
+      "dependencies": [
+        "wheat"
+      ],
+      "perishable": true,
+      "description": "Baked wheat",
+      "quality": "basic"
+    },
+    {
+      "id": "flour",
+      "name": "Flour",
+      "category": "processed_food",
+      "icon": "Fl",
+      "stackSize": 2000,
+      "baseValue": 2,
+      "dependencies": [
+        "wheat"
+      ],
+      "description": "Ground grain",
+      "quality": "basic"
+    },
+    {
+      "id": "sugar",
+      "name": "Sugar",
+      "category": "processed_food",
+      "icon": "Su",
+      "stackSize": 2000,
+      "baseValue": 10,
+      "dependencies": [
+        "sugar_cane"
+      ],
+      "description": "Refined sweetener",
+      "quality": "basic"
+    },
+    {
+      "id": "honey",
+      "name": "Honey",
+      "category": "processed_food",
+      "quality": "good",
+      "description": "Bee product"
+    },
+    {
+      "id": "wine",
+      "name": "Wine",
+      "category": "processed_food",
+      "icon": "Wn",
+      "stackSize": 300,
+      "baseValue": 25,
+      "dependencies": [
+        "grapes"
+      ],
+      "description": "Fermented grapes",
+      "quality": "good"
+    },
+    {
+      "id": "beer",
+      "name": "Beer",
+      "category": "processed_food",
+      "icon": "Be",
+      "stackSize": 500,
+      "baseValue": 8,
+      "dependencies": [
+        "barley"
+      ],
+      "description": "Brewed barley",
+      "quality": "basic"
+    },
+    {
+      "id": "pastries",
+      "name": "Pastries",
+      "category": "processed_food",
+      "quality": "good",
+      "description": "Baked sweets"
+    },
+    {
+      "id": "preserved_food",
+      "name": "Preserved Food",
+      "category": "processed_food",
+      "icon": "PF",
+      "stackSize": 800,
+      "baseValue": 10,
+      "description": "Canned goods",
+      "quality": "basic"
+    },
+    {
+      "id": "red_dye",
+      "name": "Red Dye",
+      "category": "dye",
+      "quality": "good",
+      "description": "Red coloring from berries"
+    },
+    {
+      "id": "blue_dye",
+      "name": "Blue Dye",
+      "category": "dye",
+      "quality": "good",
+      "description": "Blue coloring from indigo"
+    },
+    {
+      "id": "yellow_dye",
+      "name": "Yellow Dye",
+      "category": "dye",
+      "quality": "good",
+      "description": "Yellow coloring from flowers"
+    },
+    {
+      "id": "black_dye",
+      "name": "Black Dye",
+      "category": "dye",
+      "quality": "good",
+      "description": "Black coloring from charcoal"
+    },
+    {
+      "id": "green_dye",
+      "name": "Green Dye",
+      "category": "dye",
+      "quality": "good",
+      "description": "Green coloring from mixed dyes"
+    },
+    {
+      "id": "purple_dye",
+      "name": "Purple Dye",
+      "category": "dye",
+      "icon": "PD",
+      "stackSize": 500,
+      "baseValue": 20,
+      "dependencies": [
+        "red_dye",
+        "blue_dye"
+      ],
+      "description": "Purple coloring - rare and valuable",
+      "quality": "good"
+    },
+    {
+      "id": "orange_dye",
+      "name": "Orange Dye",
+      "category": "dye",
+      "quality": "good",
+      "description": "Orange coloring from mixed dyes"
+    },
+    {
+      "id": "paper",
+      "name": "Paper",
+      "category": "crafting",
+      "quality": "good",
+      "description": "Writing material from pulp"
+    },
+    {
+      "id": "wood_pulp",
+      "name": "Wood Pulp",
+      "category": "crafting",
+      "icon": "WP",
+      "stackSize": 2000,
+      "baseValue": 4,
+      "dependencies": [
+        "timber"
+      ],
+      "description": "Processed wood for paper making",
+      "quality": "basic"
+    },
+    {
+      "id": "fine_paper",
+      "name": "Fine Paper",
+      "category": "crafting",
+      "quality": "luxury",
+      "description": "High quality paper for books and documents"
+    },
+    {
+      "id": "ink",
+      "name": "Ink",
+      "category": "crafting",
+      "quality": "good",
+      "description": "Writing ink"
+    },
+    {
+      "id": "book",
+      "name": "Book",
+      "category": "crafting",
+      "icon": "Bk",
+      "stackSize": 200,
+      "baseValue": 30,
+      "dependencies": [
+        "paper",
+        "leather"
+      ],
+      "description": "Bound written material",
+      "quality": "good"
+    },
+    {
+      "id": "manuscript",
+      "name": "Manuscript",
+      "category": "crafting",
+      "icon": "Ms",
+      "stackSize": 50,
+      "baseValue": 100,
+      "dependencies": [
+        "fine_paper",
+        "ink"
+      ],
+      "description": "Hand-written document or illuminated text",
+      "quality": "luxury"
+    },
+    {
+      "id": "cotton",
+      "name": "Cotton",
+      "category": "textile_raw",
+      "icon": "Ct",
+      "stackSize": 2000,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Plant fiber",
+      "quality": "basic"
+    },
+    {
+      "id": "flax",
+      "name": "Flax",
+      "category": "textile_raw",
+      "icon": "Fx",
+      "stackSize": 1500,
+      "baseValue": 4,
+      "isRaw": true,
+      "description": "Linen source",
+      "quality": "basic"
+    },
+    {
+      "id": "thread",
+      "name": "Thread",
+      "category": "textile",
+      "icon": "Th",
+      "stackSize": 3000,
+      "baseValue": 4,
+      "dependencies": [
+        "cotton"
+      ],
+      "description": "Spun fiber",
+      "quality": "basic"
+    },
+    {
+      "id": "cloth",
+      "name": "Cloth",
+      "category": "textile",
+      "icon": "Cl",
+      "stackSize": 1000,
+      "baseValue": 15,
+      "dependencies": [
+        "cotton",
+        "thread"
+      ],
+      "description": "Woven fabric",
+      "quality": "basic"
+    },
+    {
+      "id": "linen",
+      "name": "Linen",
+      "category": "textile",
+      "icon": "Li",
+      "stackSize": 500,
+      "baseValue": 20,
+      "dependencies": [
+        "flax"
+      ],
+      "description": "Fine fabric",
+      "quality": "good"
+    },
+    {
+      "id": "silk",
+      "name": "Silk",
+      "category": "textile",
+      "icon": "Si",
+      "stackSize": 200,
+      "baseValue": 100,
+      "isRaw": true,
+      "description": "Luxury fabric from silkworms",
+      "quality": "luxury"
+    },
+    {
+      "id": "simple_clothes",
+      "name": "Simple Clothes",
+      "category": "clothing",
+      "icon": "SC",
+      "stackSize": 300,
+      "baseValue": 25,
+      "dependencies": [
+        "cloth",
+        "thread"
+      ],
+      "description": "Basic garments",
+      "quality": "good"
+    },
+    {
+      "id": "work_clothes",
+      "name": "Work Clothes",
+      "category": "clothing",
+      "icon": "WC",
+      "stackSize": 250,
+      "baseValue": 35,
+      "dependencies": [
+        "cloth",
+        "thread"
+      ],
+      "description": "Durable workwear",
+      "quality": "good"
+    },
+    {
+      "id": "fine_clothes",
+      "name": "Fine Clothes",
+      "category": "clothing",
+      "icon": "FC",
+      "stackSize": 150,
+      "baseValue": 80,
+      "dependencies": [
+        "linen",
+        "thread"
+      ],
+      "description": "Quality garments",
+      "quality": "luxury"
+    },
+    {
+      "id": "luxury_clothes",
+      "name": "Luxury Clothes",
+      "category": "clothing",
+      "icon": "LC",
+      "stackSize": 50,
+      "baseValue": 200,
+      "dependencies": [
+        "silk",
+        "thread"
+      ],
+      "description": "Silk garments",
+      "quality": "luxury"
+    },
+    {
+      "id": "winter_coat",
+      "name": "Winter Coat",
+      "category": "clothing",
+      "icon": "WCo",
+      "stackSize": 100,
+      "baseValue": 120,
+      "dependencies": [
+        "wool",
+        "thread"
+      ],
+      "description": "Warm outerwear",
+      "quality": "luxury"
+    },
+    {
+      "id": "shoes",
+      "name": "Shoes",
+      "category": "clothing",
+      "icon": "Sh",
+      "stackSize": 200,
+      "baseValue": 40,
+      "dependencies": [
+        "leather",
+        "thread"
+      ],
+      "description": "Leather footwear",
+      "quality": "good"
+    },
+    {
+      "id": "boots",
+      "name": "Boots",
+      "category": "clothing",
+      "icon": "Bo",
+      "stackSize": 150,
+      "baseValue": 60,
+      "dependencies": [
+        "leather",
+        "thread"
+      ],
+      "description": "Work boots",
+      "quality": "luxury"
+    },
+    {
+      "id": "hat",
+      "name": "Hat",
+      "category": "clothing",
+      "icon": "Ha",
+      "stackSize": 300,
+      "baseValue": 15,
+      "dependencies": [
+        "cloth",
+        "thread"
+      ],
+      "description": "Head covering",
+      "quality": "basic"
+    },
+    {
+      "id": "axe",
+      "name": "Axe",
+      "category": "tools",
+      "icon": "Ax",
+      "stackSize": 200,
+      "baseValue": 40,
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
+      "description": "Chopping tool",
+      "quality": "good"
+    },
+    {
+      "id": "hammer",
+      "name": "Hammer",
+      "category": "tools",
+      "icon": "Hm",
+      "stackSize": 300,
+      "baseValue": 30,
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
+      "description": "Striking tool",
+      "quality": "good"
+    },
+    {
+      "id": "saw",
+      "name": "Saw",
+      "category": "tools",
+      "icon": "Sa",
+      "stackSize": 200,
+      "baseValue": 45,
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
+      "description": "Cutting tool",
+      "quality": "good"
+    },
+    {
+      "id": "pickaxe",
+      "name": "Pickaxe",
+      "category": "tools",
+      "icon": "Pk",
+      "stackSize": 200,
+      "baseValue": 50,
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
+      "description": "Mining tool",
+      "quality": "luxury"
+    },
+    {
+      "id": "shovel",
+      "name": "Shovel",
+      "category": "tools",
+      "icon": "Sv",
+      "stackSize": 250,
+      "baseValue": 35,
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
+      "description": "Digging tool",
+      "quality": "good"
+    },
+    {
+      "id": "hoe",
+      "name": "Hoe",
+      "category": "tools",
+      "icon": "Ho",
+      "stackSize": 250,
+      "baseValue": 30,
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
+      "description": "Farming tool",
+      "quality": "good"
+    },
+    {
+      "id": "scythe",
+      "name": "Scythe",
+      "category": "tools",
+      "icon": "Sc",
+      "stackSize": 150,
+      "baseValue": 55,
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
+      "description": "Harvesting tool",
+      "quality": "luxury"
+    },
+    {
+      "id": "chisel",
+      "name": "Chisel",
+      "category": "tools",
+      "icon": "Ch",
+      "stackSize": 300,
+      "baseValue": 25,
+      "dependencies": [
+        "ore",
+        "wood"
+      ],
+      "description": "Carving tool",
+      "quality": "good"
+    },
+    {
+      "id": "needle",
+      "name": "Needle",
+      "category": "tools",
+      "icon": "Ne",
+      "stackSize": 500,
+      "baseValue": 5,
+      "dependencies": [
+        "ore"
+      ],
+      "description": "Sewing tool",
+      "quality": "basic"
+    },
+    {
+      "id": "chair",
+      "name": "Chair",
+      "category": "furniture",
+      "icon": "Ch",
+      "stackSize": 50,
+      "baseValue": 40,
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
+      "description": "Seating furniture",
+      "quality": "good"
+    },
+    {
+      "id": "table",
+      "name": "Table",
+      "category": "furniture",
+      "icon": "Tb",
+      "stackSize": 30,
+      "baseValue": 80,
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
+      "description": "Dining furniture",
+      "quality": "luxury"
+    },
+    {
+      "id": "bed",
+      "name": "Bed",
+      "category": "furniture",
+      "icon": "Bd",
+      "stackSize": 20,
+      "baseValue": 150,
+      "dependencies": [
+        "wood",
+        "cloth",
+        "nails"
+      ],
+      "description": "Sleeping furniture",
+      "quality": "luxury"
+    },
+    {
+      "id": "cabinet",
+      "name": "Cabinet",
+      "category": "furniture",
+      "icon": "Cb",
+      "stackSize": 30,
+      "baseValue": 100,
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
+      "description": "Storage furniture",
+      "quality": "luxury"
+    },
+    {
+      "id": "wardrobe",
+      "name": "Wardrobe",
+      "category": "furniture",
+      "icon": "Wd",
+      "stackSize": 20,
+      "baseValue": 180,
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
+      "description": "Clothing storage",
+      "quality": "luxury"
+    },
+    {
+      "id": "bench",
+      "name": "Bench",
+      "category": "furniture",
+      "icon": "Bn",
+      "stackSize": 40,
+      "baseValue": 50,
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
+      "description": "Long seat",
+      "quality": "luxury"
+    },
+    {
+      "id": "bookshelf",
+      "name": "Bookshelf",
+      "category": "furniture",
+      "icon": "Bs",
+      "stackSize": 25,
+      "baseValue": 120,
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
+      "description": "Book storage",
+      "quality": "luxury"
+    },
+    {
+      "id": "desk",
+      "name": "Desk",
+      "category": "furniture",
+      "icon": "Ds",
+      "stackSize": 25,
+      "baseValue": 90,
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
+      "description": "Work surface",
+      "quality": "luxury"
+    },
+    {
+      "id": "stool",
+      "name": "Stool",
+      "category": "furniture",
+      "icon": "St",
+      "stackSize": 60,
+      "baseValue": 20,
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
+      "description": "Simple seating",
+      "quality": "good"
+    },
+    {
+      "id": "shelf",
+      "name": "Shelf",
+      "category": "furniture",
+      "icon": "Sf",
+      "stackSize": 50,
+      "baseValue": 30,
+      "dependencies": [
+        "wood",
+        "nails"
+      ],
+      "description": "Wall-mounted storage",
+      "quality": "good"
+    },
+    {
+      "id": "cradle",
+      "name": "Cradle",
+      "category": "furniture",
+      "icon": "Cr",
+      "stackSize": 30,
+      "baseValue": 60,
+      "dependencies": [
+        "wood",
+        "cloth",
+        "nails"
+      ],
+      "description": "Baby bed",
+      "quality": "luxury"
+    },
+    {
+      "id": "chest",
+      "name": "Chest",
+      "category": "furniture",
+      "icon": "Ct",
+      "stackSize": 40,
+      "baseValue": 70,
+      "dependencies": [
+        "wood",
+        "iron",
+        "nails"
+      ],
+      "description": "Storage chest with lock",
+      "quality": "luxury"
+    },
+    {
+      "id": "door",
+      "name": "Door",
+      "category": "furniture",
+      "icon": "Dr",
+      "stackSize": 50,
+      "baseValue": 35,
+      "dependencies": [
+        "wood",
+        "iron",
+        "nails"
+      ],
+      "description": "Wooden door",
+      "quality": "good"
+    },
+    {
+      "id": "coal",
+      "name": "Coal",
+      "category": "fuel",
+      "icon": "Co",
+      "stackSize": 10000,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Combustible mineral",
+      "quality": "basic"
+    },
+    {
+      "id": "copper_ore",
+      "name": "Copper Ore",
+      "category": "raw_mineral",
+      "icon": "Cu",
+      "stackSize": 6000,
+      "baseValue": 6,
+      "isRaw": true,
+      "description": "Copper bearing ore",
+      "quality": "basic"
+    },
+    {
+      "id": "gold_ore",
+      "name": "Gold Ore",
+      "category": "raw_mineral",
+      "icon": "Au",
+      "stackSize": 1000,
+      "baseValue": 50,
+      "isRaw": true,
+      "description": "Precious metal ore",
+      "quality": "luxury"
+    },
+    {
+      "id": "silver_ore",
+      "name": "Silver Ore",
+      "category": "raw_mineral",
+      "icon": "Ag",
+      "stackSize": 2000,
+      "baseValue": 30,
+      "isRaw": true,
+      "description": "Valuable metal ore",
+      "quality": "good"
+    },
+    {
+      "id": "stone",
+      "name": "Stone",
+      "category": "raw_mineral",
+      "icon": "St",
+      "stackSize": 10000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "Building stone",
+      "quality": "basic"
+    },
+    {
+      "id": "marble",
+      "name": "Marble",
+      "category": "raw_mineral",
+      "icon": "Ma",
+      "stackSize": 3000,
+      "baseValue": 20,
+      "isRaw": true,
+      "description": "Decorative stone",
+      "quality": "good"
+    },
+    {
+      "id": "clay",
+      "name": "Clay",
+      "category": "raw_mineral",
+      "icon": "Cy",
+      "stackSize": 5000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Moldable earth",
+      "quality": "basic"
+    },
+    {
+      "id": "sand",
+      "name": "Sand",
+      "category": "raw_mineral",
+      "icon": "Sd",
+      "stackSize": 8000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "Glass material",
+      "quality": "basic"
+    },
+    {
+      "id": "iron",
+      "name": "Iron",
+      "category": "refined_metal",
+      "icon": "Fe",
+      "stackSize": 5000,
+      "baseValue": 15,
+      "dependencies": [
+        "ore"
+      ],
+      "description": "Refined metal",
+      "quality": "basic"
+    },
+    {
+      "id": "steel",
+      "name": "Steel",
+      "category": "refined_metal",
+      "icon": "St",
+      "stackSize": 3000,
+      "baseValue": 35,
+      "dependencies": [
+        "ore",
+        "coal"
+      ],
+      "description": "Strong alloy",
+      "quality": "good"
+    },
+    {
+      "id": "copper",
+      "name": "Copper",
+      "category": "refined_metal",
+      "icon": "Cu",
+      "stackSize": 4000,
+      "baseValue": 18,
+      "dependencies": [
+        "copper_ore"
+      ],
+      "description": "Refined copper",
+      "quality": "basic"
+    },
+    {
+      "id": "bronze",
+      "name": "Bronze",
+      "category": "refined_metal",
+      "icon": "Br",
+      "stackSize": 3000,
+      "baseValue": 25,
+      "dependencies": [
+        "copper_ore"
+      ],
+      "description": "Copper alloy",
+      "quality": "good"
+    },
+    {
+      "id": "gold",
+      "name": "Gold",
+      "category": "refined_metal",
+      "icon": "Au",
+      "stackSize": 500,
+      "baseValue": 150,
+      "dependencies": [
+        "gold_ore"
+      ],
+      "description": "Precious metal",
+      "quality": "luxury"
+    },
+    {
+      "id": "silver",
+      "name": "Silver",
+      "category": "refined_metal",
+      "icon": "Ag",
+      "stackSize": 1000,
+      "baseValue": 80,
+      "dependencies": [
+        "silver_ore"
+      ],
+      "description": "Valuable metal",
+      "quality": "luxury"
+    },
+    {
+      "id": "bricks",
+      "name": "Bricks",
+      "category": "construction",
+      "quality": "good",
+      "description": "Fired clay blocks"
+    },
+    {
+      "id": "timber",
+      "name": "Timber",
+      "category": "construction",
+      "icon": "Ti",
+      "stackSize": 2000,
+      "baseValue": 8,
+      "isRaw": true,
+      "description": "Cut logs",
+      "quality": "basic"
+    },
+    {
+      "id": "planks",
+      "name": "Planks",
+      "category": "construction",
+      "icon": "Pl",
+      "stackSize": 1000,
+      "baseValue": 15,
+      "dependencies": [
+        "timber"
+      ],
+      "description": "Processed wood",
+      "quality": "basic"
+    },
+    {
+      "id": "cement",
+      "name": "Cement",
+      "category": "construction",
+      "quality": "luxury",
+      "description": "Binding material"
+    },
+    {
+      "id": "glass",
+      "name": "Glass",
+      "category": "construction",
+      "icon": "Gl",
+      "stackSize": 500,
+      "baseValue": 25,
+      "dependencies": [
+        "sand"
+      ],
+      "description": "Transparent material",
+      "quality": "good"
+    },
+    {
+      "id": "nails",
+      "name": "Nails",
+      "category": "construction",
+      "icon": "Na",
+      "stackSize": 2000,
+      "baseValue": 8,
+      "dependencies": [
+        "ore"
+      ],
+      "description": "Fasteners",
+      "quality": "basic"
+    },
+    {
+      "id": "pottery",
+      "name": "Pottery",
+      "category": "luxury",
+      "icon": "Po",
+      "stackSize": 300,
+      "baseValue": 25,
+      "dependencies": [
+        "clay"
+      ],
+      "description": "Ceramic vessels",
+      "quality": "good"
+    },
+    {
+      "id": "jewelry",
+      "name": "Jewelry",
+      "category": "luxury",
+      "icon": "Jw",
+      "stackSize": 100,
+      "baseValue": 200,
+      "dependencies": [
+        "gold_ore",
+        "silver_ore"
+      ],
+      "description": "Decorative items",
+      "quality": "luxury"
+    },
+    {
+      "id": "painting",
+      "name": "Painting",
+      "category": "luxury",
+      "icon": "Pa",
+      "stackSize": 50,
+      "baseValue": 300,
+      "dependencies": [
+        "cloth",
+        "red_dye",
+        "blue_dye",
+        "yellow_dye"
+      ],
+      "description": "Art piece",
+      "quality": "luxury"
+    },
+    {
+      "id": "sculpture",
+      "name": "Sculpture",
+      "category": "luxury",
+      "icon": "Sc",
+      "stackSize": 30,
+      "baseValue": 400,
+      "dependencies": [
+        "marble",
+        "ore"
+      ],
+      "description": "Stone art carved with metal tools",
+      "quality": "luxury"
+    },
+    {
+      "id": "book",
+      "name": "Book",
+      "category": "luxury",
+      "icon": "Bk",
+      "stackSize": 200,
+      "baseValue": 60,
+      "dependencies": [
+        "paper",
+        "black_dye"
+      ],
+      "description": "Written work",
+      "quality": "luxury"
+    },
+    {
+      "id": "candle",
+      "name": "Candle",
+      "category": "misc",
+      "quality": "good",
+      "description": "Light source made from beeswax"
+    },
+    {
+      "id": "lamp_oil",
+      "name": "Lamp Oil",
+      "category": "misc",
+      "icon": "LO",
+      "stackSize": 800,
+      "baseValue": 8,
+      "dependencies": [
+        "oil"
+      ],
+      "description": "Fuel for lamps",
+      "quality": "basic"
+    },
+    {
+      "id": "soap",
+      "name": "Soap",
+      "category": "misc",
+      "icon": "So",
+      "stackSize": 500,
+      "baseValue": 10,
+      "dependencies": [
+        "oil"
+      ],
+      "description": "Cleaning agent from oil and lye",
+      "quality": "basic"
+    },
+    {
+      "id": "herb_seed",
+      "name": "Herb Seeds",
+      "category": "seed",
+      "icon": "HS",
+      "stackSize": 1000,
+      "baseValue": 4,
+      "isRaw": true,
+      "description": "Seeds for growing medicinal herbs",
+      "quality": "basic"
+    },
+    {
+      "id": "medicinal_herbs",
+      "name": "Medicinal Herbs",
+      "category": "plant",
+      "icon": "MH",
+      "stackSize": 800,
+      "baseValue": 10,
+      "isRaw": true,
+      "description": "Healing plants for medicine production",
+      "quality": "basic"
+    },
+    {
+      "id": "medicine",
+      "name": "Medicine",
+      "category": "misc",
+      "quality": "good",
+      "description": "Healing herbs and remedies"
+    },
+    {
+      "id": "healing_salve",
+      "name": "Healing Salve",
+      "category": "misc",
+      "icon": "Sv",
+      "stackSize": 200,
+      "baseValue": 35,
+      "dependencies": [
+        "medicinal_herbs",
+        "oil"
+      ],
+      "description": "Topical healing ointment",
+      "quality": "good"
+    },
+    {
+      "id": "tonic",
+      "name": "Tonic",
+      "category": "misc",
+      "icon": "Tn",
+      "stackSize": 300,
+      "baseValue": 25,
+      "dependencies": [
+        "medicinal_herbs",
+        "wine"
+      ],
+      "description": "Medicinal drink for health",
+      "quality": "good"
+    },
+    {
+      "id": "tallow",
+      "name": "Tallow",
+      "category": "animal_product",
+      "icon": "Tw",
+      "stackSize": 500,
+      "baseValue": 5,
+      "description": "Rendered animal fat for candles",
+      "quality": "basic"
+    },
+    {
+      "id": "lye",
+      "name": "Lye",
+      "category": "misc",
+      "icon": "Ly",
+      "stackSize": 400,
+      "baseValue": 6,
+      "description": "Alkali for soap making",
+      "quality": "basic"
+    },
+    {
+      "id": "beeswax_candle",
+      "name": "Beeswax Candle",
+      "category": "misc",
+      "icon": "BxC",
+      "stackSize": 400,
+      "baseValue": 15,
+      "dependencies": [
+        "beeswax"
+      ],
+      "description": "Premium clean-burning candle",
+      "quality": "basic"
+    },
+    {
+      "id": "flower_water",
+      "name": "Flower Water",
+      "category": "misc",
+      "icon": "FW",
+      "stackSize": 500,
+      "baseValue": 15,
+      "dependencies": [
+        "flowers"
+      ],
+      "description": "Distilled flower essence",
+      "quality": "basic"
+    },
+    {
+      "id": "wood",
+      "name": "Wood",
+      "category": "fuel",
+      "icon": "Wd",
+      "stackSize": 5000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Firewood",
+      "quality": "basic"
+    },
+    {
+      "id": "charcoal",
+      "name": "Charcoal",
+      "category": "fuel",
+      "icon": "Cc",
+      "stackSize": 3000,
+      "baseValue": 5,
+      "description": "Processed fuel",
+      "quality": "basic"
+    },
+    {
+      "id": "oil",
+      "name": "Oil",
+      "category": "fuel",
+      "icon": "Oi",
+      "stackSize": 2000,
+      "baseValue": 12,
+      "description": "Liquid fuel",
+      "quality": "basic"
+    },
+    {
+      "id": "rubber",
+      "name": "Rubber",
+      "category": "tree_product",
+      "description": "Product which is derived from Rubber trees, is used as a input for producing many other products like shoes",
+      "quality": "basic"
+    },
+    {
+      "id": "cake",
+      "name": "Cake",
+      "category": "processed_food",
+      "description": "Cake is a sweet delicacy",
+      "quality": "basic"
+    },
+    {
+      "id": "wheat_seed",
+      "name": "Wheat Seeds",
+      "category": "seed",
+      "icon": "WS",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing wheat",
+      "quality": "basic"
+    },
+    {
+      "id": "indigo_seed",
+      "name": "Indigo Seeds",
+      "category": "seed",
+      "icon": "IS",
+      "stackSize": 1000,
+      "baseValue": 5,
+      "isRaw": true,
+      "description": "Seeds for growing indigo dye plants",
+      "quality": "basic"
+    },
+    {
+      "id": "flower_seed",
+      "name": "Flower Seeds",
+      "category": "seed",
+      "icon": "Fl",
+      "stackSize": 1500,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Seeds for growing flowers",
+      "quality": "basic"
+    },
+    {
+      "id": "vegetable_seed",
+      "name": "Vegetable Seeds",
+      "category": "seed",
+      "icon": "VS",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing vegetables",
+      "quality": "basic"
+    },
+    {
+      "id": "fruit_seed",
+      "name": "Fruit Seeds",
+      "category": "seed",
+      "icon": "FS",
+      "stackSize": 800,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Seeds for growing fruit",
+      "quality": "basic"
+    },
+    {
+      "id": "cotton_seed",
+      "name": "Cotton Seeds",
+      "category": "seed",
+      "icon": "CS",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing cotton",
+      "quality": "basic"
+    },
+    {
+      "id": "flax_seed",
+      "name": "Flax Seeds",
+      "category": "seed",
+      "icon": "FS",
+      "stackSize": 1000,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Seeds for growing flax",
+      "quality": "basic"
+    },
+    {
+      "id": "tree",
+      "name": "Tree",
+      "category": "raw_resource",
+      "icon": "Tr",
+      "stackSize": 100,
+      "baseValue": 10,
+      "isRaw": true,
+      "description": "Whole tree for lumber or crafting",
+      "quality": "basic"
+    },
+    {
+      "id": "lumber",
+      "name": "Lumber",
+      "category": "construction",
+      "icon": "Lm",
+      "stackSize": 2000,
+      "baseValue": 12,
+      "dependencies": [
+        "tree"
+      ],
+      "description": "Processed wood from trees",
+      "quality": "basic"
+    },
+    {
+      "id": "iron_ore",
+      "name": "Iron Ore",
+      "category": "raw_mineral",
+      "icon": "IO",
+      "stackSize": 8000,
+      "baseValue": 5,
+      "isRaw": true,
+      "description": "Raw iron ore for smelting",
+      "quality": "basic"
+    },
+    {
+      "id": "yarn",
+      "name": "Yarn",
+      "category": "textile",
+      "icon": "Yn",
+      "stackSize": 3000,
+      "baseValue": 5,
+      "dependencies": [
+        "cotton"
+      ],
+      "description": "Spun thread from cotton",
+      "quality": "basic"
+    },
+    {
+      "id": "clothing",
+      "name": "Clothing",
+      "category": "clothing",
+      "icon": "Cl",
+      "stackSize": 300,
+      "baseValue": 30,
+      "dependencies": [
+        "cotton",
+        "thread"
+      ],
+      "description": "General garments",
+      "quality": "good"
+    },
+    {
+      "id": "shirt",
+      "name": "Shirt",
+      "category": "clothing",
+      "icon": "Sh",
+      "stackSize": 200,
+      "baseValue": 25,
+      "dependencies": [
+        "cloth",
+        "thread"
+      ],
+      "description": "Upper body garment",
+      "quality": "good"
+    },
+    {
+      "id": "pants",
+      "name": "Pants",
+      "category": "clothing",
+      "icon": "Pn",
+      "stackSize": 200,
+      "baseValue": 30,
+      "dependencies": [
+        "cloth",
+        "thread"
+      ],
+      "description": "Lower body garment",
+      "quality": "good"
+    },
+    {
+      "id": "dress",
+      "name": "Dress",
+      "category": "clothing",
+      "icon": "Dr",
+      "stackSize": 150,
+      "baseValue": 45,
+      "dependencies": [
+        "cloth",
+        "thread"
+      ],
+      "description": "Full-length formal garment",
+      "quality": "good"
+    },
+    {
+      "id": "coat",
+      "name": "Coat",
+      "category": "clothing",
+      "icon": "Co",
+      "stackSize": 100,
+      "baseValue": 60,
+      "dependencies": [
+        "cloth",
+        "thread",
+        "wool"
+      ],
+      "description": "Warm outer garment",
+      "quality": "luxury"
+    },
+    {
+      "id": "meal",
+      "name": "Meal",
+      "category": "processed_food",
+      "icon": "Me",
+      "stackSize": 500,
+      "baseValue": 15,
+      "dependencies": [
+        "grain",
+        "vegetable"
+      ],
+      "perishable": true,
+      "description": "Prepared food",
+      "quality": "basic"
+    },
+    {
+      "id": "whiskey",
+      "name": "Whiskey",
+      "category": "processed_food",
+      "icon": "Wh",
+      "stackSize": 300,
+      "baseValue": 30,
+      "dependencies": [
+        "rye"
+      ],
+      "description": "Distilled spirit from rye",
+      "quality": "good"
+    },
+    {
+      "id": "knife",
+      "name": "Knife",
+      "category": "tools",
+      "icon": "Kn",
+      "stackSize": 300,
+      "baseValue": 35,
+      "dependencies": [
+        "iron_ore",
+        "tree"
+      ],
+      "description": "Cutting tool",
+      "quality": "good"
+    },
+    {
+      "id": "gold_item",
+      "name": "Gold Item",
+      "category": "luxury",
+      "icon": "GI",
+      "stackSize": 200,
+      "baseValue": 180,
+      "dependencies": [
+        "gold_ore"
+      ],
+      "description": "Crafted gold jewelry or ornament",
+      "quality": "luxury"
+    },
+    {
+      "id": "ragi",
+      "name": "Ragi",
+      "category": "grain",
+      "description": "",
+      "quality": "basic"
+    },
+    {
+      "id": "watermelon",
+      "name": "Water Melon",
+      "category": "fruit",
+      "description": "",
+      "quality": "basic"
+    },
+    {
+      "id": "date",
+      "name": "Date",
+      "category": "fruit",
+      "quality": "luxury",
+      "description": ""
+    },
+    {
+      "id": "broccoli",
+      "name": "Broccoli",
+      "category": "vegetable",
+      "description": "",
+      "quality": "basic"
+    },
+    {
+      "id": "pepper",
+      "name": "Pepper",
+      "category": "vegetable",
+      "description": "",
+      "quality": "basic"
+    },
+    {
+      "id": "maize_seed",
+      "name": "Maize Seeds",
+      "category": "seed",
+      "description": "",
+      "quality": "basic"
+    },
+    {
+      "id": "rice_seed",
+      "name": "Rice Seeds",
+      "category": "seed",
+      "description": "",
+      "quality": "basic"
+    },
+    {
+      "id": "barley_seeds",
+      "name": "Barley Seeds",
+      "category": "seed",
+      "description": "",
+      "quality": "basic"
+    },
+    {
+      "id": "oats_seeds",
+      "name": "Oats Seeds",
+      "category": "seed",
+      "description": "",
+      "quality": "basic"
+    },
+    {
+      "id": "rye_seeds",
+      "name": "Rye Seeds",
+      "category": "seed",
+      "description": "",
+      "quality": "basic"
+    },
+    {
+      "id": "ragi_seeds",
+      "name": "Ragi Seeds",
+      "category": "seed",
+      "description": "",
+      "quality": "basic"
+    },
+    {
+      "id": "apple_sapling",
+      "name": "Apple Saplings",
+      "category": "seed",
+      "icon": "AS",
+      "stackSize": 200,
+      "baseValue": 10,
+      "isRaw": true,
+      "description": "Young apple trees for planting in orchards",
+      "quality": "basic"
+    },
+    {
+      "id": "mango_sapling",
+      "name": "Mango Saplings",
+      "category": "seed",
+      "icon": "MS",
+      "stackSize": 200,
+      "baseValue": 15,
+      "isRaw": true,
+      "description": "Young mango trees for planting in orchards",
+      "quality": "basic"
+    },
+    {
+      "id": "orange_sapling",
+      "name": "Orange Saplings",
+      "category": "seed",
+      "icon": "OS",
+      "stackSize": 200,
+      "baseValue": 12,
+      "isRaw": true,
+      "description": "Young orange trees for planting in orchards",
+      "quality": "basic"
+    },
+    {
+      "id": "grape_vine",
+      "name": "Grape Vines",
+      "category": "seed",
+      "icon": "GV",
+      "stackSize": 300,
+      "baseValue": 8,
+      "isRaw": true,
+      "description": "Grape vine cuttings for planting in orchards",
+      "quality": "basic"
+    },
+    {
+      "id": "berry_bush",
+      "name": "Berry Bushes",
+      "category": "seed",
+      "icon": "BB",
+      "stackSize": 400,
+      "baseValue": 6,
+      "isRaw": true,
+      "description": "Berry bush seedlings for planting in orchards",
+      "quality": "basic"
+    },
+    {
+      "id": "peach_sapling",
+      "name": "Peach Saplings",
+      "category": "seed",
+      "icon": "PS",
+      "stackSize": 200,
+      "baseValue": 12,
+      "isRaw": true,
+      "description": "Young peach trees for planting in orchards",
+      "quality": "basic"
+    },
+    {
+      "id": "pear_sapling",
+      "name": "Pear Saplings",
+      "category": "seed",
+      "icon": "PR",
+      "stackSize": 200,
+      "baseValue": 10,
+      "isRaw": true,
+      "description": "Young pear trees for planting in orchards",
+      "quality": "basic"
+    },
+    {
+      "id": "watermelon_seed",
+      "name": "Watermelon Seeds",
+      "category": "seed",
+      "icon": "WM",
+      "stackSize": 500,
+      "baseValue": 4,
+      "isRaw": true,
+      "description": "Seeds for growing watermelons",
+      "quality": "basic"
+    },
+    {
+      "id": "date_palm_sapling",
+      "name": "Date Palm Saplings",
+      "category": "seed",
+      "icon": "DP",
+      "stackSize": 150,
+      "baseValue": 20,
+      "isRaw": true,
+      "description": "Young date palm trees for planting in orchards",
+      "quality": "good"
+    },
+    {
+      "id": "potato_seed",
+      "name": "Seed Potatoes",
+      "category": "seed",
+      "icon": "PS",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seed potatoes for planting",
+      "quality": "basic"
+    },
+    {
+      "id": "carrot_seed",
+      "name": "Carrot Seeds",
+      "category": "seed",
+      "icon": "CR",
+      "stackSize": 1500,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing carrots",
+      "quality": "basic"
+    },
+    {
+      "id": "onion_seed",
+      "name": "Onion Seeds",
+      "category": "seed",
+      "icon": "OS",
+      "stackSize": 1500,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing onions",
+      "quality": "basic"
+    },
+    {
+      "id": "cabbage_seed",
+      "name": "Cabbage Seeds",
+      "category": "seed",
+      "icon": "CB",
+      "stackSize": 1000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing cabbage",
+      "quality": "basic"
+    },
+    {
+      "id": "tomato_seed",
+      "name": "Tomato Seeds",
+      "category": "seed",
+      "icon": "TS",
+      "stackSize": 1200,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Seeds for growing tomatoes",
+      "quality": "basic"
+    },
+    {
+      "id": "lettuce_seed",
+      "name": "Lettuce Seeds",
+      "category": "seed",
+      "icon": "LS",
+      "stackSize": 1500,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing lettuce",
+      "quality": "basic"
+    },
+    {
+      "id": "bean_seed",
+      "name": "Bean Seeds",
+      "category": "seed",
+      "icon": "BS",
+      "stackSize": 1500,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Seeds for growing beans",
+      "quality": "basic"
+    },
+    {
+      "id": "pumpkin_seed",
+      "name": "Pumpkin Seeds",
+      "category": "seed",
+      "icon": "PM",
+      "stackSize": 800,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Seeds for growing pumpkins",
+      "quality": "basic"
+    },
+    {
+      "id": "broccoli_seed",
+      "name": "Broccoli Seeds",
+      "category": "seed",
+      "icon": "BR",
+      "stackSize": 1000,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Seeds for growing broccoli",
+      "quality": "basic"
+    },
+    {
+      "id": "pepper_seed",
+      "name": "Pepper Seeds",
+      "category": "seed",
+      "icon": "PP",
+      "stackSize": 1200,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Seeds for growing peppers",
+      "quality": "basic"
+    },
+    {
+      "id": "sugarcane_cutting",
+      "name": "Sugarcane Cutting",
+      "category": "seed",
+      "icon": "SC",
+      "stackSize": 500,
+      "baseValue": 3,
+      "isRaw": true,
+      "description": "Stem cutting for planting sugarcane",
+      "quality": "basic"
+    },
+    {
+      "id": "molasses",
+      "name": "Molasses",
+      "category": "processed_food",
+      "icon": "Mo",
+      "stackSize": 1000,
+      "baseValue": 8,
+      "dependencies": [
+        "sugar_cane"
+      ],
+      "description": "Dark syrup byproduct of sugar refining",
+      "quality": "basic"
+    },
+    {
+      "id": "rum",
+      "name": "Rum",
+      "category": "alcohol",
+      "icon": "Rm",
+      "stackSize": 300,
+      "baseValue": 25,
+      "dependencies": [
+        "molasses"
+      ],
+      "description": "Distilled spirit from molasses",
+      "quality": "good"
+    },
+    {
+      "id": "candy",
+      "name": "Candy",
+      "category": "processed_food",
+      "icon": "Cn",
+      "stackSize": 500,
+      "baseValue": 15,
+      "dependencies": [
+        "sugar"
+      ],
+      "description": "Sweet confection",
+      "quality": "basic"
+    },
+    {
+      "id": "sawdust",
+      "name": "Sawdust",
+      "category": "byproduct",
+      "icon": "SD",
+      "stackSize": 5000,
+      "baseValue": 1,
+      "dependencies": [
+        "lumber"
+      ],
+      "description": "Fine wood particles - byproduct of lumber processing",
+      "quality": "basic"
+    },
+    {
+      "id": "barrel",
+      "name": "Barrel",
+      "category": "container",
+      "icon": "Br",
+      "stackSize": 100,
+      "baseValue": 25,
+      "dependencies": [
+        "planks",
+        "iron"
+      ],
+      "description": "Wooden storage container with iron bands",
+      "quality": "good"
+    },
+    {
+      "id": "crate",
+      "name": "Crate",
+      "category": "container",
+      "icon": "Cr",
+      "stackSize": 150,
+      "baseValue": 15,
+      "dependencies": [
+        "planks",
+        "nails"
+      ],
+      "description": "Wooden shipping container",
+      "quality": "basic"
+    },
+    {
+      "id": "firewood",
+      "name": "Firewood",
+      "category": "fuel",
+      "icon": "Fw",
+      "stackSize": 3000,
+      "baseValue": 3,
+      "dependencies": [
+        "timber"
+      ],
+      "description": "Split wood for heating and cooking",
+      "quality": "basic"
+    },
+    {
+      "id": "tiles",
+      "name": "Tiles",
+      "category": "construction",
+      "icon": "Ti",
+      "stackSize": 2000,
+      "baseValue": 8,
+      "dependencies": [
+        "clay"
+      ],
+      "description": "Fired clay tiles for roofing and flooring",
+      "quality": "basic"
+    },
+    {
+      "id": "terracotta",
+      "name": "Terracotta",
+      "category": "luxury",
+      "icon": "Tc",
+      "stackSize": 300,
+      "baseValue": 20,
+      "dependencies": [
+        "clay"
+      ],
+      "description": "Decorative fired clay items",
+      "quality": "good"
+    },
+    {
+      "id": "ceramics",
+      "name": "Ceramics",
+      "category": "household",
+      "icon": "Ce",
+      "stackSize": 500,
+      "baseValue": 12,
+      "dependencies": [
+        "clay"
+      ],
+      "description": "Ceramic bowls, plates, and household items",
+      "quality": "basic"
+    },
+    {
+      "id": "clay_pipe",
+      "name": "Clay Pipe",
+      "category": "construction",
+      "icon": "CP",
+      "stackSize": 500,
+      "baseValue": 6,
+      "dependencies": [
+        "clay"
+      ],
+      "description": "Clay pipes for water and drainage systems",
+      "quality": "basic"
+    },
+    {
+      "id": "window_pane",
+      "name": "Window Pane",
+      "category": "construction",
+      "icon": "WP",
+      "stackSize": 200,
+      "baseValue": 20,
+      "dependencies": [
+        "glass"
+      ],
+      "description": "Glass window pane for buildings",
+      "quality": "good"
+    },
+    {
+      "id": "bottle",
+      "name": "Bottle",
+      "category": "container",
+      "icon": "Bt",
+      "stackSize": 500,
+      "baseValue": 8,
+      "dependencies": [
+        "glass"
+      ],
+      "description": "Glass bottle for liquids",
+      "quality": "basic"
+    },
+    {
+      "id": "mirror",
+      "name": "Mirror",
+      "category": "luxury",
+      "icon": "Mr",
+      "stackSize": 100,
+      "baseValue": 50,
+      "dependencies": [
+        "glass",
+        "silver"
+      ],
+      "description": "Reflective glass mirror",
+      "quality": "luxury"
+    },
+    {
+      "id": "cut_stone",
+      "name": "Cut Stone",
+      "category": "construction",
+      "icon": "CS",
+      "stackSize": 2000,
+      "baseValue": 5,
+      "dependencies": [
+        "stone"
+      ],
+      "description": "Precisely cut building stone",
+      "quality": "basic"
+    },
+    {
+      "id": "column",
+      "name": "Column",
+      "category": "construction",
+      "icon": "Cm",
+      "stackSize": 50,
+      "baseValue": 40,
+      "dependencies": [
+        "stone"
+      ],
+      "description": "Stone column for architecture",
+      "quality": "good"
+    },
+    {
+      "id": "statue",
+      "name": "Statue",
+      "category": "luxury",
+      "quality": "masterwork",
+      "description": "Carved marble statue"
+    },
+    {
+      "id": "gravestone",
+      "name": "Gravestone",
+      "category": "misc",
+      "icon": "Gs",
+      "stackSize": 100,
+      "baseValue": 25,
+      "dependencies": [
+        "stone"
+      ],
+      "description": "Memorial stone marker",
+      "quality": "good"
+    },
+    {
+      "id": "mustard_seed",
+      "name": "Mustard Seed",
+      "category": "seed",
+      "icon": "Ms",
+      "stackSize": 5000,
+      "baseValue": 3,
+      "description": "Seeds for mustard plant and oil extraction",
+      "quality": "basic"
+    },
+    {
+      "id": "sesame_seed",
+      "name": "Sesame Seed",
+      "category": "seed",
+      "icon": "Ss",
+      "stackSize": 5000,
+      "baseValue": 4,
+      "description": "Seeds for sesame oil extraction",
+      "quality": "basic"
+    },
+    {
+      "id": "groundnut",
+      "name": "Groundnut",
+      "category": "raw_food",
+      "icon": "Gn",
+      "stackSize": 3000,
+      "baseValue": 5,
+      "description": "Peanuts for oil and snacks",
+      "quality": "basic"
+    },
+    {
+      "id": "groundnut_seed",
+      "name": "Groundnut Seed",
+      "category": "seed",
+      "icon": "GS",
+      "stackSize": 3000,
+      "baseValue": 4,
+      "description": "Seeds for groundnut farming",
+      "quality": "basic"
+    },
+    {
+      "id": "coconut",
+      "name": "Coconut",
+      "category": "raw_food",
+      "icon": "Cc",
+      "stackSize": 500,
+      "baseValue": 8,
+      "description": "Tropical fruit for oil and cooking",
+      "quality": "basic"
+    },
+    {
+      "id": "coconut_palm_sapling",
+      "name": "Coconut Palm Sapling",
+      "category": "seed",
+      "icon": "CP",
+      "stackSize": 200,
+      "baseValue": 15,
+      "description": "Sapling for coconut palm cultivation",
+      "quality": "basic"
+    },
+    {
+      "id": "rubber_tree_sapling",
+      "name": "Rubber Tree Sapling",
+      "category": "seed",
+      "icon": "RT",
+      "stackSize": 200,
+      "baseValue": 20,
+      "description": "Sapling for rubber tree plantation",
+      "quality": "good"
+    },
+    {
+      "id": "latex",
+      "name": "Latex",
+      "category": "tree_product",
+      "icon": "Lx",
+      "stackSize": 2000,
+      "baseValue": 8,
+      "description": "Raw rubber sap tapped from rubber trees",
+      "quality": "basic"
+    },
+    {
+      "id": "sunflower_seed",
+      "name": "Sunflower Seed",
+      "category": "seed",
+      "icon": "Sf",
+      "stackSize": 5000,
+      "baseValue": 3,
+      "description": "Seeds for sunflower oil extraction",
+      "quality": "basic"
+    },
+    {
+      "id": "oil",
+      "name": "Cooking Oil",
+      "category": "processed_food",
+      "icon": "Oi",
+      "stackSize": 2000,
+      "baseValue": 10,
+      "description": "Vegetable oil for cooking and frying",
+      "quality": "basic"
+    },
+    {
+      "id": "lentils",
+      "name": "Lentils",
+      "category": "raw_food",
+      "icon": "Ln",
+      "stackSize": 3000,
+      "baseValue": 4,
+      "description": "Protein-rich legumes",
+      "quality": "basic"
+    },
+    {
+      "id": "lentil_seed",
+      "name": "Lentil Seed",
+      "category": "seed",
+      "icon": "LS",
+      "stackSize": 3000,
+      "baseValue": 3,
+      "description": "Seeds for lentil farming",
+      "quality": "basic"
+    },
+    {
+      "id": "ghee",
+      "name": "Ghee",
+      "category": "processed_food",
+      "icon": "Gh",
+      "stackSize": 1000,
+      "baseValue": 20,
+      "dependencies": [
+        "milk"
+      ],
+      "description": "Clarified butter for cooking",
+      "quality": "good"
+    },
+    {
+      "id": "butter",
+      "name": "Butter",
+      "category": "processed_food",
+      "icon": "Bu",
+      "stackSize": 1000,
+      "baseValue": 12,
+      "dependencies": [
+        "milk"
+      ],
+      "description": "Churned milk fat",
+      "quality": "basic"
+    },
+    {
+      "id": "curd",
+      "name": "Curd",
+      "category": "processed_food",
+      "icon": "Cd",
+      "stackSize": 1000,
+      "baseValue": 8,
+      "dependencies": [
+        "milk"
+      ],
+      "description": "Fermented milk / yogurt",
+      "quality": "basic"
+    },
+    {
+      "id": "paneer",
+      "name": "Paneer",
+      "category": "processed_food",
+      "icon": "Pn",
+      "stackSize": 500,
+      "baseValue": 15,
+      "dependencies": [
+        "milk"
+      ],
+      "description": "Fresh Indian cheese",
+      "quality": "basic"
+    },
+    {
+      "id": "cream",
+      "name": "Cream",
+      "category": "processed_food",
+      "icon": "Cr",
+      "stackSize": 1000,
+      "baseValue": 10,
+      "dependencies": [
+        "milk"
+      ],
+      "description": "Milk fat for cooking and desserts",
+      "quality": "basic"
+    },
+    {
+      "id": "buttermilk",
+      "name": "Buttermilk",
+      "category": "processed_food",
+      "icon": "Bm",
+      "stackSize": 1000,
+      "baseValue": 5,
+      "dependencies": [
+        "milk"
+      ],
+      "description": "Liquid remaining after churning butter",
+      "quality": "basic"
+    },
+    {
+      "id": "rice_flour",
+      "name": "Rice Flour",
+      "category": "processed_food",
+      "icon": "RF",
+      "stackSize": 2000,
+      "baseValue": 6,
+      "dependencies": [
+        "rice"
+      ],
+      "description": "Ground rice for South Indian dishes",
+      "quality": "basic"
+    },
+    {
+      "id": "cornmeal",
+      "name": "Cornmeal",
+      "category": "processed_food",
+      "icon": "CM",
+      "stackSize": 2000,
+      "baseValue": 5,
+      "dependencies": [
+        "maize"
+      ],
+      "description": "Ground maize for tortillas and porridge",
+      "quality": "basic"
+    },
+    {
+      "id": "lentil_flour",
+      "name": "Lentil Flour",
+      "category": "processed_food",
+      "icon": "LF",
+      "stackSize": 2000,
+      "baseValue": 7,
+      "dependencies": [
+        "lentils"
+      ],
+      "description": "Ground lentils for pakoras and snacks",
+      "quality": "basic"
+    },
+    {
+      "id": "noodles",
+      "name": "Noodles",
+      "category": "processed_food",
+      "icon": "Nd",
+      "stackSize": 1000,
+      "baseValue": 8,
+      "dependencies": [
+        "flour"
+      ],
+      "description": "Wheat or rice noodles",
+      "quality": "basic"
+    },
+    {
+      "id": "porridge",
+      "name": "Porridge",
+      "category": "prepared_food",
+      "icon": "Pg",
+      "stackSize": 500,
+      "baseValue": 6,
+      "dependencies": [
+        "oats"
+      ],
+      "description": "Cooked grain breakfast",
+      "quality": "basic"
+    },
+    {
+      "id": "tortilla",
+      "name": "Tortilla",
+      "category": "prepared_food",
+      "icon": "Tr",
+      "stackSize": 1000,
+      "baseValue": 4,
+      "dependencies": [
+        "cornmeal"
+      ],
+      "description": "Maize flatbread",
+      "quality": "basic"
+    },
+    {
+      "id": "roti",
+      "name": "Roti",
+      "category": "prepared_food",
+      "icon": "Rt",
+      "stackSize": 1000,
+      "baseValue": 3,
+      "dependencies": [
+        "flour"
+      ],
+      "description": "Whole wheat flatbread",
+      "quality": "basic"
+    },
+    {
+      "id": "paratha",
+      "name": "Paratha",
+      "category": "prepared_food",
+      "icon": "Pa",
+      "stackSize": 800,
+      "baseValue": 5,
+      "dependencies": [
+        "flour",
+        "ghee"
+      ],
+      "description": "Layered flatbread with ghee",
+      "quality": "basic"
+    },
+    {
+      "id": "naan",
+      "name": "Naan",
+      "category": "prepared_food",
+      "icon": "Na",
+      "stackSize": 800,
+      "baseValue": 6,
+      "dependencies": [
+        "flour",
+        "curd"
+      ],
+      "description": "Leavened tandoor bread",
+      "quality": "basic"
+    },
+    {
+      "id": "puri",
+      "name": "Puri",
+      "category": "prepared_food",
+      "icon": "Pu",
+      "stackSize": 1000,
+      "baseValue": 4,
+      "dependencies": [
+        "flour",
+        "oil"
+      ],
+      "description": "Deep fried puffed bread",
+      "quality": "basic"
+    },
+    {
+      "id": "samosa",
+      "name": "Samosa",
+      "category": "prepared_food",
+      "quality": "good",
+      "description": "Fried pastry with spiced potato filling"
+    },
+    {
+      "id": "kachori",
+      "name": "Kachori",
+      "category": "prepared_food",
+      "quality": "good",
+      "description": "Fried pastry with spiced lentil filling"
+    },
+    {
+      "id": "pakora",
+      "name": "Pakora",
+      "category": "prepared_food",
+      "icon": "Pk",
+      "stackSize": 500,
+      "baseValue": 6,
+      "dependencies": [
+        "lentil_flour",
+        "vegetables"
+      ],
+      "description": "Deep fried vegetable fritters",
+      "quality": "basic"
+    },
+    {
+      "id": "vada",
+      "name": "Vada",
+      "category": "prepared_food",
+      "icon": "Vd",
+      "stackSize": 500,
+      "baseValue": 6,
+      "dependencies": [
+        "lentils"
+      ],
+      "description": "Fried savory lentil doughnut",
+      "quality": "basic"
+    },
+    {
+      "id": "idli",
+      "name": "Idli",
+      "category": "prepared_food",
+      "icon": "Id",
+      "stackSize": 500,
+      "baseValue": 5,
+      "dependencies": [
+        "rice",
+        "lentils"
+      ],
+      "description": "Steamed rice and lentil cakes",
+      "quality": "basic"
+    },
+    {
+      "id": "dosa",
+      "name": "Dosa",
+      "category": "prepared_food",
+      "icon": "Do",
+      "stackSize": 400,
+      "baseValue": 7,
+      "dependencies": [
+        "rice",
+        "lentils"
+      ],
+      "description": "Crispy rice and lentil crepe",
+      "quality": "basic"
+    },
+    {
+      "id": "dal",
+      "name": "Dal",
+      "category": "prepared_food",
+      "icon": "Dl",
+      "stackSize": 500,
+      "baseValue": 6,
+      "dependencies": [
+        "lentils"
+      ],
+      "description": "Cooked spiced lentils",
+      "quality": "basic"
+    },
+    {
+      "id": "biryani",
+      "name": "Biryani",
+      "category": "prepared_food",
+      "icon": "Bi",
+      "stackSize": 300,
+      "baseValue": 20,
+      "dependencies": [
+        "rice",
+        "meat",
+        "spices"
+      ],
+      "description": "Layered spiced rice with meat",
+      "quality": "good"
+    },
+    {
+      "id": "khichdi",
+      "name": "Khichdi",
+      "category": "prepared_food",
+      "icon": "Kh",
+      "stackSize": 400,
+      "baseValue": 8,
+      "dependencies": [
+        "rice",
+        "lentils"
+      ],
+      "description": "Rice and lentil comfort food",
+      "quality": "basic"
+    },
+    {
+      "id": "pulao",
+      "name": "Pulao",
+      "category": "prepared_food",
+      "icon": "Pl",
+      "stackSize": 400,
+      "baseValue": 10,
+      "dependencies": [
+        "rice",
+        "vegetables"
+      ],
+      "description": "Flavored rice with vegetables",
+      "quality": "basic"
+    },
+    {
+      "id": "ladoo",
+      "name": "Ladoo",
+      "category": "sweet",
+      "quality": "good",
+      "description": "Sweet ball dessert"
+    },
+    {
+      "id": "jalebi",
+      "name": "Jalebi",
+      "category": "sweet",
+      "quality": "good",
+      "description": "Fried sweet spiral soaked in syrup"
+    },
+    {
+      "id": "halwa",
+      "name": "Halwa",
+      "category": "sweet",
+      "quality": "good",
+      "description": "Sweet semolina pudding"
+    },
+    {
+      "id": "fruit_juice",
+      "name": "Fruit Juice",
+      "category": "beverage",
+      "icon": "FJ",
+      "stackSize": 1000,
+      "baseValue": 8,
+      "description": "Fresh pressed fruit juice",
+      "quality": "basic"
+    },
+    {
+      "id": "jam",
+      "name": "Jam",
+      "category": "processed_food",
+      "icon": "Jm",
+      "stackSize": 500,
+      "baseValue": 12,
+      "dependencies": [
+        "fruit",
+        "sugar"
+      ],
+      "description": "Preserved fruit spread",
+      "quality": "basic"
+    },
+    {
+      "id": "wine",
+      "name": "Wine",
+      "category": "beverage",
+      "icon": "Wn",
+      "stackSize": 500,
+      "baseValue": 25,
+      "dependencies": [
+        "grapes"
+      ],
+      "description": "Fermented grape wine",
+      "quality": "good"
+    },
+    {
+      "id": "cider",
+      "name": "Cider",
+      "category": "beverage",
+      "icon": "Ci",
+      "stackSize": 500,
+      "baseValue": 18,
+      "dependencies": [
+        "apple"
+      ],
+      "description": "Fermented apple cider",
+      "quality": "basic"
+    },
+    {
+      "id": "dried_fruit",
+      "name": "Dried Fruit",
+      "category": "processed_food",
+      "icon": "DF",
+      "stackSize": 1000,
+      "baseValue": 15,
+      "description": "Preserved dried fruits",
+      "quality": "basic"
+    },
+    {
+      "id": "pickles",
+      "name": "Pickles",
+      "category": "processed_food",
+      "icon": "Pi",
+      "stackSize": 1000,
+      "baseValue": 10,
+      "description": "Preserved pickled vegetables",
+      "quality": "basic"
+    },
+    {
+      "id": "vegetable_soup",
+      "name": "Vegetable Soup",
+      "category": "prepared_food",
+      "icon": "VS",
+      "stackSize": 400,
+      "baseValue": 8,
+      "description": "Hot vegetable soup",
+      "quality": "basic"
+    },
+    {
+      "id": "salad",
+      "name": "Salad",
+      "category": "prepared_food",
+      "icon": "Sd",
+      "stackSize": 300,
+      "baseValue": 6,
+      "description": "Fresh vegetable salad",
+      "quality": "basic"
+    },
+    {
+      "id": "tomato_sauce",
+      "name": "Tomato Sauce",
+      "category": "processed_food",
+      "icon": "TS",
+      "stackSize": 1000,
+      "baseValue": 8,
+      "dependencies": [
+        "tomato"
+      ],
+      "description": "Cooked tomato base for cooking",
+      "quality": "basic"
+    },
+    {
+      "id": "pie",
+      "name": "Pie",
+      "category": "prepared_food",
+      "icon": "Pe",
+      "stackSize": 200,
+      "baseValue": 15,
+      "dependencies": [
+        "flour",
+        "fruit"
+      ],
+      "description": "Baked pastry with filling",
+      "quality": "basic"
+    },
+    {
+      "id": "stew",
+      "name": "Stew",
+      "category": "prepared_food",
+      "icon": "Sw",
+      "stackSize": 300,
+      "baseValue": 18,
+      "dependencies": [
+        "meat",
+        "vegetables"
+      ],
+      "description": "Slow-cooked meat and vegetable dish",
+      "quality": "basic"
+    },
+    {
+      "id": "red_cloth",
+      "name": "Red Cloth",
+      "category": "textile",
+      "icon": "RC",
+      "stackSize": 800,
+      "baseValue": 25,
+      "dependencies": [
+        "cloth",
+        "red_dye"
+      ],
+      "description": "Cloth dyed vibrant red",
+      "quality": "good"
+    },
+    {
+      "id": "blue_cloth",
+      "name": "Blue Cloth",
+      "category": "textile",
+      "icon": "BC",
+      "stackSize": 800,
+      "baseValue": 28,
+      "dependencies": [
+        "cloth",
+        "blue_dye"
+      ],
+      "description": "Cloth dyed deep blue",
+      "quality": "good"
+    },
+    {
+      "id": "yellow_cloth",
+      "name": "Yellow Cloth",
+      "category": "textile",
+      "icon": "YC",
+      "stackSize": 800,
+      "baseValue": 25,
+      "dependencies": [
+        "cloth",
+        "yellow_dye"
+      ],
+      "description": "Cloth dyed bright yellow",
+      "quality": "good"
+    },
+    {
+      "id": "green_cloth",
+      "name": "Green Cloth",
+      "category": "textile",
+      "icon": "GC",
+      "stackSize": 800,
+      "baseValue": 30,
+      "dependencies": [
+        "cloth",
+        "green_dye"
+      ],
+      "description": "Cloth dyed forest green",
+      "quality": "good"
+    },
+    {
+      "id": "purple_cloth",
+      "name": "Purple Cloth",
+      "category": "textile",
+      "icon": "PC",
+      "stackSize": 600,
+      "baseValue": 40,
+      "dependencies": [
+        "cloth",
+        "purple_dye"
+      ],
+      "description": "Cloth dyed royal purple - rare and valuable",
+      "quality": "good"
+    },
+    {
+      "id": "black_cloth",
+      "name": "Black Cloth",
+      "category": "textile",
+      "icon": "BkC",
+      "stackSize": 800,
+      "baseValue": 22,
+      "dependencies": [
+        "cloth",
+        "black_dye"
+      ],
+      "description": "Cloth dyed deep black",
+      "quality": "good"
+    },
+    {
+      "id": "orange_cloth",
+      "name": "Orange Cloth",
+      "category": "textile",
+      "icon": "OC",
+      "stackSize": 800,
+      "baseValue": 27,
+      "dependencies": [
+        "cloth",
+        "orange_dye"
+      ],
+      "description": "Cloth dyed bright orange",
+      "quality": "good"
+    },
+    {
+      "id": "dyed_linen",
+      "name": "Dyed Linen",
+      "category": "textile",
+      "icon": "DL",
+      "stackSize": 400,
+      "baseValue": 35,
+      "dependencies": [
+        "linen",
+        "blue_dye"
+      ],
+      "description": "Fine linen dyed in rich colors",
+      "quality": "good"
+    },
+    {
+      "id": "embroidered_linen",
+      "name": "Embroidered Linen",
+      "category": "textile",
+      "icon": "EL",
+      "stackSize": 200,
+      "baseValue": 80,
+      "dependencies": [
+        "dyed_linen",
+        "thread",
+        "gold"
+      ],
+      "description": "Luxury embroidered linen with gold thread",
+      "quality": "luxury"
+    },
+    {
+      "id": "formal_attire",
+      "name": "Formal Attire",
+      "category": "clothing",
+      "icon": "FA",
+      "stackSize": 100,
+      "baseValue": 150,
+      "dependencies": [
+        "fine_clothes",
+        "blue_cloth",
+        "thread"
+      ],
+      "description": "High-end formal clothing for special occasions",
+      "quality": "luxury"
+    },
+    {
+      "id": "ceremonial_robes",
+      "name": "Ceremonial Robes",
+      "category": "clothing",
+      "icon": "CR",
+      "stackSize": 50,
+      "baseValue": 300,
+      "dependencies": [
+        "silk",
+        "purple_dye",
+        "gold"
+      ],
+      "description": "Extremely valuable ceremonial garments",
+      "quality": "luxury"
+    },
+    {
+      "id": "uniform",
+      "name": "Uniform",
+      "category": "clothing",
+      "icon": "Un",
+      "stackSize": 200,
+      "baseValue": 45,
+      "dependencies": [
+        "work_clothes",
+        "black_dye"
+      ],
+      "description": "Standardized work uniform",
+      "quality": "good"
+    },
+    {
+      "id": "gloves",
+      "name": "Gloves",
+      "category": "clothing",
+      "icon": "Gl",
+      "stackSize": 300,
+      "baseValue": 20,
+      "dependencies": [
+        "leather",
+        "thread"
+      ],
+      "description": "Leather hand protection",
+      "quality": "good"
+    },
+    {
+      "id": "wool_gloves",
+      "name": "Wool Gloves",
+      "category": "clothing",
+      "quality": "good",
+      "description": "Warm wool hand protection"
+    },
+    {
+      "id": "wool_hat",
+      "name": "Wool Hat",
+      "category": "clothing",
+      "quality": "good",
+      "description": "Warm wool head covering"
+    },
+    {
+      "id": "gemstone",
+      "name": "Gemstone",
+      "category": "raw_mineral",
+      "icon": "Gm",
+      "stackSize": 500,
+      "baseValue": 80,
+      "isRaw": true,
+      "description": "Precious gemstone for jewelry",
+      "quality": "luxury"
+    },
+    {
+      "id": "silver_ring",
+      "name": "Silver Ring",
+      "category": "jewelry",
+      "icon": "SR",
+      "stackSize": 300,
+      "baseValue": 50,
+      "dependencies": [
+        "silver"
+      ],
+      "description": "Simple silver ring",
+      "quality": "luxury"
+    },
+    {
+      "id": "gold_ring",
+      "name": "Gold Ring",
+      "category": "jewelry",
+      "icon": "GR",
+      "stackSize": 200,
+      "baseValue": 100,
+      "dependencies": [
+        "gold"
+      ],
+      "description": "Elegant gold ring",
+      "quality": "luxury"
+    },
+    {
+      "id": "silver_necklace",
+      "name": "Silver Necklace",
+      "category": "jewelry",
+      "icon": "SN",
+      "stackSize": 200,
+      "baseValue": 80,
+      "dependencies": [
+        "silver",
+        "thread"
+      ],
+      "description": "Silver chain necklace",
+      "quality": "luxury"
+    },
+    {
+      "id": "gold_necklace",
+      "name": "Gold Necklace",
+      "category": "jewelry",
+      "icon": "GN",
+      "stackSize": 150,
+      "baseValue": 180,
+      "dependencies": [
+        "gold",
+        "thread"
+      ],
+      "description": "Elegant gold necklace",
+      "quality": "luxury"
+    },
+    {
+      "id": "gemstone_jewelry",
+      "name": "Gemstone Jewelry",
+      "category": "jewelry",
+      "icon": "GJ",
+      "stackSize": 100,
+      "baseValue": 250,
+      "dependencies": [
+        "gold",
+        "gemstone"
+      ],
+      "description": "Gold jewelry set with precious gemstones",
+      "quality": "luxury"
+    },
+    {
+      "id": "crown",
+      "name": "Crown",
+      "category": "jewelry",
+      "icon": "Cw",
+      "stackSize": 20,
+      "baseValue": 800,
+      "dependencies": [
+        "gold",
+        "gemstone"
+      ],
+      "description": "Royal crown of gold and gemstones",
+      "quality": "luxury"
+    },
+    {
+      "id": "portrait",
+      "name": "Portrait",
+      "category": "luxury",
+      "icon": "Pt",
+      "stackSize": 30,
+      "baseValue": 400,
+      "dependencies": [
+        "cloth",
+        "red_dye",
+        "blue_dye",
+        "yellow_dye",
+        "gold"
+      ],
+      "description": "Commissioned portrait painting",
+      "quality": "luxury"
+    },
+    {
+      "id": "tapestry",
+      "name": "Tapestry",
+      "category": "luxury",
+      "icon": "Tp",
+      "stackSize": 20,
+      "baseValue": 500,
+      "dependencies": [
+        "wool",
+        "thread",
+        "red_dye",
+        "blue_dye"
+      ],
+      "description": "Large decorative woven wall hanging",
+      "quality": "luxury"
+    },
+    {
+      "id": "bronze_sculpture",
+      "name": "Bronze Sculpture",
+      "category": "luxury",
+      "quality": "masterwork",
+      "description": "Cast bronze artwork"
+    },
+    {
+      "id": "figurine",
+      "name": "Figurine",
+      "category": "luxury",
+      "icon": "Fg",
+      "stackSize": 200,
+      "baseValue": 25,
+      "dependencies": [
+        "clay"
+      ],
+      "description": "Small decorative clay figure",
+      "quality": "good"
+    },
+    {
+      "id": "glassware",
+      "name": "Glassware",
+      "category": "household",
+      "quality": "good",
+      "description": "Glass cups, bowls, and decorative items"
+    },
+    {
+      "id": "limestone",
+      "name": "Limestone",
+      "category": "raw_mineral",
+      "icon": "Ls",
+      "stackSize": 8000,
+      "baseValue": 2,
+      "isRaw": true,
+      "description": "Calcium carbite rock for lime production",
+      "quality": "basic"
+    },
+    {
+      "id": "quickite",
+      "name": "Quickite",
+      "category": "construction",
+      "icon": "Ql",
+      "stackSize": 3000,
+      "baseValue": 8,
+      "dependencies": [
+        "limestone"
+      ],
+      "description": "Calcium oxide for cement and mortar",
+      "quality": "basic"
+    },
+    {
+      "id": "mortar",
+      "name": "Mortar",
+      "category": "construction",
+      "icon": "Mr",
+      "stackSize": 4000,
+      "baseValue": 12,
+      "dependencies": [
+        "cement",
+        "sand"
+      ],
+      "description": "Binding mixture for masonry",
+      "quality": "basic"
+    },
+    {
+      "id": "concrete",
+      "name": "Concrete",
+      "category": "construction",
+      "icon": "Cn",
+      "stackSize": 5000,
+      "baseValue": 15,
+      "dependencies": [
+        "cement",
+        "sand",
+        "stone"
+      ],
+      "description": "Strong modern building material",
+      "quality": "basic"
+    },
+    {
+      "id": "plaster",
+      "name": "Plaster",
+      "category": "construction",
+      "icon": "Pl",
+      "stackSize": 3000,
+      "baseValue": 10,
+      "dependencies": [
+        "quickite",
+        "sand"
+      ],
+      "description": "Wall finishing material",
+      "quality": "basic"
+    },
+    {
+      "id": "stucco",
+      "name": "Stucco",
+      "category": "construction",
+      "icon": "Su",
+      "stackSize": 2000,
+      "baseValue": 18,
+      "dependencies": [
+        "plaster",
+        "marble"
+      ],
+      "description": "Decorative exterior coating",
+      "quality": "basic"
+    }
+  ]
+}

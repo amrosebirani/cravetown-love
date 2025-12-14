@@ -1,0 +1,132 @@
+{
+  "version": "1.0.0",
+  "classes": [
+    {
+      "id": "elite",
+      "name": "Elite",
+      "description": "Social status matters as much as survival",
+      "allocationPriority": 1,
+      "baseIncome": 1000,
+
+      "baseCravingVector": {
+        "coarse": [3.0, 2.0, 2.5, 4.0, 5.0, 2.0, 2.0, 1.5, 1.0],
+        "fine": [
+          3.0, 2.5, 3.0, 2.5, 2.0, 2.5, 2.0, 1.5,
+          2.0, 1.5, 2.5, 1.5, 1.0,
+          2.5, 3.0, 2.0, 3.0, 2.5, 2.0,
+          4.5, 3.5, 4.0, 3.5, 2.0, 4.0, 2.0,
+          5.0, 4.0, 5.0, 5.5, 3.0, 4.0,
+          2.0, 2.5, 1.5, 1.5, 1.0,
+          2.5, 2.0, 2.0, 1.5,
+          2.0, 1.5, 1.5, 1.0,
+          0.5, 1.0, 0.5, 1.5, 0.5
+        ]
+      },
+
+      "thresholds": {
+        "emigration": 40,
+        "riotContribution": 0.5,
+        "criticalSatisfaction": 30
+      },
+
+      "acceptedQualityTiers": ["luxury", "masterwork"],
+      "rejectedQualityTiers": ["poor", "basic"]
+    },
+
+    {
+      "id": "upper",
+      "name": "Upper Class",
+      "description": "High comfort & psychological needs",
+      "allocationPriority": 2,
+      "baseIncome": 500,
+
+      "baseCravingVector": {
+        "coarse": [3.5, 2.5, 2.0, 3.5, 3.0, 2.5, 1.5, 1.0, 1.0],
+        "fine": [
+          3.5, 3.0, 3.5, 3.0, 2.5, 2.5, 2.5, 2.0,
+          2.5, 2.0, 2.5, 2.0, 1.5,
+          2.0, 2.5, 2.0, 2.0, 2.0, 1.5,
+          3.5, 3.5, 3.5, 3.0, 2.5, 3.0, 2.0,
+          3.0, 2.5, 3.0, 3.5, 2.0, 3.0,
+          2.5, 2.5, 2.0, 2.0, 2.0,
+          1.5, 1.5, 1.5, 1.0,
+          1.0, 1.0, 1.0, 0.8,
+          1.0, 1.0, 0.8, 1.2, 0.8
+        ]
+      },
+
+      "thresholds": {
+        "emigration": 35,
+        "riotContribution": 0.7,
+        "criticalSatisfaction": 25
+      },
+
+      "acceptedQualityTiers": ["good", "luxury", "masterwork"],
+      "rejectedQualityTiers": ["poor"]
+    },
+
+    {
+      "id": "middle",
+      "name": "Middle Class",
+      "description": "Balanced needs across all cravings",
+      "allocationPriority": 3,
+      "baseIncome": 200,
+
+      "baseCravingVector": {
+        "coarse": [4.0, 3.0, 1.5, 2.0, 1.5, 3.0, 1.0, 0.7, 1.0],
+        "fine": [
+          4.0, 3.5, 4.0, 3.5, 3.0, 3.0, 2.5, 2.0,
+          3.0, 2.5, 3.0, 2.5, 2.0,
+          1.5, 1.5, 1.5, 1.0, 1.5, 1.0,
+          2.0, 2.0, 2.0, 2.0, 2.5, 1.5, 1.5,
+          1.5, 1.0, 1.5, 1.5, 1.0, 1.0,
+          3.0, 3.0, 2.5, 2.5, 2.5,
+          1.0, 1.0, 1.0, 0.8,
+          0.7, 0.7, 0.7, 0.6,
+          1.0, 1.0, 1.0, 1.2, 1.0
+        ]
+      },
+
+      "thresholds": {
+        "emigration": 30,
+        "riotContribution": 1.0,
+        "criticalSatisfaction": 20
+      },
+
+      "acceptedQualityTiers": ["basic", "good", "luxury"],
+      "rejectedQualityTiers": []
+    },
+
+    {
+      "id": "lower",
+      "name": "Lower Class",
+      "description": "Survival-focused, high biological & safety",
+      "allocationPriority": 4,
+      "baseIncome": 50,
+
+      "baseCravingVector": {
+        "coarse": [4.5, 3.0, 1.0, 1.0, 0.5, 3.0, 0.5, 0.5, 1.5],
+        "fine": [
+          4.5, 4.0, 4.5, 4.0, 3.5, 3.5, 3.0, 2.5,
+          3.0, 2.5, 3.0, 2.5, 2.0,
+          1.0, 0.8, 1.0, 0.5, 1.0, 0.3,
+          1.0, 0.8, 1.0, 1.2, 2.0, 0.8, 0.8,
+          0.5, 0.3, 0.5, 0.5, 0.3, 0.3,
+          3.0, 3.0, 2.5, 2.5, 2.5,
+          0.5, 0.5, 0.5, 0.3,
+          0.5, 0.5, 0.5, 0.4,
+          1.5, 1.5, 1.5, 1.5, 1.5
+        ]
+      },
+
+      "thresholds": {
+        "emigration": 25,
+        "riotContribution": 1.5,
+        "criticalSatisfaction": 15
+      },
+
+      "acceptedQualityTiers": ["poor", "basic", "good"],
+      "rejectedQualityTiers": []
+    }
+  ]
+}

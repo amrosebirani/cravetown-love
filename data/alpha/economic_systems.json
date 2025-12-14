@@ -1,0 +1,213 @@
+{
+  "version": "1.0.0",
+  "description": "Economic system configurations for different game modes",
+  "defaultSystem": "capitalist",
+
+  "systems": {
+    "capitalist": {
+      "id": "capitalist",
+      "name": "Free Market",
+      "description": "Private ownership with profit motive. Citizens can own land and buildings, accumulate wealth, and hire workers.",
+
+      "ownership": {
+        "privateOwnershipAllowed": true,
+        "landCanBePrivate": true,
+        "buildingsCanBePrivate": true,
+        "maxOwnershipPerPerson": null,
+        "inheritanceAllowed": true,
+        "inheritanceTax": 0.1
+      },
+
+      "income": {
+        "wageSystem": "market",
+        "profitDistribution": "owners",
+        "rentAllowed": true,
+        "interestAllowed": true,
+        "wageDescription": "Wages set by supply/demand and skill level"
+      },
+
+      "taxation": {
+        "incomeTax": {
+          "lower": 0.0,
+          "middle": 0.10,
+          "upper": 0.15,
+          "elite": 0.20
+        },
+        "capitalGainsTax": 0.15,
+        "propertyTax": 0.02,
+        "tradeTax": 0.05
+      },
+
+      "mobility": {
+        "classChangeEnabled": true,
+        "wealthAccumulationRate": 1.0,
+        "description": "Full class mobility based on wealth accumulation"
+      }
+    },
+
+    "collectivist": {
+      "id": "collectivist",
+      "name": "Collective Ownership",
+      "description": "State/collective ownership of production. Buildings are owned collectively, profits go to treasury for redistribution.",
+
+      "ownership": {
+        "privateOwnershipAllowed": false,
+        "landCanBePrivate": false,
+        "buildingsCanBePrivate": false,
+        "maxOwnershipPerPerson": 0,
+        "inheritanceAllowed": false,
+        "inheritanceTax": 1.0
+      },
+
+      "income": {
+        "wageSystem": "state",
+        "profitDistribution": "treasury",
+        "rentAllowed": false,
+        "interestAllowed": false,
+        "wageDescription": "Standardized wages set by state based on role"
+      },
+
+      "stateWages": {
+        "administrator": 80,
+        "specialist": 60,
+        "skilled_worker": 45,
+        "laborer": 30
+      },
+
+      "taxation": {
+        "incomeTax": {
+          "all": 0.0
+        },
+        "note": "No income tax - state provides directly"
+      },
+
+      "mobility": {
+        "classChangeEnabled": true,
+        "wealthAccumulationRate": 0.1,
+        "classBasedOn": "role_and_skill",
+        "description": "Class based on role and skill level, not wealth"
+      },
+
+      "roleClassMapping": {
+        "administrator": "elite",
+        "specialist": "upper",
+        "skilled_worker": "middle",
+        "laborer": "lower"
+      }
+    },
+
+    "feudal": {
+      "id": "feudal",
+      "name": "Feudal Hierarchy",
+      "description": "Land-based hierarchy with tribute obligations. Lords grant land to vassals in exchange for loyalty and tribute.",
+
+      "ownership": {
+        "privateOwnershipAllowed": true,
+        "landCanBePrivate": true,
+        "buildingsCanBePrivate": true,
+        "requiresTitle": true,
+        "maxOwnershipByTitle": {
+          "lord": null,
+          "baron": 20,
+          "knight": 8,
+          "guild_master": 5,
+          "freeman": 2,
+          "craftsman": 1
+        },
+        "inheritanceAllowed": true,
+        "inheritanceTax": 0.0
+      },
+
+      "income": {
+        "wageSystem": "traditional",
+        "profitDistribution": "owners",
+        "rentAllowed": true,
+        "interestAllowed": false,
+        "wageDescription": "Fixed traditional wages by craft"
+      },
+
+      "obligations": {
+        "tributeRate": 0.30,
+        "laborDaysPerWeek": 2,
+        "tributeDescription": "30% of production to liege lord, 2 days labor per week"
+      },
+
+      "titles": {
+        "lord": {
+          "class": "elite",
+          "canGrantLand": true,
+          "canGrantTitles": ["baron", "knight"]
+        },
+        "baron": {
+          "class": "elite",
+          "canGrantLand": true,
+          "canGrantTitles": ["knight"]
+        },
+        "count": {
+          "class": "elite",
+          "canGrantLand": true,
+          "canGrantTitles": ["knight"]
+        },
+        "knight": {
+          "class": "upper",
+          "canGrantLand": false,
+          "canGrantTitles": []
+        },
+        "guild_master": {
+          "class": "upper",
+          "canGrantLand": false,
+          "canGrantTitles": []
+        },
+        "freeman": {
+          "class": "middle",
+          "canGrantLand": false,
+          "canGrantTitles": []
+        },
+        "craftsman": {
+          "class": "middle",
+          "canGrantLand": false,
+          "canGrantTitles": []
+        },
+        "serf": {
+          "class": "lower",
+          "canGrantLand": false,
+          "canGrantTitles": [],
+          "boundToLand": true
+        }
+      },
+
+      "taxation": {
+        "incomeTax": {
+          "all": 0.0
+        },
+        "note": "No income tax - tribute system instead"
+      },
+
+      "mobility": {
+        "classChangeEnabled": false,
+        "titleGrantRequired": true,
+        "wealthAccumulationRate": 0.5,
+        "description": "Class change requires title grant from higher lord"
+      }
+    }
+  },
+
+  "systemComparison": {
+    "note": "Quick reference for system differences",
+    "privateOwnership": {
+      "capitalist": true,
+      "collectivist": false,
+      "feudal": "with_title"
+    },
+    "classMobility": {
+      "capitalist": "high",
+      "collectivist": "skill_based",
+      "feudal": "very_low"
+    },
+    "wealthSource": {
+      "capitalist": "ownership_and_labor",
+      "collectivist": "state_wages",
+      "feudal": "land_and_tribute"
+    }
+  }
+}

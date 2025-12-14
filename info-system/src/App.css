@@ -6,6 +6,12 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-mode {
+  background-color: #0a0a0a;
+  color-scheme: dark;
 }
 
 * {
@@ -15,4 +21,141 @@ body {
 #root {
   width: 100%;
   height: 100vh;
+}
+
+/* Smooth transitions for theme switching */
+.ant-layout,
+.ant-layout-sider,
+.ant-layout-header,
+.ant-layout-content,
+.ant-menu,
+.ant-card,
+.ant-table,
+.ant-modal-content,
+.ant-input,
+.ant-select-selector,
+.ant-btn {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease !important;
+}
+
+/* Custom scrollbar for dark mode */
+body.dark-mode ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+  background: #1f1f1f;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}
+
+/* Light mode scrollbar */
+body:not(.dark-mode) ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body:not(.dark-mode) ::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+
+body:not(.dark-mode) ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+body:not(.dark-mode) ::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Fix for ant-design table hover in dark mode */
+body.dark-mode .ant-table-tbody > tr:hover > td {
+  background: #262626 !important;
+}
+
+/* Fix for ant-design card backgrounds in dark mode */
+body.dark-mode .ant-card {
+  background: #1f1f1f;
+}
+
+body.dark-mode .ant-card-head {
+  border-bottom-color: #303030;
+}
+
+/* Fix for collapse panels in dark mode */
+body.dark-mode .ant-collapse {
+  background: #1f1f1f;
+}
+
+body.dark-mode .ant-collapse-header {
+  background: #262626 !important;
+}
+
+body.dark-mode .ant-collapse-content {
+  background: #1f1f1f;
+}
+
+/* Fix for modal in dark mode */
+body.dark-mode .ant-modal-content {
+  background: #1f1f1f;
+}
+
+body.dark-mode .ant-modal-header {
+  background: #1f1f1f;
+  border-bottom-color: #303030;
+}
+
+body.dark-mode .ant-modal-footer {
+  border-top-color: #303030;
+}
+
+/* Fix for form labels in dark mode */
+body.dark-mode .ant-form-item-label > label {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Fix for popconfirm in dark mode */
+body.dark-mode .ant-popover-inner {
+  background: #1f1f1f;
+}
+
+/* Fix for tooltip in dark mode */
+body.dark-mode .ant-tooltip-inner {
+  background: #262626;
+}
+
+/* Fix for select dropdown in dark mode */
+body.dark-mode .ant-select-dropdown {
+  background: #1f1f1f;
+}
+
+body.dark-mode .ant-select-item-option-active {
+  background: #262626;
+}
+
+body.dark-mode .ant-select-item-option-selected {
+  background: #177ddc;
+}
+
+/* Fix for date picker in dark mode */
+body.dark-mode .ant-picker-panel-container {
+  background: #1f1f1f;
+}
+
+/* Theme toggle switch styling */
+.ant-switch {
+  min-width: 44px;
+}
+
+/* Header title glow effect in dark mode */
+body.dark-mode .ant-layout-header div:first-child {
+  text-shadow: 0 0 10px rgba(24, 144, 255, 0.3);
 }

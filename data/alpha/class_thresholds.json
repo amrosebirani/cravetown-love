@@ -1,0 +1,116 @@
+{
+  "version": "1.0.0",
+  "description": "Thresholds for calculating emergent social class based on wealth and income",
+
+  "classCalculationInterval": 20,
+  "note": "Class is recalculated every N cycles for performance",
+
+  "netWorthThresholds": {
+    "elite": {
+      "min": 10000,
+      "description": "Extremely wealthy landowners and investors"
+    },
+    "upper": {
+      "min": 3000,
+      "max": 9999,
+      "description": "Successful merchants and property owners"
+    },
+    "middle": {
+      "min": 500,
+      "max": 2999,
+      "description": "Skilled workers with modest savings"
+    },
+    "lower": {
+      "max": 499,
+      "description": "Workers with little to no savings"
+    }
+  },
+
+  "capitalRatioThresholds": {
+    "description": "Ratio of capital income to total income (0.0 - 1.0)",
+    "elite": 0.8,
+    "upper": 0.5,
+    "middle": 0.2,
+    "note": "Higher ratio means more income from ownership vs labor"
+  },
+
+  "skillIncomeThresholds": {
+    "description": "Alternative path to class via high skill income (gold per cycle)",
+    "upper": 100,
+    "middle": 40,
+    "note": "Skilled workers can reach upper/middle class without capital"
+  },
+
+  "classCalculationRules": {
+    "elite": {
+      "requirement": "AND",
+      "conditions": [
+        "netWorth >= 10000",
+        "capitalRatio >= 0.8"
+      ],
+      "description": "Must have both high wealth AND high capital income ratio"
+    },
+    "upper": {
+      "requirement": "OR",
+      "conditions": [
+        "netWorth >= 3000",
+        "capitalRatio >= 0.5",
+        "skillIncome >= 100"
+      ],
+      "description": "Can achieve through wealth, capital ratio, OR high skill income"
+    },
+    "middle": {
+      "requirement": "OR",
+      "conditions": [
+        "netWorth >= 500",
+        "capitalRatio >= 0.2",
+        "skillIncome >= 40"
+      ],
+      "description": "Can achieve through modest wealth, some ownership, OR decent income"
+    },
+    "lower": {
+      "requirement": "DEFAULT",
+      "description": "Anyone not meeting middle class thresholds"
+    }
+  },
+
+  "mobilitySettings": {
+    "upwardMobility": {
+      "enabled": true,
+      "stabilityPeriod": 10,
+      "description": "Must maintain threshold for N cycles before class upgrade"
+    },
+    "downwardMobility": {
+      "enabled": true,
+      "gracePeriod": 5,
+      "description": "Grace period of N cycles before class downgrade"
+    }
+  },
+
+  "classEffects": {
+    "elite": {
+      "emigrationThreshold": 45,
+      "qualityMinimum": "good",
+      "luxuryMultiplier": 1.5,
+      "statusMultiplier": 1.8
+    },
+    "upper": {
+      "emigrationThreshold": 40,
+      "qualityMinimum": "basic",
+      "luxuryMultiplier": 1.3,
+      "statusMultiplier": 1.4
+    },
+    "middle": {
+      "emigrationThreshold": 35,
+      "qualityMinimum": "poor",
+      "luxuryMultiplier": 1.0,
+      "statusMultiplier": 1.0
+    },
+    "lower": {
+      "emigrationThreshold": 25,
+      "qualityMinimum": null,
+      "luxuryMultiplier": 0.5,
+      "statusMultiplier": 0.5
+    }
+  }
+}

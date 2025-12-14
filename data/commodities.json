@@ -929,16 +929,6 @@
       "description": "Combustible mineral"
     },
     {
-      "id": "ore",
-      "name": "Iron Ore",
-      "category": "raw_mineral",
-      "icon": "Or",
-      "stackSize": 8000,
-      "baseValue": 5,
-      "isRaw": true,
-      "description": "Raw metal ore"
-    },
-    {
       "id": "copper_ore",
       "name": "Copper Ore",
       "category": "raw_mineral",

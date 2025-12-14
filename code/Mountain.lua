@@ -288,3 +288,84 @@ end
 function Mountain:GetRangeCount()
     return #self.mRanges
 end
+
+-- Check if a rectangle collides with any mountain
+-- Used for building placement validation
+function Mountain:CheckRectCollision(x, y, width, height)
+    for _, range in ipairs(self.mRanges) do
+        if x < range.x + range.width and
+           x + width > range.x and
+           y < range.y + range.height and
+           y + height > range.y then
+            return true
+        end
+    end
+    return false
+end
+
+-- Create mountain from starting location config positions
+-- positions: array of {x, y, width, height} tables
+function Mountain:CreateFromPositions(positions)
+    if not positions or #positions == 0 then
+        return
+    end
+
+    -- Clear existing ranges
+    self.mRanges = {}
+
+    -- Create a mountain range for each position
+    for i, pos in ipairs(positions) do
+        local range = {
+            x = pos.x or 0,
+            y = pos.y or 0,
+            width = pos.width or 150,
+            height = pos.height or 100,
+            berry = nil,  -- No berries for terrain mountains
+            berryName = nil,
+            color = {0.55, 0.50, 0.45},  -- Rocky gray-brown
+            quantity = 0
+        }
+        table.insert(self.mRanges, range)
+    end
+
+    print("[Mountain] Created " .. #self.mRanges .. " mountains from position data")
+end
+
+-- Simplified Create function for terrain-only mountains (no berries)
+function Mountain.CreateTerrain(config)
+    local this = {
+        mBoundaryMinX = config.minX or 0,
+        mBoundaryMinY = config.minY or 0,
+        mBoundaryMaxX = config.maxX or 3200,
+        mBoundaryMaxY = config.maxY or 2400,
+        mRiver = nil,
+        mForest = nil,
+        mMines = nil,
+        mInventory = nil,
+        mRanges = {}
+    }
+
+    setmetatable(this, Mountain)
+
+    -- Create ranges from provided positions
+    if config.positions then
+        for i, pos in ipairs(config.positions) do
+            local range = {
+                x = pos.x or 0,
+                y = pos.y or 0,
+                width = pos.width or 150,
+                height = pos.height or 100,
+                berry = nil,
+                berryName = nil,
+                color = {0.55, 0.50, 0.45},  -- Rocky gray-brown
+                quantity = 0
+            }
+            table.insert(this.mRanges, range)
+        end
+    end
+
+    print("[Mountain] Created terrain mountains: " .. #this.mRanges .. " ranges")
+    return this
+end
+
+return Mountain

@@ -1,0 +1,38 @@
+{
+  "firstNames": {
+    "male": [
+      "Marcus", "William", "Thomas", "James", "Robert", "John", "Edward",
+      "Henry", "George", "Charles", "Richard", "Arthur", "Frederick", "Albert",
+      "Samuel", "Benjamin", "Daniel", "Joseph", "Michael", "David", "Peter",
+      "Simon", "Andrew", "Philip", "Matthew", "Luke", "Mark", "Paul",
+      "Alexander", "Nicholas", "Oliver", "Sebastian", "Theodore", "Vincent",
+      "Gregory", "Lawrence", "Raymond", "Harold", "Leonard", "Clarence",
+      "Bernard", "Ernest", "Eugene", "Francis", "Gerald", "Herbert", "Irving",
+      "Jerome", "Kenneth", "Leopold", "Maurice", "Norman", "Oscar", "Patrick"
+    ],
+    "female": [
+      "Elena", "Maria", "Anna", "Elizabeth", "Catherine", "Margaret", "Sarah",
+      "Emily", "Charlotte", "Victoria", "Isabella", "Sophia", "Emma", "Olivia",
+      "Grace", "Alice", "Rose", "Lily", "Clara", "Helen", "Frances", "Dorothy",
+      "Eleanor", "Florence", "Harriet", "Josephine", "Katherine", "Louise",
+      "Mildred", "Nellie", "Pauline", "Rachel", "Ruth", "Sylvia", "Theresa",
+      "Virginia", "Winifred", "Agnes", "Beatrice", "Caroline", "Diana", "Edith",
+      "Gertrude", "Irene", "Julia", "Lillian", "Martha", "Nancy", "Pearl"
+    ]
+  },
+  "lastNames": [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Davis",
+    "Wilson", "Anderson", "Taylor", "Thomas", "Moore", "Jackson", "Martin",
+    "Lee", "Thompson", "White", "Harris", "Clark", "Lewis", "Robinson",
+    "Walker", "Hall", "Young", "Allen", "King", "Wright", "Scott", "Green",
+    "Baker", "Adams", "Nelson", "Carter", "Mitchell", "Roberts", "Turner",
+    "Phillips", "Campbell", "Parker", "Evans", "Edwards", "Collins", "Stewart",
+    "Morris", "Murphy", "Cook", "Rogers", "Morgan", "Peterson", "Cooper",
+    "Reed", "Bailey", "Bell", "Howard", "Ward", "Cox", "Richardson", "Wood",
+    "Watson", "Brooks", "Kelly", "Sanders", "Price", "Bennett", "Barnes",
+    "Ross", "Henderson", "Coleman", "Jenkins", "Perry", "Powell", "Long",
+    "Chen", "Wang", "Li", "Zhang", "Liu", "Yang", "Huang", "Wu", "Zhou",
+    "Garcia", "Martinez", "Rodriguez", "Lopez", "Gonzalez", "Hernandez",
+    "Vasquez", "Torres", "Rivera", "Ramirez", "Flores", "Sanchez", "Cruz"
+  ]
+}

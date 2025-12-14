@@ -8,22 +8,40 @@ Forest.__index = Forest
 function Forest:Create(params)
     local densityLevels = {"Clear", "Sparse", "Moderate", "Dense"}
     local this = {
-        mBoundaryMinX = params.minX or -1250,
-        mBoundaryMinY = params.minY or -1250,
-        mBoundaryMaxX = params.maxX or 1250,
-        mBoundaryMaxY = params.maxY or 1250,
+        mBoundaryMinX = params.minX or 0,
+        mBoundaryMinY = params.minY or 0,
+        mBoundaryMaxX = params.maxX or 2500,
+        mBoundaryMaxY = params.maxY or 2500,
         mRiver = params.river,  -- Reference to river for collision checking
         mRegions = {},  -- Array of forest regions
         mTrees = {},    -- Array of individual trees {x, y, size}
-        mDensityStatus = densityLevels[math.random(1, #densityLevels)]  -- Random density level
+        mDensityStatus = densityLevels[math.random(1, #densityLevels)],  -- Random density level
+        -- Store world dimensions for coordinate conversion
+        -- River uses centered coords where (0,0) is world center
+        mWorldWidth = (params.maxX or 2500) - (params.minX or 0),
+        mWorldHeight = (params.maxY or 2500) - (params.minY or 0),
+        -- Store zones if provided (zone-based generation)
+        mZones = params.zones
     }
 
     setmetatable(this, self)
 
-    -- Generate random forest regions
-    this:GenerateForestRegions(params)
+    -- Generate forest - either zone-based or random regions
+    if params.zones and #params.zones > 0 then
+        this:GenerateForestFromZones(params.zones)
+    else
+        this:GenerateForestRegions(params)
+    end
 
     return this
+end
+
+function Forest:WorldToRiverCoords(worldX, worldY)
+    -- Convert world coordinates to river-centered coordinates
+    -- World coords: (0,0) at top-left, river coords: (0,0) at center
+    local riverX = worldX - self.mWorldWidth / 2
+    local riverY = worldY - self.mWorldHeight / 2
+    return riverX, riverY
 end
 
 function Forest:IsRegionNearRiver(centerX, centerY, radius)
@@ -32,16 +50,90 @@ function Forest:IsRegionNearRiver(centerX, centerY, radius)
         return false
     end
 
-    -- Minimum distance from river center (approximately)
-    local minDistanceFromRiver = 250
+    -- Convert region center to river-centered coordinates
+    local riverX, riverY = self:WorldToRiverCoords(centerX, centerY)
 
-    -- Simple check: is the region center close to X=0 (river center)?
-    -- Since river flows vertically around X=0, avoid regions too close to X=0
-    if math.abs(centerX) < minDistanceFromRiver then
-        return true
+    -- Use river's GetDistanceToRiver to check proximity
+    local distance = self.mRiver:GetDistanceToRiver(riverX, riverY)
+
+    -- Keep regions away from river (region radius + buffer)
+    local minDistanceFromRiver = radius + 150  -- Larger buffer zone
+
+    return distance < minDistanceFromRiver
+end
+
+-- Generate trees within pre-defined zones (from WorldZones)
+function Forest:GenerateForestFromZones(zones)
+    print("[Forest] Generating trees within " .. #zones .. " designated zones")
+
+    for i, zone in ipairs(zones) do
+        -- Create a region for each zone
+        local region = {
+            centerX = zone.x + zone.width / 2,
+            centerY = zone.y + zone.height / 2,
+            -- Use zone dimensions to calculate equivalent radius
+            radius = math.min(zone.width, zone.height) / 2,
+            density = 0.6 + math.random() * 0.4,  -- 0.6 to 1.0
+            irregularity = 0.3,
+            -- Store zone bounds for rectangular tree placement
+            zoneX = zone.x,
+            zoneY = zone.y,
+            zoneWidth = zone.width,
+            zoneHeight = zone.height
+        }
+
+        table.insert(self.mRegions, region)
+
+        -- Generate trees within this zone (rectangular, not circular)
+        self:GenerateTreesInZone(region)
+
+        print(string.format("[Forest] Zone %d: (%d,%d) %dx%d - %d trees",
+            i, zone.x, zone.y, zone.width, zone.height, #self.mTrees))
     end
 
-    return false
+    print("[Forest] Total trees generated: " .. #self.mTrees)
+end
+
+-- Generate trees within a rectangular zone
+function Forest:GenerateTreesInZone(region)
+    -- Calculate number of trees based on zone area and density
+    local area = region.zoneWidth * region.zoneHeight
+    local numTrees = math.floor(area * region.density / 600)  -- More trees per zone
+
+    local padding = 20  -- Keep trees away from zone edges
+
+    for i = 1, numTrees do
+        local maxAttempts = 15
+        local attempts = 0
+        local treeX, treeY, size
+
+        repeat
+            -- Random position within zone bounds
+            treeX = region.zoneX + padding + math.random() * (region.zoneWidth - padding * 2)
+            treeY = region.zoneY + padding + math.random() * (region.zoneHeight - padding * 2)
+
+            -- Calculate tree size
+            local baseSize = 8 + math.random() * 7  -- 8 to 15
+            -- Add some variation based on distance from center
+            local dx = treeX - region.centerX
+            local dy = treeY - region.centerY
+            local distFromCenter = math.sqrt(dx * dx + dy * dy)
+            local maxDist = math.max(region.zoneWidth, region.zoneHeight) / 2
+            local centeredness = 1 - math.min(1, distFromCenter / maxDist)
+            size = baseSize * (0.7 + centeredness * 0.4)
+
+            attempts = attempts + 1
+        until (attempts >= maxAttempts or not self:CheckTreeRiverCollision(treeX, treeY, size))
+
+        if attempts < maxAttempts then
+            table.insert(self.mTrees, {
+                x = treeX,
+                y = treeY,
+                size = size,
+                regionIndex = #self.mRegions
+            })
+        end
+    end
 end
 
 function Forest:GenerateForestRegions(params)
@@ -86,40 +178,23 @@ function Forest:CheckTreeRiverCollision(x, y, size)
         return false
     end
 
-    local riverBounds = self.mRiver:GetBounds()
-    local treeRadius = size * 1.5  -- Account for triangle height
-    local bufferZone = 25  -- Add significant buffer around river (in pixels)
+    -- Convert tree world coordinates to river-centered coordinates
+    local riverX, riverY = self:WorldToRiverCoords(x, y)
 
-    for _, riverSegment in ipairs(riverBounds) do
-        -- Expand river segment bounds by buffer zone
-        local expandedX = riverSegment.x - bufferZone
-        local expandedY = riverSegment.y - bufferZone
-        local expandedWidth = riverSegment.width + (bufferZone * 2)
-        local expandedHeight = riverSegment.height + (bufferZone * 2)
+    -- Use river's GetDistanceToRiver for more reliable collision
+    local distance = self.mRiver:GetDistanceToRiver(riverX, riverY)
 
-        -- Find closest point on expanded river segment rectangle to tree position
-        local closestX = math.max(expandedX, math.min(x, expandedX + expandedWidth))
-        local closestY = math.max(expandedY, math.min(y, expandedY + expandedHeight))
+    -- Buffer: tree size + river width margin
+    local bufferZone = 80  -- Generous buffer around river
+    local checkDistance = size + bufferZone
 
-        -- Calculate distance from closest point to tree center
-        local distX = x - closestX
-        local distY = y - closestY
-        local distanceSquared = distX * distX + distY * distY
-
-        -- Check if distance is less than tree radius plus buffer
-        local totalRadius = treeRadius + bufferZone
-        if distanceSquared < (totalRadius * totalRadius) then
-            return true
-        end
-    end
-
-    return false
+    return distance < checkDistance
 end
 
 function Forest:GenerateTreesInRegion(region)
     -- Calculate approximate number of trees based on area and density
     local area = math.pi * region.radius * region.radius
-    local numTrees = math.floor(area * region.density / 300)  -- Adjust divisor for tree spacing
+    local numTrees = math.floor(area * region.density / 800)  -- Higher divisor = fewer trees
 
     -- Use Poisson-like distribution for natural tree placement
     for i = 1, numTrees do
@@ -168,7 +243,11 @@ end
 function Forest:CheckCollision(building)
     -- Check if building collides with any tree
     local bx, by, bw, bh = building:GetBounds()
+    return self:CheckRectCollision(bx, by, bw, bh)
+end
 
+-- Check if a rectangle collides with any tree
+function Forest:CheckRectCollision(bx, by, bw, bh)
     for _, tree in ipairs(self.mTrees) do
         -- Treat tree as a small circle
         local treeRadius = tree.size * 0.8  -- Slightly smaller collision box
@@ -192,44 +271,43 @@ function Forest:CheckCollision(building)
 end
 
 function Forest:Render()
-    -- Draw forest regions (debug - optional, can be removed)
-    -- Uncomment to see region boundaries
-    --[[
-    love.graphics.setColor(0.2, 0.5, 0.2, 0.2)
-    for _, region in ipairs(self.mRegions) do
-        love.graphics.circle("fill", region.centerX, region.centerY, region.radius)
-    end
-    ]]
-
-    -- Draw trees as green triangles
-    love.graphics.setColor(0.1, 0.5, 0.1, 1)  -- Dark green
-
+    -- Draw trees as simple layered triangles (pine tree style)
     for _, tree in ipairs(self.mTrees) do
-        -- Draw triangle pointing up
         local size = tree.size
-        local height = size * 1.5  -- Make triangles taller
+        local x, y = tree.x, tree.y
 
-        -- Triangle vertices (pointing up)
-        local vertices = {
-            tree.x, tree.y - height,      -- Top point
-            tree.x - size, tree.y + size, -- Bottom left
-            tree.x + size, tree.y + size  -- Bottom right
-        }
+        -- Use tree's position to create consistent color variation
+        local colorSeed = (tree.x * 7 + tree.y * 13) % 100 / 100
+        local greenBase = 0.35 + colorSeed * 0.15  -- 0.35 to 0.50
+        local greenVariation = 0.1 + colorSeed * 0.1  -- slight variation
 
-        love.graphics.polygon("fill", vertices)
+        -- Draw 3 layered triangles for a pine tree look
+        -- Bottom layer (largest, darkest)
+        love.graphics.setColor(0.1, greenBase - 0.1, 0.1, 1)
+        local bottomSize = size * 1.2
+        love.graphics.polygon("fill",
+            x, y - size * 0.3,
+            x - bottomSize, y + size * 0.8,
+            x + bottomSize, y + size * 0.8
+        )
 
-        -- Add a small brown trunk (rectangle)
-        love.graphics.setColor(0.4, 0.2, 0.1, 1)  -- Brown
-        local trunkWidth = size * 0.3
-        local trunkHeight = size * 0.5
-        love.graphics.rectangle("fill",
-            tree.x - trunkWidth / 2,
-            tree.y + size,
-            trunkWidth,
-            trunkHeight)
+        -- Middle layer
+        love.graphics.setColor(0.12, greenBase, 0.12, 1)
+        local midSize = size * 0.9
+        love.graphics.polygon("fill",
+            x, y - size * 0.8,
+            x - midSize, y + size * 0.3,
+            x + midSize, y + size * 0.3
+        )
 
-        -- Reset to green for next tree
-        love.graphics.setColor(0.1, 0.5, 0.1, 1)
+        -- Top layer (smallest, brightest)
+        love.graphics.setColor(0.15, greenBase + greenVariation, 0.15, 1)
+        local topSize = size * 0.6
+        love.graphics.polygon("fill",
+            x, y - size * 1.3,
+            x - topSize, y - size * 0.2,
+            x + topSize, y - size * 0.2
+        )
     end
 
     -- Reset color
@@ -243,3 +321,5 @@ end
 function Forest:GetRegionCount()
     return #self.mRegions
 end
+
+return Forest

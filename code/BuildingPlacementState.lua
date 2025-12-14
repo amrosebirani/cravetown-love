@@ -13,7 +13,12 @@ function BuildingPlacementState:Create()
         mCanPlace = true,
         mEdgeScrollSpeed = 400,  -- Pixels per second
         mEdgeScrollMargin = 50,  -- Distance from edge to trigger scrolling
-        mSizeAdjustmentSpeed = 5  -- Pixels per scroll tick
+        mSizeAdjustmentSpeed = 5,  -- Pixels per scroll tick
+        -- Resource efficiency tracking
+        mResourceEfficiency = 1.0,
+        mEfficiencyBreakdown = {},
+        mCanPlaceResources = true,  -- Whether resources allow placement
+        mHasConstraints = false  -- Whether building has placement constraints
     }
 
     setmetatable(this, self)
@@ -27,6 +32,13 @@ function BuildingPlacementState:Enter(params)
     self.mBuildingToPlace = Building:Create({
         buildingType = buildingType
     })
+
+    -- Check if building has placement constraints
+    local constraints = buildingType.placementConstraints
+    self.mHasConstraints = constraints and constraints.enabled and constraints.requiredResources and #constraints.requiredResources > 0
+    self.mResourceEfficiency = 1.0
+    self.mEfficiencyBreakdown = {}
+    self.mCanPlaceResources = true
 end
 
 function BuildingPlacementState:Exit()
@@ -117,7 +129,24 @@ function BuildingPlacementState:Update(dt)
     -- Check for collisions and boundaries
     local hasCollision = gTown:CheckCollision(self.mBuildingToPlace)
     local isWithinBounds = gTown:IsWithinBoundaries(self.mBuildingToPlace)
-    self.mCanPlace = not hasCollision and isWithinBounds
+
+    -- Calculate resource efficiency if building has placement constraints
+    if self.mHasConstraints then
+        local buildingType = self.mBuildingToPlace.mBuildingType
+        self.mResourceEfficiency, self.mEfficiencyBreakdown, self.mCanPlaceResources = gTown:CalculateBuildingEfficiency(
+            buildingType,
+            self.mBuildingToPlace.mX,
+            self.mBuildingToPlace.mY,
+            self.mBuildingToPlace.mWidth,
+            self.mBuildingToPlace.mHeight
+        )
+    else
+        self.mResourceEfficiency = 1.0
+        self.mEfficiencyBreakdown = {}
+        self.mCanPlaceResources = true
+    end
+
+    self.mCanPlace = not hasCollision and isWithinBounds and self.mCanPlaceResources
 
     -- Handle mouse input
     if gMouseReleased then
@@ -140,29 +169,22 @@ function BuildingPlacementState:Update(dt)
                     width = self.mBuildingToPlace.mWidth,
                     height = self.mBuildingToPlace.mHeight
                 })
-                gTown:AddBuilding(placedBuilding)
-                print("Placed", placedBuilding.mName, "at", placedBuilding.mX, placedBuilding.mY)
 
-                -- If this is a farm, show grain selection modal
-                if placedBuilding.mTypeId == "farm" then
-                    require("code/GrainSelectionModal")
-                    local modal = GrainSelectionModal:Create(placedBuilding)
-                    gStateMachine:Change("TownView")
-                    gStateStack:Push(modal)
-                elseif placedBuilding.mTypeId == "bakery" then
-                    require("code/BakerySetupModal")
-                    local modal = BakerySetupModal:Create(placedBuilding)
-                    gStateMachine:Change("TownView")
-                    gStateStack:Push(modal)
-                elseif placedBuilding.mTypeId == "mine" then
-                    require("code/MineSelectionModal")
-                    local modal = MineSelectionModal:Create(placedBuilding)
-                    gStateMachine:Change("TownView")
-                    gStateStack:Push(modal)
-                else
-                    -- Return to TownView state
-                    gStateMachine:Change("TownView")
-                end
+                -- Store resource efficiency on the building
+                placedBuilding.mResourceEfficiency = self.mResourceEfficiency
+                placedBuilding.mEfficiencyBreakdown = self.mEfficiencyBreakdown
+
+                gTown:AddBuilding(placedBuilding)
+                print("Placed", placedBuilding.mName, "at", placedBuilding.mX, placedBuilding.mY,
+                      "with efficiency", string.format("%.0f%%", self.mResourceEfficiency * 100))
+
+                -- Return to TownView state and open building detail modal
+                gStateMachine:Change("TownView")
+
+                -- Open the building detail modal for the newly placed building
+                require("code/BuildingDetailModal")
+                local modal = BuildingDetailModal:Create(placedBuilding)
+                gStateStack:Push(modal)
             end
         elseif gMouseReleased.button == 2 then -- Right click
             -- Cancel placement and return to TownView state
@@ -239,6 +261,72 @@ function BuildingPlacementState:Render()
             self.mBuildingToPlace.mHeight), 15, 35)
         love.graphics.print("Arrow Keys/WASD: Adjust size", 15, 55)
         love.graphics.print("Left Click: Place | Right Click: Cancel", 15, 75)
+    end
+
+    -- Show resource efficiency panel for buildings with constraints
+    if self.mBuildingToPlace and self.mHasConstraints then
+        local screenW = love.graphics.getWidth()
+        local panelWidth = 220
+        local panelX = screenW - panelWidth - 10
+        local panelY = 10
+
+        -- Calculate panel height based on breakdown entries
+        local lineHeight = 18
+        local breakdownCount = 0
+        for _ in pairs(self.mEfficiencyBreakdown) do
+            breakdownCount = breakdownCount + 1
+        end
+        local panelHeight = 60 + (breakdownCount * lineHeight)
+
+        -- Panel background
+        love.graphics.setColor(0, 0, 0, 0.8)
+        love.graphics.rectangle("fill", panelX, panelY, panelWidth, panelHeight, 5, 5)
+
+        -- Panel border - color based on efficiency
+        if not self.mCanPlaceResources then
+            love.graphics.setColor(0.8, 0.2, 0.2, 1)  -- Red - blocked
+        elseif self.mResourceEfficiency < 0.4 then
+            love.graphics.setColor(0.9, 0.6, 0.1, 1)  -- Orange - warning
+        else
+            love.graphics.setColor(0.2, 0.7, 0.3, 1)  -- Green - good
+        end
+        love.graphics.setLineWidth(2)
+        love.graphics.rectangle("line", panelX, panelY, panelWidth, panelHeight, 5, 5)
+        love.graphics.setLineWidth(1)
+
+        -- Title
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.print("Resource Efficiency", panelX + 10, panelY + 8)
+
+        -- Efficiency percentage
+        local efficiencyText = string.format("%.0f%%", self.mResourceEfficiency * 100)
+        if not self.mCanPlaceResources then
+            love.graphics.setColor(1, 0.3, 0.3)
+            efficiencyText = efficiencyText .. " (Too Low!)"
+        elseif self.mResourceEfficiency < 0.4 then
+            love.graphics.setColor(1, 0.8, 0.3)
+        else
+            love.graphics.setColor(0.3, 1, 0.5)
+        end
+        love.graphics.print(efficiencyText, panelX + 10, panelY + 28)
+
+        -- Breakdown
+        love.graphics.setColor(0.8, 0.8, 0.8)
+        local yOffset = panelY + 48
+        for resourceId, info in pairs(self.mEfficiencyBreakdown) do
+            local displayName = info.displayName or resourceId
+            local valueText = string.format("%.0f%%", (info.value or 0) * 100)
+
+            -- Color based on whether requirement is met
+            if info.met then
+                love.graphics.setColor(0.5, 0.9, 0.5)
+            else
+                love.graphics.setColor(0.9, 0.4, 0.4)
+            end
+
+            love.graphics.print(string.format("%s: %s", displayName, valueText), panelX + 15, yOffset)
+            yOffset = yOffset + lineHeight
+        end
     end
 
     love.graphics.setColor(1, 1, 1)

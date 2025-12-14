@@ -1,0 +1,100 @@
+{
+  "version": "1.0.0",
+  "description": "Land plot system configuration for ownership and immigration",
+
+  "gridSettings": {
+    "plotWidth": 100,
+    "plotHeight": 100,
+    "description": "Each plot is 100x100 world units"
+  },
+
+  "pricing": {
+    "basePlotPrice": 100,
+    "locationMultipliers": {
+      "riverAdjacent": 1.5,
+      "resourceRich": 1.3,
+      "centralLocation": 1.2,
+      "edgeLocation": 0.8,
+      "nearMarket": 1.4,
+      "nearRoad": 1.1
+    },
+    "terrainMultipliers": {
+      "fertile": 1.4,
+      "grass": 1.0,
+      "forest": 0.9,
+      "rocky": 0.7,
+      "desert": 0.5,
+      "water": 0.0,
+      "mountain": 0.0
+    },
+    "developmentBonusRate": 0.01,
+    "appreciationRate": 0.001,
+    "description": "Base price modified by location, terrain, and development"
+  },
+
+  "rent": {
+    "baseRentRate": 0.02,
+    "description": "Base rent is 2% of land value per cycle",
+    "buildingCategoryMultipliers": {
+      "housing": 1.0,
+      "production": 1.2,
+      "commercial": 1.5,
+      "entertainment": 1.3,
+      "services": 1.1,
+      "agriculture": 0.8
+    }
+  },
+
+  "immigrationRequirements": {
+    "wealthy": {
+      "minPlots": 4,
+      "maxPlots": 10,
+      "minTotalValue": 2000,
+      "description": "Wealthy immigrants seek large estates"
+    },
+    "merchant": {
+      "minPlots": 2,
+      "maxPlots": 5,
+      "minTotalValue": 500,
+      "description": "Merchants need commercial and residential land"
+    },
+    "craftsman": {
+      "minPlots": 0,
+      "maxPlots": 2,
+      "minTotalValue": 0,
+      "description": "Craftsmen can rent, but may buy workshop land"
+    },
+    "laborer": {
+      "minPlots": 0,
+      "maxPlots": 1,
+      "minTotalValue": 0,
+      "description": "Laborers typically rent housing"
+    }
+  },
+
+  "overlay": {
+    "defaultEnabled": false,
+    "colors": {
+      "townOwned": [0.2, 0.4, 0.8, 0.4],
+      "citizenOwned": [0.8, 0.6, 0.2, 0.4],
+      "unowned": [0.5, 0.5, 0.5, 0.3],
+      "forSale": [0.2, 0.8, 0.2, 0.4],
+      "gridLines": [0.3, 0.3, 0.3, 0.5]
+    },
+    "showGrid": true,
+    "showOwnership": true,
+    "showAvailable": true,
+    "showValue": false
+  },
+
+  "initialOwnership": {
+    "townOwnedPercentage": 1.0,
+    "description": "All plots start owned by the town"
+  },
+
+  "transactions": {
+    "saleTaxRate": 0.05,
+    "giftTaxRate": 0.1,
+    "description": "Tax rates for land transfers"
+  }
+}

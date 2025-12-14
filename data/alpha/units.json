@@ -1,0 +1,1689 @@
+{
+  "version": "1.0.0",
+  "description": "Units system for commodities and consumption",
+  "baseUnits": {
+    "weight": {
+      "base": "kg",
+      "display": [
+        "g",
+        "kg"
+      ],
+      "conversions": {
+        "g": 0.001
+      }
+    },
+    "volume": {
+      "base": "liter",
+      "display": [
+        "ml",
+        "liter"
+      ],
+      "conversions": {
+        "ml": 0.001
+      }
+    },
+    "count": {
+      "base": "piece",
+      "display": [
+        "piece"
+      ]
+    },
+    "length": {
+      "base": "meter",
+      "display": [
+        "cm",
+        "meter"
+      ],
+      "conversions": {
+        "cm": 0.01
+      }
+    },
+    "time": {
+      "base": "day",
+      "display": [
+        "slot",
+        "day"
+      ],
+      "conversions": {
+        "slot": 0.1667
+      }
+    }
+  },
+  "personDayBaseline": {
+    "calories": 2000,
+    "waterLiters": 2,
+    "sleepHours": 8,
+    "description": "Base daily needs for an average adult"
+  },
+  "commodityUnits": {
+    "wheat": {
+      "unit": "kg",
+      "caloriesPerUnit": 3400,
+      "dailyNeedAmount": 0.6,
+      "description": "Raw grain, ~600g provides daily calories"
+    },
+    "bread": {
+      "unit": "loaf",
+      "weightKg": 0.5,
+      "caloriesPerUnit": 1200,
+      "dailyNeedAmount": 1.5,
+      "description": "One loaf is 500g, ~1.5 loaves per day"
+    },
+    "meat": {
+      "unit": "kg",
+      "caloriesPerUnit": 2500,
+      "proteinGrams": 250,
+      "dailyNeedAmount": 0.3,
+      "description": "~300g meat provides protein needs"
+    },
+    "fish": {
+      "unit": "kg",
+      "caloriesPerUnit": 1500,
+      "proteinGrams": 200,
+      "dailyNeedAmount": 0.4,
+      "description": "Lighter protein source"
+    },
+    "vegetables": {
+      "unit": "kg",
+      "caloriesPerUnit": 250,
+      "dailyNeedAmount": 0.5,
+      "description": "Fresh vegetables"
+    },
+    "fruit": {
+      "unit": "kg",
+      "caloriesPerUnit": 500,
+      "dailyNeedAmount": 0.3,
+      "description": "Fresh fruit"
+    },
+    "water": {
+      "unit": "liter",
+      "caloriesPerUnit": 0,
+      "dailyNeedAmount": 2,
+      "description": "Clean drinking water"
+    },
+    "milk": {
+      "unit": "liter",
+      "caloriesPerUnit": 600,
+      "dailyNeedAmount": 0.5,
+      "description": "Dairy milk"
+    },
+    "cheese": {
+      "unit": "kg",
+      "caloriesPerUnit": 4000,
+      "dailyNeedAmount": 0.05,
+      "description": "Aged cheese"
+    },
+    "eggs": {
+      "unit": "piece",
+      "caloriesPerUnit": 70,
+      "dailyNeedAmount": 2,
+      "description": "Chicken eggs"
+    },
+    "beer": {
+      "unit": "liter",
+      "caloriesPerUnit": 430,
+      "alcoholPercent": 5,
+      "description": "Alcoholic beverage"
+    },
+    "wine": {
+      "unit": "bottle",
+      "volumeLiters": 0.75,
+      "caloriesPerUnit": 600,
+      "alcoholPercent": 12,
+      "description": "Wine bottle (750ml)"
+    },
+    "spirits": {
+      "unit": "bottle",
+      "volumeLiters": 0.5,
+      "caloriesPerUnit": 1100,
+      "alcoholPercent": 40,
+      "description": "Distilled spirits"
+    },
+    "tea": {
+      "unit": "kg",
+      "servingsPerUnit": 200,
+      "dailyNeedAmount": 0.005,
+      "description": "Dried tea leaves"
+    },
+    "coffee": {
+      "unit": "kg",
+      "servingsPerUnit": 100,
+      "dailyNeedAmount": 0.01,
+      "description": "Coffee beans"
+    },
+    "sugar": {
+      "unit": "kg",
+      "caloriesPerUnit": 4000,
+      "dailyNeedAmount": 0.05,
+      "description": "Refined sugar"
+    },
+    "salt": {
+      "unit": "kg",
+      "dailyNeedAmount": 0.005,
+      "description": "Salt for cooking"
+    },
+    "spices": {
+      "unit": "kg",
+      "dailyNeedAmount": 0.002,
+      "description": "Various spices"
+    },
+    "cloth": {
+      "unit": "meter",
+      "description": "Fabric for clothing"
+    },
+    "leather": {
+      "unit": "piece",
+      "description": "Tanned leather hide"
+    },
+    "wool": {
+      "unit": "kg",
+      "description": "Processed wool"
+    },
+    "sheep": {
+      "unit": "piece",
+      "description": "Live sheep livestock"
+    },
+    "flax": {
+      "unit": "kg",
+      "description": "Raw flax plant fiber"
+    },
+    "flax_seed": {
+      "unit": "kg",
+      "description": "Seeds for flax cultivation"
+    },
+    "linen": {
+      "unit": "meter",
+      "description": "Linen fabric"
+    },
+    "hen": {
+      "unit": "piece",
+      "description": "Egg-laying chicken"
+    },
+    "feed": {
+      "unit": "kg",
+      "description": "Animal feed mixture"
+    },
+    "bee_colony": {
+      "unit": "piece",
+      "description": "Active beehive colony"
+    },
+    "beeswax": {
+      "unit": "kg",
+      "description": "Wax from beehives"
+    },
+    "raw_hide": {
+      "unit": "piece",
+      "description": "Unprocessed animal skin"
+    },
+    "tanned_leather": {
+      "unit": "piece",
+      "description": "High quality tanned leather"
+    },
+    "green_dye": {
+      "unit": "kg",
+      "description": "Green coloring dye"
+    },
+    "purple_dye": {
+      "unit": "kg",
+      "description": "Purple coloring dye"
+    },
+    "orange_dye": {
+      "unit": "kg",
+      "description": "Orange coloring dye"
+    },
+    "indigo_seed": {
+      "unit": "kg",
+      "description": "Seeds for indigo plant"
+    },
+    "flower_seed": {
+      "unit": "kg",
+      "description": "Seeds for flower cultivation"
+    },
+    "silk": {
+      "unit": "meter",
+      "description": "Luxury silk fabric"
+    },
+    "clothing_basic": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 90,
+      "description": "Basic everyday clothing"
+    },
+    "clothing_formal": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "Formal attire"
+    },
+    "shoes": {
+      "unit": "pair",
+      "durationType": "durable",
+      "durationDays": 120,
+      "description": "Footwear"
+    },
+    "bed": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Bed for sleeping"
+    },
+    "chair": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Seating furniture"
+    },
+    "table": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Table furniture"
+    },
+    "cabinet": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 700,
+      "description": "Storage furniture"
+    },
+    "blanket": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "Bedding blanket"
+    },
+    "candle": {
+      "unit": "piece",
+      "burnTimeHours": 8,
+      "dailyNeedAmount": 1,
+      "description": "Wax candle for lighting"
+    },
+    "oil_lamp": {
+      "unit": "liter",
+      "burnTimeHours": 20,
+      "dailyNeedAmount": 0.1,
+      "description": "Lamp oil"
+    },
+    "firewood": {
+      "unit": "kg",
+      "burnTimeHours": 2,
+      "dailyNeedAmount": 5,
+      "description": "Wood for heating/cooking"
+    },
+    "coal": {
+      "unit": "kg",
+      "burnTimeHours": 4,
+      "dailyNeedAmount": 3,
+      "description": "Coal for heating"
+    },
+    "iron_ore": {
+      "unit": "kg",
+      "description": "Raw iron ore for smelting into iron"
+    },
+    "copper_ore": {
+      "unit": "kg",
+      "description": "Raw copper ore for smelting into copper"
+    },
+    "gold_ore": {
+      "unit": "kg",
+      "description": "Precious gold-bearing ore, requires refining"
+    },
+    "silver_ore": {
+      "unit": "kg",
+      "description": "Silver-bearing ore for refining"
+    },
+    "stone": {
+      "unit": "kg",
+      "description": "Quarried building stone"
+    },
+    "marble": {
+      "unit": "kg",
+      "description": "Decorative marble stone"
+    },
+    "clay": {
+      "unit": "kg",
+      "description": "Raw clay for pottery and bricks"
+    },
+    "sand": {
+      "unit": "kg",
+      "description": "Sand for glass-making and construction"
+    },
+    "sugar_cane": {
+      "unit": "kg",
+      "description": "Raw sugarcane stalks"
+    },
+    "sugarcane_cutting": {
+      "unit": "piece",
+      "description": "Stem cutting for planting"
+    },
+    "molasses": {
+      "unit": "liter",
+      "caloriesPerUnit": 2900,
+      "description": "Thick dark syrup from sugar refining"
+    },
+    "rum": {
+      "unit": "bottle",
+      "volumeLiters": 0.75,
+      "caloriesPerUnit": 1500,
+      "alcoholPercent": 40,
+      "description": "Distilled spirit from molasses (750ml)"
+    },
+    "candy": {
+      "unit": "piece",
+      "caloriesPerUnit": 50,
+      "description": "Individual candy piece"
+    },
+    "soap": {
+      "unit": "piece",
+      "useDays": 30,
+      "dailyNeedAmount": 0.033,
+      "description": "Bar of soap"
+    },
+    "medicine_basic": {
+      "unit": "dose",
+      "description": "Basic herbal medicine"
+    },
+    "medicine_advanced": {
+      "unit": "dose",
+      "description": "Advanced medicine"
+    },
+    "book": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Bound book"
+    },
+    "paper": {
+      "unit": "sheet",
+      "description": "Writing paper"
+    },
+    "wood_pulp": {
+      "unit": "kg",
+      "description": "Processed wood fiber for paper making"
+    },
+    "fine_paper": {
+      "unit": "sheet",
+      "description": "High quality writing paper"
+    },
+    "book": {
+      "unit": "piece",
+      "description": "Bound book"
+    },
+    "manuscript": {
+      "unit": "piece",
+      "description": "Handwritten or illuminated document"
+    },
+    "ink": {
+      "unit": "bottle",
+      "volumeMl": 50,
+      "description": "Writing ink"
+    },
+    "tools_basic": {
+      "unit": "set",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Basic tool set"
+    },
+    "herb_seed": {
+      "unit": "kg",
+      "description": "Seeds for herb farming"
+    },
+    "medicinal_herbs": {
+      "unit": "kg",
+      "description": "Healing plant material"
+    },
+    "healing_salve": {
+      "unit": "jar",
+      "description": "Topical healing ointment"
+    },
+    "tonic": {
+      "unit": "bottle",
+      "description": "Medicinal drink"
+    },
+    "tallow": {
+      "unit": "kg",
+      "description": "Rendered animal fat"
+    },
+    "lye": {
+      "unit": "kg",
+      "description": "Alkali for soap making"
+    },
+    "candle": {
+      "unit": "piece",
+      "description": "Tallow candle"
+    },
+    "beeswax_candle": {
+      "unit": "piece",
+      "description": "Premium beeswax candle"
+    },
+    "perfume": {
+      "unit": "bottle",
+      "description": "Fragrant perfume"
+    },
+    "flower_water": {
+      "unit": "liter",
+      "description": "Distilled flower essence"
+    },
+    "pottery": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Ceramic pottery"
+    },
+    "glassware": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 300,
+      "description": "Glass items"
+    },
+    "jewelry_silver": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Silver jewelry"
+    },
+    "jewelry_gold": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Gold jewelry"
+    },
+    "gold_coin": {
+      "unit": "piece",
+      "weightGrams": 8,
+      "description": "Gold currency"
+    },
+    "silver_coin": {
+      "unit": "piece",
+      "weightGrams": 10,
+      "description": "Silver currency"
+    },
+    "painting": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Decorative painting"
+    },
+    "sculpture": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Decorative sculpture"
+    },
+    "house_basic": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Basic housing structure"
+    },
+    "house_large": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Large house"
+    },
+    "manor": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Manor estate"
+    },
+    "tree": {
+      "unit": "piece",
+      "description": "Whole tree for felling"
+    },
+    "timber": {
+      "unit": "piece",
+      "weightKg": 50,
+      "description": "Large log section from felled tree"
+    },
+    "lumber": {
+      "unit": "piece",
+      "weightKg": 10,
+      "description": "Processed wood board"
+    },
+    "planks": {
+      "unit": "piece",
+      "weightKg": 5,
+      "description": "Thin wood planks for construction"
+    },
+    "firewood": {
+      "unit": "kg",
+      "burnTimeHours": 2,
+      "dailyNeedAmount": 5,
+      "description": "Split wood for heating and cooking"
+    },
+    "charcoal": {
+      "unit": "kg",
+      "burnTimeHours": 4,
+      "dailyNeedAmount": 3,
+      "description": "Carbonized wood fuel - burns hotter than firewood"
+    },
+    "sawdust": {
+      "unit": "kg",
+      "description": "Fine wood particles - byproduct of sawing"
+    },
+    "barrel": {
+      "unit": "piece",
+      "volumeLiters": 200,
+      "durationType": "durable",
+      "durationDays": 1000,
+      "description": "Wooden storage barrel"
+    },
+    "crate": {
+      "unit": "piece",
+      "volumeLiters": 50,
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Wooden shipping crate"
+    },
+    "bricks": {
+      "unit": "piece",
+      "weightKg": 2.5,
+      "durationType": "permanent",
+      "description": "Fired clay brick for construction"
+    },
+    "tiles": {
+      "unit": "piece",
+      "weightKg": 1.5,
+      "durationType": "permanent",
+      "description": "Fired clay tile for roofing or flooring"
+    },
+    "terracotta": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 3650,
+      "description": "Decorative fired clay item"
+    },
+    "ceramics": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Ceramic household item"
+    },
+    "clay_pipe": {
+      "unit": "piece",
+      "lengthMeters": 1,
+      "durationType": "permanent",
+      "description": "Clay pipe section for water/drainage"
+    },
+    "pottery": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Ceramic pottery vessel"
+    },
+    "glass": {
+      "unit": "kg",
+      "description": "Raw glass material"
+    },
+    "window_pane": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 3650,
+      "description": "Glass window pane"
+    },
+    "bottle": {
+      "unit": "piece",
+      "volumeMl": 750,
+      "durationType": "durable",
+      "durationDays": 1000,
+      "description": "Glass bottle"
+    },
+    "glassware": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 300,
+      "description": "Glass household item"
+    },
+    "mirror": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 3650,
+      "description": "Reflective mirror"
+    },
+    "cut_stone": {
+      "unit": "piece",
+      "weightKg": 20,
+      "durationType": "permanent",
+      "description": "Cut building stone block"
+    },
+    "column": {
+      "unit": "piece",
+      "weightKg": 200,
+      "durationType": "permanent",
+      "description": "Stone architectural column"
+    },
+    "statue": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Carved marble statue"
+    },
+    "gravestone": {
+      "unit": "piece",
+      "weightKg": 50,
+      "durationType": "permanent",
+      "description": "Memorial gravestone"
+    },
+    "bronze": {
+      "unit": "kg",
+      "description": "Bronze alloy metal"
+    },
+    "mustard_seed": {
+      "unit": "kg",
+      "description": "Mustard seeds for oil"
+    },
+    "sesame_seed": {
+      "unit": "kg",
+      "description": "Sesame seeds for oil"
+    },
+    "groundnut": {
+      "unit": "kg",
+      "description": "Peanuts/groundnuts"
+    },
+    "coconut": {
+      "unit": "piece",
+      "weightKg": 1.5,
+      "description": "Whole coconut"
+    },
+    "rubber_tree_sapling": {
+      "unit": "piece",
+      "description": "Rubber tree sapling for plantation"
+    },
+    "latex": {
+      "unit": "liter",
+      "description": "Raw rubber sap from rubber trees"
+    },
+    "rubber": {
+      "unit": "kg",
+      "description": "Processed rubber for manufacturing"
+    },
+    "sunflower_seed": {
+      "unit": "kg",
+      "description": "Sunflower seeds for oil"
+    },
+    "oil": {
+      "unit": "liter",
+      "description": "Cooking oil"
+    },
+    "lentils": {
+      "unit": "kg",
+      "caloriesPerUnit": 3500,
+      "proteinGrams": 250,
+      "dailyNeedAmount": 0.2,
+      "description": "Dried lentils"
+    },
+    "ghee": {
+      "unit": "kg",
+      "caloriesPerUnit": 9000,
+      "description": "Clarified butter"
+    },
+    "butter": {
+      "unit": "kg",
+      "caloriesPerUnit": 7200,
+      "description": "Butter"
+    },
+    "curd": {
+      "unit": "liter",
+      "caloriesPerUnit": 600,
+      "dailyNeedAmount": 0.25,
+      "description": "Yogurt/curd"
+    },
+    "paneer": {
+      "unit": "kg",
+      "caloriesPerUnit": 2650,
+      "proteinGrams": 180,
+      "description": "Fresh cheese"
+    },
+    "cream": {
+      "unit": "liter",
+      "caloriesPerUnit": 3400,
+      "description": "Dairy cream"
+    },
+    "buttermilk": {
+      "unit": "liter",
+      "caloriesPerUnit": 400,
+      "description": "Buttermilk"
+    },
+    "rice_flour": {
+      "unit": "kg",
+      "caloriesPerUnit": 3600,
+      "description": "Ground rice flour"
+    },
+    "cornmeal": {
+      "unit": "kg",
+      "caloriesPerUnit": 3600,
+      "description": "Ground maize"
+    },
+    "lentil_flour": {
+      "unit": "kg",
+      "caloriesPerUnit": 3500,
+      "description": "Ground lentil flour"
+    },
+    "noodles": {
+      "unit": "kg",
+      "caloriesPerUnit": 3500,
+      "description": "Dried noodles"
+    },
+    "porridge": {
+      "unit": "serving",
+      "caloriesPerUnit": 300,
+      "description": "Cooked porridge serving"
+    },
+    "tortilla": {
+      "unit": "piece",
+      "caloriesPerUnit": 100,
+      "description": "Maize tortilla"
+    },
+    "roti": {
+      "unit": "piece",
+      "caloriesPerUnit": 80,
+      "description": "Wheat flatbread"
+    },
+    "paratha": {
+      "unit": "piece",
+      "caloriesPerUnit": 150,
+      "description": "Layered flatbread"
+    },
+    "naan": {
+      "unit": "piece",
+      "caloriesPerUnit": 260,
+      "description": "Leavened bread"
+    },
+    "puri": {
+      "unit": "piece",
+      "caloriesPerUnit": 100,
+      "description": "Fried bread"
+    },
+    "samosa": {
+      "unit": "piece",
+      "caloriesPerUnit": 250,
+      "description": "Fried pastry"
+    },
+    "kachori": {
+      "unit": "piece",
+      "caloriesPerUnit": 200,
+      "description": "Fried lentil pastry"
+    },
+    "pakora": {
+      "unit": "piece",
+      "caloriesPerUnit": 50,
+      "description": "Fried fritter"
+    },
+    "vada": {
+      "unit": "piece",
+      "caloriesPerUnit": 150,
+      "description": "Fried lentil doughnut"
+    },
+    "idli": {
+      "unit": "piece",
+      "caloriesPerUnit": 60,
+      "description": "Steamed rice cake"
+    },
+    "dosa": {
+      "unit": "piece",
+      "caloriesPerUnit": 170,
+      "description": "Rice crepe"
+    },
+    "dal": {
+      "unit": "serving",
+      "caloriesPerUnit": 200,
+      "description": "Cooked lentils serving"
+    },
+    "biryani": {
+      "unit": "serving",
+      "caloriesPerUnit": 500,
+      "description": "Rice and meat dish"
+    },
+    "khichdi": {
+      "unit": "serving",
+      "caloriesPerUnit": 300,
+      "description": "Rice and lentil dish"
+    },
+    "pulao": {
+      "unit": "serving",
+      "caloriesPerUnit": 350,
+      "description": "Flavored rice"
+    },
+    "ladoo": {
+      "unit": "piece",
+      "caloriesPerUnit": 150,
+      "description": "Sweet ball"
+    },
+    "jalebi": {
+      "unit": "piece",
+      "caloriesPerUnit": 100,
+      "description": "Fried sweet"
+    },
+    "halwa": {
+      "unit": "serving",
+      "caloriesPerUnit": 300,
+      "description": "Sweet pudding"
+    },
+    "fruit_juice": {
+      "unit": "liter",
+      "caloriesPerUnit": 450,
+      "description": "Fresh fruit juice"
+    },
+    "jam": {
+      "unit": "kg",
+      "caloriesPerUnit": 2500,
+      "description": "Fruit preserve"
+    },
+    "wine": {
+      "unit": "bottle",
+      "volumeLiters": 0.75,
+      "caloriesPerUnit": 600,
+      "alcoholPercent": 12,
+      "description": "Grape wine"
+    },
+    "cider": {
+      "unit": "bottle",
+      "volumeLiters": 0.5,
+      "caloriesPerUnit": 250,
+      "alcoholPercent": 5,
+      "description": "Apple cider"
+    },
+    "dried_fruit": {
+      "unit": "kg",
+      "caloriesPerUnit": 3000,
+      "description": "Dried preserved fruit"
+    },
+    "pickles": {
+      "unit": "kg",
+      "caloriesPerUnit": 200,
+      "description": "Pickled vegetables"
+    },
+    "vegetable_soup": {
+      "unit": "serving",
+      "caloriesPerUnit": 150,
+      "description": "Soup serving"
+    },
+    "salad": {
+      "unit": "serving",
+      "caloriesPerUnit": 100,
+      "description": "Fresh salad"
+    },
+    "tomato_sauce": {
+      "unit": "liter",
+      "caloriesPerUnit": 300,
+      "description": "Tomato cooking sauce"
+    },
+    "pie": {
+      "unit": "piece",
+      "caloriesPerUnit": 350,
+      "description": "Baked pie"
+    },
+    "stew": {
+      "unit": "serving",
+      "caloriesPerUnit": 400,
+      "description": "Meat and vegetable stew"
+    },
+    "red_cloth": {
+      "unit": "meter",
+      "description": "Red dyed fabric"
+    },
+    "blue_cloth": {
+      "unit": "meter",
+      "description": "Blue dyed fabric"
+    },
+    "yellow_cloth": {
+      "unit": "meter",
+      "description": "Yellow dyed fabric"
+    },
+    "green_cloth": {
+      "unit": "meter",
+      "description": "Green dyed fabric"
+    },
+    "purple_cloth": {
+      "unit": "meter",
+      "description": "Purple dyed fabric - rare"
+    },
+    "black_cloth": {
+      "unit": "meter",
+      "description": "Black dyed fabric"
+    },
+    "orange_cloth": {
+      "unit": "meter",
+      "description": "Orange dyed fabric"
+    },
+    "dyed_linen": {
+      "unit": "meter",
+      "description": "Dyed linen fabric"
+    },
+    "embroidered_linen": {
+      "unit": "meter",
+      "description": "Luxury embroidered linen"
+    },
+    "formal_attire": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "Formal clothing set"
+    },
+    "ceremonial_robes": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Ceremonial garments"
+    },
+    "uniform": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 120,
+      "description": "Work uniform"
+    },
+    "gloves": {
+      "unit": "pair",
+      "durationType": "durable",
+      "durationDays": 90,
+      "description": "Leather gloves"
+    },
+    "wool_gloves": {
+      "unit": "pair",
+      "durationType": "durable",
+      "durationDays": 60,
+      "description": "Wool gloves"
+    },
+    "wool_hat": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 90,
+      "description": "Wool hat"
+    },
+    "gemstone": {
+      "unit": "piece",
+      "description": "Precious gemstone"
+    },
+    "silver_ring": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Silver ring jewelry"
+    },
+    "gold_ring": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Gold ring jewelry"
+    },
+    "silver_necklace": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Silver necklace jewelry"
+    },
+    "gold_necklace": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Gold necklace jewelry"
+    },
+    "gemstone_jewelry": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Jewelry with gemstones"
+    },
+    "crown": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Royal crown"
+    },
+    "portrait": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Portrait painting"
+    },
+    "tapestry": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Woven wall hanging"
+    },
+    "bronze_sculpture": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Bronze artwork"
+    },
+    "figurine": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Small clay figure"
+    },
+    "limestone": {
+      "unit": "kg",
+      "description": "Limestone rock"
+    },
+    "quickite": {
+      "unit": "kg",
+      "description": "Calcium oxide"
+    },
+    "mortar": {
+      "unit": "kg",
+      "description": "Masonry mortar"
+    },
+    "concrete": {
+      "unit": "kg",
+      "description": "Concrete material"
+    },
+    "plaster": {
+      "unit": "kg",
+      "description": "Wall plaster"
+    },
+    "stucco": {
+      "unit": "kg",
+      "description": "Decorative stucco"
+    },
+    "apple": {
+      "unit": "piece",
+      "caloriesPerUnit": 95,
+      "dailyNeedAmount": 2,
+      "description": "Fresh apple"
+    },
+    "apple_sapling": {
+      "unit": "piece",
+      "description": "Apple tree sapling for planting"
+    },
+    "axe": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Woodcutting tool"
+    },
+    "barley": {
+      "unit": "kg",
+      "caloriesPerUnit": 3500,
+      "dailyNeedAmount": 0.5,
+      "description": "Barley grain"
+    },
+    "barley_seeds": {
+      "unit": "kg",
+      "description": "Barley seeds for planting"
+    },
+    "bean_seed": {
+      "unit": "kg",
+      "description": "Bean seeds for planting"
+    },
+    "beans": {
+      "unit": "kg",
+      "caloriesPerUnit": 3400,
+      "proteinGrams": 210,
+      "dailyNeedAmount": 0.15,
+      "description": "Dried beans"
+    },
+    "beef": {
+      "unit": "kg",
+      "caloriesPerUnit": 2500,
+      "proteinGrams": 260,
+      "dailyNeedAmount": 0.3,
+      "description": "Beef meat"
+    },
+    "bench": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Seating bench"
+    },
+    "berries": {
+      "unit": "kg",
+      "caloriesPerUnit": 400,
+      "dailyNeedAmount": 0.15,
+      "description": "Fresh berries"
+    },
+    "berry_bush": {
+      "unit": "piece",
+      "description": "Berry bush for planting"
+    },
+    "black_dye": {
+      "unit": "kg",
+      "description": "Black coloring dye"
+    },
+    "blue_dye": {
+      "unit": "kg",
+      "description": "Blue coloring dye"
+    },
+    "bookshelf": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 700,
+      "description": "Book storage furniture"
+    },
+    "boots": {
+      "unit": "pair",
+      "durationType": "durable",
+      "durationDays": 150,
+      "description": "Work boots"
+    },
+    "broccoli": {
+      "unit": "kg",
+      "caloriesPerUnit": 340,
+      "dailyNeedAmount": 0.2,
+      "description": "Fresh broccoli"
+    },
+    "broccoli_seed": {
+      "unit": "kg",
+      "description": "Broccoli seeds for planting"
+    },
+    "cabbage": {
+      "unit": "kg",
+      "caloriesPerUnit": 250,
+      "dailyNeedAmount": 0.25,
+      "description": "Fresh cabbage"
+    },
+    "cabbage_seed": {
+      "unit": "kg",
+      "description": "Cabbage seeds for planting"
+    },
+    "cake": {
+      "unit": "piece",
+      "caloriesPerUnit": 350,
+      "description": "Baked cake"
+    },
+    "carrot": {
+      "unit": "kg",
+      "caloriesPerUnit": 410,
+      "dailyNeedAmount": 0.2,
+      "description": "Fresh carrots"
+    },
+    "carrot_seed": {
+      "unit": "kg",
+      "description": "Carrot seeds for planting"
+    },
+    "cement": {
+      "unit": "kg",
+      "description": "Cement for construction"
+    },
+    "chest": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 700,
+      "description": "Storage chest"
+    },
+    "chicken": {
+      "unit": "kg",
+      "caloriesPerUnit": 2390,
+      "proteinGrams": 270,
+      "dailyNeedAmount": 0.25,
+      "description": "Chicken meat"
+    },
+    "chisel": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Carving tool"
+    },
+    "clothing": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 90,
+      "description": "Generic clothing"
+    },
+    "coat": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "Outerwear coat"
+    },
+    "coconut_palm_sapling": {
+      "unit": "piece",
+      "description": "Coconut palm sapling for planting"
+    },
+    "copper": {
+      "unit": "kg",
+      "description": "Copper metal"
+    },
+    "cotton": {
+      "unit": "kg",
+      "description": "Raw cotton fiber"
+    },
+    "cotton_seed": {
+      "unit": "kg",
+      "description": "Cotton seeds for planting"
+    },
+    "cradle": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Baby cradle"
+    },
+    "date": {
+      "unit": "kg",
+      "caloriesPerUnit": 2820,
+      "dailyNeedAmount": 0.05,
+      "description": "Dried dates"
+    },
+    "date_palm_sapling": {
+      "unit": "piece",
+      "description": "Date palm sapling for planting"
+    },
+    "desk": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Work desk"
+    },
+    "door": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 1000,
+      "description": "Building door"
+    },
+    "dress": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "Dress garment"
+    },
+    "feathers": {
+      "unit": "kg",
+      "description": "Bird feathers"
+    },
+    "fine_clothes": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "High quality clothing"
+    },
+    "flour": {
+      "unit": "kg",
+      "caloriesPerUnit": 3640,
+      "description": "Wheat flour"
+    },
+    "flowers": {
+      "unit": "kg",
+      "description": "Fresh flowers"
+    },
+    "fruit_seed": {
+      "unit": "kg",
+      "description": "Generic fruit seeds for planting"
+    },
+    "gold": {
+      "unit": "kg",
+      "description": "Gold metal"
+    },
+    "gold_item": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Gold decorative item"
+    },
+    "grape_vine": {
+      "unit": "piece",
+      "description": "Grape vine for planting"
+    },
+    "grapes": {
+      "unit": "kg",
+      "caloriesPerUnit": 690,
+      "dailyNeedAmount": 0.2,
+      "description": "Fresh grapes"
+    },
+    "groundnut_seed": {
+      "unit": "kg",
+      "description": "Groundnut seeds for planting"
+    },
+    "hammer": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Construction hammer"
+    },
+    "hat": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 120,
+      "description": "Head covering"
+    },
+    "hoe": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Farming hoe"
+    },
+    "honey": {
+      "unit": "kg",
+      "caloriesPerUnit": 3040,
+      "dailyNeedAmount": 0.02,
+      "description": "Natural honey"
+    },
+    "indigo": {
+      "unit": "kg",
+      "description": "Indigo plant material"
+    },
+    "iron": {
+      "unit": "kg",
+      "description": "Iron metal"
+    },
+    "jewelry": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Decorative jewelry"
+    },
+    "knife": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Cutting knife"
+    },
+    "lamp_oil": {
+      "unit": "liter",
+      "burnTimeHours": 20,
+      "dailyNeedAmount": 0.1,
+      "description": "Oil for lamps"
+    },
+    "lentil_seed": {
+      "unit": "kg",
+      "description": "Lentil seeds for planting"
+    },
+    "lettuce": {
+      "unit": "kg",
+      "caloriesPerUnit": 150,
+      "dailyNeedAmount": 0.15,
+      "description": "Fresh lettuce"
+    },
+    "lettuce_seed": {
+      "unit": "kg",
+      "description": "Lettuce seeds for planting"
+    },
+    "luxury_clothes": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "Luxury clothing"
+    },
+    "maize": {
+      "unit": "kg",
+      "caloriesPerUnit": 3650,
+      "dailyNeedAmount": 0.4,
+      "description": "Maize/corn grain"
+    },
+    "maize_seed": {
+      "unit": "kg",
+      "description": "Maize seeds for planting"
+    },
+    "mango": {
+      "unit": "piece",
+      "caloriesPerUnit": 135,
+      "dailyNeedAmount": 1,
+      "description": "Fresh mango"
+    },
+    "mango_sapling": {
+      "unit": "piece",
+      "description": "Mango tree sapling for planting"
+    },
+    "meal": {
+      "unit": "serving",
+      "caloriesPerUnit": 600,
+      "dailyNeedAmount": 3,
+      "description": "Prepared meal serving"
+    },
+    "medicine": {
+      "unit": "dose",
+      "description": "Medical treatment dose"
+    },
+    "mutton": {
+      "unit": "kg",
+      "caloriesPerUnit": 2940,
+      "proteinGrams": 250,
+      "dailyNeedAmount": 0.25,
+      "description": "Mutton/lamb meat"
+    },
+    "nails": {
+      "unit": "piece",
+      "description": "Construction nails"
+    },
+    "needle": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "Sewing needle"
+    },
+    "oats": {
+      "unit": "kg",
+      "caloriesPerUnit": 3890,
+      "dailyNeedAmount": 0.3,
+      "description": "Oat grain"
+    },
+    "oats_seeds": {
+      "unit": "kg",
+      "description": "Oat seeds for planting"
+    },
+    "onion": {
+      "unit": "kg",
+      "caloriesPerUnit": 400,
+      "dailyNeedAmount": 0.1,
+      "description": "Fresh onions"
+    },
+    "onion_seed": {
+      "unit": "kg",
+      "description": "Onion seeds for planting"
+    },
+    "orange": {
+      "unit": "piece",
+      "caloriesPerUnit": 62,
+      "dailyNeedAmount": 2,
+      "description": "Fresh orange"
+    },
+    "orange_sapling": {
+      "unit": "piece",
+      "description": "Orange tree sapling for planting"
+    },
+    "pants": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 90,
+      "description": "Lower body garment"
+    },
+    "pastries": {
+      "unit": "piece",
+      "caloriesPerUnit": 300,
+      "description": "Baked pastry"
+    },
+    "peach": {
+      "unit": "piece",
+      "caloriesPerUnit": 59,
+      "dailyNeedAmount": 2,
+      "description": "Fresh peach"
+    },
+    "peach_sapling": {
+      "unit": "piece",
+      "description": "Peach tree sapling for planting"
+    },
+    "pear": {
+      "unit": "piece",
+      "caloriesPerUnit": 102,
+      "dailyNeedAmount": 2,
+      "description": "Fresh pear"
+    },
+    "pear_sapling": {
+      "unit": "piece",
+      "description": "Pear tree sapling for planting"
+    },
+    "pepper": {
+      "unit": "kg",
+      "caloriesPerUnit": 400,
+      "dailyNeedAmount": 0.05,
+      "description": "Fresh peppers"
+    },
+    "pepper_seed": {
+      "unit": "kg",
+      "description": "Pepper seeds for planting"
+    },
+    "pickaxe": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Mining pickaxe"
+    },
+    "potato": {
+      "unit": "kg",
+      "caloriesPerUnit": 770,
+      "dailyNeedAmount": 0.4,
+      "description": "Fresh potatoes"
+    },
+    "potato_seed": {
+      "unit": "kg",
+      "description": "Seed potatoes for planting"
+    },
+    "preserved_food": {
+      "unit": "kg",
+      "caloriesPerUnit": 2500,
+      "dailyNeedAmount": 0.3,
+      "description": "Preserved food rations"
+    },
+    "pumpkin": {
+      "unit": "kg",
+      "caloriesPerUnit": 260,
+      "dailyNeedAmount": 0.3,
+      "description": "Fresh pumpkin"
+    },
+    "pumpkin_seed": {
+      "unit": "kg",
+      "description": "Pumpkin seeds for planting"
+    },
+    "ragi": {
+      "unit": "kg",
+      "caloriesPerUnit": 3360,
+      "dailyNeedAmount": 0.3,
+      "description": "Finger millet grain"
+    },
+    "ragi_seeds": {
+      "unit": "kg",
+      "description": "Ragi seeds for planting"
+    },
+    "red_dye": {
+      "unit": "kg",
+      "description": "Red coloring dye"
+    },
+    "rice": {
+      "unit": "kg",
+      "caloriesPerUnit": 3600,
+      "dailyNeedAmount": 0.4,
+      "description": "White rice"
+    },
+    "rice_seed": {
+      "unit": "kg",
+      "description": "Rice seeds for planting"
+    },
+    "rye": {
+      "unit": "kg",
+      "caloriesPerUnit": 3380,
+      "dailyNeedAmount": 0.5,
+      "description": "Rye grain"
+    },
+    "rye_seeds": {
+      "unit": "kg",
+      "description": "Rye seeds for planting"
+    },
+    "saw": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Wood cutting saw"
+    },
+    "scythe": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Harvesting scythe"
+    },
+    "shelf": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Storage shelf"
+    },
+    "shirt": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 90,
+      "description": "Upper body garment"
+    },
+    "shovel": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Digging shovel"
+    },
+    "silver": {
+      "unit": "kg",
+      "description": "Silver metal"
+    },
+    "simple_clothes": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 90,
+      "description": "Basic everyday clothing"
+    },
+    "steel": {
+      "unit": "kg",
+      "description": "Steel metal"
+    },
+    "stool": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Simple stool seating"
+    },
+    "thread": {
+      "unit": "kg",
+      "description": "Sewing thread"
+    },
+    "tomato": {
+      "unit": "kg",
+      "caloriesPerUnit": 180,
+      "dailyNeedAmount": 0.2,
+      "description": "Fresh tomatoes"
+    },
+    "tomato_seed": {
+      "unit": "kg",
+      "description": "Tomato seeds for planting"
+    },
+    "vegetable_seed": {
+      "unit": "kg",
+      "description": "Generic vegetable seeds"
+    },
+    "wardrobe": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 700,
+      "description": "Clothing storage furniture"
+    },
+    "watermelon": {
+      "unit": "kg",
+      "caloriesPerUnit": 300,
+      "dailyNeedAmount": 0.5,
+      "description": "Fresh watermelon"
+    },
+    "watermelon_seed": {
+      "unit": "kg",
+      "description": "Watermelon seeds for planting"
+    },
+    "wheat_seed": {
+      "unit": "kg",
+      "description": "Wheat seeds for planting"
+    },
+    "whiskey": {
+      "unit": "bottle",
+      "volumeLiters": 0.7,
+      "caloriesPerUnit": 1540,
+      "alcoholPercent": 40,
+      "description": "Distilled whiskey"
+    },
+    "winter_coat": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "Warm winter outerwear"
+    },
+    "wood": {
+      "unit": "kg",
+      "description": "Raw wood material"
+    },
+    "work_clothes": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 120,
+      "description": "Work/labor clothing"
+    },
+    "yarn": {
+      "unit": "kg",
+      "description": "Spun yarn for knitting"
+    },
+    "yellow_dye": {
+      "unit": "kg",
+      "description": "Yellow coloring dye"
+    }
+  },
+  "displayFormats": {
+    "calories": "{value} kcal",
+    "percentage": "{value}%",
+    "feedsPeople": "Feeds {value} people",
+    "dailyNeed": "{value}% of daily {dimension}"
+  }
+}

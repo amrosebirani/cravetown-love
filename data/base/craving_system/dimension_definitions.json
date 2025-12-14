@@ -1,0 +1,866 @@
+{
+  "version": "1.0.0",
+  "dimensionCount": {
+    "coarse": 9,
+    "fine": 60
+  },
+  "coarseDimensions": [
+    {
+      "id": "biological",
+      "index": 0,
+      "name": "Biological",
+      "description": "Food, water, medicine, rest, basic bodily needs",
+      "tier": "survival",
+      "criticalThreshold": 20,
+      "emigrationWeight": 0.4,
+      "productivityImpact": 0.5
+    },
+    {
+      "id": "safety",
+      "index": 1,
+      "name": "Safety",
+      "description": "Protection from harm, housing, crime prevention",
+      "tier": "security",
+      "criticalThreshold": 30,
+      "emigrationWeight": 0.25,
+      "productivityImpact": 0.3
+    },
+    {
+      "id": "touch",
+      "index": 2,
+      "name": "Touch",
+      "description": "Physical comfort from fabrics, furniture, pleasant textures",
+      "tier": "comfort",
+      "criticalThreshold": 25,
+      "emigrationWeight": 0.1,
+      "productivityImpact": 0.2
+    },
+    {
+      "id": "psychological",
+      "index": 3,
+      "name": "Psychological",
+      "description": "Mental stimulation, learning, meaning, spiritual fulfillment",
+      "tier": "social_psychological",
+      "criticalThreshold": 20,
+      "emigrationWeight": 0.15,
+      "productivityImpact": 0.25
+    },
+    {
+      "id": "social_status",
+      "index": 4,
+      "name": "Social Status",
+      "description": "Reputation, visible symbols of success",
+      "tier": "social_psychological",
+      "criticalThreshold": 15,
+      "emigrationWeight": 0.05,
+      "productivityImpact": 0.15
+    },
+    {
+      "id": "social_connection",
+      "index": 5,
+      "name": "Social Connection",
+      "description": "Social bonds, friendship, belonging",
+      "tier": "social_psychological",
+      "criticalThreshold": 30,
+      "emigrationWeight": 0.15,
+      "productivityImpact": 0.2
+    },
+    {
+      "id": "exotic_goods",
+      "index": 6,
+      "name": "Exotic Goods",
+      "description": "Rare/foreign items, unusual foods",
+      "tier": "aspirational",
+      "criticalThreshold": 10,
+      "emigrationWeight": 0.02,
+      "productivityImpact": 0.05
+    },
+    {
+      "id": "shiny_objects",
+      "index": 7,
+      "name": "Shiny Objects",
+      "description": "Precious metals, gems, beautiful objects",
+      "tier": "aspirational",
+      "criticalThreshold": 10,
+      "emigrationWeight": 0.01,
+      "productivityImpact": 0.05
+    },
+    {
+      "id": "vice",
+      "index": 8,
+      "name": "Vice",
+      "description": "Intoxicants, gambling, indulgent foods",
+      "tier": "special",
+      "criticalThreshold": 5,
+      "emigrationWeight": 0,
+      "productivityImpact": -0.1
+    }
+  ],
+  "fineDimensions": [
+    {
+      "id": "biological_nutrition_grain",
+      "index": 0,
+      "parentCoarse": "biological",
+      "name": "Grain Nutrition",
+      "tags": [
+        "nutrition",
+        "grain",
+        "staple"
+      ],
+      "aggregationWeight": 0.2
+    },
+    {
+      "id": "biological_nutrition_protein",
+      "index": 1,
+      "parentCoarse": "biological",
+      "name": "Protein Nutrition",
+      "tags": [
+        "nutrition",
+        "protein",
+        "meat"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "biological_nutrition_produce",
+      "index": 2,
+      "parentCoarse": "biological",
+      "name": "Produce Nutrition",
+      "tags": [
+        "nutrition",
+        "produce",
+        "vegetables",
+        "fruit"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "biological_hydration",
+      "index": 3,
+      "parentCoarse": "biological",
+      "name": "Hydration",
+      "tags": [
+        "hydration",
+        "water",
+        "beverages"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "biological_health_medicine",
+      "index": 4,
+      "parentCoarse": "biological",
+      "name": "Medicine",
+      "tags": [
+        "health",
+        "medicine",
+        "healing"
+      ],
+      "aggregationWeight": 0.1
+    },
+    {
+      "id": "biological_health_hygiene",
+      "index": 5,
+      "parentCoarse": "biological",
+      "name": "Hygiene",
+      "tags": [
+        "health",
+        "hygiene",
+        "cleanliness"
+      ],
+      "aggregationWeight": 0.1
+    },
+    {
+      "id": "biological_energy_rest",
+      "index": 6,
+      "parentCoarse": "biological",
+      "name": "Rest Quality",
+      "tags": [
+        "energy",
+        "rest",
+        "sleep"
+      ],
+      "aggregationWeight": 0.1
+    },
+    {
+      "id": "biological_energy_stimulation",
+      "index": 7,
+      "parentCoarse": "biological",
+      "name": "Energy Stimulation",
+      "tags": [
+        "energy",
+        "stimulation",
+        "coffee",
+        "tea"
+      ],
+      "aggregationWeight": 0.05
+    },
+    {
+      "id": "safety_security_law",
+      "index": 8,
+      "parentCoarse": "safety",
+      "name": "Law & Order",
+      "tags": [
+        "security",
+        "law",
+        "police"
+      ],
+      "aggregationWeight": 0.25
+    },
+    {
+      "id": "safety_security_defense",
+      "index": 9,
+      "parentCoarse": "safety",
+      "name": "Defense",
+      "tags": [
+        "security",
+        "defense",
+        "military",
+        "walls"
+      ],
+      "aggregationWeight": 0.2
+    },
+    {
+      "id": "safety_shelter_housing",
+      "index": 10,
+      "parentCoarse": "safety",
+      "name": "Housing",
+      "tags": [
+        "shelter",
+        "housing",
+        "home"
+      ],
+      "aggregationWeight": 0.35
+    },
+    {
+      "id": "safety_shelter_warmth",
+      "index": 11,
+      "parentCoarse": "safety",
+      "name": "Warmth",
+      "tags": [
+        "shelter",
+        "warmth",
+        "heating"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "safety_fire_protection",
+      "index": 12,
+      "parentCoarse": "safety",
+      "name": "Fire Protection",
+      "tags": [
+        "safety",
+        "fire",
+        "protection"
+      ],
+      "aggregationWeight": 0.05
+    },
+    {
+      "id": "touch_clothing_everyday",
+      "index": 13,
+      "parentCoarse": "touch",
+      "name": "Everyday Clothing",
+      "tags": [
+        "clothing",
+        "everyday",
+        "basic"
+      ],
+      "aggregationWeight": 0.25
+    },
+    {
+      "id": "touch_clothing_formal",
+      "index": 14,
+      "parentCoarse": "touch",
+      "name": "Formal Clothing",
+      "tags": [
+        "clothing",
+        "formal",
+        "fashion"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "touch_furniture_functional",
+      "index": 15,
+      "parentCoarse": "touch",
+      "name": "Functional Furniture",
+      "tags": [
+        "furniture",
+        "functional",
+        "bed",
+        "chair"
+      ],
+      "aggregationWeight": 0.25
+    },
+    {
+      "id": "touch_furniture_decorative",
+      "index": 16,
+      "parentCoarse": "touch",
+      "name": "Decorative Furniture",
+      "tags": [
+        "furniture",
+        "decorative",
+        "luxury"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "touch_textiles_bedding",
+      "index": 17,
+      "parentCoarse": "touch",
+      "name": "Bedding & Textiles",
+      "tags": [
+        "textiles",
+        "bedding",
+        "linens"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "touch_sensory_luxury",
+      "index": 18,
+      "parentCoarse": "touch",
+      "name": "Sensory Luxury",
+      "tags": [
+        "sensory",
+        "luxury",
+        "perfume",
+        "flowers"
+      ],
+      "aggregationWeight": 0.05
+    },
+    {
+      "id": "psychological_education_books",
+      "index": 19,
+      "parentCoarse": "psychological",
+      "name": "Books & Reading",
+      "tags": [
+        "education",
+        "books",
+        "knowledge"
+      ],
+      "aggregationWeight": 0.2
+    },
+    {
+      "id": "psychological_education_formal",
+      "index": 20,
+      "parentCoarse": "psychological",
+      "name": "Formal Education",
+      "tags": [
+        "education",
+        "school",
+        "tutoring"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "psychological_entertainment_arts",
+      "index": 21,
+      "parentCoarse": "psychological",
+      "name": "Arts & Culture",
+      "tags": [
+        "entertainment",
+        "arts",
+        "culture",
+        "theater"
+      ],
+      "aggregationWeight": 0.2
+    },
+    {
+      "id": "psychological_entertainment_games",
+      "index": 22,
+      "parentCoarse": "psychological",
+      "name": "Games & Leisure",
+      "tags": [
+        "entertainment",
+        "games",
+        "sports",
+        "leisure"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "psychological_purpose_work",
+      "index": 23,
+      "parentCoarse": "psychological",
+      "name": "Meaningful Work",
+      "tags": [
+        "purpose",
+        "work",
+        "achievement"
+      ],
+      "aggregationWeight": 0.1
+    },
+    {
+      "id": "psychological_purpose_religion",
+      "index": 24,
+      "parentCoarse": "psychological",
+      "name": "Religion & Spirituality",
+      "tags": [
+        "purpose",
+        "religion",
+        "spirituality",
+        "church"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "psychological_purpose_civic",
+      "index": 25,
+      "parentCoarse": "psychological",
+      "name": "Civic Participation",
+      "tags": [
+        "purpose",
+        "civic",
+        "community"
+      ],
+      "aggregationWeight": 0.05
+    },
+    {
+      "id": "status_reputation_display",
+      "index": 26,
+      "parentCoarse": "social_status",
+      "name": "Display Wealth",
+      "tags": [
+        "reputation",
+        "display",
+        "wealth"
+      ],
+      "aggregationWeight": 0.3
+    },
+    {
+      "id": "status_reputation_title",
+      "index": 27,
+      "parentCoarse": "social_status",
+      "name": "Title & Rank",
+      "tags": [
+        "reputation",
+        "title",
+        "rank"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "status_wealth_precious",
+      "index": 28,
+      "parentCoarse": "social_status",
+      "name": "Precious Possessions",
+      "tags": [
+        "wealth",
+        "precious",
+        "valuable"
+      ],
+      "aggregationWeight": 0.2
+    },
+    {
+      "id": "status_wealth_property",
+      "index": 29,
+      "parentCoarse": "social_status",
+      "name": "Property Ownership",
+      "tags": [
+        "wealth",
+        "property",
+        "land",
+        "manor"
+      ],
+      "aggregationWeight": 0.2
+    },
+    {
+      "id": "status_service_servants",
+      "index": 30,
+      "parentCoarse": "social_status",
+      "name": "Servants & Staff",
+      "tags": [
+        "service",
+        "servants",
+        "staff"
+      ],
+      "aggregationWeight": 0.1
+    },
+    {
+      "id": "status_fashion_luxury",
+      "index": 31,
+      "parentCoarse": "social_status",
+      "name": "Luxury Fashion",
+      "tags": [
+        "fashion",
+        "luxury",
+        "clothing"
+      ],
+      "aggregationWeight": 0.05
+    },
+    {
+      "id": "social_friendship_casual",
+      "index": 32,
+      "parentCoarse": "social_connection",
+      "name": "Casual Friendship",
+      "tags": [
+        "friendship",
+        "casual",
+        "tavern"
+      ],
+      "aggregationWeight": 0.3
+    },
+    {
+      "id": "social_friendship_intimate",
+      "index": 33,
+      "parentCoarse": "social_connection",
+      "name": "Close Bonds",
+      "tags": [
+        "friendship",
+        "intimate",
+        "close"
+      ],
+      "aggregationWeight": 0.2
+    },
+    {
+      "id": "social_community_church",
+      "index": 34,
+      "parentCoarse": "social_connection",
+      "name": "Religious Community",
+      "tags": [
+        "community",
+        "church",
+        "congregation"
+      ],
+      "aggregationWeight": 0.2
+    },
+    {
+      "id": "social_community_civic",
+      "index": 35,
+      "parentCoarse": "social_connection",
+      "name": "Civic Community",
+      "tags": [
+        "community",
+        "civic",
+        "public"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "social_family_bonds",
+      "index": 36,
+      "parentCoarse": "social_connection",
+      "name": "Family Bonds",
+      "tags": [
+        "family",
+        "spouse",
+        "children"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "exotic_food_spices",
+      "index": 37,
+      "parentCoarse": "exotic_goods",
+      "name": "Spices",
+      "tags": [
+        "food",
+        "spices",
+        "exotic"
+      ],
+      "aggregationWeight": 0.3
+    },
+    {
+      "id": "exotic_food_imports",
+      "index": 38,
+      "parentCoarse": "exotic_goods",
+      "name": "Imported Foods",
+      "tags": [
+        "food",
+        "imports",
+        "foreign",
+        "wine"
+      ],
+      "aggregationWeight": 0.3
+    },
+    {
+      "id": "exotic_items_textiles",
+      "index": 39,
+      "parentCoarse": "exotic_goods",
+      "name": "Exotic Textiles",
+      "tags": [
+        "textiles",
+        "silk",
+        "rare"
+      ],
+      "aggregationWeight": 0.25
+    },
+    {
+      "id": "exotic_items_novelty",
+      "index": 40,
+      "parentCoarse": "exotic_goods",
+      "name": "Novelty Items",
+      "tags": [
+        "novelty",
+        "curiosity",
+        "foreign"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "shiny_precious_gold",
+      "index": 41,
+      "parentCoarse": "shiny_objects",
+      "name": "Gold",
+      "tags": [
+        "precious",
+        "gold",
+        "metal"
+      ],
+      "aggregationWeight": 0.35
+    },
+    {
+      "id": "shiny_precious_silver",
+      "index": 42,
+      "parentCoarse": "shiny_objects",
+      "name": "Silver",
+      "tags": [
+        "precious",
+        "silver",
+        "metal"
+      ],
+      "aggregationWeight": 0.25
+    },
+    {
+      "id": "shiny_precious_gems",
+      "index": 43,
+      "parentCoarse": "shiny_objects",
+      "name": "Gems & Jewelry",
+      "tags": [
+        "precious",
+        "gems",
+        "jewelry"
+      ],
+      "aggregationWeight": 0.25
+    },
+    {
+      "id": "shiny_decorative_art",
+      "index": 44,
+      "parentCoarse": "shiny_objects",
+      "name": "Decorative Art",
+      "tags": [
+        "decorative",
+        "art",
+        "beauty"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "vice_alcohol_beer",
+      "index": 45,
+      "parentCoarse": "vice",
+      "name": "Beer & Ale",
+      "tags": [
+        "alcohol",
+        "beer",
+        "ale"
+      ],
+      "aggregationWeight": 0.25
+    },
+    {
+      "id": "vice_alcohol_spirits",
+      "index": 46,
+      "parentCoarse": "vice",
+      "name": "Wine & Spirits",
+      "tags": [
+        "alcohol",
+        "wine",
+        "whiskey",
+        "spirits"
+      ],
+      "aggregationWeight": 0.25
+    },
+    {
+      "id": "vice_gambling",
+      "index": 47,
+      "parentCoarse": "vice",
+      "name": "Gambling",
+      "tags": [
+        "gambling",
+        "betting",
+        "games"
+      ],
+      "aggregationWeight": 0.2
+    },
+    {
+      "id": "vice_indulgence_sweets",
+      "index": 48,
+      "parentCoarse": "vice",
+      "name": "Sweets & Desserts",
+      "tags": [
+        "indulgence",
+        "sweets",
+        "desserts"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "vice_indulgence_excess",
+      "index": 49,
+      "parentCoarse": "vice",
+      "name": "Excess & Overindulgence",
+      "tags": [
+        "indulgence",
+        "excess",
+        "gluttony"
+      ],
+      "aggregationWeight": 0.15
+    },
+    {
+      "id": "safety_shelter_housing_basic",
+      "name": "Basic Housing",
+      "parentCoarse": "safety",
+      "tags": [
+        "shelter",
+        "housing",
+        "basic"
+      ],
+      "aggregationWeight": 0.15,
+      "index": 50
+    },
+    {
+      "id": "safety_shelter_housing_good",
+      "name": "Quality Housing",
+      "parentCoarse": "safety",
+      "tags": [
+        "shelter",
+        "housing",
+        "good",
+        "aspirational"
+      ],
+      "aggregationWeight": 0.15,
+      "index": 51
+    },
+    {
+      "id": "safety_shelter_housing_luxury",
+      "name": "Luxury Housing",
+      "parentCoarse": "safety",
+      "tags": [
+        "shelter",
+        "housing",
+        "luxury",
+        "aspirational"
+      ],
+      "aggregationWeight": 0.15,
+      "index": 52
+    },
+    {
+      "id": "safety_shelter_housing_prestige",
+      "name": "Prestige Housing",
+      "parentCoarse": "safety",
+      "tags": [
+        "shelter",
+        "housing",
+        "prestige",
+        "elite"
+      ],
+      "aggregationWeight": 0.15,
+      "index": 53
+    },
+    {
+      "id": "safety_shelter_weather",
+      "name": "Weather Protection",
+      "parentCoarse": "safety",
+      "tags": [
+        "shelter",
+        "weather",
+        "protection"
+      ],
+      "aggregationWeight": 0.15,
+      "index": 54
+    },
+    {
+      "id": "psychological_detstress_relax",
+      "name": "Destress & Relax",
+      "parentCoarse": "psychological",
+      "tags": [
+        "relax",
+        "destress",
+        "chill"
+      ],
+      "aggregationWeight": 0.1,
+      "decayRate": 0.02,
+      "index": 55
+    },
+    {
+      "id": "safety_shelter_lighting",
+      "name": "Lighting & Illumination",
+      "parentCoarse": "safety",
+      "tags": [
+        "lighting",
+        "visibility"
+      ],
+      "aggregationWeight": 0.15,
+      "decayRate": 0.05,
+      "index": 56
+    },
+    {
+      "id": "biological_nutrition_fat",
+      "name": "Fat Nutrition",
+      "parentCoarse": "biological",
+      "tags": [
+        "nutrition",
+        "fat"
+      ],
+      "aggregationWeight": 0.15,
+      "decayRate": 0.05,
+      "index": 57
+    },
+    {
+      "id": "touch_furniture_storage",
+      "name": "Storage Furniture",
+      "parentCoarse": "touch",
+      "tags": [
+        "storage"
+      ],
+      "aggregationWeight": 0.15,
+      "index": 58
+    },
+    {
+      "id": "touch_child_comfort",
+      "name": "Child Comfort",
+      "parentCoarse": "touch",
+      "tags": [
+        "child",
+        "comfort"
+      ],
+      "aggregationWeight": 0.15,
+      "index": 59
+    }
+  ],
+  "metadata": {
+    "lastUpdated": "2025-12-09",
+    "changeLog": [
+      {
+        "version": "1.0.0",
+        "date": "2025-11-25",
+        "changes": "Initial 9 coarse + 50 fine dimensions"
+      },
+      {
+        "version": "1.1.0",
+        "date": "2025-12-09",
+        "changes": "Added housing dimensions (50-54): basic, good, luxury, prestige housing + weather protection"
+      }
+    ],
+    "futureExpansion": {
+      "reservedIndices": {
+        "coarse": [
+          9,
+          10,
+          11,
+          12
+        ],
+        "fine": [
+          55,
+          56,
+          57,
+          58,
+          59
+        ]
+      },
+      "notes": "Can add up to 4 more coarse dimensions without breaking existing data"
+    }
+  }
+}

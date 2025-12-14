@@ -6,41 +6,53 @@
 Prototype1State = {}
 Prototype1State.__index = Prototype1State
 
+local ConsumptionPrototype = require("code.ConsumptionPrototype")
+
 function Prototype1State:Create()
-    local this = {}
+    local this = {
+        prototype = nil
+    }
     setmetatable(this, self)
     return this
 end
 
 function Prototype1State:Enter(params)
     print("Entering Prototype 1: Consumption Engine")
+    self.prototype = ConsumptionPrototype:Create()
 end
 
 function Prototype1State:Exit()
+    self.prototype = nil
 end
 
 function Prototype1State:Update(dt)
+    if self.prototype then
+        self.prototype:Update(dt)
+    end
 end
 
 function Prototype1State:Render()
-    love.graphics.clear(0.9, 0.9, 0.95)
+    if self.prototype then
+        self.prototype:Render()
+    end
+end
 
-    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+function Prototype1State:keypressed(key)
+    if self.prototype then
+        self.prototype:KeyPressed(key)
+        return key == "escape"  -- Signal that we handled escape
+    end
+    return false
+end
 
-    -- Placeholder content
-    love.graphics.setColor(0.3, 0.3, 0.3)
-    love.graphics.setNewFont(32)
-    local text = "Prototype 1: Consumption Engine"
-    local textWidth = love.graphics.getFont():getWidth(text)
-    love.graphics.print(text, (screenW - textWidth) / 2, screenH / 2 - 40)
+function Prototype1State:OnMouseWheel(dx, dy)
+    -- Future: Handle mouse wheel for scrolling
+end
 
-    love.graphics.setNewFont(18)
-    love.graphics.setColor(0.5, 0.5, 0.5)
-    local subtext = "Coming soon... Press ESC to return"
-    local subtextWidth = love.graphics.getFont():getWidth(subtext)
-    love.graphics.print(subtext, (screenW - subtextWidth) / 2, screenH / 2 + 20)
-
-    love.graphics.setColor(1, 1, 1)
+function Prototype1State:textinput(t)
+    if self.prototype then
+        self.prototype:TextInput(t)
+    end
 end
 
 return Prototype1State

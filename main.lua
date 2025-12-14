@@ -2,6 +2,10 @@
 local lurker = require("lurker")
 local manualHotReload = true  -- Set to true for manual reload, false for automatic
 
+-- MCP Bridge for AI agent integration
+local MCPBridge = nil
+local gMCPBridge = nil
+
 require("code/StateMachine")
 require("code/StateStack")
 require("code/Building")
@@ -12,10 +16,17 @@ require("code/BuildingPlacementState")
 require("code/BuildingMenu")
 
 -- Prototype states
+require("code/VersionSelector")
 require("code/PrototypeLauncher")
 require("code/Prototype1State")
 require("code/Prototype2State")
 require("code/InfoSystemState")
+require("code/AlphaPrototypeState")
+
+-- Consumption test states
+local TestCharacterV2State = require("code/consumption/TestCharacterV2State")
+local TestAllocationEngineV2State = require("code/consumption/TestAllocationEngineV2State")
+local ConsumptionPrototypeState = require("code/consumption/ConsumptionPrototypeState")
 
 -- Camera library
 Camera = require("code/Camera")
@@ -55,9 +66,10 @@ function love.load()
     gMousePressed = nil
     gMouseReleased = nil
 
-    -- Global mode: "launcher", "main", "prototype1", "prototype2"
-    gMode = "launcher"
-    gPrototypeLauncher = PrototypeLauncher:Create()
+    -- Global mode: "version_select", "launcher", "main", "prototype2", "test_character_v2", "test_allocation_v2", "test_cache", "alpha"
+    gMode = "version_select"
+    gVersionSelector = VersionSelector:Create()
+    gPrototypeLauncher = nil
 
     -- These will be initialized when a mode is selected
     gTown = nil
@@ -65,9 +77,25 @@ function love.load()
     gStateStack = nil
     gStateMachine = nil
     gMusic = nil
-    gPrototype1 = nil
     gPrototype2 = nil
     gInfoSystem = nil
+    gAlphaPrototype = nil
+    gTestCharacterV2 = nil
+    gTestAllocationV2 = nil
+    gTestCache = nil
+
+    -- Initialize MCP Bridge if enabled via environment variable
+    -- Launch game with: CRAVETOWN_MCP=1 love .
+    if os.getenv("CRAVETOWN_MCP") == "1" then
+        MCPBridge = require("code.mcp.MCPBridge")
+        local mcpPort = tonumber(os.getenv("CRAVETOWN_MCP_PORT")) or 9999
+        local mcpHeadless = os.getenv("CRAVETOWN_HEADLESS") == "1"
+        gMCPBridge = MCPBridge:init({
+            port = mcpPort,
+            headless = mcpHeadless
+        })
+        print("[MCP] Bridge enabled - waiting for connections on port " .. mcpPort)
+    end
 end
 
 function InitializeMainGame()
@@ -152,6 +180,35 @@ function InitializeInfoSystem()
     gMode = "infosystem"
 end
 
+function InitializeAlphaPrototype()
+    print("Initializing Alpha Prototype (Birthday Edition)...")
+    gAlphaPrototype = AlphaPrototypeState:Create()
+    gAlphaPrototype:Enter()
+    gMode = "alpha"
+end
+
+function InitializeTestCharacterV2()
+    print("Initializing CharacterV2 Test...")
+    gTestCharacterV2 = TestCharacterV2State
+    gTestCharacterV2:enter()
+    gMode = "test_character_v2"
+end
+
+function InitializeTestAllocationV2()
+    print("Initializing AllocationEngineV2 Test...")
+    gTestAllocationV2 = TestAllocationEngineV2State
+    gTestAllocationV2:enter()
+    gMode = "test_allocation_v2"
+end
+
+function InitializeTestCache()
+    print("Initializing Consumption Prototype (Phase 5 Complete)...")
+    -- test_cache mode now launches the full consumption prototype UI
+    gTestCache = ConsumptionPrototypeState
+    gTestCache:enter()
+    gMode = "test_cache"
+end
+
 function ReturnToLauncher()
     print("Returning to launcher...")
     -- Clean up current mode
@@ -163,10 +220,29 @@ function ReturnToLauncher()
     gPrototype1 = nil
     gPrototype2 = nil
     gInfoSystem = nil
+    gAlphaPrototype = nil
     gMode = "launcher"
+
+    -- Recreate launcher if needed
+    if not gPrototypeLauncher then
+        gPrototypeLauncher = PrototypeLauncher:Create()
+    end
 end
 
 function love.update(dt)
+    -- Update MCP Bridge (handle connections and messages)
+    if gMCPBridge then
+        gMCPBridge:update(dt)
+
+        -- Apply game speed modifier from MCP
+        dt = dt * gMCPBridge:getGameSpeed()
+
+        -- Skip update if paused via MCP
+        if gMCPBridge:isPaused() then
+            return
+        end
+    end
+
     -- Hot reload files (only if automatic mode)
     if not manualHotReload then
         lurker.update()
@@ -180,12 +256,24 @@ function love.update(dt)
         end
     end
 
-    if gMode == "launcher" then
+    if gMode == "version_select" then
+        -- Update version selector
+        local selected = gVersionSelector:Update(dt)
+        if selected then
+            print("Version selected: " .. gVersionSelector:GetSelectedVersion())
+            -- Move to prototype launcher
+            gMode = "launcher"
+            gPrototypeLauncher = PrototypeLauncher:Create()
+        end
+
+    elseif gMode == "launcher" then
         -- Update launcher
         local launched = gPrototypeLauncher:Update(dt)
         if launched then
             local selected = gPrototypeLauncher:GetSelectedPrototype()
-            if selected == "main" then
+            if selected == "alpha" then
+                InitializeAlphaPrototype()
+            elseif selected == "main" then
                 InitializeMainGame()
             elseif selected == "infosystem" then
                 InitializeInfoSystem()
@@ -193,6 +281,12 @@ function love.update(dt)
                 InitializePrototype1()
             elseif selected == "prototype2" then
                 InitializePrototype2()
+            elseif selected == "test_character_v2" then
+                InitializeTestCharacterV2()
+            elseif selected == "test_allocation_v2" then
+                InitializeTestAllocationV2()
+            elseif selected == "test_cache" then
+                InitializeTestCache()
             end
         end
 
@@ -240,6 +334,26 @@ function love.update(dt)
         if gInfoSystem then
             gInfoSystem:Update(dt)
         end
+
+    elseif gMode == "alpha" then
+        if gAlphaPrototype then
+            gAlphaPrototype:Update(dt)
+        end
+
+    elseif gMode == "test_character_v2" then
+        if gTestCharacterV2 then
+            gTestCharacterV2:update(dt)
+        end
+
+    elseif gMode == "test_allocation_v2" then
+        if gTestAllocationV2 then
+            gTestAllocationV2:update(dt)
+        end
+
+    elseif gMode == "test_cache" then
+        if gTestCache then
+            gTestCache:update(dt)
+        end
     end
 
     -- Clear mouse events after processing
@@ -248,7 +362,15 @@ function love.update(dt)
 end
 
 function love.draw()
-    if gMode == "launcher" then
+    -- Skip rendering in headless mode (for faster AI testing)
+    if gMCPBridge and gMCPBridge:isHeadless() then
+        return
+    end
+
+    if gMode == "version_select" then
+        gVersionSelector:Render()
+
+    elseif gMode == "launcher" then
         gPrototypeLauncher:Render()
 
     elseif gMode == "main" then
@@ -263,11 +385,24 @@ function love.draw()
             if gCamera then
                 love.graphics.print("Camera: " .. math.floor(gCamera.x) .. ", " .. math.floor(gCamera.y), 10, 30)
             end
+            love.graphics.print("Press R for Resource Overlays", 10, 50)
 
-            -- Debug: show building positions
+            -- MCP status indicator
+            if gMCPBridge then
+                local mcpStatus = gMCPBridge:isConnected() and "MCP: Connected" or "MCP: Waiting..."
+                if gMCPBridge:isPaused() then
+                    mcpStatus = mcpStatus .. " [PAUSED]"
+                end
+                love.graphics.setColor(0, 0.5, 0)
+                love.graphics.print(mcpStatus, 10, 70)
+                love.graphics.setColor(0, 0, 0)
+            end
+
+            -- Debug: show building positions (offset if MCP is active)
+            local debugStartY = gMCPBridge and 90 or 70
             local buildings = gTown:GetBuildings()
             for i, b in ipairs(buildings) do
-                love.graphics.print(string.format("B%d: %.0f, %.0f", i, b.mX, b.mY), 10, 50 + (i-1)*20)
+                love.graphics.print(string.format("B%d: %.0f, %.0f", i, b.mX, b.mY), 10, debugStartY + (i-1)*20)
             end
 
             love.graphics.setColor(1, 1, 1)
@@ -275,6 +410,11 @@ function love.draw()
 
         if gStateStack then
             gStateStack:Render()
+        end
+
+        -- Render resource overlay control panel (in screen space)
+        if gTown then
+            gTown:RenderResourceOverlayPanel()
         end
 
     elseif gMode == "prototype1" then
@@ -290,6 +430,26 @@ function love.draw()
     elseif gMode == "infosystem" then
         if gInfoSystem then
             gInfoSystem:Render()
+        end
+
+    elseif gMode == "alpha" then
+        if gAlphaPrototype then
+            gAlphaPrototype:Render()
+        end
+
+    elseif gMode == "test_character_v2" then
+        if gTestCharacterV2 then
+            gTestCharacterV2:draw()
+        end
+
+    elseif gMode == "test_allocation_v2" then
+        if gTestAllocationV2 then
+            gTestAllocationV2:draw()
+        end
+
+    elseif gMode == "test_cache" then
+        if gTestCache then
+            gTestCache:draw()
         end
     end
 
@@ -336,15 +496,53 @@ end
 function love.mousepressed(x, y, button, istouch, presses)
     -- Store mouse press for state handling
     gMousePressed = {x = x, y = y, button = button}
+
+    -- Handle resource overlay panel click in main mode
+    if gMode == "main" and button == 1 then
+        if gTown and gTown:HandleResourceOverlayClick(x, y) then
+            -- Click was handled by overlay panel, don't propagate
+            return
+        end
+    end
+
+    -- Forward to prototype1 if active
+    if gMode == "prototype1" then
+        if gPrototype1 and gPrototype1.prototype then
+            gPrototype1.prototype:MousePressed(x, y, button)
+        end
+    elseif gMode == "alpha" then
+        if gAlphaPrototype and gAlphaPrototype.mousepressed then
+            gAlphaPrototype:mousepressed(x, y, button)
+        end
+    elseif gMode == "test_cache" then
+        if gTestCache and gTestCache.prototype then
+            gTestCache.prototype:MousePressed(x, y, button)
+        end
+    end
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
     -- Store mouse release for state handling
     gMouseReleased = {x = x, y = y, button = button}
+
+    -- Forward to prototype1 if active
+    if gMode == "prototype1" then
+        if gPrototype1 and gPrototype1.prototype then
+            gPrototype1.prototype:MouseReleased(x, y, button)
+        end
+    elseif gMode == "test_cache" then
+        if gTestCache and gTestCache.prototype then
+            gTestCache.prototype:MouseReleased(x, y, button)
+        end
+    end
 end
 
 function love.wheelmoved(dx, dy)
-    if gMode == "main" then
+    if gMode == "version_select" then
+        if gVersionSelector and gVersionSelector.OnMouseWheel then
+            gVersionSelector:OnMouseWheel(dx, dy)
+        end
+    elseif gMode == "main" then
         -- Handle mouse wheel for scrolling in UI elements
         -- Pass to state stack states (like InventoryDrawer)
         if gStateStack then
@@ -367,6 +565,22 @@ function love.wheelmoved(dx, dy)
     elseif gMode == "infosystem" then
         if gInfoSystem and gInfoSystem.OnMouseWheel then
             gInfoSystem:OnMouseWheel(dx, dy)
+        end
+    elseif gMode == "alpha" then
+        if gAlphaPrototype and gAlphaPrototype.wheelmoved then
+            gAlphaPrototype:wheelmoved(dx, dy)
+        end
+    elseif gMode == "test_cache" then
+        if gTestCache and gTestCache.prototype and gTestCache.prototype.OnMouseWheel then
+            gTestCache.prototype:OnMouseWheel(dx, dy)
+        end
+    end
+end
+
+function love.mousemoved(x, y, dx, dy)
+    if gMode == "alpha" then
+        if gAlphaPrototype and gAlphaPrototype.mousemoved then
+            gAlphaPrototype:mousemoved(x, y, dx, dy)
         end
     end
 end
@@ -400,31 +614,81 @@ function love.keypressed(key)
         return
     end
 
-    -- ESC to return to launcher (from prototypes and main game)
-    if key == "escape" then
-        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" or gMode == "main" then
-            ReturnToLauncher()
-            return
-        elseif gMode == "launcher" then
-            love.event.quit()
-            return
-        end
-    end
+    -- Forward keypressed to states first (they may handle escape)
+    local keyHandled = false
 
     if gMode == "main" then
+        -- Handle resource overlay toggle (R key)
+        if key == "r" and gTown then
+            local handled = gTown:HandleResourceOverlayKey(key)
+            if handled then
+                keyHandled = true
+            end
+        end
+
         -- forward to focused modal (for name input)
-        if gStateStack then
+        if not keyHandled and gStateStack then
             for i = #gStateStack.mStates, 1, -1 do
                 local state = gStateStack.mStates[i]
                 if state.keypressed then
-                    state:keypressed(key)
+                    local handled = state:keypressed(key)
+                    if handled then
+                        keyHandled = true
+                    end
                     break
                 end
             end
         end
+    elseif gMode == "prototype2" then
+        if gPrototype2 and gPrototype2.keypressed then
+            local handled = gPrototype2:keypressed(key)
+            if handled then
+                keyHandled = true
+            end
+        end
     elseif gMode == "infosystem" then
         if gInfoSystem and gInfoSystem.keypressed then
-            gInfoSystem:keypressed(key)
+            local handled = gInfoSystem:keypressed(key)
+            if handled then
+                keyHandled = true
+            end
+        end
+    elseif gMode == "alpha" then
+        if gAlphaPrototype and gAlphaPrototype.keypressed then
+            local handled = gAlphaPrototype:keypressed(key)
+            if handled then
+                keyHandled = true
+            end
+        end
+    elseif gMode == "test_cache" then
+        -- Forward keypressed to ConsumptionPrototype
+        if gTestCache and gTestCache.KeyPressed then
+            gTestCache:KeyPressed(key)
+            keyHandled = true
+        end
+    end
+
+    -- ESC to return to launcher (from prototypes and main game) - only if not handled by state
+    if key == "escape" and not keyHandled then
+        if gMode == "prototype1" or gMode == "prototype2" or gMode == "infosystem" or gMode == "main" or gMode == "alpha" or gMode == "test_character_v2" or gMode == "test_allocation_v2" or gMode == "test_cache" then
+            -- Forward to test state first if it has keypressed
+            if gMode == "test_character_v2" and gTestCharacterV2 and gTestCharacterV2.keypressed then
+                gTestCharacterV2:keypressed(key)
+            elseif gMode == "test_allocation_v2" and gTestAllocationV2 and gTestAllocationV2.keypressed then
+                gTestAllocationV2:keypressed(key)
+            elseif gMode == "test_cache" and gTestCache and gTestCache.keypressed then
+                gTestCache:keypressed(key)
+            end
+            ReturnToLauncher()
+            return
+        elseif gMode == "launcher" then
+            -- Go back to version selector
+            gMode = "version_select"
+            gVersionSelector = VersionSelector:Create()
+            return
+        elseif gMode == "version_select" then
+            love.event.quit()
+            return
         end
     end
 
@@ -450,5 +714,16 @@ function love.textinput(t)
         if gInfoSystem and gInfoSystem.textinput then
             gInfoSystem:textinput(t)
         end
+    elseif gMode == "alpha" then
+        if gAlphaPrototype and gAlphaPrototype.textinput then
+            gAlphaPrototype:textinput(t)
+        end
+    end
+end
+
+function love.quit()
+    -- Shutdown MCP Bridge cleanly
+    if gMCPBridge then
+        gMCPBridge:shutdown()
     end
 end

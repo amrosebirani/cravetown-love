@@ -26,6 +26,19 @@ function Building:Create(params)
         end
     end
 
+    -- Get station count and storage from upgrade levels
+    local stationCount = 2  -- default
+    local inputCapacity = 300
+    local outputCapacity = 500
+    if buildingType.upgradeLevels and buildingType.upgradeLevels[1] then
+        local level0 = buildingType.upgradeLevels[1]
+        stationCount = level0.stations or 2
+        if level0.storage then
+            inputCapacity = level0.storage.inputCapacity or 300
+            outputCapacity = level0.storage.outputCapacity or 500
+        end
+    end
+
     local this = {
         mBuildingType = buildingType,
         mTypeId = buildingType.id,
@@ -42,23 +55,46 @@ function Building:Create(params)
         mProperties = properties,
         mWorkers = {},  -- Array of worker IDs assigned to this building
         mAutoAssignWorkers = true,
-        -- Production system
-        mProductionTimer = 0,  -- Time elapsed since last production
-        mFirstProduction = true,  -- Flag for first production cycle
-        mPlacementTime = 0,  -- Time when building was placed
-        mProducedGrain = nil,  -- For farms: which grain is produced (wheat, barley, etc.)
-        -- Bakery production
+        -- Station-based production system
+        mStations = {},
+        mCurrentLevel = 0,  -- Current upgrade level
+        -- Storage system
+        mStorage = {
+            inputs = {},           -- {commodityId: amount}
+            inputCapacity = inputCapacity,
+            inputUsed = 0,
+            outputs = {},          -- {commodityId: amount}
+            outputCapacity = outputCapacity,
+            outputUsed = 0
+        },
+        -- Legacy production system (for backwards compatibility)
+        mProductionTimer = 0,
+        mFirstProduction = true,
+        mPlacementTime = 0,
+        mProducedGrain = nil,
         mBakery = {
             wheatPerBread = 5,
             wheatReserved = 0,
             breadQueued = 0,
             breadProduced = 0,
-            intervalSec = 120,  -- 2 minutes per bread
+            intervalSec = 120,
             timer = 0,
             active = false
         },
-        mProductionNotifications = {}  -- Visual notifications for production
+        mProductionNotifications = {}
     }
+
+    -- Initialize stations
+    for i = 1, stationCount do
+        table.insert(this.mStations, {
+            id = i,
+            recipe = nil,          -- Assigned recipe object
+            worker = nil,          -- Assigned worker ID
+            state = "IDLE",        -- IDLE, PRODUCING, NO_MATERIALS, NO_WORKER
+            progress = 0.0,        -- 0.0 to 1.0 (production cycle completion)
+            efficiency = 1.0       -- Worker efficiency multiplier
+        })
+    end
 
     setmetatable(this, self)
     return this

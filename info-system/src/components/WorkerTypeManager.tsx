@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, Space, message, Popconfirm, Modal, Form, Input, InputNumber, Select } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-import type { WorkerType, WorkerTypesData } from '../types';
-import { loadWorkerTypes, saveWorkerTypes } from '../api';
-import { WORK_CATEGORIES } from '../constants';
+import type { WorkerType, WorkerTypesData, WorkCategory } from '../types';
+import { loadWorkerTypes, saveWorkerTypes, loadWorkCategories } from '../api';
 
 const WORKER_CATEGORIES = [
   'Agriculture',
@@ -25,6 +24,7 @@ const SKILL_LEVELS = ['Basic', 'Intermediate', 'Skilled', 'Expert'];
 
 const WorkerTypeManager = () => {
   const [workerTypes, setWorkerTypes] = useState<WorkerType[]>([]);
+  const [workCategories, setWorkCategories] = useState<WorkCategory[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingWorkerType, setEditingWorkerType] = useState<WorkerType | null>(null);
   const [editorVisible, setEditorVisible] = useState(false);
@@ -34,7 +34,17 @@ const WorkerTypeManager = () => {
 
   useEffect(() => {
     loadWorkerTypesList();
+    loadWorkCategoriesList();
   }, []);
+
+  const loadWorkCategoriesList = async () => {
+    try {
+      const data = await loadWorkCategories();
+      setWorkCategories(data.workCategories);
+    } catch (error) {
+      console.error('Failed to load work categories:', error);
+    }
+  };
 
   const loadWorkerTypesList = async () => {
     setLoading(true);
@@ -319,8 +329,8 @@ const WorkerTypeManager = () => {
                 placeholder="Select work categories"
                 style={{ width: '100%' }}
               >
-                {WORK_CATEGORIES.map(category => (
-                  <Select.Option key={category} value={category}>{category}</Select.Option>
+                {workCategories.map(category => (
+                  <Select.Option key={category.id} value={category.name}>{category.name}</Select.Option>
                 ))}
               </Select>
             </Form.Item>

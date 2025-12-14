@@ -1,0 +1,149 @@
+{
+  "workCategories": [
+    {
+      "id": "agriculture",
+      "name": "Agriculture",
+      "description": "Farming, crop cultivation, and agricultural work"
+    },
+    {
+      "id": "animal_husbandry",
+      "name": "Animal Husbandry",
+      "description": "Raising and caring for livestock"
+    },
+    {
+      "id": "food_preparation",
+      "name": "Food Preparation",
+      "description": "Cooking and meal preparation"
+    },
+    {
+      "id": "baking",
+      "name": "Baking",
+      "description": "Bread and baked goods production"
+    },
+    {
+      "id": "brewing_distilling",
+      "name": "Brewing & Distilling",
+      "description": "Beer brewing and spirit distillation"
+    },
+    {
+      "id": "woodworking",
+      "name": "Woodworking",
+      "description": "Crafting furniture and wooden structures"
+    },
+    {
+      "id": "lumber_processing",
+      "name": "Lumber Processing",
+      "description": "Processing timber into lumber and planks"
+    },
+    {
+      "id": "forestry",
+      "name": "Forestry",
+      "description": "Harvesting timber and forest management"
+    },
+    {
+      "id": "mining",
+      "name": "Mining",
+      "description": "Extracting ore, coal, and minerals"
+    },
+    {
+      "id": "metalworking",
+      "name": "Metalworking",
+      "description": "Working with metals to create products"
+    },
+    {
+      "id": "blacksmithing",
+      "name": "Blacksmithing",
+      "description": "Forging tools, weapons, and metal goods"
+    },
+    {
+      "id": "smelting",
+      "name": "Smelting",
+      "description": "Smelting ore into metal ingots"
+    },
+    {
+      "id": "jewelry_crafting",
+      "name": "Jewelry Crafting",
+      "description": "Creating jewelry and gold items"
+    },
+    {
+      "id": "textile_weaving",
+      "name": "Textile Weaving",
+      "description": "Weaving thread into cloth and fabric"
+    },
+    {
+      "id": "spinning",
+      "name": "Spinning",
+      "description": "Spinning fibers into thread"
+    },
+    {
+      "id": "tailoring",
+      "name": "Tailoring",
+      "description": "Creating clothing and garments"
+    },
+    {
+      "id": "footwear_manufacturing",
+      "name": "Footwear Manufacturing",
+      "description": "Manufacturing shoes and footwear"
+    },
+    {
+      "id": "masonry",
+      "name": "Masonry",
+      "description": "Working with bricks and stone for construction"
+    },
+    {
+      "id": "brick_making",
+      "name": "Brick Making",
+      "description": "Producing bricks for construction"
+    },
+    {
+      "id": "glassblowing",
+      "name": "Glassblowing",
+      "description": "Creating glass products"
+    },
+    {
+      "id": "healthcare",
+      "name": "Healthcare",
+      "description": "Medical care and treatment"
+    },
+    {
+      "id": "nursing",
+      "name": "Nursing",
+      "description": "Patient care and medical assistance"
+    },
+    {
+      "id": "education",
+      "name": "Education",
+      "description": "Teaching and instruction"
+    },
+    {
+      "id": "philosophy",
+      "name": "Philosophy",
+      "description": "Philosophical thinking and teaching"
+    },
+    {
+      "id": "commerce",
+      "name": "Commerce",
+      "description": "Trading and selling goods"
+    },
+    {
+      "id": "banking_finance",
+      "name": "Banking & Finance",
+      "description": "Financial transactions and banking operations"
+    },
+    {
+      "id": "hospitality",
+      "name": "Hospitality",
+      "description": "Service in restaurants, bars, and similar establishments"
+    },
+    {
+      "id": "general_labor",
+      "name": "General Labor",
+      "description": "Unskilled labor tasks that don't require specific training"
+    },
+    {
+      "id": "artisan_crafts",
+      "name": "Artisan Crafts",
+      "description": "High-quality skilled craftwork"
+    }
+  ]
+}

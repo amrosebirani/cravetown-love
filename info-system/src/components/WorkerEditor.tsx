@@ -5,13 +5,22 @@ import type { WorkerRequirements } from '../types';
 import { loadWorkerTypes } from '../api';
 
 interface WorkerEditorProps {
-  workers: WorkerRequirements;
+  workers?: WorkerRequirements;
   onChange: (workers: WorkerRequirements) => void;
 }
 
 const WorkerEditor = ({ workers, onChange }: WorkerEditorProps) => {
   const [workerTypeOptions, setWorkerTypeOptions] = useState<Array<{ value: string; label: string }>>([]);
   const [_messageApi, contextHolder] = message.useMessage();
+
+  // Provide default workers if undefined
+  const currentWorkers: WorkerRequirements = workers || {
+    required: 1,
+    max: 3,
+    vocations: [],
+    efficiencyBonus: 0.1,
+    wages: 0
+  };
 
   useEffect(() => {
     loadWorkerTypeOptions();
@@ -33,7 +42,7 @@ const WorkerEditor = ({ workers, onChange }: WorkerEditorProps) => {
 
   const handleChange = (field: keyof WorkerRequirements, value: any) => {
     onChange({
-      ...workers,
+      ...currentWorkers,
       [field]: value
     });
   };
@@ -50,7 +59,7 @@ const WorkerEditor = ({ workers, onChange }: WorkerEditorProps) => {
           >
             <InputNumber
               min={0}
-              value={workers.required}
+              value={currentWorkers.required}
               onChange={(value) => handleChange('required', value || 0)}
               style={{ width: '100%' }}
             />
@@ -62,9 +71,9 @@ const WorkerEditor = ({ workers, onChange }: WorkerEditorProps) => {
             style={{ marginBottom: 0 }}
           >
             <InputNumber
-              min={workers.required}
-              value={workers.max}
-              onChange={(value) => handleChange('max', value || workers.required)}
+              min={currentWorkers.required}
+              value={currentWorkers.max}
+              onChange={(value) => handleChange('max', value || currentWorkers.required)}
               style={{ width: '100%' }}
             />
           </Form.Item>
@@ -79,7 +88,7 @@ const WorkerEditor = ({ workers, onChange }: WorkerEditorProps) => {
             min={0}
             max={1}
             step={0.01}
-            value={workers.efficiencyBonus}
+            value={currentWorkers.efficiencyBonus}
             onChange={(value) => handleChange('efficiencyBonus', value || 0)}
             style={{ width: '100%' }}
             formatter={(value) => `${(Number(value) * 100).toFixed(0)}%`}
@@ -94,7 +103,7 @@ const WorkerEditor = ({ workers, onChange }: WorkerEditorProps) => {
         >
           <Select
             mode="tags"
-            value={workers.vocations}
+            value={currentWorkers.vocations}
             onChange={(value) => handleChange('vocations', value)}
             placeholder="Select worker types or type custom vocations"
             style={{ width: '100%' }}
@@ -118,11 +127,11 @@ const WorkerEditor = ({ workers, onChange }: WorkerEditorProps) => {
           borderRadius: '4px',
           fontSize: '12px'
         }}>
-          <strong>Summary:</strong> Requires {workers.required} worker{workers.required !== 1 ? 's' : ''},
-          max {workers.max}. Each additional worker adds {(workers.efficiencyBonus * 100).toFixed(0)}% efficiency.
-          {workers.vocations.length > 0 ? (
+          <strong>Summary:</strong> Requires {currentWorkers.required} worker{currentWorkers.required !== 1 ? 's' : ''},
+          max {currentWorkers.max}. Each additional worker adds {(currentWorkers.efficiencyBonus * 100).toFixed(0)}% efficiency.
+          {currentWorkers.vocations.length > 0 ? (
             <div style={{ marginTop: '4px' }}>
-              Accepted vocations: {workers.vocations.map(v => (
+              Accepted vocations: {currentWorkers.vocations.map(v => (
                 <Tag key={v} style={{ marginTop: '4px' }}>{v}</Tag>
               ))}
             </div>

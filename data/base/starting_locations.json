@@ -1,0 +1,308 @@
+{
+  "version": "1.0.0",
+  "description": "Starting location configurations for new games",
+  "locations": [
+    {
+      "id": "river_valley",
+      "name": "River Valley",
+      "icon": "~",
+      "description": "A lush valley bisected by a wide river, perfect for fishing and water-dependent industries.",
+      "bonus": "+20% fishing, +water access",
+      "challenge": "-15% farming space",
+      "terrain": {
+        "riverEnabled": true,
+        "riverWidth": 120,
+        "riverPosition": "center",
+        "forestDensity": 0.3,
+        "mountainsEnabled": false,
+        "mountainCount": 0,
+        "mountainPositions": [],
+        "groundColor": [0.35, 0.55, 0.25],
+        "waterColor": [0.2, 0.4, 0.7]
+      },
+      "productionModifiers": {
+        "fishing": 1.2,
+        "farming": 0.85,
+        "water_access": 1.5
+      },
+      "starterBuildings": [
+        {"typeId": "farm", "x": 100, "y": 100, "autoAssignRecipe": true},
+        {"typeId": "fishery", "x": 200, "y": 150, "autoAssignRecipe": true}
+      ],
+      "starterResources": [
+        {"commodityId": "wheat", "quantity": 40},
+        {"commodityId": "fish", "quantity": 30},
+        {"commodityId": "water", "quantity": 150},
+        {"commodityId": "bread", "quantity": 20}
+      ],
+      "starterGold": 1000,
+      "population": {
+        "initialCount": 15,
+        "classDistribution": {
+          "elite": 0.05,
+          "upper": 0.15,
+          "middle": 0.50,
+          "lower": 0.30
+        }
+      }
+    },
+    {
+      "id": "mountain_pass",
+      "name": "Mountain Pass",
+      "icon": "^",
+      "description": "A rocky highland surrounded by mountains rich in ore and gems, but with limited farmland.",
+      "bonus": "+30% ore/mining",
+      "challenge": "-20% farm output",
+      "terrain": {
+        "riverEnabled": false,
+        "riverWidth": 0,
+        "riverPosition": "none",
+        "forestDensity": 0.15,
+        "mountainsEnabled": true,
+        "mountainCount": 6,
+        "mountainPositions": [
+          {"x": 200, "y": 100, "width": 180, "height": 120},
+          {"x": 2800, "y": 150, "width": 200, "height": 150},
+          {"x": 150, "y": 2000, "width": 160, "height": 100},
+          {"x": 2700, "y": 2100, "width": 190, "height": 130},
+          {"x": 1500, "y": 100, "width": 150, "height": 110},
+          {"x": 1400, "y": 2200, "width": 170, "height": 120}
+        ],
+        "groundColor": [0.45, 0.40, 0.35],
+        "waterColor": [0.3, 0.4, 0.5]
+      },
+      "productionModifiers": {
+        "mining": 1.3,
+        "ore_extraction": 1.3,
+        "gem_finding": 1.25,
+        "farming": 0.8
+      },
+      "starterBuildings": [
+        {"typeId": "mine", "x": 300, "y": 200, "autoAssignRecipe": true},
+        {"typeId": "farm", "x": 150, "y": 400, "autoAssignRecipe": true}
+      ],
+      "starterResources": [
+        {"commodityId": "iron_ore", "quantity": 40},
+        {"commodityId": "stone", "quantity": 50},
+        {"commodityId": "wheat", "quantity": 30},
+        {"commodityId": "water", "quantity": 80}
+      ],
+      "starterGold": 1200,
+      "population": {
+        "initialCount": 12,
+        "classDistribution": {
+          "elite": 0.05,
+          "upper": 0.10,
+          "middle": 0.45,
+          "lower": 0.40
+        }
+      }
+    },
+    {
+      "id": "fertile_plains",
+      "name": "Fertile Plains",
+      "icon": "*",
+      "description": "Vast open grasslands with rich soil, ideal for agriculture and animal husbandry.",
+      "bonus": "+20% farm output, +water",
+      "challenge": "-10% ore availability",
+      "terrain": {
+        "riverEnabled": true,
+        "riverWidth": 80,
+        "riverPosition": "east",
+        "forestDensity": 0.2,
+        "mountainsEnabled": false,
+        "mountainCount": 0,
+        "mountainPositions": [],
+        "groundColor": [0.4, 0.6, 0.3],
+        "waterColor": [0.25, 0.45, 0.65]
+      },
+      "productionModifiers": {
+        "farming": 1.2,
+        "animal_husbandry": 1.15,
+        "water_access": 1.1,
+        "mining": 0.9,
+        "ore_extraction": 0.9
+      },
+      "starterBuildings": [
+        {"typeId": "farm", "x": 100, "y": 100, "autoAssignRecipe": true},
+        {"typeId": "bakery", "x": 200, "y": 100, "autoAssignRecipe": true},
+        {"typeId": "ranch", "x": 300, "y": 150, "autoAssignRecipe": true}
+      ],
+      "starterResources": [
+        {"commodityId": "wheat", "quantity": 60},
+        {"commodityId": "bread", "quantity": 40},
+        {"commodityId": "water", "quantity": 120},
+        {"commodityId": "beef", "quantity": 25},
+        {"commodityId": "carrot", "quantity": 30}
+      ],
+      "starterGold": 1000,
+      "population": {
+        "initialCount": 15,
+        "classDistribution": {
+          "elite": 0.05,
+          "upper": 0.15,
+          "middle": 0.50,
+          "lower": 0.30
+        }
+      }
+    },
+    {
+      "id": "forest_edge",
+      "name": "Forest Edge",
+      "icon": "#",
+      "description": "A settlement at the edge of an ancient forest, abundant in lumber and wild game.",
+      "bonus": "+30% lumber, +hunting",
+      "challenge": "-15% open building space",
+      "terrain": {
+        "riverEnabled": true,
+        "riverWidth": 60,
+        "riverPosition": "west",
+        "forestDensity": 0.55,
+        "mountainsEnabled": false,
+        "mountainCount": 0,
+        "mountainPositions": [],
+        "groundColor": [0.3, 0.45, 0.25],
+        "waterColor": [0.2, 0.35, 0.5]
+      },
+      "productionModifiers": {
+        "lumber": 1.3,
+        "woodworking": 1.2,
+        "hunting": 1.25,
+        "foraging": 1.2
+      },
+      "starterBuildings": [
+        {"typeId": "sawmill", "x": 150, "y": 120, "autoAssignRecipe": true},
+        {"typeId": "hunter_lodge", "x": 280, "y": 150, "autoAssignRecipe": true},
+        {"typeId": "farm", "x": 400, "y": 200, "autoAssignRecipe": true}
+      ],
+      "starterResources": [
+        {"commodityId": "lumber", "quantity": 60},
+        {"commodityId": "venison", "quantity": 25},
+        {"commodityId": "wheat", "quantity": 35},
+        {"commodityId": "water", "quantity": 100},
+        {"commodityId": "apple", "quantity": 20}
+      ],
+      "starterGold": 900,
+      "population": {
+        "initialCount": 14,
+        "classDistribution": {
+          "elite": 0.03,
+          "upper": 0.12,
+          "middle": 0.50,
+          "lower": 0.35
+        }
+      }
+    },
+    {
+      "id": "desert_oasis",
+      "name": "Desert Oasis",
+      "icon": "o",
+      "description": "A trading hub around a desert oasis, excellent for exotic goods but harsh for agriculture.",
+      "bonus": "+exotic goods trade",
+      "challenge": "-30% water, -20% farming",
+      "terrain": {
+        "riverEnabled": false,
+        "riverWidth": 0,
+        "riverPosition": "none",
+        "forestDensity": 0.05,
+        "mountainsEnabled": true,
+        "mountainCount": 3,
+        "mountainPositions": [
+          {"x": 2600, "y": 300, "width": 200, "height": 140},
+          {"x": 2500, "y": 1800, "width": 180, "height": 120},
+          {"x": 200, "y": 1200, "width": 150, "height": 100}
+        ],
+        "oasisEnabled": true,
+        "oasisPosition": {"x": 1600, "y": 1200},
+        "oasisRadius": 200,
+        "groundColor": [0.7, 0.6, 0.4],
+        "waterColor": [0.3, 0.5, 0.7]
+      },
+      "productionModifiers": {
+        "trade": 1.3,
+        "exotic_goods": 1.4,
+        "farming": 0.8,
+        "water_access": 0.7
+      },
+      "starterBuildings": [
+        {"typeId": "market", "x": 1550, "y": 1150, "autoAssignRecipe": false},
+        {"typeId": "farm", "x": 1650, "y": 1100, "autoAssignRecipe": true}
+      ],
+      "starterResources": [
+        {"commodityId": "gold_coins", "quantity": 200},
+        {"commodityId": "spices", "quantity": 30},
+        {"commodityId": "silk", "quantity": 15},
+        {"commodityId": "water", "quantity": 60},
+        {"commodityId": "wheat", "quantity": 25}
+      ],
+      "starterGold": 1500,
+      "population": {
+        "initialCount": 12,
+        "classDistribution": {
+          "elite": 0.08,
+          "upper": 0.20,
+          "middle": 0.45,
+          "lower": 0.27
+        }
+      }
+    },
+    {
+      "id": "mining_hills",
+      "name": "Mining Hills",
+      "icon": "M",
+      "description": "Rolling hills studded with mineral deposits and gem caves, a miner's paradise.",
+      "bonus": "+40% ore, +gems",
+      "challenge": "-25% farming, limited water",
+      "terrain": {
+        "riverEnabled": false,
+        "riverWidth": 0,
+        "riverPosition": "none",
+        "forestDensity": 0.1,
+        "mountainsEnabled": true,
+        "mountainCount": 8,
+        "mountainPositions": [
+          {"x": 300, "y": 200, "width": 140, "height": 100},
+          {"x": 800, "y": 150, "width": 160, "height": 110},
+          {"x": 1400, "y": 250, "width": 150, "height": 95},
+          {"x": 2200, "y": 180, "width": 170, "height": 115},
+          {"x": 400, "y": 1800, "width": 155, "height": 105},
+          {"x": 1100, "y": 2000, "width": 145, "height": 100},
+          {"x": 2000, "y": 1900, "width": 165, "height": 110},
+          {"x": 2600, "y": 1600, "width": 175, "height": 120}
+        ],
+        "groundColor": [0.5, 0.45, 0.38],
+        "waterColor": [0.35, 0.45, 0.55]
+      },
+      "productionModifiers": {
+        "mining": 1.4,
+        "ore_extraction": 1.4,
+        "gem_finding": 1.35,
+        "farming": 0.75,
+        "water_access": 0.6
+      },
+      "starterBuildings": [
+        {"typeId": "mine", "x": 500, "y": 400, "autoAssignRecipe": true},
+        {"typeId": "mine", "x": 700, "y": 350, "autoAssignRecipe": true},
+        {"typeId": "smelter", "x": 600, "y": 500, "autoAssignRecipe": true}
+      ],
+      "starterResources": [
+        {"commodityId": "iron_ore", "quantity": 80},
+        {"commodityId": "copper_ore", "quantity": 50},
+        {"commodityId": "coal", "quantity": 60},
+        {"commodityId": "stone", "quantity": 70},
+        {"commodityId": "water", "quantity": 50},
+        {"commodityId": "wheat", "quantity": 20}
+      ],
+      "starterGold": 1100,
+      "population": {
+        "initialCount": 14,
+        "classDistribution": {
+          "elite": 0.03,
+          "upper": 0.10,
+          "middle": 0.42,
+          "lower": 0.45
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "townNames": [
+    "Ironhaven", "Millbrook", "Stonegate", "Riverside", "Oakdale", "Pinewood",
+    "Silvermine", "Copperhill", "Goldcrest", "Blackwater", "Whitehall", "Redford",
+    "Greenfield", "Blueridge", "Greystone", "Ashwood", "Elmsworth", "Maplecross",
+    "Willowmere", "Thornbury", "Ravenhollow", "Foxden", "Wolfbane", "Eaglepeak",
+    "Hawksrest", "Crowsfoot", "Sparrowdale", "Finchley", "Swanbrook", "Dovecote",
+    "Hartfield", "Deerwood", "Bearholm", "Liongate", "Dragonspire", "Serpentine",
+    "Starfall", "Moonrise", "Sundale", "Cloudpeak", "Stormhold", "Frostgate",
+    "Fireforge", "Earthworks", "Windmill", "Waterford", "Dustwell", "Mudbrook"
+  ],
+  "hardships": [
+    "the great fire of {year}",
+    "the plague that swept through",
+    "the war with the eastern lords",
+    "the terrible famine",
+    "the mine collapse",
+    "the great flood",
+    "the winter storms",
+    "the drought of {year}",
+    "the bandit raids",
+    "the earthquake",
+    "the volcanic eruption nearby",
+    "the bridge collapse",
+    "the factory explosion",
+    "the crop blight"
+  ],
+  "dangers": [
+    "rising violence and lawlessness",
+    "corrupt and greedy lords",
+    "economic collapse and poverty",
+    "religious persecution",
+    "political unrest",
+    "guild conflicts",
+    "resource depletion",
+    "overcrowding and disease",
+    "failing harvests",
+    "harsh new taxes",
+    "feuding noble families",
+    "criminal gangs taking over"
+  ],
+  "motivations": {
+    "safety": [
+      "seeks a safe haven for {family}",
+      "needs stability and security",
+      "wants to escape the chaos",
+      "hopes to find peace at last"
+    ],
+    "biological": [
+      "seeks better food and living conditions",
+      "hopes to find abundance here",
+      "wants a place where {family} won't go hungry",
+      "dreams of a full larder and warm hearth"
+    ],
+    "social": [
+      "seeks a community to belong to",
+      "hopes to find true friendship",
+      "wants to rebuild {possessive} social connections",
+      "dreams of being part of something greater"
+    ],
+    "achievement": [
+      "seeks new challenges to conquer",
+      "wants to prove {reflexive} worthy",
+      "hopes to make a name for {reflexive}",
+      "dreams of building something lasting"
+    ],
+    "status": [
+      "seeks the recognition {pronoun} deserves",
+      "wants to restore {possessive} reputation",
+      "hopes to rise above {possessive} current station",
+      "dreams of respect and admiration"
+    ],
+    "psychological": [
+      "seeks intellectual stimulation",
+      "wants to learn and grow",
+      "hopes to find meaning in work",
+      "dreams of self-improvement"
+    ],
+    "exotic": [
+      "craves new experiences",
+      "wants to taste the finer things",
+      "hopes to explore new cultures",
+      "dreams of exotic adventures"
+    ],
+    "default": [
+      "seeks a fresh start",
+      "hopes to build a new life",
+      "wants to find {possessive} place in the world",
+      "dreams of a better tomorrow"
+    ]
+  },
+  "backstoryTemplates": [
+    "{name} fled {origin} after {hardship}. {motivation_sentence}",
+    "Once a respected {vocation} in {origin}, {name} left due to {danger}. {motivation_sentence}",
+    "{hardship} drove {name} from {origin}. Now {pronoun} {motivation_sentence}",
+    "Life in {origin} became unbearable with {danger}. {name} packed up and left, seeking {motivation_short}.",
+    "After losing everything in {origin} to {hardship}, {name} travels seeking {motivation_short}.",
+    "{name} left {origin} not out of desperation, but ambition. {motivation_sentence}"
+  ]
+}

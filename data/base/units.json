@@ -1,0 +1,360 @@
+{
+  "version": "1.0.0",
+  "description": "Units system for commodities and consumption",
+  "baseUnits": {
+    "weight": {
+      "base": "kg",
+      "display": [
+        "g",
+        "kg"
+      ],
+      "conversions": {
+        "g": 0.001
+      }
+    },
+    "volume": {
+      "base": "liter",
+      "display": [
+        "ml",
+        "liter"
+      ],
+      "conversions": {
+        "ml": 0.001
+      }
+    },
+    "count": {
+      "base": "piece",
+      "display": [
+        "piece"
+      ]
+    },
+    "length": {
+      "base": "meter",
+      "display": [
+        "cm",
+        "meter"
+      ],
+      "conversions": {
+        "cm": 0.01
+      }
+    },
+    "time": {
+      "base": "day",
+      "display": [
+        "slot",
+        "day"
+      ],
+      "conversions": {
+        "slot": 0.1667
+      }
+    }
+  },
+  "personDayBaseline": {
+    "calories": 2000,
+    "waterLiters": 2,
+    "sleepHours": 8,
+    "description": "Base daily needs for an average adult"
+  },
+  "commodityUnits": {
+    "wheat": {
+      "unit": "kg",
+      "caloriesPerUnit": 3400,
+      "dailyNeedAmount": 0.6,
+      "description": "Raw grain, ~600g provides daily calories"
+    },
+    "bread": {
+      "unit": "loaf",
+      "weightKg": 0.5,
+      "caloriesPerUnit": 1200,
+      "dailyNeedAmount": 1.5,
+      "description": "One loaf is 500g, ~1.5 loaves per day"
+    },
+    "meat": {
+      "unit": "kg",
+      "caloriesPerUnit": 2500,
+      "proteinGrams": 250,
+      "dailyNeedAmount": 0.3,
+      "description": "~300g meat provides protein needs"
+    },
+    "fish": {
+      "unit": "kg",
+      "caloriesPerUnit": 1500,
+      "proteinGrams": 200,
+      "dailyNeedAmount": 0.4,
+      "description": "Lighter protein source"
+    },
+    "vegetables": {
+      "unit": "kg",
+      "caloriesPerUnit": 250,
+      "dailyNeedAmount": 0.5,
+      "description": "Fresh vegetables"
+    },
+    "fruit": {
+      "unit": "kg",
+      "caloriesPerUnit": 500,
+      "dailyNeedAmount": 0.3,
+      "description": "Fresh fruit"
+    },
+    "water": {
+      "unit": "liter",
+      "caloriesPerUnit": 0,
+      "dailyNeedAmount": 2,
+      "description": "Clean drinking water"
+    },
+    "milk": {
+      "unit": "liter",
+      "caloriesPerUnit": 600,
+      "dailyNeedAmount": 0.5,
+      "description": "Dairy milk"
+    },
+    "cheese": {
+      "unit": "kg",
+      "caloriesPerUnit": 4000,
+      "dailyNeedAmount": 0.05,
+      "description": "Aged cheese"
+    },
+    "eggs": {
+      "unit": "piece",
+      "caloriesPerUnit": 70,
+      "dailyNeedAmount": 2,
+      "description": "Chicken eggs"
+    },
+    "beer": {
+      "unit": "liter",
+      "caloriesPerUnit": 430,
+      "alcoholPercent": 5,
+      "description": "Alcoholic beverage"
+    },
+    "wine": {
+      "unit": "bottle",
+      "volumeLiters": 0.75,
+      "caloriesPerUnit": 600,
+      "alcoholPercent": 12,
+      "description": "Wine bottle (750ml)"
+    },
+    "spirits": {
+      "unit": "bottle",
+      "volumeLiters": 0.5,
+      "caloriesPerUnit": 1100,
+      "alcoholPercent": 40,
+      "description": "Distilled spirits"
+    },
+    "tea": {
+      "unit": "kg",
+      "servingsPerUnit": 200,
+      "dailyNeedAmount": 0.005,
+      "description": "Dried tea leaves"
+    },
+    "coffee": {
+      "unit": "kg",
+      "servingsPerUnit": 100,
+      "dailyNeedAmount": 0.01,
+      "description": "Coffee beans"
+    },
+    "sugar": {
+      "unit": "kg",
+      "caloriesPerUnit": 4000,
+      "dailyNeedAmount": 0.05,
+      "description": "Refined sugar"
+    },
+    "salt": {
+      "unit": "kg",
+      "dailyNeedAmount": 0.005,
+      "description": "Salt for cooking"
+    },
+    "spices": {
+      "unit": "kg",
+      "dailyNeedAmount": 0.002,
+      "description": "Various spices"
+    },
+    "cloth": {
+      "unit": "meter",
+      "description": "Fabric for clothing"
+    },
+    "leather": {
+      "unit": "piece",
+      "description": "Tanned leather hide"
+    },
+    "wool": {
+      "unit": "kg",
+      "description": "Processed wool"
+    },
+    "linen": {
+      "unit": "meter",
+      "description": "Linen fabric"
+    },
+    "silk": {
+      "unit": "meter",
+      "description": "Luxury silk fabric"
+    },
+    "clothing_basic": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 90,
+      "description": "Basic everyday clothing"
+    },
+    "clothing_formal": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "Formal attire"
+    },
+    "shoes": {
+      "unit": "pair",
+      "durationType": "durable",
+      "durationDays": 120,
+      "description": "Footwear"
+    },
+    "bed": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Bed for sleeping"
+    },
+    "chair": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Seating furniture"
+    },
+    "table": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Table furniture"
+    },
+    "cabinet": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 700,
+      "description": "Storage furniture"
+    },
+    "blanket": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 180,
+      "description": "Bedding blanket"
+    },
+    "candle": {
+      "unit": "piece",
+      "burnTimeHours": 8,
+      "dailyNeedAmount": 1,
+      "description": "Wax candle for lighting"
+    },
+    "oil_lamp": {
+      "unit": "liter",
+      "burnTimeHours": 20,
+      "dailyNeedAmount": 0.1,
+      "description": "Lamp oil"
+    },
+    "firewood": {
+      "unit": "kg",
+      "burnTimeHours": 2,
+      "dailyNeedAmount": 5,
+      "description": "Wood for heating/cooking"
+    },
+    "coal": {
+      "unit": "kg",
+      "burnTimeHours": 4,
+      "dailyNeedAmount": 3,
+      "description": "Coal for heating"
+    },
+    "soap": {
+      "unit": "piece",
+      "useDays": 30,
+      "dailyNeedAmount": 0.033,
+      "description": "Bar of soap"
+    },
+    "medicine_basic": {
+      "unit": "dose",
+      "description": "Basic herbal medicine"
+    },
+    "medicine_advanced": {
+      "unit": "dose",
+      "description": "Advanced medicine"
+    },
+    "book": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Bound book"
+    },
+    "paper": {
+      "unit": "sheet",
+      "description": "Writing paper"
+    },
+    "ink": {
+      "unit": "bottle",
+      "volumeMl": 50,
+      "description": "Writing ink"
+    },
+    "tools_basic": {
+      "unit": "set",
+      "durationType": "durable",
+      "durationDays": 365,
+      "description": "Basic tool set"
+    },
+    "pottery": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 500,
+      "description": "Ceramic pottery"
+    },
+    "glassware": {
+      "unit": "piece",
+      "durationType": "durable",
+      "durationDays": 300,
+      "description": "Glass items"
+    },
+    "jewelry_silver": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Silver jewelry"
+    },
+    "jewelry_gold": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Gold jewelry"
+    },
+    "gold_coin": {
+      "unit": "piece",
+      "weightGrams": 8,
+      "description": "Gold currency"
+    },
+    "silver_coin": {
+      "unit": "piece",
+      "weightGrams": 10,
+      "description": "Silver currency"
+    },
+    "painting": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Decorative painting"
+    },
+    "sculpture": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Decorative sculpture"
+    },
+    "house_basic": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Basic housing structure"
+    },
+    "house_large": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Large house"
+    },
+    "manor": {
+      "unit": "piece",
+      "durationType": "permanent",
+      "description": "Manor estate"
+    }
+  },
+  "displayFormats": {
+    "calories": "{value} kcal",
+    "percentage": "{value}%",
+    "feedsPeople": "Feeds {value} people",
+    "dailyNeed": "{value}% of daily {dimension}"
+  }
+}

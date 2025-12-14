@@ -1,0 +1,257 @@
+{
+  "version": "1.0.0",
+  "description": "Consumption prototype mechanics: decay rates, diminishing returns, and variety-seeking behavior",
+
+  "cravingDecayRates": {
+    "description": "Per-cycle decay rates by class (points per 60-second cycle)",
+    "biological": {
+      "elite": 2.0,
+      "upper": 2.5,
+      "middle": 3.0,
+      "lower": 3.5
+    },
+    "touch": {
+      "elite": 1.5,
+      "upper": 2.0,
+      "middle": 2.5,
+      "lower": 3.0
+    },
+    "psychological": {
+      "elite": 3.0,
+      "upper": 2.5,
+      "middle": 2.0,
+      "lower": 1.5
+    },
+    "safety": {
+      "elite": 1.0,
+      "upper": 1.5,
+      "middle": 2.0,
+      "lower": 2.5
+    },
+    "social_status": {
+      "elite": 5.0,
+      "upper": 3.0,
+      "middle": 2.0,
+      "lower": 1.0
+    },
+    "social_connection": {
+      "elite": 2.0,
+      "upper": 2.5,
+      "middle": 3.0,
+      "lower": 2.5
+    },
+    "exotic_goods": {
+      "elite": 4.0,
+      "upper": 2.5,
+      "middle": 1.5,
+      "lower": 0.5
+    },
+    "shiny_objects": {
+      "elite": 3.5,
+      "upper": 2.0,
+      "middle": 1.0,
+      "lower": 0.5
+    },
+    "vice": {
+      "elite": 2.5,
+      "upper": 2.0,
+      "middle": 1.5,
+      "lower": 1.0
+    }
+  },
+
+  "commodityDiminishingReturns": {
+    "description": "Diminishing returns system for repeated commodity consumption",
+    "enabled": true,
+    "decayFormula": "1.0 - (consecutiveConsumptions * decayRate)",
+    "decayRate": 0.15,
+    "minMultiplier": 0.25,
+    "varietyCooldownCycles": 10,
+    "varietySeekingThreshold": 0.70,
+    "varietyBonusMultiplier": 1.10,
+    "otherCommodityDecayRate": 1,
+    "otherCommodityDecayCycles": 3
+  },
+
+  "priorityCalculation": {
+    "description": "How allocation priority is calculated each cycle",
+    "formula": "classWeight * 100 + sum(desperation * cravingWeight)",
+    "classWeights": {
+      "elite": 10,
+      "upper": 7,
+      "middle": 4,
+      "lower": 1
+    },
+    "desperationThresholds": {
+      "critical": 20,
+      "low": 40,
+      "medium": 60,
+      "high": 80
+    },
+    "desperationMultipliers": {
+      "critical": 10.0,
+      "low": 5.0,
+      "medium": 2.0,
+      "high": 1.0,
+      "satisfied": 0.1
+    },
+    "cravingPriorityWeights": {
+      "biological": 1.0,
+      "safety": 0.9,
+      "touch": 0.7,
+      "social_connection": 0.6,
+      "psychological": 0.5,
+      "social_status": 0.3,
+      "exotic_goods": 0.2,
+      "shiny_objects": 0.2,
+      "vice": 0.1
+    }
+  },
+
+  "consequenceThresholds": {
+    "description": "Thresholds for emigration, riots, and productivity penalties",
+    "emigration": {
+      "enabled": true,
+      "consecutiveLowSatisfactionCycles": {
+        "elite": 5,
+        "upper": 8,
+        "middle": 12,
+        "lower": 15
+      },
+      "averageSatisfactionThreshold": {
+        "elite": 50,
+        "upper": 40,
+        "middle": 30,
+        "lower": 25
+      },
+      "criticalCravingsRequired": 2,
+      "emigrationChancePerCycle": 0.15
+    },
+    "riots": {
+      "enabled": true,
+      "populationPercentageUnhappy": 0.40,
+      "criticalCravingsAverage": 2.5,
+      "riotTriggerChance": 0.10,
+      "riotDuration": 3,
+      "riotProductivityPenalty": 0.75
+    },
+    "productivity": {
+      "enabled": true,
+      "baseProductivity": 1.0,
+      "satisfactionThresholds": {
+        "veryHigh": {"min": 80, "multiplier": 1.25},
+        "high": {"min": 60, "multiplier": 1.10},
+        "normal": {"min": 40, "multiplier": 1.0},
+        "low": {"min": 20, "multiplier": 0.75},
+        "critical": {"min": 0, "multiplier": 0.50}
+      }
+    }
+  },
+
+  "characterGeneration": {
+    "description": "Parameters for generating test characters",
+    "defaultPopulation": 50,
+    "classDistribution": {
+      "elite": 0.10,
+      "upper": 0.20,
+      "middle": 0.40,
+      "lower": 0.30
+    },
+    "startingSatisfactionRanges": {
+      "_comment": "Starting satisfaction ranges should give average 60-75% at game start",
+      "elite": {
+        "biological": [70, 85],
+        "touch": [65, 80],
+        "psychological": [70, 85],
+        "safety": [75, 90],
+        "social_status": [75, 90],
+        "social_connection": [65, 80],
+        "exotic_goods": [60, 75],
+        "shiny_objects": [60, 75],
+        "vice": [50, 65]
+      },
+      "upper": {
+        "biological": [65, 80],
+        "touch": [60, 75],
+        "psychological": [65, 80],
+        "safety": [70, 85],
+        "social_status": [65, 80],
+        "social_connection": [60, 75],
+        "exotic_goods": [55, 70],
+        "shiny_objects": [55, 70],
+        "vice": [45, 60]
+      },
+      "middle": {
+        "biological": [60, 75],
+        "touch": [55, 70],
+        "psychological": [55, 70],
+        "safety": [60, 75],
+        "social_status": [55, 70],
+        "social_connection": [55, 70],
+        "exotic_goods": [50, 65],
+        "shiny_objects": [50, 65],
+        "vice": [40, 55]
+      },
+      "lower": {
+        "biological": [60, 75],
+        "touch": [55, 70],
+        "psychological": [55, 70],
+        "safety": [60, 75],
+        "social_status": [50, 65],
+        "social_connection": [55, 70],
+        "exotic_goods": [45, 60],
+        "shiny_objects": [45, 60],
+        "vice": [40, 55]
+      }
+    },
+    "traits": {
+      "available": [
+        {"id": "ambitious", "name": "Ambitious", "effect": "social_status decay +20%"},
+        {"id": "frugal", "name": "Frugal", "effect": "exotic_goods decay -15%"},
+        {"id": "bookish", "name": "Bookish", "effect": "psychological decay +25%"},
+        {"id": "social", "name": "Social", "effect": "social_connection decay +20%"},
+        {"id": "materialistic", "name": "Materialistic", "effect": "shiny_objects decay +30%"},
+        {"id": "ascetic", "name": "Ascetic", "effect": "vice decay -50%, biological decay -10%"},
+        {"id": "hedonist", "name": "Hedonist", "effect": "vice decay +40%, touch decay +20%"},
+        {"id": "anxious", "name": "Anxious", "effect": "safety decay +30%"}
+      ],
+      "traitsPerCharacter": 2
+    }
+  },
+
+  "names": {
+    "first": [
+      "John", "Mary", "William", "Elizabeth", "James", "Margaret", "Thomas", "Sarah",
+      "Robert", "Anne", "Richard", "Catherine", "Charles", "Jane", "George", "Alice",
+      "Edward", "Emma", "Henry", "Grace", "Arthur", "Hannah", "Frederick", "Lucy",
+      "Albert", "Emily", "Walter", "Charlotte", "Samuel", "Sophia", "David", "Clara",
+      "Joseph", "Eleanor", "Benjamin", "Isabella", "Daniel", "Harriet", "Michael", "Frances",
+      "Peter", "Beatrice", "Philip", "Rose", "Andrew", "Violet", "Edmund", "Lily",
+      "Francis", "Matilda"
+    ],
+    "last": [
+      "Smith", "Baker", "Miller", "Taylor", "Cooper", "Turner", "Walker", "Wood",
+      "Hall", "Wright", "Green", "Hill", "Brown", "White", "Harris", "Martin",
+      "Clark", "Lewis", "Young", "King", "Scott", "Adams", "Parker", "Evans",
+      "Morris", "Rogers", "Reed", "Cook", "Bell", "Murphy", "Bailey", "Rivera",
+      "Campbell", "Mitchell", "Roberts", "Carter", "Phillips", "Turner", "Collins", "Edwards",
+      "Stewart", "Morris", "Morgan", "Peterson", "Fisher", "Gray", "Barnes", "Henderson",
+      "Coleman", "Jenkins"
+    ]
+  },
+
+  "vocations": [
+    "Farmer", "Baker", "Cook", "Barman", "Carpenter", "Woodworker",
+    "Lumberjack", "Woodcutter", "Miner", "Blacksmith", "Smelter", "Metalworker",
+    "Goldsmith", "Tailor", "Weaver", "Spinner", "Shoemaker", "Mason",
+    "Glassblower", "Artisan", "Herder", "General Worker", "Doctor", "Nurse",
+    "Teacher", "Merchant", "Banker", "Philosopher"
+  ],
+
+  "metadata": {
+    "lastUpdated": "2025-11-27",
+    "version": "1.0.0",
+    "author": "Cravetown Team",
+    "notes": "Initial consumption prototype mechanics - tuned for 50 characters, 60-second cycles"
+  }
+}

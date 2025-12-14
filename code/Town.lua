@@ -7,6 +7,8 @@ require("code/River")
 require("code/Forest")
 require("code/Mine")
 require("code/Mountain")
+require("code/NaturalResources")
+require("code/ResourceOverlay")
 
 Town = {}
 Town.__index = Town
@@ -66,6 +68,25 @@ function Town:Create(params)
         mines = this.mMines,
         inventory = this.mInventory  -- Pass inventory reference
     })
+
+    -- Create natural resources system (ground water, fertility, ores, etc.)
+    this.mNaturalResources = NaturalResources:Create({
+        minX = -1250,
+        minY = -1250,
+        maxX = 1250,
+        maxY = 1250,
+        river = this.mRiver,
+        seed = os.time()  -- Use current time for variety, or fixed seed for reproducibility
+    })
+
+    -- Generate all natural resources
+    this.mNaturalResources:generateAll()
+
+    -- Create resource overlay for visualization
+    this.mResourceOverlay = ResourceOverlay:Create(this.mNaturalResources)
+
+    -- Print resource statistics (debug)
+    this.mNaturalResources:printStats()
 
     -- Add comprehensive starting resources - 1000 of each item
 
@@ -318,6 +339,11 @@ function Town:Render()
     -- Draw the river
     if self.mRiver then
         self.mRiver:Render()
+    end
+
+    -- Draw natural resource overlays (between terrain and buildings)
+    if self.mResourceOverlay then
+        self.mResourceOverlay:render()
     end
 
     -- Draw crosshair at world origin (0, 0)
@@ -627,4 +653,53 @@ end
 
 function Town:GetMountains()
     return self.mMountains
+end
+
+function Town:GetNaturalResources()
+    return self.mNaturalResources
+end
+
+function Town:GetResourceOverlay()
+    return self.mResourceOverlay
+end
+
+-- Render resource overlay control panel (call in screen space after camera pop)
+function Town:RenderResourceOverlayPanel()
+    if self.mResourceOverlay then
+        self.mResourceOverlay:renderPanel()
+    end
+end
+
+-- Handle keyboard input for resource overlay
+function Town:HandleResourceOverlayKey(key)
+    if self.mResourceOverlay then
+        return self.mResourceOverlay:handleKeyPress(key)
+    end
+    return false
+end
+
+-- Handle mouse click on resource overlay panel
+function Town:HandleResourceOverlayClick(mouseX, mouseY)
+    if self.mResourceOverlay then
+        return self.mResourceOverlay:handlePanelClick(mouseX, mouseY)
+    end
+    return false
+end
+
+-- Calculate building placement efficiency based on natural resources
+function Town:CalculateBuildingEfficiency(buildingType, worldX, worldY, width, height)
+    if self.mNaturalResources then
+        return self.mNaturalResources:calculateBuildingEfficiency(
+            buildingType, worldX, worldY, width, height
+        )
+    end
+    return 1.0, {}, true  -- Default: 100% efficiency, can place
+end
+
+-- Get resource value at a position (for building placement preview)
+function Town:GetResourceValue(resourceId, worldX, worldY)
+    if self.mNaturalResources then
+        return self.mNaturalResources:getValue(resourceId, worldX, worldY)
+    end
+    return 0
 end

@@ -11,12 +11,15 @@ function River:Create(params)
         -- River flows from top to bottom with natural curves
         mBaseWidth = params.baseWidth or 180,
         mColor = params.color or {0.2, 0.4, 0.7},
-        mBankColor = params.bankColor or {0.3, 0.5, 0.3},
-        mBankWidth = 15,
+        mBankColor = params.bankColor or {0.25, 0.42, 0.28},  -- Very subtle, close to grass
+        mBankWidth = 4,  -- Minimal bank width for subtle edge
         mPoints = {},  -- Array of {x, y, width, flowSpeed, clarity} points defining the river path
         mSegmentLength = 3,  -- Much smaller segments for smoother curves
         mTime = 0,  -- Animation time
-        mFlowStatus = flowLevels[math.random(1, #flowLevels)]  -- Random flow level
+        mFlowStatus = flowLevels[math.random(1, #flowLevels)],  -- Random flow level
+        -- Lake/reservoir at the end of the river - organic shape
+        mLake = nil,  -- Will be set after path generation
+        mLakePoints = {}  -- Organic polygon points for the lake
     }
 
     setmetatable(this, self)
@@ -133,6 +136,82 @@ function River:GeneratePath(params)
 
     -- Add the last control point
     table.insert(self.mPoints, controlPoints[#controlPoints])
+
+    -- Create organic lake at the end of the river
+    self:GenerateOrganicLake()
+end
+
+-- Generate an organic/natural shaped lake at the end of the river
+function River:GenerateOrganicLake()
+    local lastPoint = self.mPoints[#self.mPoints]
+    if not lastPoint then return end
+
+    -- Lake center is slightly below the last river point
+    local lakeBaseRadius = self.mBaseWidth * 1.8
+    local lakeCenterX = lastPoint.x
+    local lakeCenterY = lastPoint.y + lakeBaseRadius * 0.4
+
+    -- Generate organic lake shape using perlin-like noise
+    local numPoints = 24  -- Number of points around the perimeter
+    local angleStep = (2 * math.pi) / numPoints
+
+    -- Generate random variation for organic shape
+    local seed = lakeCenterX * 1000 + lakeCenterY  -- Pseudo-random seed
+    math.randomseed(seed)
+
+    -- Create irregular radii for each point
+    local radii = {}
+    for i = 1, numPoints do
+        -- Base radius with smooth random variation
+        local angle = (i - 1) * angleStep
+        -- Multiple sine waves for organic shape
+        local variation = 0.15 * math.sin(angle * 2 + math.random() * 0.5) +
+                          0.1 * math.sin(angle * 3 + math.random() * 0.3) +
+                          0.08 * math.sin(angle * 5 + math.random() * 0.2)
+        radii[i] = lakeBaseRadius * (0.85 + variation + math.random() * 0.15)
+    end
+
+    -- Smooth the radii to avoid sharp transitions
+    local smoothedRadii = {}
+    for i = 1, numPoints do
+        local prev = radii[((i - 2) % numPoints) + 1]
+        local curr = radii[i]
+        local next = radii[(i % numPoints) + 1]
+        smoothedRadii[i] = (prev + curr * 2 + next) / 4
+    end
+
+    -- Generate lake boundary points
+    self.mLakePoints = {}
+    self.mLakeBankPoints = {}
+
+    for i = 1, numPoints do
+        local angle = (i - 1) * angleStep
+        local radius = smoothedRadii[i]
+        local bankRadius = radius + self.mBankWidth
+
+        -- Water edge
+        table.insert(self.mLakePoints, {
+            x = lakeCenterX + math.cos(angle) * radius,
+            y = lakeCenterY + math.sin(angle) * radius
+        })
+
+        -- Bank edge
+        table.insert(self.mLakeBankPoints, {
+            x = lakeCenterX + math.cos(angle) * bankRadius,
+            y = lakeCenterY + math.sin(angle) * bankRadius
+        })
+    end
+
+    -- Store lake info for collision detection
+    self.mLake = {
+        x = lakeCenterX,
+        y = lakeCenterY,
+        radius = lakeBaseRadius,
+        innerRadius = lakeBaseRadius - self.mBankWidth
+    }
+
+    -- Reset random seed
+    math.randomseed(os.time())
 end
 
 function River:GetBounds()
@@ -179,6 +258,143 @@ function River:CheckCollision(building)
     end
 
     return false
+end
+
+-- Check if a point is within a certain distance of the river
+-- Returns: isNear (boolean), distance (number or nil)
+function River:IsPointNear(x, y, minDistance)
+    minDistance = minDistance or 0
+
+    for i = 1, #self.mPoints - 1 do
+        local p = self.mPoints[i]
+        local nextPoint = self.mPoints[i + 1]
+
+        -- Check if y is between this point and next
+        local minY = math.min(p.y, nextPoint.y)
+        local maxY = math.max(p.y, nextPoint.y)
+
+        if y >= minY and y <= maxY then
+            -- Interpolate the X position of river center at this Y
+            local t = (y - p.y) / (nextPoint.y - p.y + 0.001)
+            local riverX = p.x + t * (nextPoint.x - p.x)
+            local riverWidth = p.width + t * (nextPoint.width - p.width)
+
+            -- Calculate distance from river edge
+            local distFromCenter = math.abs(x - riverX)
+            local distFromEdge = distFromCenter - (riverWidth / 2)
+
+            -- Check if point is within threshold distance of river
+            if distFromEdge < minDistance then
+                return true, math.max(0, distFromEdge)
+            end
+        end
+    end
+
+    return false, nil
+end
+
+-- Get distance from a point to the nearest river edge
+-- Returns distance (positive = outside river, negative = inside river)
+function River:GetDistanceToRiver(x, y)
+    local minDist = math.huge
+
+    for i = 1, #self.mPoints - 1 do
+        local p = self.mPoints[i]
+        local nextPoint = self.mPoints[i + 1]
+
+        local minY = math.min(p.y, nextPoint.y)
+        local maxY = math.max(p.y, nextPoint.y)
+
+        if y >= minY and y <= maxY then
+            local t = (y - p.y) / (nextPoint.y - p.y + 0.001)
+            local riverX = p.x + t * (nextPoint.x - p.x)
+            local riverWidth = p.width + t * (nextPoint.width - p.width)
+
+            local distFromCenter = math.abs(x - riverX)
+            local distFromEdge = distFromCenter - (riverWidth / 2)
+
+            minDist = math.min(minDist, distFromEdge)
+        end
+    end
+
+    -- Also check distance to lake using polygon-based check
+    if self.mLake and self.mLakePoints and #self.mLakePoints > 0 then
+        -- First do a quick check with approximate radius
+        local dx = x - self.mLake.x
+        local dy = y - self.mLake.y
+        local distToLakeCenter = math.sqrt(dx * dx + dy * dy)
+
+        -- If close enough to lake, do precise polygon check
+        if distToLakeCenter < self.mLake.radius * 1.5 then
+            local insideLake = self:IsPointInPolygon(x, y, self.mLakePoints)
+            if insideLake then
+                minDist = -10  -- Inside the lake
+            else
+                -- Find distance to nearest lake edge
+                local minLakeDist = math.huge
+                for i = 1, #self.mLakePoints do
+                    local p1 = self.mLakePoints[i]
+                    local p2 = self.mLakePoints[(i % #self.mLakePoints) + 1]
+                    local dist = self:PointToSegmentDistance(x, y, p1.x, p1.y, p2.x, p2.y)
+                    minLakeDist = math.min(minLakeDist, dist)
+                end
+                minDist = math.min(minDist, minLakeDist)
+            end
+        end
+    end
+
+    return minDist
+end
+
+-- Check if a point is inside a polygon (ray casting algorithm)
+function River:IsPointInPolygon(x, y, polygon)
+    local inside = false
+    local j = #polygon
+
+    for i = 1, #polygon do
+        local xi, yi = polygon[i].x, polygon[i].y
+        local xj, yj = polygon[j].x, polygon[j].y
+
+        if ((yi > y) ~= (yj > y)) and
+           (x < (xj - xi) * (y - yi) / (yj - yi) + xi) then
+            inside = not inside
+        end
+        j = i
+    end
+
+    return inside
+end
+
+-- Distance from point to line segment
+function River:PointToSegmentDistance(px, py, x1, y1, x2, y2)
+    local dx = x2 - x1
+    local dy = y2 - y1
+    local lenSq = dx * dx + dy * dy
+
+    if lenSq == 0 then
+        -- Segment is a point
+        return math.sqrt((px - x1)^2 + (py - y1)^2)
+    end
+
+    local t = math.max(0, math.min(1, ((px - x1) * dx + (py - y1) * dy) / lenSq))
+    local projX = x1 + t * dx
+    local projY = y1 + t * dy
+
+    return math.sqrt((px - projX)^2 + (py - projY)^2)
+end
+
+-- Check if a point is inside water (river or lake)
+-- Returns true if point is in water
+function River:IsPointInWater(x, y)
+    return self:GetDistanceToRiver(x, y) < 0
+end
+
+-- Check if a point is inside water with buffer (for collision)
+-- Returns true if point is too close to water
+function River:IsPointNearWater(x, y, buffer)
+    buffer = buffer or 20
+    local dist = self:GetDistanceToRiver(x, y)
+    return dist < buffer
 end
 
 function River:Update(dt)
@@ -283,26 +499,8 @@ function River:Render()
         table.insert(leftHighlight, {x = p.x + nx * highlightWidth, y = p.y + ny * highlightWidth})
     end
 
-    -- Draw river banks using triangle strip
-    love.graphics.setColor(self.mBankColor[1], self.mBankColor[2], self.mBankColor[3])
-
-    -- Build vertices for triangle strip
-    local bankVertices = {}
-    for i = 1, #leftBankEdge do
-        table.insert(bankVertices, leftBankEdge[i].x)
-        table.insert(bankVertices, leftBankEdge[i].y)
-        table.insert(bankVertices, rightBankEdge[i].x)
-        table.insert(bankVertices, rightBankEdge[i].y)
-    end
-
-    -- Draw as triangle strip
-    if #bankVertices >= 6 then
-        local mesh = love.graphics.newMesh(#bankVertices / 2, "strip", "static")
-        for i = 1, #bankVertices / 2 do
-            mesh:setVertex(i, bankVertices[i * 2 - 1], bankVertices[i * 2])
-        end
-        love.graphics.draw(mesh)
-    end
+    -- Skip drawing bank - just draw water directly for cleaner look
+    -- (Banks were too visible and looked weird)
 
     -- Draw river water with shader - use average flow direction for entire river
     -- Calculate overall flow direction (top to bottom)
@@ -361,6 +559,35 @@ function River:Render()
     -- Reset shader
     love.graphics.setShader()
 
+    -- Draw the organic lake at the end (no bank, just water)
+    if self.mLake and self.mLakePoints and #self.mLakePoints >= 3 then
+        -- Draw lake water with shader (organic polygon)
+        love.graphics.setShader(self.mWaterShader)
+        love.graphics.setColor(1, 1, 1)
+
+        local waterVerts = {}
+        for _, p in ipairs(self.mLakePoints) do
+            table.insert(waterVerts, p.x)
+            table.insert(waterVerts, p.y)
+        end
+
+        if love.math.isConvex(waterVerts) then
+            love.graphics.polygon("fill", waterVerts)
+        else
+            -- Triangulate for non-convex polygon
+            local ok, triangles = pcall(love.math.triangulate, waterVerts)
+            if ok and triangles then
+                for _, tri in ipairs(triangles) do
+                    love.graphics.polygon("fill", tri)
+                end
+            end
+        end
+
+        love.graphics.setShader()
+    end
+
     -- No highlights needed - keep the water uniform and muddy
     love.graphics.setColor(1, 1, 1)
 end
+
+return River
