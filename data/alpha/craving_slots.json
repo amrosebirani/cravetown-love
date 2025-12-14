@@ -1,341 +1,519 @@
 {
   "version": "1.0.0",
   "description": "Maps cravings to time slots when they are active",
-
   "mappings": {
     "biological_nutrition_grain": {
-      "slots": ["early_morning", "afternoon", "evening"],
+      "slots": [
+        "early_morning",
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 3,
       "description": "Meals throughout the day"
     },
     "biological_nutrition_protein": {
-      "slots": ["afternoon", "evening"],
+      "slots": [
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 2,
       "description": "Main meals with protein"
     },
     "biological_nutrition_produce": {
-      "slots": ["morning", "afternoon", "evening"],
+      "slots": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 3,
       "description": "Fresh produce with meals"
     },
     "biological_hydration": {
-      "slots": ["early_morning", "morning", "afternoon", "evening", "night"],
+      "slots": [
+        "early_morning",
+        "morning",
+        "afternoon",
+        "evening",
+        "night"
+      ],
       "frequencyPerDay": 5,
       "description": "Water throughout waking hours"
     },
     "biological_health_medicine": {
-      "slots": ["morning", "evening"],
+      "slots": [
+        "morning",
+        "evening"
+      ],
       "frequencyPerDay": 2,
       "description": "Medicine if needed"
     },
     "biological_health_hygiene": {
-      "slots": ["early_morning", "night"],
+      "slots": [
+        "early_morning",
+        "night"
+      ],
       "frequencyPerDay": 2,
       "description": "Morning and evening hygiene"
     },
     "biological_energy_rest": {
-      "slots": ["late_night"],
+      "slots": [
+        "late_night"
+      ],
       "frequencyPerDay": 1,
       "description": "Sleep during late night"
     },
     "biological_energy_stimulation": {
-      "slots": ["early_morning", "afternoon"],
+      "slots": [
+        "early_morning",
+        "afternoon"
+      ],
       "frequencyPerDay": 2,
       "description": "Coffee/tea for energy"
     },
-
     "safety_security_law": {
-      "slots": ["morning", "afternoon", "evening"],
+      "slots": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Sense of security during active hours"
     },
     "safety_security_defense": {
-      "slots": ["night", "late_night"],
+      "slots": [
+        "night",
+        "late_night"
+      ],
       "frequencyPerDay": 1,
       "description": "Defense concerns at night"
     },
     "safety_shelter_housing": {
-      "slots": ["evening", "night", "late_night"],
+      "slots": [
+        "evening",
+        "night",
+        "late_night"
+      ],
       "frequencyPerDay": 1,
       "description": "Home at end of day"
     },
     "safety_shelter_warmth": {
-      "slots": ["late_night", "early_morning"],
+      "slots": [
+        "late_night",
+        "early_morning"
+      ],
       "frequencyPerDay": 1,
       "description": "Warmth during cold hours"
     },
     "safety_fire_protection": {
-      "slots": ["night"],
+      "slots": [
+        "night"
+      ],
       "frequencyPerDay": 1,
       "description": "Fire safety concern"
     },
-
     "touch_clothing_everyday": {
-      "slots": ["early_morning"],
+      "slots": [
+        "early_morning"
+      ],
       "frequencyPerDay": 1,
       "description": "Getting dressed"
     },
     "touch_clothing_formal": {
-      "slots": ["morning"],
+      "slots": [
+        "morning"
+      ],
       "frequencyPerDay": 1,
       "description": "Formal attire for work/events"
     },
     "touch_furniture_functional": {
-      "slots": ["morning", "afternoon", "evening"],
+      "slots": [
+        "morning",
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Using furniture throughout day"
     },
     "touch_furniture_decorative": {
-      "slots": ["evening"],
+      "slots": [
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Appreciating decor at leisure"
     },
     "touch_textiles_bedding": {
-      "slots": ["late_night"],
+      "slots": [
+        "late_night"
+      ],
       "frequencyPerDay": 1,
       "description": "Quality bedding for sleep"
     },
     "touch_sensory_luxury": {
-      "slots": ["evening", "night"],
+      "slots": [
+        "evening",
+        "night"
+      ],
       "frequencyPerDay": 1,
       "description": "Sensory pleasures in leisure time"
     },
-
     "psychological_education_books": {
-      "slots": ["evening", "night"],
+      "slots": [
+        "evening",
+        "night"
+      ],
       "frequencyPerDay": 1,
       "description": "Reading in free time"
     },
     "psychological_education_formal": {
-      "slots": ["morning", "afternoon"],
+      "slots": [
+        "morning",
+        "afternoon"
+      ],
       "frequencyPerDay": 1,
       "description": "School/education during day"
     },
     "psychological_entertainment_arts": {
-      "slots": ["evening"],
+      "slots": [
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Entertainment in evening"
     },
     "psychological_entertainment_games": {
-      "slots": ["afternoon", "evening"],
+      "slots": [
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Games and leisure activities"
     },
     "psychological_purpose_work": {
-      "slots": ["morning", "afternoon"],
+      "slots": [
+        "morning",
+        "afternoon"
+      ],
       "frequencyPerDay": 1,
       "description": "Meaningful work during work hours"
     },
     "psychological_purpose_religion": {
-      "slots": ["early_morning", "evening"],
+      "slots": [
+        "early_morning",
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Prayer/worship times"
     },
     "psychological_purpose_civic": {
-      "slots": ["afternoon", "evening"],
+      "slots": [
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Community participation"
     },
-
     "status_reputation_display": {
-      "slots": ["morning", "afternoon"],
+      "slots": [
+        "morning",
+        "afternoon"
+      ],
       "frequencyPerDay": 1,
       "description": "Displaying status during social hours"
     },
     "status_reputation_title": {
-      "slots": ["morning", "afternoon"],
+      "slots": [
+        "morning",
+        "afternoon"
+      ],
       "frequencyPerDay": 1,
       "description": "Title recognition during work"
     },
     "status_wealth_precious": {
-      "slots": ["evening"],
+      "slots": [
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Enjoying precious possessions"
     },
     "status_wealth_property": {
-      "slots": ["evening"],
+      "slots": [
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Pride in property"
     },
     "status_service_servants": {
-      "slots": ["morning", "evening"],
+      "slots": [
+        "morning",
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Being served"
     },
     "status_fashion_luxury": {
-      "slots": ["evening"],
+      "slots": [
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Luxury fashion for events"
     },
-
     "social_friendship_casual": {
-      "slots": ["afternoon", "evening"],
+      "slots": [
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Socializing with friends"
     },
     "social_friendship_intimate": {
-      "slots": ["evening", "night"],
+      "slots": [
+        "evening",
+        "night"
+      ],
       "frequencyPerDay": 1,
       "description": "Close relationships"
     },
     "social_community_church": {
-      "slots": ["morning"],
+      "slots": [
+        "morning"
+      ],
       "frequencyPerDay": 1,
       "description": "Church congregation"
     },
     "social_community_civic": {
-      "slots": ["afternoon"],
+      "slots": [
+        "afternoon"
+      ],
       "frequencyPerDay": 1,
       "description": "Civic gatherings"
     },
     "social_family_bonds": {
-      "slots": ["evening", "night"],
+      "slots": [
+        "evening",
+        "night"
+      ],
       "frequencyPerDay": 1,
       "description": "Family time"
     },
-
     "exotic_food_spices": {
-      "slots": ["afternoon", "evening"],
+      "slots": [
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Exotic flavors in meals"
     },
     "exotic_food_imports": {
-      "slots": ["evening"],
+      "slots": [
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Imported delicacies"
     },
     "exotic_items_textiles": {
-      "slots": ["evening"],
+      "slots": [
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Exotic textile appreciation"
     },
     "exotic_items_novelty": {
-      "slots": ["afternoon", "evening"],
+      "slots": [
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Novelty items"
     },
-
     "shiny_precious_gold": {
-      "slots": ["evening"],
+      "slots": [
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Admiring gold"
     },
     "shiny_precious_silver": {
-      "slots": ["evening"],
+      "slots": [
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Silver possessions"
     },
     "shiny_precious_gems": {
-      "slots": ["evening"],
+      "slots": [
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Jewelry and gems"
     },
     "shiny_decorative_art": {
-      "slots": ["evening", "night"],
+      "slots": [
+        "evening",
+        "night"
+      ],
       "frequencyPerDay": 1,
       "description": "Art appreciation"
     },
-
     "vice_alcohol_beer": {
-      "slots": ["evening", "night"],
+      "slots": [
+        "evening",
+        "night"
+      ],
       "frequencyPerDay": 1,
       "description": "Beer after work"
     },
     "vice_alcohol_spirits": {
-      "slots": ["evening", "night"],
+      "slots": [
+        "evening",
+        "night"
+      ],
       "frequencyPerDay": 1,
       "description": "Wine/spirits with dinner"
     },
     "vice_gambling": {
-      "slots": ["evening", "night"],
+      "slots": [
+        "evening",
+        "night"
+      ],
       "frequencyPerDay": 1,
       "description": "Gambling in leisure time"
     },
     "vice_indulgence_sweets": {
-      "slots": ["afternoon", "evening"],
+      "slots": [
+        "afternoon",
+        "evening"
+      ],
       "frequencyPerDay": 1,
       "description": "Sweet treats"
     },
     "vice_indulgence_excess": {
-      "slots": ["evening", "night"],
+      "slots": [
+        "evening",
+        "night"
+      ],
       "frequencyPerDay": 1,
       "description": "Overindulgence"
+    },
+    "biological_nutrition_fat": {
+      "slots": [
+        "early_morning",
+        "afternoon"
+      ],
+      "frequencyPerDay": 1,
+      "description": ""
+    },
+    "biological_fragrance_exotic": {
+      "slots": [
+        "night",
+        "late_night",
+        "early_morning"
+      ],
+      "frequencyPerDay": 1,
+      "description": ""
     }
   },
-
   "classModifiers": {
     "elite": {
       "psychological_entertainment_arts": {
-        "additionalSlots": ["afternoon"],
+        "additionalSlots": [
+          "afternoon"
+        ],
         "description": "Elite have leisure time for arts in afternoon"
       },
       "status_reputation_display": {
-        "additionalSlots": ["evening"],
+        "additionalSlots": [
+          "evening"
+        ],
         "description": "Elite display status at evening events"
       },
       "exotic_food_imports": {
-        "additionalSlots": ["afternoon"],
+        "additionalSlots": [
+          "afternoon"
+        ],
         "description": "Elite enjoy imported foods at lunch"
       }
     },
     "upper": {
       "psychological_entertainment_arts": {
-        "additionalSlots": ["afternoon"],
+        "additionalSlots": [
+          "afternoon"
+        ],
         "description": "Upper class has afternoon leisure"
       }
     },
     "lower": {
       "psychological_entertainment_arts": {
-        "removeSlots": ["evening"],
+        "removeSlots": [
+          "evening"
+        ],
         "description": "Lower class works evenings, less entertainment"
       },
       "status_reputation_display": {
-        "removeSlots": ["morning", "afternoon"],
+        "removeSlots": [
+          "morning",
+          "afternoon"
+        ],
         "description": "Lower class focuses on survival, not status"
       }
     }
   },
-
   "traitModifiers": {
     "workaholic": {
       "psychological_entertainment_games": {
-        "removeSlots": ["evening"],
+        "removeSlots": [
+          "evening"
+        ],
         "description": "Workaholics skip evening leisure"
       },
       "psychological_purpose_work": {
-        "additionalSlots": ["evening"],
+        "additionalSlots": [
+          "evening"
+        ],
         "description": "Workaholics work evenings too"
       }
     },
     "socialite": {
       "social_friendship_casual": {
-        "additionalSlots": ["morning"],
+        "additionalSlots": [
+          "morning"
+        ],
         "description": "Socialites socialize all day"
       }
     },
     "ascetic": {
       "vice_alcohol_beer": {
-        "removeSlots": ["evening", "night"],
+        "removeSlots": [
+          "evening",
+          "night"
+        ],
         "description": "Ascetics avoid alcohol"
       },
       "vice_alcohol_spirits": {
-        "removeSlots": ["evening", "night"],
+        "removeSlots": [
+          "evening",
+          "night"
+        ],
         "description": "Ascetics avoid alcohol"
       },
       "vice_indulgence_excess": {
-        "removeSlots": ["evening", "night"],
+        "removeSlots": [
+          "evening",
+          "night"
+        ],
         "description": "Ascetics avoid excess"
       }
     },
     "night_owl": {
       "biological_energy_rest": {
-        "removeSlots": ["late_night"],
-        "additionalSlots": ["morning"],
+        "removeSlots": [
+          "late_night"
+        ],
+        "additionalSlots": [
+          "morning"
+        ],
         "description": "Night owls sleep late"
       }
     }
   },
-
   "durableSlots": {
     "description": "Durables apply their effects once per day at a specific slot",
     "categorySlots": {
