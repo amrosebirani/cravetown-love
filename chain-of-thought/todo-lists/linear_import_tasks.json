@@ -1,0 +1,254 @@
+{
+  "project": {
+    "name": "Cravetown Alpha - One Week Playability Sprint",
+    "description": "Achieve playable alpha for expert game players. Target: 500-1000 citizens, specialized Indian dish starter towns, character movement, debug views.",
+    "targetDate": "2025-12-25"
+  },
+  "labels": [
+    {"name": "Level-0", "color": "#10B981", "description": "No dependencies - can start immediately"},
+    {"name": "Level-1", "color": "#3B82F6", "description": "Depends on Level 0 completion"},
+    {"name": "Level-2", "color": "#8B5CF6", "description": "Depends on Level 1 completion"},
+    {"name": "Level-3", "color": "#F59E0B", "description": "Depends on Level 2 completion"},
+    {"name": "Level-4", "color": "#EF4444", "description": "Integration and polish"},
+    {"name": "bug", "color": "#DC2626", "description": "Bug fix"},
+    {"name": "feature", "color": "#2563EB", "description": "New feature"},
+    {"name": "design", "color": "#7C3AED", "description": "Design/data work"},
+    {"name": "verification", "color": "#F97316", "description": "System verification"}
+  ],
+  "issues": [
+    {
+      "id": "A",
+      "title": "[A] Balance Analysis & Tuning",
+      "description": "## Objective\nEnsure 500-1000 citizens can be sustained with proper building ratios.\n\n## Tasks\n- [ ] A1: Export current production rates per building type\n- [ ] A2: Export current consumption rates per citizen per class\n- [ ] A3: Calculate required buildings for 500 citizens\n- [ ] A4: Calculate required buildings for 1000 citizens\n- [ ] A5: Document building ratio recommendations\n- [ ] A6: Identify current imbalances\n- [ ] A7: Propose rate adjustments (production up OR consumption down)\n\n## Deliverables\n- Balance spreadsheet with commodity flows\n- Updated consumption_mechanics.json\n- Updated building_types.json (production rates)\n\n## Acceptance Criteria\n- Town of 500 citizens can reach equilibrium\n- Production matches consumption within 10%",
+      "labels": ["Level-0", "design"],
+      "priority": "high",
+      "estimate": "4-6 hours",
+      "dependsOn": []
+    },
+    {
+      "id": "B",
+      "title": "[B] Debug Panel Foundation",
+      "description": "## Objective\nCreate toggleable debug panel with tabs for different views.\n\n## Tasks\n- [ ] B1: Create `code/DebugPanel.lua` with basic structure\n- [ ] B2: Add toggle hotkey (F12 or ` backtick)\n- [ ] B3: Implement tab system (Overview, Citizens, Buildings, Economy, Events)\n- [ ] B4: Create Overview tab with:\n  - Population by class\n  - Average satisfaction by dimension (9 coarse)\n  - Production rates summary\n  - Consumption rates summary\n  - Gold balance and flow\n- [ ] B5: Add mode toggle: Developer View vs Expert Player View\n- [ ] B6: Make panel draggable/collapsible\n- [ ] B7: Hook into AlphaUI rendering\n\n## Files to Create\n- `code/DebugPanel.lua`\n\n## Acceptance Criteria\n- Panel toggles with hotkey\n- Overview shows all key metrics\n- Both developer and expert player modes work",
+      "labels": ["Level-0", "feature"],
+      "priority": "high",
+      "estimate": "4-5 hours",
+      "dependsOn": []
+    },
+    {
+      "id": "C",
+      "title": "[C] Movement State Machine",
+      "description": "## Objective\nCreate character movement state tracking and basic movement logic.\n\n## Tasks\n- [ ] C1: Create `code/CharacterMovement.lua`\n- [ ] C2: Define movement states enum (IDLE, WALKING, WORKING, RESTING, CONSUMING, WANDERING)\n- [ ] C3: Add position data to citizen structure (x, y, targetX, targetY, state, speed, facing)\n- [ ] C4: Implement `setDestination(citizen, x, y, buildingId)`\n- [ ] C5: Implement `updateMovement(citizen, dt)` - linear interpolation toward target\n- [ ] C6: Add building entrance point calculation\n- [ ] C7: Hook into AlphaWorld:Update()\n\n## Files to Create\n- `code/CharacterMovement.lua`\n\n## Acceptance Criteria\n- Citizens can be assigned destinations\n- Citizens move toward destinations over time\n- Movement state updates correctly",
+      "labels": ["Level-0", "feature"],
+      "priority": "high",
+      "estimate": "4-5 hours",
+      "dependsOn": []
+    },
+    {
+      "id": "D",
+      "title": "[D] Bug Fix: Loading Performance at 1%",
+      "description": "## Problem\nLoading appears to stall at 1% - this is a real performance issue, not just perception.\n\n## Investigation Tasks\n- [ ] D1: Profile `AlphaPrototypeState:LoadWorldAsync()`\n- [ ] D2: Identify which step takes longest\n- [ ] D3: Check if DataLoader operations are blocking\n- [ ] D4: Check coroutine yield frequency\n\n## Fix Tasks\n- [ ] D5: Add more granular progress updates\n- [ ] D6: Split heavy operations into smaller chunks with yields\n- [ ] D7: Consider lazy loading for non-essential data\n- [ ] D8: Add loading substep messages for user feedback\n\n## Likely Culprits\n- Large JSON file parsing\n- World terrain generation\n- Building placement validation\n- Citizen generation loop\n\n## Acceptance Criteria\n- Loading progresses smoothly from 0-100%\n- No visible stall at any percentage\n- Loading completes in reasonable time (<5 seconds)",
+      "labels": ["Level-0", "bug"],
+      "priority": "urgent",
+      "estimate": "3-4 hours",
+      "dependsOn": []
+    },
+    {
+      "id": "E",
+      "title": "[E] Bug Fix: Recipe Selection Click",
+      "description": "## Problem\nGlitchy click registration in recipe selection UI.\n\n## Investigation Tasks\n- [ ] E1: Test recipe selection with logging\n- [ ] E2: Check MouseReleased event propagation\n- [ ] E3: Verify button bounds calculation\n- [ ] E4: Check for overlapping clickable elements\n\n## Fix Tasks\n- [ ] E5: Fix click detection logic\n- [ ] E6: Add visual click feedback (button press animation)\n- [ ] E7: Add audio click feedback (optional)\n- [ ] E8: Test across different screen resolutions\n\n## Acceptance Criteria\n- Recipe selection responds correctly to every click\n- Visual feedback confirms click registered\n- Works at all supported resolutions",
+      "labels": ["Level-0", "bug"],
+      "priority": "high",
+      "estimate": "2-3 hours",
+      "dependsOn": []
+    },
+    {
+      "id": "F",
+      "title": "[F] System Verification - Productivity, Terrain, Economy",
+      "description": "## Objective\nVerify that key systems from UI spec are actually connected and working.\n\n## Verification Tasks\n- [ ] F1: **Productivity Impact on Production**\n  - Test: Change citizen satisfaction\n  - Verify: Production rate changes accordingly\n  - If broken: Connect satisfaction → worker productivity → building efficiency\n\n- [ ] F2: **Location/Terrain Multipliers**\n  - Test: Place farm on high fertility vs low fertility\n  - Verify: Production rate differs\n  - If broken: Connect terrain data → building placement → efficiency modifier\n\n- [ ] F3: **Rents System**\n  - Test: Citizens in housing\n  - Verify: Gold deducted from citizens / added to building owner\n  - If broken: Implement rent collection in cycle loop\n\n- [ ] F4: **Building Profits**\n  - Test: Production building operating\n  - Verify: Profit calculated and added to town treasury\n  - If broken: Implement profit calculation\n\n- [ ] F5: **Tax System**\n  - Test: End of cycle\n  - Verify: Taxes collected based on settings\n  - If broken: Implement tax collection\n\n- [ ] F6: Document which systems work and which need implementation\n- [ ] F7: Create tickets for non-working systems\n\n## Acceptance Criteria\n- All systems verified as working or documented as broken\n- Follow-up tickets created for any broken systems",
+      "labels": ["Level-0", "verification"],
+      "priority": "high",
+      "estimate": "3-4 hours",
+      "dependsOn": []
+    },
+    {
+      "id": "G",
+      "title": "[G] Town Template Data Design",
+      "description": "## Objective\nDesign the data structure and content for specialized Indian dish starter towns.\n\n## Tasks\n- [ ] G1: Define town template JSON schema\n- [ ] G2: Design **Samosa Town** (Mumbai):\n  - Buildings: Potato Farm, Wheat Farm, Groundnut Farm, Mill, Oil Press, Samosa Kitchen\n  - Citizens: 9-12 (farmers, millers, cooks)\n  - Starting inventory\n  - Production chain balance\n\n- [ ] G3: Design **Poha Town** (Indore):\n  - Buildings: Rice Paddy, Groundnut Farm, Onion Farm, Rice Mill, Oil Press, Poha Kitchen\n  - Citizens: 10-12\n  - Production chain balance\n\n- [ ] G4: Design **Jalebi Town** (Sweet Town):\n  - Buildings: Sugarcane Farm, Wheat Farm, Sugar Mill, Flour Mill, Sweet Shop\n  - Citizens: 10-12\n  - Production chain balance\n\n- [ ] G5: Design **Mining Town** (Generic fallback):\n  - Buildings: Iron Mine, Forge\n  - Citizens: 8-10\n  - Production chain balance\n\n- [ ] G6: Calculate starting resources for each (survive 20+ cycles)\n- [ ] G7: Define difficulty rating for each\n\n## Deliverable\nDesign document with all town specifications\n\n## Acceptance Criteria\n- All 4 towns fully specified\n- Production chains balanced\n- Starting resources calculated",
+      "labels": ["Level-0", "design"],
+      "priority": "high",
+      "estimate": "3-4 hours",
+      "dependsOn": []
+    },
+    {
+      "id": "H",
+      "title": "[H] Pathfinding System",
+      "description": "## Objective\nImplement A* pathfinding for citizen movement.\n\n## Tasks\n- [ ] H1: Create `code/NavGrid.lua` with cell types (walkable, blocked, road)\n- [ ] H2: Implement `NavGrid:Generate(world)` - mark buildings as blocked, roads as preferred\n- [ ] H3: Create `code/Pathfinder.lua`\n- [ ] H4: Implement A* algorithm returning array of waypoints\n- [ ] H5: Add path cost modifiers (Road: 0.7x, Grass: 1.0x, Rough: 1.5x)\n- [ ] H6: Implement path caching for common routes (home→work)\n- [ ] H7: Add path recalculation when buildings placed/removed\n- [ ] H8: Integrate with CharacterMovement\n\n## Files to Create\n- `code/NavGrid.lua`\n- `code/Pathfinder.lua`\n\n## Acceptance Criteria\n- Citizens pathfind around buildings\n- Roads are preferred paths\n- Path updates when world changes",
+      "labels": ["Level-1", "feature"],
+      "priority": "high",
+      "estimate": "5-6 hours",
+      "dependsOn": ["C"]
+    },
+    {
+      "id": "I",
+      "title": "[I] Debug Overlays - Building/Citizen Detail",
+      "description": "## Objective\nAdd detailed debug views for individual buildings and citizens.\n\n## Tasks\n- [ ] I1: **Citizens Tab in Debug Panel:**\n  - Sortable list of all citizens\n  - Filter by class, satisfaction level, employment\n  - Click to select and show details\n\n- [ ] I2: **Citizen Detail View:**\n  - All 49 fine dimensions with values\n  - Current craving intensities (top 10)\n  - Fatigue per commodity\n  - Current schedule/activity\n  - Employment info\n  - Housing info\n  - Movement path (if walking)\n\n- [ ] I3: **Buildings Tab in Debug Panel:**\n  - List of all buildings by type\n  - Filter by production status\n  - Click to select and show details\n\n- [ ] I4: **Building Detail View:**\n  - Production queue state\n  - Input buffer contents\n  - Output buffer contents\n  - Worker list with efficiency\n  - Bottleneck indicator\n  - Production history (last 10 cycles)\n\n- [ ] I5: **World Overlay Modes** (toggle with hotkeys):\n  - Satisfaction heatmap\n  - Production overlay\n  - Housing capacity overlay\n  - Employment overlay\n\n- [ ] I6: Add overlay toggle buttons to debug panel\n\n## Acceptance Criteria\n- Can drill down into any citizen or building\n- Overlays visualize town state at a glance",
+      "labels": ["Level-1", "feature"],
+      "priority": "medium",
+      "estimate": "5-6 hours",
+      "dependsOn": ["B"]
+    },
+    {
+      "id": "J",
+      "title": "[J] Balance Implementation",
+      "description": "## Objective\nApply balance changes identified in analysis.\n\n## Tasks\n- [ ] J1: Update production rates in `building_types.json`\n- [ ] J2: Update consumption rates in `consumption_mechanics.json`\n- [ ] J3: Update craving decay rates if needed\n- [ ] J4: Test with 100 citizens for 50 cycles\n- [ ] J5: Test with 500 citizens for 50 cycles\n- [ ] J6: Verify town can reach equilibrium\n- [ ] J7: Document final balance values\n\n## Acceptance Criteria\n- 500 citizen town reaches equilibrium\n- No runaway resource depletion\n- No excessive resource accumulation",
+      "labels": ["Level-1", "design"],
+      "priority": "high",
+      "estimate": "3-4 hours",
+      "dependsOn": ["A"]
+    },
+    {
+      "id": "K",
+      "title": "[K] Starter Town JSON Creation",
+      "description": "## Objective\nCreate actual JSON files for starter towns and loading logic.\n\n## Tasks\n- [ ] K1: Create `data/starting_towns/` directory\n- [ ] K2: Create `samosa_town.json` with full specification\n- [ ] K3: Create `poha_town.json`\n- [ ] K4: Create `jalebi_town.json`\n- [ ] K5: Create `mining_town.json`\n- [ ] K6: Update `NewGameSetup.lua` to show town selection\n- [ ] K7: Implement `StarterTownLoader.lua`\n- [ ] K8: Add town preview in selection UI\n\n## Files to Create\n- `data/starting_towns/samosa_town.json`\n- `data/starting_towns/poha_town.json`\n- `data/starting_towns/jalebi_town.json`\n- `data/starting_towns/mining_town.json`\n- `code/StarterTownLoader.lua`\n\n## Acceptance Criteria\n- Can select any of 4 starter towns\n- Town loads with correct buildings/citizens/inventory\n- Preview shows town info before selection",
+      "labels": ["Level-1", "feature"],
+      "priority": "high",
+      "estimate": "4-5 hours",
+      "dependsOn": ["G", "A"]
+    },
+    {
+      "id": "L",
+      "title": "[L] Bug Fix: Butcher Building Missing",
+      "description": "## Problem\nButcher not showing in building menu.\n\n## Tasks\n- [ ] L1: Check `building_types.json` for butcher definition\n- [ ] L2: Check building menu population logic\n- [ ] L3: Fix registration if missing\n- [ ] L4: Test butcher placement and production\n\n## Acceptance Criteria\n- Butcher appears in building menu\n- Can place and operate butcher building",
+      "labels": ["Level-1", "bug"],
+      "priority": "medium",
+      "estimate": "1-2 hours",
+      "dependsOn": ["F"]
+    },
+    {
+      "id": "M",
+      "title": "[M] Bug Fix: Housing Availability Display",
+      "description": "## Problem\nImmigration modal shows incorrect housing availability (21).\n\n## Tasks\n- [ ] M1: Trace housing calculation in immigration modal\n- [ ] M2: Identify where \"21\" comes from\n- [ ] M3: Fix calculation to use actual available slots\n- [ ] M4: Add unit test for housing calculation\n\n## Acceptance Criteria\n- Housing availability shows correct number\n- Updates when housing built/destroyed",
+      "labels": ["Level-1", "bug"],
+      "priority": "medium",
+      "estimate": "2-3 hours",
+      "dependsOn": []
+    },
+    {
+      "id": "N",
+      "title": "[N] Daily Routines System",
+      "description": "## Objective\nCharacters follow daily schedules, moving between locations.\n\n## Tasks\n- [ ] N1: Create `code/DailyRoutine.lua`\n- [ ] N2: Define schedule templates for employed, unemployed, homeless\n- [ ] N3: Implement `getCurrentActivity(citizen, hour)`\n- [ ] N4: Implement `resolveLocation(citizen, locationType)` - resolve residence, workplace, market, tavern\n- [ ] N5: Connect to time system - on slot change, recalculate destinations\n- [ ] N6: Add homeless special case - shelter spots, wandering\n- [ ] N7: Add activity-specific states\n\n## Files to Create\n- `code/DailyRoutine.lua`\n\n## Acceptance Criteria\n- Citizens follow realistic daily schedule\n- Movement triggers at time slot changes\n- Homeless citizens have different behavior",
+      "labels": ["Level-2", "feature"],
+      "priority": "high",
+      "estimate": "5-6 hours",
+      "dependsOn": ["H"]
+    },
+    {
+      "id": "O",
+      "title": "[O] Economy Flow Visualization",
+      "description": "## Objective\nVisualize how resources flow through the town economy.\n\n## Tasks\n- [ ] O1: Create Economy tab in Debug Panel\n- [ ] O2: Implement Sankey-style flow diagram (Production → Inventory → Consumption)\n- [ ] O3: Add commodity filter (view single commodity flow)\n- [ ] O4: Show surplus/deficit indicators\n- [ ] O5: Add trend sparklines (last 10 cycles)\n- [ ] O6: Show gold flow separately (sources and sinks)\n\n## Acceptance Criteria\n- Can visualize any commodity's flow\n- Gold flow tracked separately\n- Trends visible over time",
+      "labels": ["Level-2", "feature"],
+      "priority": "medium",
+      "estimate": "4-5 hours",
+      "dependsOn": ["I"]
+    },
+    {
+      "id": "P",
+      "title": "[P] Story Flow / Cutscene System",
+      "description": "## Objective\nAnimated introduction cutscenes with narrator for each starter town.\n\n## Tasks\n- [ ] P1: Create `code/CutsceneSystem.lua` with slide structure\n- [ ] P2: Define slide structure (background, text, duration, animation)\n- [ ] P3: Implement cutscene renderer with typewriter effect\n- [ ] P4: Create story content for Samosa Town (4 slides)\n- [ ] P5: Create story content for Poha Town\n- [ ] P6: Create story content for Jalebi Town\n- [ ] P7: Create story content for Mining Town\n- [ ] P8: Add skip button for replays\n- [ ] P9: Integrate with NewGameSetup flow\n\n## Files to Create\n- `code/CutsceneSystem.lua`\n- `data/story/samosa_town_intro.json`\n- `data/story/poha_town_intro.json`\n- `data/story/jalebi_town_intro.json`\n- `data/story/mining_town_intro.json`\n\n## Acceptance Criteria\n- Each town has intro cutscene\n- Typewriter text effect works\n- Can skip cutscene\n- Cutscene plays before game starts",
+      "labels": ["Level-2", "feature"],
+      "priority": "medium",
+      "estimate": "6-8 hours",
+      "dependsOn": ["K"]
+    },
+    {
+      "id": "Q",
+      "title": "[Q] Specialized Building Types",
+      "description": "## Objective\nAdd all buildings needed for Indian dish production chains.\n\n## Tasks\n- [ ] Q1: Add Samosa Chain buildings to building_types.json:\n  - potato_farm, wheat_farm, groundnut_farm, flour_mill, oil_press, samosa_kitchen\n\n- [ ] Q2: Add Poha Chain buildings:\n  - rice_paddy, onion_farm, rice_mill, poha_kitchen\n\n- [ ] Q3: Add Jalebi Chain buildings:\n  - sugarcane_farm, sugar_mill, sweet_shop\n\n- [ ] Q4: Add corresponding commodities to commodities.json\n- [ ] Q5: Define fulfillment vectors for new commodities\n- [ ] Q6: Add building icons (placeholder colored squares)\n- [ ] Q7: Test each production chain independently\n\n## Acceptance Criteria\n- All production chains complete\n- Each chain produces final product\n- Commodities satisfy relevant cravings",
+      "labels": ["Level-2", "feature"],
+      "priority": "high",
+      "estimate": "4-5 hours",
+      "dependsOn": ["K"]
+    },
+    {
+      "id": "R",
+      "title": "[R] Bug Fix: Input/Output Storage",
+      "description": "## Problem\nBuilding input/output storage not working properly.\n\n## Tasks\n- [ ] R1: Review building input buffer implementation\n- [ ] R2: Review building output buffer implementation\n- [ ] R3: Identify specific issues\n- [ ] R4: Fix storage logic\n- [ ] R5: Add storage capacity display in building UI\n\n## Acceptance Criteria\n- Input buffers hold materials correctly\n- Output buffers hold products correctly\n- Storage limits enforced",
+      "labels": ["Level-2", "bug"],
+      "priority": "medium",
+      "estimate": "3-4 hours",
+      "dependsOn": []
+    },
+    {
+      "id": "S",
+      "title": "[S] Character Visual Representation",
+      "description": "## Objective\nRender citizens in world view with appropriate visuals.\n\n## Tasks\n- [ ] S1: Enhance citizen rendering in AlphaWorld.lua\n  - Draw citizens at world positions\n  - Different colors/shapes for classes\n  - Satisfaction indicator (colored halo)\n\n- [ ] S2: Add movement animation (oscillating motion or Anim8 sprites)\n\n- [ ] S3: Add state indicators:\n  - Working: Tool icon\n  - Resting: Zzz icon\n  - Eating: Food icon\n  - Protesting: Exclamation\n  - Homeless: Different posture\n\n- [ ] S4: Add facing direction (flip based on movement)\n- [ ] S5: Implement LOD (Level of Detail) for performance\n- [ ] S6: Add click selection for citizens\n\n## Acceptance Criteria\n- Citizens visible and moving in world\n- Can distinguish class and satisfaction visually\n- Selection works\n- 60 FPS with 500+ citizens",
+      "labels": ["Level-3", "feature"],
+      "priority": "high",
+      "estimate": "4-5 hours",
+      "dependsOn": ["N"]
+    },
+    {
+      "id": "T",
+      "title": "[T] Tutorial Overlay System",
+      "description": "## Objective\nOverlay hints that guide new players without blocking gameplay.\n\n## Tasks\n- [ ] T1: Create `code/TutorialOverlay.lua`\n- [ ] T2: Define hint structure (trigger, position, text, highlight, dismiss conditions)\n- [ ] T3: Create hint content (7 hints covering core mechanics)\n- [ ] T4: Implement hint renderer with semi-transparent box\n- [ ] T5: Add highlight system (pulse animation on elements)\n- [ ] T6: Track hint progress (don't repeat)\n- [ ] T7: Add \"Reset Tutorial\" option in settings\n\n## Files to Create\n- `code/TutorialOverlay.lua`\n\n## Acceptance Criteria\n- Hints appear at appropriate times\n- Can dismiss hints\n- Progress saved between sessions",
+      "labels": ["Level-3", "feature"],
+      "priority": "medium",
+      "estimate": "4-5 hours",
+      "dependsOn": []
+    },
+    {
+      "id": "U",
+      "title": "[U] Supply Chain Viewer",
+      "description": "## Objective\nShow visual diagram of how each commodity is produced.\n\n## Tasks\n- [ ] U1: Create `code/SupplyChainViewer.lua`\n- [ ] U2: Build chain data from commodities and recipes\n- [ ] U3: Render chain diagram with nodes and arrows\n- [ ] U4: Show requirements calculation (workers, buildings, gold)\n- [ ] U5: Show current vs needed buildings\n- [ ] U6: Add \"Build This Chain\" quick action\n- [ ] U7: Access from Info panel, building detail, commodity tooltip\n\n## Files to Create\n- `code/SupplyChainViewer.lua`\n\n## Acceptance Criteria\n- Can view supply chain for any commodity\n- Shows what's missing\n- Can initiate building from viewer",
+      "labels": ["Level-3", "feature"],
+      "priority": "medium",
+      "estimate": "4-5 hours",
+      "dependsOn": ["Q"]
+    },
+    {
+      "id": "V",
+      "title": "[V] Event System Foundation",
+      "description": "## Objective\nCreate disruptive events that challenge player's equilibrium.\n\n## Tasks\n- [ ] V1: Create `code/EventSystem.lua`\n- [ ] V2: Define event types (drought, pest_infestation, disease, trade_opportunity, immigration_wave)\n- [ ] V3: Implement event triggering (random chance, weight by conditions, cooldown)\n- [ ] V4: Implement event effects (modify production/consumption/satisfaction)\n- [ ] V5: Create event notification UI (modal + ongoing indicator)\n- [ ] V6: Create 5-10 initial events for variety\n\n## Files to Create\n- `code/EventSystem.lua`\n\n## Acceptance Criteria\n- Events trigger periodically\n- Events have meaningful impact\n- Player notified of events\n- Events end after duration",
+      "labels": ["Level-3", "feature"],
+      "priority": "medium",
+      "estimate": "4-5 hours",
+      "dependsOn": ["J"]
+    },
+    {
+      "id": "W",
+      "title": "[W] Full Integration Testing",
+      "description": "## Objective\nVerify all systems work together.\n\n## Tasks\n- [ ] W1: Start new Samosa Town game\n- [ ] W2: Play through 100 cycles\n- [ ] W3: Verify all systems:\n  - Citizens move to work/home\n  - Production runs\n  - Consumption happens\n  - Satisfaction changes\n  - Immigration works\n  - Events trigger\n- [ ] W4: Test with 500 citizens\n- [ ] W5: Test with 1000 citizens\n- [ ] W6: Measure performance (target: 60 FPS)\n- [ ] W7: Document any issues found\n\n## Acceptance Criteria\n- All systems integrated\n- 60 FPS with 500 citizens\n- No crashes or major bugs",
+      "labels": ["Level-4", "verification"],
+      "priority": "high",
+      "estimate": "4-6 hours",
+      "dependsOn": ["S", "T", "U", "V"]
+    },
+    {
+      "id": "X",
+      "title": "[X] Remaining Bug Fixes",
+      "description": "## Tasks\n- [ ] X1: Quality tier random values fix\n- [ ] X2: Forest not in mini map fix\n- [ ] X3: Version manager data cloning fix\n- [ ] X4: Any bugs discovered during integration testing\n\n## Acceptance Criteria\n- All known bugs fixed\n- No P1/P2 bugs remaining",
+      "labels": ["Level-4", "bug"],
+      "priority": "medium",
+      "estimate": "3-4 hours",
+      "dependsOn": ["W"]
+    },
+    {
+      "id": "Y",
+      "title": "[Y] Final Balance Pass",
+      "description": "## Tasks\n- [ ] Y1: Playtest each starter town\n- [ ] Y2: Adjust starting resources if needed\n- [ ] Y3: Adjust production rates if needed\n- [ ] Y4: Verify difficulty feels right\n- [ ] Y5: Document final numbers\n\n## Acceptance Criteria\n- All towns playable and balanced\n- Difficulty appropriate for expert players",
+      "labels": ["Level-4", "design"],
+      "priority": "high",
+      "estimate": "2-3 hours",
+      "dependsOn": ["W"]
+    },
+    {
+      "id": "Z",
+      "title": "[Z] Documentation & Playtest",
+      "description": "## Tasks\n- [ ] Z1: Update README with play instructions\n- [ ] Z2: Document keyboard shortcuts\n- [ ] Z3: Create quick reference card for mechanics\n- [ ] Z4: Get external playtest feedback\n- [ ] Z5: Note issues for post-sprint\n\n## Acceptance Criteria\n- Documentation complete\n- External feedback collected\n- Post-sprint backlog created",
+      "labels": ["Level-4", "design"],
+      "priority": "medium",
+      "estimate": "2-3 hours",
+      "dependsOn": ["Y"]
+    }
+  ]
+}
