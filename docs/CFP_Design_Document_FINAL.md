@@ -56,7 +56,7 @@ Each choice initiates a town pre-configured with:
 
 1. **Recipe-based Production System**: Multi-ingredient production with time/quality management
 2. **Multi-Craving Satisfaction**: Single commodity satisfies multiple craving types
-3. **Rupee Economy**: Currency system (₹) for wages, building costs, and trading
+3. **Gold Economy**: Currency system for building costs and trading
 4. **Specialized Buildings**: "Dish Shops" with advanced production logic
 5. **Cultural Immersion**: Authentic Indian street food economy simulation
 
@@ -100,7 +100,7 @@ Each choice initiates a town pre-configured with:
 - **Production Time:** 120 seconds per batch (2 cooks)
 - **Batch Size:** 10 Vada Pav per cycle
 - **Difficulty:** ⭐⭐⭐ Medium (Beginner-friendly)
-- **Starting Rupees:** ₹1,000
+- **Starting Gold:** 1,000
 
 ---
 
@@ -143,7 +143,7 @@ Each choice initiates a town pre-configured with:
 - **Cooking Time:** 60 seconds per dosa
 - **Batch Size:** 8 dosa per cycle
 - **Difficulty:** ⭐⭐⭐⭐ High (Fermentation complexity)
-- **Starting Rupees:** ₹1,200
+- **Starting Gold:** 1,200
 
 ---
 
@@ -190,7 +190,7 @@ Each choice initiates a town pre-configured with:
 - **Production Time:** 90 seconds per batch
 - **Batch Size:** 12 Poha per cycle
 - **Difficulty:** ⭐⭐ Low (Fast, beginner-friendly)
-- **Starting Rupees:** ₹800
+- **Starting Gold:** 800
 
 ---
 
@@ -227,7 +227,7 @@ Each choice initiates a town pre-configured with:
 - **Production Time:** 300 seconds per batch (includes boiling)
 - **Batch Size:** 4 rasgolla servings (24 pieces) per cycle
 - **Difficulty:** ⭐⭐⭐⭐⭐ Very High (Complex process, quality-sensitive)
-- **Starting Rupees:** ₹1,500
+- **Starting Gold:** 1,500
 
 ---
 
@@ -314,7 +314,7 @@ Each raw ingredient satisfies base cravings:
     ├─→ Spawn Initial Buildings (Empty)
     ├─→ Populate Character Pool (Unemployed)
     ├─→ Initialize Inventory (Starter Resources)
-    └─→ Set Starting Rupee Reserve (₹)
+    └─→ Set Starting Gold Reserve
     ↓
 [Tutorial / Guided Setup] (Optional)
     ├─→ Place Required Buildings
@@ -345,7 +345,6 @@ Each raw ingredient satisfies base cravings:
     │ Mills process ingredients        │
     │ Dish Shops combine into dishes   │
     │ Add to Town Inventory            │
-    │ Pay Worker Wages (₹)             │
     └──────────────────────────────────┘
                     ↓
         ┌───────────────────────┐
@@ -385,19 +384,19 @@ Each raw ingredient satisfies base cravings:
     │   - Emigration (if unhappy)      │
     │   - Production Efficiency Change │
     │ Update Town Statistics           │
-    │ Rupee Balance Check              │
+    │ Gold Balance Check               │
     └──────────────────────────────────┘
                     ↓
         ┌───────────────────────┐
         │ PHASE 5: MARKET OPEN  │
-        │ 🚧 (Phase 4 Feature)  │
+        │ 🚧 (Phase 4 Feature)  │`
         └───────────────────────┘
                     ↓
     ┌──────────────────────────────────┐
     │ Calculate Surplus/Deficit        │
     │ Open Trading Interface           │
     │ Enable Inter-Town Trading        │
-    │ Rupee/Barter Transactions        │
+    │ Gold/Barter Transactions         │
     └──────────────────────────────────┘
                     ↓
             [Loop Repeats]
@@ -432,7 +431,7 @@ CommoditySelector = {
             recipe = { ... },
             buildings = { ... },
             characters = { ... },
-            startingRupees = 1000
+            startingGold = 1000
         },
         dosa = { ... },
         poha = { ... },
@@ -499,7 +498,7 @@ RecipeSystem = {
 
 ---
 
-#### 5.1.3 Rupee Currency System
+#### 5.1.3 Gold Currency System
 
 **File:** `CurrencySystem.lua`
 
@@ -507,27 +506,26 @@ RecipeSystem = {
 
 ```lua
 CurrencySystem = {
-    currencyName = "Rupee",
-    currencySymbol = "₹",
-    rupeeReserves = {}, -- townID → rupee amount
+    currencyName = "Gold",
+    goldReserves = {}, -- townID → gold amount
     transactionHistory = {}
 }
 ```
 
 **Required Functions:**
-- `InitializeRupees(townID, startingRupees)` - Give town initial ₹
-- `AddRupees(townID, amount, reason)` - Credit rupees
-- `DeductRupees(townID, amount, reason)` - Debit rupees (returns success/fail)
-- `GetRupeeBalance(townID)` - Check current rupees
+- `InitializeGold(townID, startingGold)` - Give town initial gold
+- `AddGold(townID, amount, reason)` - Credit gold
+- `DeductGold(townID, amount, reason)` - Debit gold (returns success/fail)
+- `GetGoldBalance(townID)` - Check current gold
 - `RecordTransaction(fromTownID, toTownID, amount, commodityID, transactionType)`
 
 **Integration Points:**
-- Add `mRupeeReserve` to `Town.lua`
-- Display rupees in UI (TopBar) with ₹ symbol
-- Connect to wage payment system (Phase 3)
+- Add `mGoldReserve` to `Town.lua`
+- Display gold in UI (TopBar)
+- Connect to trading system (Phase 4)
 - Connect to Trading System (Phase 4) for purchases
 
-**Conflicts:** ✅ RESOLVED - Currency renamed from "Gold" to "Rupee" (See Section 6.1.5)
+**Note:** Gold currency is separate from `gold_ore` commodity which can be mined and traded
 
 ---
 
@@ -594,7 +592,7 @@ CurrencySystem = {
     rarity = 2, -- 1-4 scale
     perishable = true,
     shelfLife = 1, -- game days
-    baseValue = 10 -- Worth 10 Rupees when sold
+    baseValue = 10 -- Worth 10 gold when sold
 }
 ```
 
@@ -639,7 +637,7 @@ CurrencySystem = {
 
     size = { width = 3, height = 3 },
     cost = {
-        rupees = 200,
+        gold = 200,
         wood = 10,
         stone = 5
     },
@@ -717,12 +715,6 @@ CurrencySystem = {
     efficiency = {
         base = 1.0,
         satisfactionMultiplier = 0.02 -- +2% per satisfaction point above 50
-    },
-
-    -- Wage system (Phase 3)
-    wages = {
-        base = 50, -- Rupees per day
-        skill_bonus = 10 -- Rupees per skill level
     },
 
     -- OPTIONAL: For future specialization system (Phase 4+)
@@ -1020,7 +1012,7 @@ Town = {
 
     -- NEW FOR CFP
     mCommodityFocus = nil, -- "vadapav", "dosa", "poha", "rasgolla"
-    mRupeeReserve = 1000, -- Starting rupees (₹)
+    mGoldReserve = 1000, -- Starting gold
 
     -- 🚧 Phase 4 (Multiplayer)
     mMarketListings = {}, -- Active market listings
@@ -1045,52 +1037,24 @@ function Town:SetCommodityFocus(commodityID)
     self.mCommodityFocus = commodityID
 end
 
-function Town:GetRupeeBalance()
-    return self.mRupeeReserve
+function Town:GetGoldBalance()
+    return self.mGoldReserve
 end
 
-function Town:AddRupees(amount, reason)
-    self.mRupeeReserve = self.mRupeeReserve + amount
-    print("[RUPEE] +" .. amount .. " (Reason: " .. reason .. ")")
+function Town:AddGold(amount, reason)
+    self.mGoldReserve = self.mGoldReserve + amount
+    print("[GOLD] +" .. amount .. " (Reason: " .. reason .. ")")
 end
 
-function Town:DeductRupees(amount, reason)
-    if self.mRupeeReserve >= amount then
-        self.mRupeeReserve = self.mRupeeReserve - amount
-        print("[RUPEE] -" .. amount .. " (Reason: " .. reason .. ")")
+function Town:DeductGold(amount, reason)
+    if self.mGoldReserve >= amount then
+        self.mGoldReserve = self.mGoldReserve - amount
+        print("[GOLD] -" .. amount .. " (Reason: " .. reason .. ")")
         return true
     else
-        print("[RUPEE] INSUFFICIENT FUNDS: Need " .. amount .. ", Have " .. self.mRupeeReserve)
+        print("[GOLD] INSUFFICIENT FUNDS: Need " .. amount .. ", Have " .. self.mGoldReserve)
         return false
     end
-end
-
--- 🚧 Phase 3: Wage System
-function Town:PayWages()
-    local totalWages = 0
-
-    for _, char in ipairs(self.mCharacterPool) do
-        if char.employment and char.employment.building then
-            local wage = char.dailyWage or 50 -- default ₹50/day
-
-            if self:DeductRupees(wage, "Wage: " .. char.name) then
-                totalWages = totalWages + wage
-
-                -- Increase character satisfaction for being paid
-                char.mSatisfactionLevels.social_status =
-                    math.min(100, char.mSatisfactionLevels.social_status + 5)
-            else
-                -- Cannot pay wage - dissatisfaction
-                char.mSatisfactionLevels.social_status =
-                    math.max(0, char.mSatisfactionLevels.social_status - 10)
-
-                print("[WARNING] Cannot pay wage for " .. char.name)
-            end
-        end
-    end
-
-    print("[WAGES] Total paid: ₹" .. totalWages)
-    return totalWages
 end
 
 -- 🚧 Phase 4: Trading (Multiplayer)
@@ -1101,7 +1065,7 @@ function Town:GetSurplusForTrade()
     return produced - consumed
 end
 
-function Town:ListItemOnMarket(commodityID, quantity, priceRupees, barterOffer)
+function Town:ListItemOnMarket(commodityID, quantity, priceGold, barterOffer)
     -- To be implemented in Phase 4
 end
 
@@ -1126,7 +1090,7 @@ end
 - 4 large cards showing each commodity option
 - City name, commodity image/icon, brief description
 - Difficulty indicator (⭐ rating)
-- Starting rupees display
+- Starting gold display
 - "Select" button for each commodity
 - Back button to main menu
 
@@ -1142,7 +1106,7 @@ end
 │  │   Mumbai     │  │  Bangalore   │                   │
 │  │  [Image 🍔]  │  │  [Image 🥞]  │                   │
 │  │  ⭐⭐⭐       │  │  ⭐⭐⭐⭐     │                   │
-│  │  ₹1,000      │  │  ₹1,200      │                   │
+│  │  1,000 gold  │  │  1,200 gold  │                   │
 │  │  [SELECT]    │  │  [SELECT]    │                   │
 │  └──────────────┘  └──────────────┘                   │
 │                                                          │
@@ -1151,7 +1115,7 @@ end
 │  │   Indore     │  │   Kolkata    │                   │
 │  │  [Image 🍚]  │  │  [Image ⚪]  │                   │
 │  │  ⭐⭐         │  │  ⭐⭐⭐⭐⭐   │                   │
-│  │  ₹800        │  │  ₹1,500      │                   │
+│  │  800 gold    │  │  1,500 gold  │                   │
 │  │  [SELECT]    │  │  [SELECT]    │                   │
 │  └──────────────┘  └──────────────┘                   │
 │                                                          │
@@ -1202,25 +1166,24 @@ end
 
 ---
 
-#### 5.3.3 Rupee Display (TopBar Extension)
+#### 5.3.3 Gold Display (TopBar Extension)
 
 **File:** Update existing `TopBarUI.lua`
 
 **Status:** ✅ EXTEND EXISTING - Build in Phase 3
 
-**Add rupee counter to top bar:**
+**Add gold counter to top bar:**
 
 ```
 ┌─────────────────────────────────────────────┐
-│  CRAVETOWN  |  ₹1,250  |  Day: 5            │
+│  CRAVETOWN  |  Gold: 1,250  |  Day: 5       │
 └─────────────────────────────────────────────┘
 ```
 
 **Additional Info (on hover/tap):**
-- Rupee reserve: ₹1,250
-- Daily wages: -₹350
-- Daily income: +₹0 (from sales)
-- Net: -₹350/day
+- Gold reserve: 1,250
+- Recent transactions
+- Building construction costs
 
 ---
 
@@ -1378,7 +1341,7 @@ end
 | Phase | Scope | Implementation |
 |-------|-------|----------------|
 | **Phase 1-2** | Single-Player CFP | No multiplayer, focus on production/consumption |
-| **Phase 3** | Local Economy | Rupee system, wage payments, building costs |
+| **Phase 3** | Local Economy | Gold system, building costs |
 | **Phase 4** | Multiplayer Trading | LAN or server-based trading with market UI |
 
 **Phase 4 Options:**
@@ -1470,33 +1433,20 @@ end
 
 ---
 
-### 6.1.5 🚨 CRITICAL CONFLICT: Currency System - Gold vs Rupee
+### 6.1.5 Currency System - Gold Implementation
 
-**Problem:**
-- `gold` exists as a minable commodity (`gold_ore`)
-- Term "Gold" has **two conflicting meanings**:
-  1. `gold_ore` - Commodity mined from mountains
-  2. `Gold` (currency) - Payment medium for wages/trading
+**Context:**
+- `gold_ore` exists as a minable commodity
+- "Gold" is used as the currency for trading and town finances
 
-**CFP Needs:**
-- Currency for wages, trading, town finances
-- Clear distinction from `gold_ore` commodity
+**✅ SOLUTION:**
 
-**✅ SOLUTION (Approved & CRITICAL):**
+**Use "Gold" as currency while keeping `gold_ore` as a tradeable commodity**
 
-**Rename currency from "Gold" to "Rupee" (₹)**
-
-**Rationale:**
-- **Thematically appropriate**: All four cities are Indian (Mumbai, Bangalore, Kolkata, Indore)
-- **Historically accurate**: Rupee is the currency of India
-- **No confusion**: Clearly distinct from `gold_ore` commodity
-- **Familiar**: Players understand Rupee in Indian context
-- **Cultural consistency**: Matches CFP's focus on Indian street food
-
-**Implementation Changes:**
+**Implementation:**
 
 ```lua
--- ✅ KEEP: Gold as minable ore commodity
+-- ✅ KEEP: Gold ore as minable commodity
 -- In CommodityTypes.lua
 {
     id = "gold_ore",
@@ -1504,61 +1454,60 @@ end
     category = "raw_material",
     icon = "Au",
     stackSize = 1000,
-    baseValue = 50, -- Worth 50 Rupees when sold to market
-    description = "Precious metal ore - can be refined or sold for Rupees"
+    baseValue = 50, -- Worth 50 gold when sold to market
+    description = "Precious metal ore - can be refined or sold for gold"
 }
 
--- ✅ NEW: Rupee currency system
+-- ✅ Gold currency system
 -- In CurrencySystem.lua
 CurrencySystem = {
-    currencyName = "Rupee",
-    currencySymbol = "₹",
-    rupeeReserves = {}, -- townID → rupee amount
+    currencyName = "Gold",
+    goldReserves = {}, -- townID → gold amount
     transactionHistory = {}
 }
 
-function CurrencySystem:InitializeRupees(townID, startingRupees)
-    self.rupeeReserves[townID] = startingRupees or 1000
+function CurrencySystem:InitializeGold(townID, startingGold)
+    self.goldReserves[townID] = startingGold or 1000
 end
 
-function CurrencySystem:AddRupees(townID, amount, reason)
-    self.rupeeReserves[townID] = (self.rupeeReserves[townID] or 0) + amount
+function CurrencySystem:AddGold(townID, amount, reason)
+    self.goldReserves[townID] = (self.goldReserves[townID] or 0) + amount
     self:RecordTransaction(townID, nil, amount, reason)
 end
 
-function CurrencySystem:DeductRupees(townID, amount, reason)
+function CurrencySystem:DeductGold(townID, amount, reason)
     if self:GetBalance(townID) >= amount then
-        self.rupeeReserves[townID] = self.rupeeReserves[townID] - amount
+        self.goldReserves[townID] = self.goldReserves[townID] - amount
         self:RecordTransaction(townID, nil, -amount, reason)
         return true
     end
-    return false -- Insufficient rupees
+    return false -- Insufficient gold
 end
 
 function CurrencySystem:GetBalance(townID)
-    return self.rupeeReserves[townID] or 0
+    return self.goldReserves[townID] or 0
 end
 ```
 
-**Required Renaming Throughout Codebase:**
+**Variable Naming:**
 
-| OLD (Remove) | NEW (Replace with) |
-|--------------|-------------------|
-| `mGoldReserve` | `mRupeeReserve` |
-| `goldReserve` | `rupeeReserve` |
-| `priceGold` | `priceRupees` |
-| `goldCost` | `rupeeCost` |
-| `payGold()` | `payRupees()` |
-| "Price in Gold" (UI) | "Price in Rupees (₹)" |
-| "gold per day" (wages) | "Rupees per day" |
+| Variable Name | Usage |
+|--------------|-------|
+| `mGoldReserve` | Town's currency balance |
+| `goldReserve` | Currency balance reference |
+| `priceGold` | Gold cost for items |
+| `goldCost` | Gold cost for buildings |
+| `payGold()` | Gold payment function |
+| `gold_ore` | Minable commodity (separate from currency) |
 
-**UI Updates:**
-- TopBar: Display as `₹1,250` (use ₹ symbol)
-- Building costs: `₹200` instead of `200 Gold`
-- Wage payments: `₹50/day` instead of `50 gold/day`
-- Market prices: `₹100` instead of `100g`
+**UI Display:**
+- TopBar: Display as `Gold: 1,250`
+- Building costs: `200 gold`
+- Market prices: `100 gold`
 
-**Status:** ✅ Critical for Phase 3, must be implemented before wage/trading systems
+**Note:** The term "gold" in currency context is distinct from the `gold_ore` commodity. Context makes it clear (e.g., "costs 200 gold" vs "10 units of gold_ore").
+
+**Status:** ✅ Critical for Phase 3, must be implemented before trading systems
 
 ---
 
@@ -1679,11 +1628,6 @@ If total commodities exceed ~150 items:
     efficiency = {
         base = 1.0,
         satisfactionMultiplier = 0.02 -- +2% per satisfaction point above 50
-    },
-
-    wages = {
-        base = 50, -- Rupees per day
-        skill_bonus = 0 -- No skill system in Phase 1
     }
 }
 
@@ -1750,7 +1694,6 @@ end
 - Skill levels (1-5) with efficiency multipliers
 - Experience point accumulation over time
 - Training and skill advancement system
-- Higher-skilled workers deserve higher wages
 
 **⚠️ SOLUTION (Needs Implementation - Phase 3 Priority):**
 
@@ -1766,8 +1709,7 @@ Character = {
     experience = 0, -- XP points (not used yet)
 
     -- Derived stats
-    skillEfficiency = 1.0, -- Recalculated when skillLevel changes
-    dailyWage = 50 -- Recalculated: baseWage + (skillLevel * 10)
+    skillEfficiency = 1.0 -- Recalculated when skillLevel changes
 }
 
 function Character:CalculateSkillEfficiency()
@@ -1779,19 +1721,10 @@ function Character:CalculateSkillEfficiency()
     self.skillEfficiency = 1.0 + ((self.skillLevel - 1) * 0.15)
 end
 
-function Character:CalculateDailyWage()
-    local characterType = CharacterTypes[self.vocation]
-    local baseWage = characterType.wages.base or 50
-    local skillBonus = characterType.wages.skill_bonus or 10
-
-    self.dailyWage = baseWage + (self.skillLevel * skillBonus)
-end
-
 -- Manual skill level adjustment (for testing Phase 3)
 function Character:SetSkillLevel(level)
     self.skillLevel = math.max(1, math.min(5, level))
     self:CalculateSkillEfficiency()
-    self:CalculateDailyWage()
 end
 ```
 
@@ -1820,7 +1753,6 @@ function Character:LevelUp()
         self.skillLevel = self.skillLevel + 1
         self.experience = 0 -- Reset XP for next level
         self:CalculateSkillEfficiency()
-        self:CalculateDailyWage()
 
         print("[LEVEL UP!] " .. self.name .. " is now Level " .. self.skillLevel .. " " .. self.vocation)
     end
@@ -1856,165 +1788,6 @@ end
 ```
 
 **Status:** 🚧 Urgent - Must implement minimal version in Phase 3, full XP system in Phase 4
-
----
-
-### 6.1.9 🚧 CONFLICT: Wage System
-
-**Problem:**
-- No wage system implemented
-- Characters currently work for free
-- No economic pressure on town finances
-
-**CFP Needs:**
-- Daily wage payments in Rupees (₹)
-- Wage affects character satisfaction (social_status craving)
-- Town must manage Rupee reserves to pay workers
-- Inability to pay wages causes dissatisfaction/emigration
-
-**⚠️ SOLUTION (Urgent - Phase 3 Priority):**
-
-***This is critical for CFP's economic model and must be implemented in Phase 3.***
-
-**Minimal Implementation (Phase 3):**
-
-```lua
--- In Character.lua - Add wage tracking
-Character = {
-    vocation = "cook",
-    dailyWage = 50, -- Fixed for Phase 3, skill-based in Phase 4
-
-    employment = {
-        building = buildingID or nil,
-        startDate = timestamp,
-        daysWorked = 0,
-        unpaidDays = 0 -- Track missed payments
-    }
-}
-
--- In Town.lua - Wage payment system
-function Town:PayWages()
-    local totalWages = 0
-    local unpaidWorkers = {}
-
-    for _, char in ipairs(self.mCharacterPool) do
-        if char.employment and char.employment.building then
-            local wage = char.dailyWage
-
-            if self.mRupeeReserve >= wage then
-                -- SUCCESS: Pay wage
-                self.mRupeeReserve = self.mRupeeReserve - wage
-                totalWages = totalWages + wage
-                char.employment.unpaidDays = 0
-
-                -- Increase satisfaction for being paid
-                char.mSatisfactionLevels.social_status =
-                    math.min(100, char.mSatisfactionLevels.social_status + 5)
-
-                print("[WAGE] Paid " .. char.name .. ": ₹" .. wage)
-
-            else
-                -- FAILURE: Cannot pay wage
-                char.employment.unpaidDays = char.employment.unpaidDays + 1
-                table.insert(unpaidWorkers, char.name)
-
-                -- Severe dissatisfaction
-                char.mSatisfactionLevels.social_status =
-                    math.max(0, char.mSatisfactionLevels.social_status - 15)
-
-                -- After 3 unpaid days, worker quits
-                if char.employment.unpaidDays >= 3 then
-                    print("[QUIT] " .. char.name .. " quit due to non-payment!")
-                    self:UnassignCharacter(char.id)
-                    -- Potentially emigrates
-                end
-            end
-        end
-    end
-
-    -- Alerts
-    if #unpaidWorkers > 0 then
-        print("⚠️ [ALERT] Cannot pay wages for " .. #unpaidWorkers .. " workers!")
-        print("   Unpaid: " .. table.concat(unpaidWorkers, ", "))
-    end
-
-    print("💰 [WAGES] Total paid: ₹" .. totalWages .. " | Remaining: ₹" .. self.mRupeeReserve)
-    return totalWages
-end
-
--- In GameLoop.lua - Call daily
-function GameLoop:EndOfDayCycle()
-    self.mTown:PayWages() -- Pay all workers
-    self.mTown:UpdateSatisfaction() -- Decay satisfaction
-    self.mTown:CheckMigration() -- Emigration check
-end
-```
-
-**Wage Economics:**
-
-| Worker Type | Base Wage (Phase 3) | Skill-Based Wage (Phase 4) |
-|-------------|---------------------|----------------------------|
-| Farmer | ₹40/day | ₹40 + (10 × skillLevel) |
-| Miller | ₹50/day | ₹50 + (10 × skillLevel) |
-| Cook | ₹50/day | ₹50 + (15 × skillLevel) |
-| Specialist | ₹60/day | ₹60 + (15 × skillLevel) |
-
-**Example Daily Costs:**
-
-```
-Vada Pav Town (10 workers):
-- 3 Farmers × ₹40 = ₹120
-- 2 Millers × ₹50 = ₹100
-- 1 Spice Worker × ₹50 = ₹50
-- 2 Cooks × ₹50 = ₹100
-- 2 Support × ₹40 = ₹80
-─────────────────────────────
-TOTAL DAILY WAGES: ₹450
-
-Starting Rupees: ₹1,000
-Days until broke (no income): ~2.2 days
-
-→ Player MUST generate income (selling commodities) or town collapses!
-```
-
-**Full Implementation (Phase 4+):**
-
-```lua
--- Skill-based wages
-function Character:CalculateDailyWage()
-    local baseWage = CharacterTypes[self.vocation].wages.base
-    local skillBonus = CharacterTypes[self.vocation].wages.skill_bonus
-    self.dailyWage = baseWage + (self.skillLevel * skillBonus)
-end
-
--- Market rate adjustments (supply/demand for workers)
-function Town:CalculateWageMultiplier()
-    local unemployed = self:CountUnemployedCharacters()
-    local openPositions = self:CountOpenPositions()
-
-    if openPositions > unemployed then
-        return 1.2 -- Labor shortage: wages +20%
-    elseif unemployed > openPositions * 2 then
-        return 0.9 -- Labor surplus: wages -10%
-    else
-        return 1.0 -- Balanced market
-    end
-end
-
--- Bonus payments for high productivity
-function Building:AwardProductionBonus()
-    if self.mProductionEfficiency > 1.2 then -- >120% efficiency
-        for _, workerID in ipairs(self.workforce.assigned) do
-            local worker = GetCharacterByID(workerID)
-            local bonus = worker.dailyWage * 0.1 -- 10% bonus
-            self.mOwner:AddRupees(-bonus, "Production bonus: " .. worker.name)
-            print("💰 [BONUS] " .. worker.name .. " earned ₹" .. bonus .. " bonus!")
-        end
-    end
-end
-```
-
-**Status:** 🚧 Urgent - Must implement minimal version in Phase 3 for economic pressure
 
 ---
 
@@ -2193,54 +1966,49 @@ character:ConsumeCommodity("vadapav", 1)
 
 ---
 
-### Phase 3: Rupee Economy & Wages (Week 4)
+### Phase 3: Gold Economy (Week 4)
 
-**Goal:** Add currency and wage system (no trading yet)
+**Goal:** Add currency system for building costs and trading (no wages)
 
 **Tasks:**
 
 1. **Create CurrencySystem.lua**
-   - Implement rupee tracking with ₹ symbol
-   - Add `InitializeRupees()`, `AddRupees()`, `DeductRupees()` functions
+   - Implement gold tracking
+   - Add `InitializeGold()`, `AddGold()`, `DeductGold()` functions
    - Transaction history logging
 
 2. **Extend Town.lua**
-   - Add `mRupeeReserve` variable
-   - Implement `Town:PayWages()` system
-   - Handle insufficient rupees (worker dissatisfaction)
+   - Add `mGoldReserve` variable
+   - Track gold balance changes
 
 3. **Update TopBar UI**
-   - Display rupee balance: `₹1,250`
-   - Show daily wage costs on hover
-   - Alert when rupees < 3 days of wages
+   - Display gold balance: `Gold: 1,250`
+   - Show gold change indicators
 
 4. **Implement Skill System (Minimal)**
    - Add `skillLevel` (1-5) to Character
    - Calculate efficiency: `1.0 + (skillLevel - 1) × 0.15`
-   - Calculate wages: `baseWage + (skillLevel × 10)`
    - Manual skill adjustment (no XP yet)
 
 5. **Add Building Costs**
-   - Buildings cost rupees to construct
-   - Deduct from town rupees on placement
-   - Alert if insufficient rupees
+   - Buildings cost gold to construct
+   - Deduct from town gold on placement
+   - Alert if insufficient gold
 
 6. **Economic Testing**
    - Run 30-day simulation
-   - Verify wage payments deplete rupees
-   - Test worker quit behavior (unpaid for 3 days)
-   - Balance starting rupees vs wage costs
+   - Verify building construction costs gold
+   - Test production with different skill levels
+   - Balance starting gold vs building costs
 
-**Deliverable:** Complete rupee economy with wage pressure
+**Deliverable:** Complete gold economy for construction and trading
 
 **Testing Criteria:**
-- [ ] Rupees display correctly in UI
-- [ ] Wages paid daily, deducted from reserve
-- [ ] Workers quit if unpaid for 3+ days
-- [ ] Satisfaction drops when unpaid
-- [ ] Building construction costs rupees
-- [ ] Town can become bankrupt (₹0)
-- [ ] Economic pressure incentivizes efficiency
+- [ ] Gold displays correctly in UI
+- [ ] Building construction costs gold
+- [ ] Skill levels affect production efficiency
+- [ ] Town gold tracked accurately
+- [ ] Alerts when insufficient gold for construction
 
 ---
 
@@ -2262,7 +2030,7 @@ character:ConsumeCommodity("vadapav", 1)
 
 3. **Build MarketUI.lua**
    - Browse listings interface (see other towns' offers)
-   - List item for sale (set rupee price or barter request)
+   - List item for sale (set gold price or barter request)
    - Trade offer interface (send offer, counter-offer)
    - Trade history log
 
@@ -2289,7 +2057,7 @@ character:ConsumeCommodity("vadapav", 1)
 - [ ] Two devices can discover each other on LAN
 - [ ] Market listings appear on both devices
 - [ ] Trade can be initiated and completed
-- [ ] Rupees and commodities transfer correctly
+- [ ] Gold and commodities transfer correctly
 - [ ] No data loss or duplication
 - [ ] Disconnection handled gracefully
 
@@ -2308,7 +2076,7 @@ character:ConsumeCommodity("vadapav", 1)
 
 2. **Balance Adjustments**
    - Tweak production rates based on feedback
-   - Adjust rupee costs/wages for economic balance
+   - Adjust gold costs for economic balance
    - Refine craving satisfaction values
 
 3. **Visual Polish**
@@ -2369,7 +2137,7 @@ Each with unique production chains, craving profiles, and regional themes.
 ### 8.3 Competitive Elements
 
 - **Production Leaderboards** - Highest output of each commodity (weekly/monthly)
-- **Wealth Leaderboards** - Most rupees accumulated
+- **Wealth Leaderboards** - Most gold accumulated
 - **Town Reputation** - Based on trade reliability (fulfilled vs failed trades)
 - **Seasonal Events** - Limited-time high-demand periods (festivals, holidays)
 - **Achievements** - "Vada Pav Master", "100 Trades Completed", etc.
@@ -2379,10 +2147,10 @@ Each with unique production chains, craving profiles, and regional themes.
 ### 8.4 Expanded Economy
 
 - **Taxation** - Government spending on infrastructure (roads, police)
-- **Loans** - Borrow rupees for expansion (with interest payments)
-- **Investments** - Stake rupees in other towns for returns
+- **Loans** - Borrow gold for expansion (with interest payments)
+- **Investments** - Stake gold in other towns for returns
 - **Insurance** - Protect against production failures (pay premiums)
-- **Bank System** - Store rupees with interest, withdraw anytime
+- **Bank System** - Store gold with interest, withdraw anytime
 
 ---
 
@@ -2451,7 +2219,7 @@ cravetown-love/
     city = {
         name = "Mumbai",
         aesthetic = "mumbai_theme", -- Color scheme, fonts, sounds
-        startingRupees = 1000
+        startingGold = 1000
     },
     recipe = {
         recipeID = "vadapav",
@@ -2489,7 +2257,7 @@ cravetown-love/
     sellerName = "Mumbai Town #001",
     commodityID = "vadapav",
     quantity = 50,
-    priceRupees = 100, -- 100 rupees total (₹2 per Vada Pav)
+    priceGold = 100, -- 100 gold total (2 gold per Vada Pav)
     barterOffer = {
         commodityID = "dosa",
         quantity = 30
@@ -2511,8 +2279,8 @@ cravetown-love/
     buyerName = "Bangalore Town #002",
     sellerTownID = "town_mumbai_001",
     listingID = "listing_12345",
-    offerType = "rupees", -- or "barter"
-    offerAmount = 100, -- if offerType = "rupees"
+    offerType = "gold", -- or "barter"
+    offerAmount = 100, -- if offerType = "gold"
     offerCommodity = nil, -- if offerType = "barter"
     offerQuantity = nil, -- if offerType = "barter"
     status = "pending", -- pending, accepted, rejected, completed
@@ -2537,7 +2305,7 @@ cravetown-love/
 
 **POST** `/market/list`
 - Create new market listing
-- Body: `{ townID, commodityID, quantity, priceRupees, barterOffer }`
+- Body: `{ townID, commodityID, quantity, priceGold, barterOffer }`
 - Response: `{ listingID, status: "active" }`
 
 ---
@@ -2577,7 +2345,7 @@ cravetown-love/
 - **Production Efficiency:** % of game time with active production (target: >70%)
 - **Craving Satisfaction:** Average character satisfaction (target: 50-70)
 - **Trade Volume:** Number of trades per session (Phase 4)
-- **Rupee Flow:** Rupees earned vs spent ratio (target: break-even by day 10)
+- **Gold Flow:** Gold earned vs spent ratio (from trading)
 
 ### 10.2 Player Engagement
 
@@ -2621,19 +2389,13 @@ cravetown-love/
 
 **Risk:** Trading too complex for casual players
 **Mitigation:** Simple UI, clear tutorials, AI assistance
-**Fallback:** Simplified rupee-only trading (remove barter)
+**Fallback:** Simplified gold-only trading (remove barter)
 
 ---
 
 **Risk:** One commodity becoming dominant
 **Mitigation:** Unique advantages for each (Poha fast, Rasgolla high-value), seasonal events
 **Fallback:** Balance patches based on play data
-
----
-
-**Risk:** Wage system creates too much pressure
-**Mitigation:** Generous starting rupees (₹1000), slow ramp-up
-**Fallback:** "Easy mode" with lower wages or rupee subsidies
 
 ---
 
@@ -2658,24 +2420,23 @@ The Commodity-Focus Prototype provides a streamlined entry point to Cravetown's 
 **Key Innovations:**
 1. **Recipe-based Production System** - Multi-ingredient dishes with complex production logic
 2. **Multi-Craving Satisfaction** - Single commodity satisfies multiple needs simultaneously
-3. **Rupee Economy** - Currency system (₹) for wages, building costs, and trading
+3. **Gold Economy** - Currency system for building costs and trading
 4. **Cultural Authenticity** - Indian street food with city-specific themes
 
 **Critical Path to Launch:**
 1. ✅ Phase 1: Build recipe system and production chains (Weeks 1-2)
 2. ✅ Phase 2: Balance craving satisfaction and production rates (Week 3)
-3. 🚧 Phase 3: Add rupee economy and wage system (Week 4)
+3. 🚧 Phase 3: Add gold economy (Week 4)
 4. 🚧 Phase 4: Implement local multiplayer trading (Weeks 5-6)
 5. 🚧 Phase 5: Polish and playtest for demo (Week 7)
 
 **Conflicts Resolved:**
 - ✅ Specialized dish buildings (Section 6.1.1 & 6.1.2)
-- ✅ Rupee currency system (Section 6.1.5)
+- ✅ Gold currency system (Section 6.1.5)
 - ✅ Multi-craving satisfaction (Section 6.1.10)
 - ✅ Generic cook roles (Section 6.1.7)
 - ✅ Commodity ID validation (Section 6.1.6)
 - 🚧 Skill tracking system (Section 6.1.8 - Phase 3 priority)
-- 🚧 Wage payment system (Section 6.1.9 - Phase 3 priority)
 - 🚧 Multiplayer architecture (Section 6.1.3 - Phase 4)
 
 **Next Steps:**
@@ -2701,9 +2462,9 @@ The Commodity-Focus Prototype provides a streamlined entry point to Cravetown's 
 
 *(Efficiency formulas and calculations - see original draft Section C)*
 
-### Appendix D: Rupee Economy Formulas
+### Appendix D: Gold Economy Formulas
 
-*(Building costs, wages, AI pricing - see original draft Section D)*
+*(Building costs, AI pricing - see original draft Section D)*
 
 ### Appendix E: Network Protocol Specification
 
@@ -2722,7 +2483,7 @@ The Commodity-Focus Prototype provides a streamlined entry point to Cravetown's 
 
 **Changelog (v3.0 - FINAL):**
 - ✅ All 10 conflicts resolved with approved solutions
-- ✅ Currency renamed from "Gold" to "Rupee" (₹) throughout
+- ✅ Currency system uses Gold (separate from gold_ore commodity)
 - ✅ Clear prioritization: Phase 1-2 (production), Phase 3 (economy), Phase 4 (multiplayer)
 - ✅ 🚧 markers for deferred/urgent items
 - ✅ Complete code examples for all critical systems
@@ -2733,5 +2494,5 @@ The Commodity-Focus Prototype provides a streamlined entry point to Cravetown's 
 **Critical Items for Immediate Implementation:**
 1. Specialized dish buildings with production state machine (Phase 1)
 2. Multi-craving satisfaction system (Phase 2)
-3. Rupee currency system with wage payments (Phase 3 - URGENT)
+3. Gold currency system for building costs and trading (Phase 3 - URGENT)
 4. Skill tracking system (Phase 3 - URGENT)

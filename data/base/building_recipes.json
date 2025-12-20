@@ -306,6 +306,20 @@
       "notes": "12 minutes. Makes 8 shovels."
     },
     {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Nails Forging",
+      "category": "Production",
+      "productionTime": 600,
+      "inputs": {
+        "iron_ore": 10
+      },
+      "outputs": {
+        "nails": 20
+      },
+      "notes": "10 minutes. Makes 20 nails."
+    },
+    {
       "buildingType": "mine",
       "name": "Gold Mine",
       "recipeName": "Gold Ore Mining",
