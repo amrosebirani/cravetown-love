@@ -3398,6 +3398,93 @@
       ],
       "description": "Decorative exterior coating",
       "quality": "basic"
+    },
+    {
+      "id": "tea_seed",
+      "name": "Tea Seeds",
+      "category": "seed",
+      "icon": "TS",
+      "stackSize": 5000,
+      "baseValue": 1,
+      "isRaw": true,
+      "dependencies": [],
+      "description": "Seeds for growing tea plants",
+      "perishable": false
+    },
+    {
+      "id": "coffee_seed",
+      "name": "Coffee Seeds",
+      "category": "seed",
+      "icon": "CS",
+      "stackSize": 5000,
+      "baseValue": 1,
+      "isRaw": true,
+      "dependencies": [],
+      "description": "Seeds for growing coffee plants",
+      "perishable": false
+    },
+    {
+      "id": "tea_leaves",
+      "name": "Tea Leaves",
+      "category": "plant",
+      "icon": "TL",
+      "stackSize": 3000,
+      "baseValue": 2,
+      "dependencies": [
+        "tea_seed",
+        "water"
+      ],
+      "description": "Fresh tea leaves for brewing",
+      "perishable": true
+    },
+    {
+      "id": "coffee_leaves",
+      "name": "Coffee Beans",
+      "category": "plant",
+      "icon": "CB",
+      "stackSize": 3000,
+      "baseValue": 3,
+      "dependencies": [
+        "coffee_seed",
+        "water"
+      ],
+      "description": "Fresh coffee beans for brewing",
+      "perishable": true
+    },
+    {
+      "id": "tea_drink",
+      "name": "Tea",
+      "category": "processed_food",
+      "icon": "Te",
+      "stackSize": 1000,
+      "baseValue": 4,
+      "dependencies": [
+        "tea_leaves",
+        "water",
+        "sugar",
+        "milk",
+        "spices",
+        "fuel"
+      ],
+      "description": "Hot brewed tea",
+      "perishable": true
+    },
+    {
+      "id": "coffee_drink",
+      "name": "Coffee",
+      "category": "processed_food",
+      "icon": "Co",
+      "stackSize": 1000,
+      "baseValue": 5,
+      "dependencies": [
+        "coffee_leaves",
+        "water",
+        "sugar",
+        "milk",
+        "fuel"
+      ],
+      "description": "Hot brewed coffee",
+      "perishable": true
     }
   ]
 }
