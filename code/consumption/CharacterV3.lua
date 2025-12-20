@@ -15,6 +15,39 @@ CharacterV3._DimensionDefinitions = CharacterV3._DimensionDefinitions or nil
 CharacterV3._CommodityFatigueRates = CharacterV3._CommodityFatigueRates or nil
 CharacterV3._EnablementRules = CharacterV3._EnablementRules or nil
 CharacterV3._ClassThresholds = CharacterV3._ClassThresholds or nil  -- For emergent class calculation
+CharacterV3._DifficultySettings = CharacterV3._DifficultySettings or nil  -- For delayed reaction system
+
+-- Default difficulty settings for delayed reaction satisfaction system
+CharacterV3.DEFAULT_DIFFICULTY_SETTINGS = {
+    easy = {
+        bufferDays = 7,
+        decayMultiplier = 0.5,   -- slower decay
+        gainMultiplier = 1.5,    -- faster gain
+        decayExponent = 0.06,    -- gentler curve
+        gainLogScale = 25        -- more generous
+    },
+    normal = {
+        bufferDays = 5,
+        decayMultiplier = 1.0,
+        gainMultiplier = 1.0,
+        decayExponent = 0.08,
+        gainLogScale = 20
+    },
+    hard = {
+        bufferDays = 3,
+        decayMultiplier = 1.5,   -- faster decay
+        gainMultiplier = 0.7,    -- slower gain
+        decayExponent = 0.10,    -- steeper curve
+        gainLogScale = 15        -- stingier
+    },
+    brutal = {
+        bufferDays = 2,
+        decayMultiplier = 2.0,
+        gainMultiplier = 0.5,
+        decayExponent = 0.12,
+        gainLogScale = 10
+    }
+}
 
 -- Initialize data (called once at prototype start)
 function CharacterV3.Init(mechanicsData, fulfillmentData, traitsData, classesData, dimensionsData, fatigueData, enablementData, classThresholdsData)
@@ -258,6 +291,28 @@ function CharacterV3:New(class, id)
     char.consecutiveLowSatisfactionCycles = 0
     char.emigrationThreshold = 30  -- Will be set from config
     char.hasEmigrated = false
+
+    -- =============================================================================
+    -- LAYER 8: Satisfaction Delayed Reaction System (66D streak tracking)
+    -- =============================================================================
+    -- Tracks consecutive days of met/unmet cravings per fine dimension
+    -- Satisfaction only changes after N buffer days (asymmetric decay/gain curves)
+    char.cravingStreaks = {}  -- [fineIndex] = {type = "met"|"unmet", days = count, lastUpdated = dayNumber}
+    char.todayFulfillment = {}  -- [fineIndex] = points fulfilled today (reset daily)
+    char.lastDayProcessed = 0  -- Track which game day was last processed
+
+    -- Initialize streak tracking for all fine dimensions
+    for i = 0, CharacterV3.GetFineMaxIndex() do
+        -- Start with small random streaks to avoid everyone hitting buffer simultaneously
+        local initialDays = math.random(1, 3)
+        local initialType = math.random() > 0.5 and "met" or "unmet"
+        char.cravingStreaks[i] = {
+            type = initialType,
+            days = initialDays,
+            lastUpdated = 0
+        }
+        char.todayFulfillment[i] = 0
+    end
 
     -- =============================================================================
     -- Phase 5: Productivity and Protest tracking
