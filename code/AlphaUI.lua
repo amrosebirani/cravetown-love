@@ -2776,7 +2776,7 @@ function AlphaUI:FocusCameraOnPlots(plots)
         -- Get the world view dimensions
         local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
         local worldViewW = screenW - self.leftPanelWidth - self.rightPanelWidth
-        local worldViewH = screenH - self.topBarHeight - self.eventLogHeight
+        local worldViewH = screenH - self.topBarHeight - self.bottomBarHeight
 
         -- Set camera to center on the plots
         self.cameraX = centerX - worldViewW / 2
@@ -6002,20 +6002,20 @@ function AlphaUI:PlaceBuildingForImmigrant(buildingType, x, y, citizen)
     local cost = buildingType.constructionCost or {}
     local goldCost = cost.gold or 0
 
-    -- Get citizen's wealth from economics system
-    local citizenWealth = 0
+    -- Get citizen's gold from economics system
+    local citizenGold = 0
     if self.world.economicsSystem then
-        citizenWealth = self.world.economicsSystem:GetWealth(citizen.id) or 0
+        citizenGold = self.world.economicsSystem:GetGold(citizen.id) or 0
     end
 
-    if goldCost > citizenWealth then
-        return nil, {"Insufficient funds (need " .. goldCost .. " gold, have " .. math.floor(citizenWealth) .. ")"}
+    if goldCost > citizenGold then
+        return nil, {"Insufficient funds (need " .. goldCost .. " gold, have " .. math.floor(citizenGold) .. ")"}
     end
 
-    -- Deduct cost from citizen's wealth (not town gold)
+    -- Deduct cost from citizen's gold (not town gold)
     if self.world.economicsSystem and goldCost > 0 then
-        self.world.economicsSystem:AddWealth(citizen.id, -goldCost)
-        print(string.format("[AlphaUI] Deducted %d gold from %s's wealth for building", goldCost, citizen.name))
+        self.world.economicsSystem:SpendGold(citizen.id, goldCost, "building_construction")
+        print(string.format("[AlphaUI] Deducted %d gold from %s's gold for building", goldCost, citizen.name))
     end
 
     -- For material costs, still check town inventory (immigrants use town materials for now)
