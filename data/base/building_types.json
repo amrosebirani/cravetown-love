@@ -1093,6 +1093,268 @@
           }
         }
       ]
+    },
+    {
+      "id": "tea_farm",
+      "name": "Tea Farm",
+      "category": "agriculture",
+      "label": "TF",
+      "description": "Cultivates tea plants and harvests tea leaves",
+      "color": [
+        0.2,
+        0.5,
+        0.3
+      ],
+      "workCategories": [
+        "Agriculture",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Agriculture": 1,
+        "General Labor": 0.3
+      },
+      "placementConstraints": {
+        "enabled": true,
+        "requiredResources": [
+          {
+            "resourceId": "fertility",
+            "weight": 0.6,
+            "minValue": 0.2,
+            "displayName": "Soil Fertility"
+          },
+          {
+            "resourceId": "ground_water",
+            "weight": 0.4,
+            "minValue": 0.15,
+            "displayName": "Ground Water"
+          }
+        ],
+        "efficiencyFormula": "weighted_average",
+        "warningThreshold": 0.4,
+        "blockingThreshold": 0.2
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Small Tea Farm",
+          "description": "A small tea farm with basic facilities for 2 workers",
+          "stations": 2,
+          "width": 80,
+          "height": 80,
+          "constructionMaterials": {
+            "wood": 30,
+            "hoe": 2,
+            "tea_seed": 50
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 500
+          }
+        },
+        {
+          "level": 1,
+          "name": "Medium Tea Farm",
+          "description": "An expanded tea farm with 4 work stations",
+          "stations": 4,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "wood": 30,
+            "stone": 15,
+            "hoe": 2,
+            "tea_seed": 25
+          },
+          "storage": {
+            "inputCapacity": 500,
+            "outputCapacity": 1000
+          }
+        },
+        {
+          "level": 2,
+          "name": "Large Tea Farm",
+          "description": "A large tea farm with 8 work stations and advanced equipment",
+          "stations": 8,
+          "width": 180,
+          "height": 180,
+          "upgradeMaterials": {
+            "wood": 50,
+            "stone": 30,
+            "hoe": 4,
+            "scythe": 4,
+            "tea_seed": 30
+          },
+          "storage": {
+            "inputCapacity": 800,
+            "outputCapacity": 2000
+          }
+        }
+      ]
+    },
+    {
+      "id": "coffee_farm",
+      "name": "Coffee Farm",
+      "category": "agriculture",
+      "label": "CF",
+      "description": "Cultivates coffee plants and harvests coffee beans",
+      "color": [
+        0.4,
+        0.25,
+        0.15
+      ],
+      "workCategories": [
+        "Agriculture",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Agriculture": 1,
+        "General Labor": 0.3
+      },
+      "placementConstraints": {
+        "enabled": true,
+        "requiredResources": [
+          {
+            "resourceId": "fertility",
+            "weight": 0.7,
+            "minValue": 0.25,
+            "displayName": "Soil Fertility"
+          },
+          {
+            "resourceId": "ground_water",
+            "weight": 0.3,
+            "minValue": 0.2,
+            "displayName": "Ground Water"
+          }
+        ],
+        "efficiencyFormula": "weighted_average",
+        "warningThreshold": 0.45,
+        "blockingThreshold": 0.25
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Small Coffee Farm",
+          "description": "A small coffee farm with basic facilities for 2 workers",
+          "stations": 2,
+          "width": 80,
+          "height": 80,
+          "constructionMaterials": {
+            "wood": 30,
+            "hoe": 2,
+            "coffee_seed": 50
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 500
+          }
+        },
+        {
+          "level": 1,
+          "name": "Medium Coffee Farm",
+          "description": "An expanded coffee farm with 4 work stations",
+          "stations": 4,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "wood": 30,
+            "stone": 15,
+            "hoe": 2,
+            "coffee_seed": 25
+          },
+          "storage": {
+            "inputCapacity": 500,
+            "outputCapacity": 1000
+          }
+        },
+        {
+          "level": 2,
+          "name": "Large Coffee Farm",
+          "description": "A large coffee farm with 8 work stations and advanced equipment",
+          "stations": 8,
+          "width": 180,
+          "height": 180,
+          "upgradeMaterials": {
+            "wood": 50,
+            "stone": 30,
+            "hoe": 4,
+            "scythe": 4,
+            "coffee_seed": 30
+          },
+          "storage": {
+            "inputCapacity": 800,
+            "outputCapacity": 2000
+          }
+        }
+      ]
+    },
+    {
+      "id": "beverage_shop",
+      "name": "Beverage Shop",
+      "category": "production",
+      "label": "BS",
+      "description": "Specializes in preparing hot beverages like tea and coffee",
+      "color": [
+        0.6,
+        0.4,
+        0.2
+      ],
+      "workCategories": [
+        "Beverage Preparation",
+        "Hospitality"
+      ],
+      "workerEfficiency": {
+        "Beverage Preparation": 1,
+        "Hospitality": 0.6
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Beverage Shop",
+          "description": "A basic beverage shop with 1 work station",
+          "stations": 1,
+          "width": 49,
+          "height": 49,
+          "constructionMaterials": {
+            "wood": 35,
+            "bricks": 25
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Beverage Shop",
+          "description": "An improved beverage shop with 2 work stations",
+          "stations": 2,
+          "width": 70,
+          "height": 70,
+          "upgradeMaterials": {
+            "wood": 18,
+            "bricks": 13
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Beverage Shop",
+          "description": "An advanced beverage shop with 4 work stations and modern equipment",
+          "stations": 4,
+          "width": 105,
+          "height": 105,
+          "upgradeMaterials": {
+            "wood": 28,
+            "bricks": 20
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
     }
   ]
 }

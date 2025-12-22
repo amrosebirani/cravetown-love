@@ -306,6 +306,20 @@
       "notes": "12 minutes. Makes 8 shovels."
     },
     {
+      "buildingType": "blacksmith",
+      "name": "Blacksmith",
+      "recipeName": "Nails Forging",
+      "category": "Production",
+      "productionTime": 600,
+      "inputs": {
+        "iron_ore": 10
+      },
+      "outputs": {
+        "nails": 20
+      },
+      "notes": "10 minutes. Makes 20 nails."
+    },
+    {
       "buildingType": "mine",
       "name": "Gold Mine",
       "recipeName": "Gold Ore Mining",
@@ -344,6 +358,108 @@
         "cake": 2
       },
       "notes": "8 minutes. Makes 2 cakes."
+    },
+    {
+      "buildingType": "tea_farm",
+      "name": "Tea Farm",
+      "recipeName": "Tea Leaf Harvesting",
+      "category": "Raw Material",
+      "productionTime": 90,
+      "inputs": {
+        "water": 2
+      },
+      "outputs": {
+        "tea_leaves": 24
+      },
+      "notes": "90 seconds. Harvests 24 tea leaves with water irrigation."
+    },
+    {
+      "buildingType": "coffee_farm",
+      "name": "Coffee Farm",
+      "recipeName": "Coffee Bean Harvesting",
+      "category": "Raw Material",
+      "productionTime": 270,
+      "inputs": {
+        "water": 3
+      },
+      "outputs": {
+        "coffee_leaves": 20
+      },
+      "notes": "270 seconds (3x slower than tea). Harvests 20 coffee beans."
+    },
+    {
+      "buildingType": "beverage_shop",
+      "name": "Beverage Shop",
+      "recipeName": "Tea Brewing",
+      "category": "Consumable",
+      "productionTime": 60,
+      "inputs": {
+        "tea_leaves": 4,
+        "water": 8,
+        "sugar": 2,
+        "fuel": 1,
+        "milk": 2,
+        "spices": 0.5
+      },
+      "outputs": {
+        "tea_drink": 10
+      },
+      "notes": "1 minute. Makes 10 cups of masala tea."
+    },
+    {
+      "buildingType": "beverage_shop",
+      "name": "Beverage Shop",
+      "recipeName": "Coffee Brewing",
+      "category": "Consumable",
+      "productionTime": 75,
+      "inputs": {
+        "coffee_leaves": 5,
+        "water": 8,
+        "sugar": 2,
+        "fuel": 1,
+        "milk": 2
+      },
+      "outputs": {
+        "coffee_drink": 10
+      },
+      "notes": "75 seconds. Makes 10 cups of coffee."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Restaurant Tea Service",
+      "category": "Consumable",
+      "productionTime": 60,
+      "inputs": {
+        "tea_leaves": 4,
+        "water": 8,
+        "sugar": 2,
+        "fuel": 1,
+        "milk": 2,
+        "spices": 0.5
+      },
+      "outputs": {
+        "tea_drink": 10
+      },
+      "notes": "1 minute. Restaurant prepares 10 cups of tea."
+    },
+    {
+      "buildingType": "restaurant",
+      "name": "Restaurant",
+      "recipeName": "Restaurant Coffee Service",
+      "category": "Consumable",
+      "productionTime": 75,
+      "inputs": {
+        "coffee_leaves": 5,
+        "water": 8,
+        "sugar": 2,
+        "fuel": 1,
+        "milk": 2
+      },
+      "outputs": {
+        "coffee_drink": 10
+      },
+      "notes": "75 seconds. Restaurant prepares 10 cups of coffee."
     }
   ]
 }

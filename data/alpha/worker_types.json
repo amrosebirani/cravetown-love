@@ -48,6 +48,18 @@
       ]
     },
     {
+      "id": "barista",
+      "name": "Barista",
+      "category": "Food Production",
+      "minimumWage": 10,
+      "skillLevel": "Intermediate",
+      "description": "Expert in preparing hot beverages, particularly tea and coffee",
+      "workCategories": [
+        "Beverage Preparation",
+        "Hospitality"
+      ]
+    },
+    {
       "id": "carpenter",
       "name": "Carpenter",
       "category": "Construction",

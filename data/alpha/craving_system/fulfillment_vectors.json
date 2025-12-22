@@ -10784,6 +10784,209 @@
         "luxury": 0.8,
         "masterwork": 1.2
       }
+    },
+    "tea_seed": {
+      "id": "tea_seed",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {}
+      },
+      "tags": [
+        "seed",
+        "agriculture",
+        "raw_material"
+      ],
+      "durability": "permanent",
+      "qualityMultipliers": {
+        "poor": 0.8,
+        "basic": 1,
+        "good": 1.2
+      }
+    },
+    "coffee_seed": {
+      "id": "coffee_seed",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {}
+      },
+      "tags": [
+        "seed",
+        "agriculture",
+        "raw_material"
+      ],
+      "durability": "permanent",
+      "qualityMultipliers": {
+        "poor": 0.8,
+        "basic": 1,
+        "good": 1.2
+      }
+    },
+    "tea_leaves": {
+      "id": "tea_leaves",
+      "fulfillmentVector": {
+        "coarse": [
+          2,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_energy_stimulation": 2,
+          "touch_sensory_luxury": 1
+        }
+      },
+      "tags": [
+        "raw_material",
+        "beverage_ingredient",
+        "agriculture_product",
+        "aromatic"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.4,
+        "luxury": 1.8
+      }
+    },
+    "coffee_leaves": {
+      "id": "coffee_leaves",
+      "fulfillmentVector": {
+        "coarse": [
+          3,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_energy_stimulation": 3,
+          "touch_sensory_luxury": 1
+        }
+      },
+      "tags": [
+        "raw_material",
+        "beverage_ingredient",
+        "agriculture_product",
+        "aromatic",
+        "premium"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.5,
+        "luxury": 2
+      }
+    },
+    "tea_drink": {
+      "id": "tea_drink",
+      "fulfillmentVector": {
+        "coarse": [
+          18,
+          0,
+          14,
+          24,
+          0,
+          22,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_energy_stimulation": 8,
+          "biological_hydration": 10,
+          "touch_sensory_luxury": 14,
+          "psychological_detstress_relax": 12,
+          "psychological_entertainment_arts": 12,
+          "social_friendship_casual": 22
+        }
+      },
+      "tags": [
+        "beverage",
+        "tea",
+        "hot_drink",
+        "social",
+        "caffeinated",
+        "comfort",
+        "street_food"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.4,
+        "luxury": 1.8
+      }
+    },
+    "coffee_drink": {
+      "id": "coffee_drink",
+      "fulfillmentVector": {
+        "coarse": [
+          25,
+          0,
+          14,
+          30,
+          0,
+          26,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_energy_stimulation": 15,
+          "biological_hydration": 10,
+          "touch_sensory_luxury": 14,
+          "psychological_detstress_relax": 10,
+          "psychological_entertainment_arts": 20,
+          "social_friendship_casual": 26
+        }
+      },
+      "tags": [
+        "beverage",
+        "coffee",
+        "hot_drink",
+        "social",
+        "caffeinated",
+        "premium",
+        "energizing"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.5,
+        "luxury": 2
+      }
     }
   }
 }

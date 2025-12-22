@@ -11,7 +11,7 @@ interface WorkerEditorProps {
 
 const WorkerEditor = ({ workers, onChange }: WorkerEditorProps) => {
   const [workerTypeOptions, setWorkerTypeOptions] = useState<Array<{ value: string; label: string }>>([]);
-  const [messageApi, contextHolder] = message.useMessage();
+  const [_messageApi, contextHolder] = message.useMessage();
 
   // Provide default workers if undefined
   const currentWorkers: WorkerRequirements = workers || {
