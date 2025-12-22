@@ -56,6 +56,8 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
         world.enablementRules,
         world.classThresholds  -- Phase 3: for emergent class calculation
     )
+    -- Initialize delayed reaction satisfaction system with default difficulty
+    CharacterV3.SetDifficultySettings("normal")
     reportProgress(0.15, "Initializing commodity cache...")
     CommodityCache.Init(world.fulfillmentVectors, world.dimensionDefinitions, world.substitutionRules, CharacterV3)
     reportProgress(0.2, "Initializing allocation engine...")
@@ -576,6 +578,9 @@ function AlphaWorld:OnDayChange(dayNumber)
     -- Apply housing satisfaction (once per day)
     self:ApplyHousingSatisfaction(dayNumber)
 
+    -- Process delayed reaction satisfaction system (streak-based, once per day)
+    self:ProcessDelayedReactionSatisfaction(dayNumber)
+
     -- Process economic updates
     self:ProcessDailyEconomics(dayNumber)
 end
@@ -614,6 +619,39 @@ function AlphaWorld:ApplyHousingSatisfaction(dayNumber)
 
     if homelessCount > 0 then
         self:LogEvent("housing", homelessCount .. " homeless citizens suffering", {
+            severity = "warning"
+        })
+    end
+end
+
+-- Process delayed reaction satisfaction system for all citizens (once per day)
+-- This implements the streak-based satisfaction system where satisfaction only
+-- changes after N buffer days of consistently met/unmet cravings
+function AlphaWorld:ProcessDelayedReactionSatisfaction(dayNumber)
+    local criticalCount = 0
+    local totalProcessed = 0
+
+    for _, citizen in ipairs(self.citizens) do
+        -- Check if citizen has the ProcessEndOfDay method (CharacterV3)
+        if citizen.ProcessEndOfDay then
+            local processed = citizen:ProcessEndOfDay(dayNumber)
+            if processed then
+                totalProcessed = totalProcessed + 1
+
+                -- Track citizens with critical unmet streaks
+                if citizen.GetCriticalStreaks then
+                    local criticalStreaks = citizen:GetCriticalStreaks()
+                    if #criticalStreaks > 0 then
+                        criticalCount = criticalCount + 1
+                    end
+                end
+            end
+        end
+    end
+
+    -- Log if there are citizens with critical needs
+    if criticalCount > 0 then
+        self:LogEvent("satisfaction", criticalCount .. " citizens have critical unmet needs", {
             severity = "warning"
         })
     end

@@ -15,6 +15,39 @@ CharacterV3._DimensionDefinitions = CharacterV3._DimensionDefinitions or nil
 CharacterV3._CommodityFatigueRates = CharacterV3._CommodityFatigueRates or nil
 CharacterV3._EnablementRules = CharacterV3._EnablementRules or nil
 CharacterV3._ClassThresholds = CharacterV3._ClassThresholds or nil  -- For emergent class calculation
+CharacterV3._DifficultySettings = CharacterV3._DifficultySettings or nil  -- For delayed reaction system
+
+-- Default difficulty settings for delayed reaction satisfaction system
+CharacterV3.DEFAULT_DIFFICULTY_SETTINGS = {
+    easy = {
+        bufferDays = 7,
+        decayMultiplier = 0.5,   -- slower decay
+        gainMultiplier = 1.5,    -- faster gain
+        decayExponent = 0.06,    -- gentler curve
+        gainLogScale = 25        -- more generous
+    },
+    normal = {
+        bufferDays = 5,
+        decayMultiplier = 1.0,
+        gainMultiplier = 1.0,
+        decayExponent = 0.08,
+        gainLogScale = 20
+    },
+    hard = {
+        bufferDays = 3,
+        decayMultiplier = 1.5,   -- faster decay
+        gainMultiplier = 0.7,    -- slower gain
+        decayExponent = 0.10,    -- steeper curve
+        gainLogScale = 15        -- stingier
+    },
+    brutal = {
+        bufferDays = 2,
+        decayMultiplier = 2.0,
+        gainMultiplier = 0.5,
+        decayExponent = 0.12,
+        gainLogScale = 10
+    }
+}
 
 -- Initialize data (called once at prototype start)
 function CharacterV3.Init(mechanicsData, fulfillmentData, traitsData, classesData, dimensionsData, fatigueData, enablementData, classThresholdsData)
@@ -258,6 +291,28 @@ function CharacterV3:New(class, id)
     char.consecutiveLowSatisfactionCycles = 0
     char.emigrationThreshold = 30  -- Will be set from config
     char.hasEmigrated = false
+
+    -- =============================================================================
+    -- LAYER 8: Satisfaction Delayed Reaction System (66D streak tracking)
+    -- =============================================================================
+    -- Tracks consecutive days of met/unmet cravings per fine dimension
+    -- Satisfaction only changes after N buffer days (asymmetric decay/gain curves)
+    char.cravingStreaks = {}  -- [fineIndex] = {type = "met"|"unmet", days = count, lastUpdated = dayNumber}
+    char.todayFulfillment = {}  -- [fineIndex] = points fulfilled today (reset daily)
+    char.lastDayProcessed = 0  -- Track which game day was last processed
+
+    -- Initialize streak tracking for all fine dimensions
+    for i = 0, CharacterV3.GetFineMaxIndex() do
+        -- Start with small random streaks to avoid everyone hitting buffer simultaneously
+        local initialDays = math.random(1, 3)
+        local initialType = math.random() > 0.5 and "met" or "unmet"
+        char.cravingStreaks[i] = {
+            type = initialType,
+            days = initialDays,
+            lastUpdated = 0
+        }
+        char.todayFulfillment[i] = 0
+    end
 
     -- =============================================================================
     -- Phase 5: Productivity and Protest tracking
@@ -586,6 +641,216 @@ function CharacterV3:UpdateSatisfaction(currentCycle)
 end
 
 -- =============================================================================
+-- LAYER 8: Delayed Reaction Satisfaction System (66D Streak Tracking)
+-- =============================================================================
+
+-- Set difficulty settings (call from game setup)
+function CharacterV3.SetDifficultySettings(difficulty)
+    local difficultyLower = string.lower(difficulty or "normal")
+    CharacterV3._DifficultySettings = CharacterV3.DEFAULT_DIFFICULTY_SETTINGS[difficultyLower]
+        or CharacterV3.DEFAULT_DIFFICULTY_SETTINGS.normal
+    print(string.format("[CharacterV3] Difficulty set to '%s' (buffer=%d days)",
+        difficultyLower, CharacterV3._DifficultySettings.bufferDays))
+end
+
+-- Get current difficulty settings
+function CharacterV3.GetDifficultySettings()
+    return CharacterV3._DifficultySettings or CharacterV3.DEFAULT_DIFFICULTY_SETTINGS.normal
+end
+
+-- Record fulfillment for a dimension (called when consuming commodities)
+function CharacterV3:RecordFulfillment(fineIndex, points)
+    if not self.todayFulfillment then
+        self.todayFulfillment = {}
+    end
+    self.todayFulfillment[fineIndex] = (self.todayFulfillment[fineIndex] or 0) + points
+end
+
+-- Reset daily fulfillment tracking (called at start of each game day)
+function CharacterV3:ResetDailyFulfillment()
+    for i = 0, CharacterV3.GetFineMaxIndex() do
+        self.todayFulfillment[i] = 0
+    end
+end
+
+-- Check if a craving dimension is "met" for the day (hybrid approach)
+-- Uses both threshold-based and flow-based checks
+function CharacterV3:IsCravingMet(fineIndex)
+    local currentCraving = self.currentCravings[fineIndex] or 0
+    local baseCraving = self.baseCravings[fineIndex] or 1
+    local maxCraving = baseCraving * 50  -- Max accumulation
+
+    -- Threshold check: craving is low enough (below 50% of max)
+    local thresholdMet = currentCraving < (maxCraving * 0.5)
+
+    -- Flow check: fulfilled more than decayed today
+    -- Daily decay = baseCraving * cycles per day (6 cycles)
+    local CYCLES_PER_DAY = 6
+    local dailyDecay = baseCraving * CYCLES_PER_DAY
+    local todayFulfillment = self.todayFulfillment[fineIndex] or 0
+    local flowMet = todayFulfillment >= dailyDecay
+
+    -- Met if EITHER condition is true (generous interpretation)
+    return thresholdMet or flowMet
+end
+
+-- Update streak tracking at end of day
+function CharacterV3:UpdateStreaksEndOfDay(currentDay)
+    if not self.cravingStreaks then
+        -- Initialize if missing (hot reload safety)
+        self.cravingStreaks = {}
+        for i = 0, CharacterV3.GetFineMaxIndex() do
+            self.cravingStreaks[i] = {type = "met", days = 1, lastUpdated = currentDay}
+        end
+    end
+
+    for fineIndex = 0, CharacterV3.GetFineMaxIndex() do
+        local streak = self.cravingStreaks[fineIndex]
+        if not streak then
+            streak = {type = "met", days = 0, lastUpdated = currentDay}
+            self.cravingStreaks[fineIndex] = streak
+        end
+
+        local isMet = self:IsCravingMet(fineIndex)
+
+        if isMet then
+            if streak.type == "met" then
+                -- Continue met streak
+                streak.days = streak.days + 1
+            else
+                -- Switch from unmet to met - reset streak
+                streak.type = "met"
+                streak.days = 1
+            end
+        else
+            if streak.type == "unmet" then
+                -- Continue unmet streak
+                streak.days = streak.days + 1
+            else
+                -- Switch from met to unmet - reset streak
+                streak.type = "unmet"
+                streak.days = 1
+            end
+        end
+
+        streak.lastUpdated = currentDay
+    end
+
+    -- Reset daily fulfillment tracking for next day
+    self:ResetDailyFulfillment()
+
+    -- Update last processed day
+    self.lastDayProcessed = currentDay
+end
+
+-- Calculate satisfaction change based on streak (asymmetric curves)
+-- Decay: exponential (things fall apart fast)
+-- Gain: logarithmic (trust builds slowly)
+function CharacterV3:CalculateSatisfactionChange(streak, settings)
+    local N = settings.bufferDays
+    local streakDays = streak.days
+
+    if streak.type == "unmet" and streakDays > N then
+        -- Exponential decay after buffer
+        local x = streakDays - N
+        local baseDecay = math.exp(x * settings.decayExponent)
+        return -math.min(30, baseDecay * settings.decayMultiplier)
+
+    elseif streak.type == "met" and streakDays > N then
+        -- Logarithmic gain after buffer
+        local x = streakDays - N
+        local baseGain = settings.gainLogScale * math.log(x * 0.5 + 1)
+        return math.min(10, baseGain * settings.gainMultiplier)
+    end
+
+    return 0  -- Within buffer period - no change
+end
+
+-- Update satisfaction using delayed reaction system (called once per game day)
+-- This replaces per-cycle satisfaction decay with daily streak-based updates
+function CharacterV3:UpdateSatisfactionDaily(currentDay)
+    local settings = CharacterV3.GetDifficultySettings()
+
+    for fineIndex = 0, CharacterV3.GetFineMaxIndex() do
+        local streak = self.cravingStreaks[fineIndex]
+        if streak then
+            local change = self:CalculateSatisfactionChange(streak, settings)
+
+            if change ~= 0 then
+                local currentSat = self.satisfactionFine[fineIndex] or 50
+                self.satisfactionFine[fineIndex] = math.max(-100, math.min(300, currentSat + change))
+            end
+        end
+    end
+
+    -- Recompute coarse satisfaction from fine
+    CharacterV3.ComputeCoarseSatisfaction(self)
+end
+
+-- Combined end-of-day processing (call this once per game day)
+function CharacterV3:ProcessEndOfDay(currentDay)
+    -- Skip if already processed this day
+    if self.lastDayProcessed >= currentDay then
+        return false
+    end
+
+    -- Update streaks based on today's fulfillment
+    self:UpdateStreaksEndOfDay(currentDay)
+
+    -- Apply delayed reaction satisfaction changes
+    self:UpdateSatisfactionDaily(currentDay)
+
+    return true
+end
+
+-- Get streak summary for a dimension (for debug/UI)
+function CharacterV3:GetStreakInfo(fineIndex)
+    local streak = self.cravingStreaks[fineIndex]
+    if not streak then
+        return nil
+    end
+
+    local settings = CharacterV3.GetDifficultySettings()
+    local daysUntilEffect = math.max(0, settings.bufferDays - streak.days)
+    local projectedChange = self:CalculateSatisfactionChange(streak, settings)
+
+    return {
+        type = streak.type,
+        days = streak.days,
+        bufferDays = settings.bufferDays,
+        daysUntilEffect = daysUntilEffect,
+        isActive = streak.days > settings.bufferDays,
+        projectedChange = projectedChange,
+        lastUpdated = streak.lastUpdated
+    }
+end
+
+-- Get summary of all critical streaks (unmet for more than buffer days)
+function CharacterV3:GetCriticalStreaks()
+    local critical = {}
+    local settings = CharacterV3.GetDifficultySettings()
+
+    for fineIndex = 0, CharacterV3.GetFineMaxIndex() do
+        local streak = self.cravingStreaks[fineIndex]
+        if streak and streak.type == "unmet" and streak.days > settings.bufferDays then
+            local fineName = CharacterV3.fineNames[fineIndex] or ("dim_" .. fineIndex)
+            table.insert(critical, {
+                index = fineIndex,
+                name = fineName,
+                days = streak.days,
+                daysOverBuffer = streak.days - settings.bufferDays,
+                projectedDecay = self:CalculateSatisfactionChange(streak, settings)
+            })
+        end
+    end
+
+    -- Sort by severity (days over buffer)
+    table.sort(critical, function(a, b) return a.daysOverBuffer > b.daysOverBuffer end)
+
+    return critical
+end
+
+-- =============================================================================
 -- LAYER 5: Calculate Commodity Multiplier (Slot-Based Fatigue)
 -- =============================================================================
 
@@ -758,6 +1023,9 @@ function CharacterV3:FulfillCraving(commodity, quantity, currentCycle, allocatio
                 local oldValue = self.currentCravings[fineIndex] or 0
                 self.currentCravings[fineIndex] = math.max(0, oldValue - gain)
                 totalCravingReduction = totalCravingReduction + gain
+
+                -- LAYER 8: Record fulfillment for delayed reaction system
+                self:RecordFulfillment(fineIndex, gain)
             end
         end
     end
