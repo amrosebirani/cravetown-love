@@ -36,6 +36,42 @@
       ]
     },
     {
+      "id": "street_food_cook",
+      "name": "Street Food Cook",
+      "category": "Food Production",
+      "minimumWage": 10,
+      "skillLevel": "Intermediate",
+      "description": "Specializes in Indian street food like samosa, vada, pakora, and poha",
+      "workCategories": [
+        "Cooking",
+        "General Labor"
+      ]
+    },
+    {
+      "id": "restaurant_cook",
+      "name": "Restaurant Cook",
+      "category": "Food Production",
+      "minimumWage": 13,
+      "skillLevel": "Skilled",
+      "description": "Prepares complex restaurant dishes like dosa, idli, and biryani",
+      "workCategories": [
+        "Food Preparation",
+        "Hospitality"
+      ]
+    },
+    {
+      "id": "sweet_maker",
+      "name": "Sweet Maker",
+      "category": "Food Production",
+      "minimumWage": 14,
+      "skillLevel": "Skilled",
+      "description": "Crafts Indian sweets like rasogulla, ladoo, jalebi, and halwa",
+      "workCategories": [
+        "Confectionery",
+        "Food Preparation"
+      ]
+    },
+    {
       "id": "barman",
       "name": "Barman",
       "category": "Food Production",
@@ -79,6 +115,54 @@
       "description": "Processes timber into lumber and planks",
       "workCategories": [
         "Lumber Processing"
+      ]
+    },
+    {
+      "id": "grain_processor",
+      "name": "Grain Processor",
+      "category": "Production",
+      "minimumWage": 11,
+      "skillLevel": "Intermediate",
+      "description": "Mills grains into flour or processes rice into flattened rice",
+      "workCategories": [
+        "Grain Processing",
+        "General Labor"
+      ]
+    },
+    {
+      "id": "oil_presser",
+      "name": "Oil Presser",
+      "category": "Production",
+      "minimumWage": 10,
+      "skillLevel": "Intermediate",
+      "description": "Extracts oil from groundnuts, mustard seeds, sesame, and coconuts",
+      "workCategories": [
+        "Oil Pressing",
+        "General Labor"
+      ]
+    },
+    {
+      "id": "sugar_processor",
+      "name": "Sugar Processor",
+      "category": "Production",
+      "minimumWage": 12,
+      "skillLevel": "Intermediate",
+      "description": "Refines sugarcane into sugar",
+      "workCategories": [
+        "Sugar Processing",
+        "General Labor"
+      ]
+    },
+    {
+      "id": "dairy_worker",
+      "name": "Dairy Worker",
+      "category": "Production",
+      "minimumWage": 11,
+      "skillLevel": "Intermediate",
+      "description": "Processes milk into butter, paneer, cheese, and other dairy products",
+      "workCategories": [
+        "Dairy Processing",
+        "General Labor"
       ]
     },
     {
@@ -251,6 +335,19 @@
       ]
     },
     {
+      "id": "animal_herder",
+      "name": "Animal Herder",
+      "category": "Agriculture",
+      "minimumWage": 9,
+      "skillLevel": "Basic",
+      "description": "Manages dairy animals, ensures milk production and animal welfare",
+      "workCategories": [
+        "Animal Husbandry",
+        "Dairy Farming",
+        "General Labor"
+      ]
+    },
+    {
       "id": "worker",
       "name": "General Worker",
       "category": "General Labor",
@@ -259,6 +356,18 @@
       "description": "Performs general labor tasks",
       "workCategories": [
         "General Labor"
+      ]
+    },
+    {
+      "id": "apprentice",
+      "name": "Apprentice",
+      "category": "General Labor",
+      "minimumWage": 5,
+      "skillLevel": "Basic",
+      "description": "Young worker learning a trade from skilled workers (typically age 12-17)",
+      "workCategories": [
+        "General Labor",
+        "Apprenticeship"
       ]
     },
     {

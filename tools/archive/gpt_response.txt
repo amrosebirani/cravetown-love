@@ -1,0 +1,158 @@
+Love this concept. Here’s a compact, game-ready blueprint you can drop into your first playable.
+
+CraveTown — Starting Scene Blueprint
+1) Opening snapshot (Era 0: “River Hamlet”)
+
+Time/tech vibe: late-agrarian → proto-market town (pre-guilds).
+
+Population: 10–14 households (40–60 people) split across classes below.
+
+Map seeds: a bend in a river with ford, low hill (fort potential), forest, clay pit, pasture, stone outcrop, and a dirt caravan road.
+
+Your powers (at start): rationing & export sliders, building placement, 3 edicts (Tithes, Night Watch, Fair Day).
+
+2) People archetypes (at start)
+Class	Role in economy	Craving biases (top → least)	Power lever	Backlash when neglected
+Elites (landed family + stewards)	Land control, militia funds	Social Status/Currency; Exotic; Safety; Visual	Withdraw funds & militia	“Closed estates” → trade -20%, immigration -15%
+Merchants (2–3 houses)	Trade routes, pricing	Exotic; Shiny; Taste; Auditory (taverns)	Hoard goods/export spike	Price shocks, black markets
+Artisans (weaver, potter, carpenter, brewer)	Transform raw → crafted	Tools/Touch; Visual; Taste; Emotional	Work slowdowns	Repair backlog, quality -1 tier
+Peasants (farm, fish, woodcut)	Food, base resources	Biological; Safety; Aromatic (smoke/candles)	Work stoppage, protests	Harvest risk, riot chance ↑
+Clergy/Sages (1 shrine keeper, 1 bard)	Cohesion, festivals	Emotional/Psych; Auditory; Aromatic	Calm unrest	If neglected, rumor/fear events
+Newcomers (immigrants trickle)	Fills labor gaps	Home parity; Safety; Cultural tokens	Join or leave quickly	Spike in “belonging” need
+
+Bias shorthand for systems: Status>Exotic>Safety (Elites), Exotic>Shiny>Taste (Merchants), Touch>Visual>Taste (Artisans), Bio>Safety>Aromatic (Peasants).
+
+3) Geography & adjacency (fun to play)
+
+River strip (fertile): Farms + Water Mill adjacency → +20% flour output. Fishing huts boost Taste/Bio cravings.
+
+Hill (keep site): Early Palisade (Safety) → lowers riot risk in inner radius; later upgrades into Stone Keep.
+
+Forest edge: Lumber → Sawmill (+adjacency if within 4 tiles of dense woods). Bee meadows nearby → mead/wax chains.
+
+Clay pit & kiln valley: Kiln near clay gives pottery (Shiny/Visual). Avoid too close to housing (Aromatic -).
+
+Stone outcrop: Quarry → walls, bridges; unlocks Monument (Status).
+
+Road & ford: Gatehouse controls tariffs; later Caravanserai and Market Square.
+
+Optional coast or marsh: Saltworks (Taste/preservation) or reeds (baskets → Touch).
+
+4) Starting buildings (Tier 0–1)
+
+Producers: Fields, Pasture, Orchard, Fishing Hut, Lumber Camp, Clay Pit, Stone Quarry, Apiary.
+Processors: Mill, Bakery, Smokehouse, Brewery/Meadery, Weavery, Carpentry, Kiln, Tannery (stinks), Candle-maker.
+Services/Civic: Shrine, Tavern, Market Stalls, Palisade+Watch, Gatehouse, Well, Storehouse.
+Housing: Peasant Cottages (upgradeable), Artisan Lofts, Merchant Houses, Manor.
+
+Early adjacency examples
+
+Apiary within 3 tiles of Orchards/Meadows → +1 Mead & +1 Wax per cycle.
+
+Kiln within 2 tiles of Clay Pit → +30% pottery, −Aromatic radius (complaints).
+
+Bakery within 2 of Market → Taste satisfaction spreads faster (larger catchment).
+
+5) Craving chains (covering categories)
+
+Bread & Feast (Biological → Taste → Emotional)
+Grain → Mill → Flour → Bakery → Bread; add Meat/Fish + Tavern = Feast nights (calms unrest for 2 days).
+
+Warm Glow (Safety → Aromatic/Visual)
+Wax → Candles; plus Night Watch edict = safer streets, night market unlocks.
+
+Soft & Fine (Touch → Status)
+Wool/Flax → Weavery → Cloth; Dyer’s Vat (local herbs) → Fine Cloth; Manor demand creates trickle-down.
+
+Clay to Glory (Visual/Shiny → Status)
+Clay → Kiln → Pottery; rare glaze (ash/salt early) → Display sets in elite halls (Status aura to nearby houses).
+
+Sweet Comfort (Addiction/Taste → Emotional)
+Honey/Grain → Meadery → Mead; over-supply → Drunken brawls event; balanced ration → tavern songs (Auditory +).
+
+Whispers of Distant Lands (Exotic → Social Currency)
+Gatehouse tariffs + Caravan → Spices/Glass Beads; Market Stalls showcase → elites & merchants satisfied, peasants jealous (Status gap meter rises).
+
+6) Core systems to wire on day 1
+
+Craving Meter per class (0–100), plus Law & Order (citywide).
+
+Export/Local sliders per good (0/25/50/75/100): push exports to fetch exotics at cost of local satisfaction.
+
+Craving Cascade: When elites reach 80% Status for N days, “Fashion Spillover” adds a weaker Status desire to merchants → then artisans → peasants.
+
+Belonging (Immigration friction): A cultural token (festival, shrine icon, familiar food) per newcomer group reduces churn; lacking it raises protests/graffiti events.
+
+Rumor & Ritual: Clergy/Sage actions convert Emotional/Psych deficits into one-time calm or ideology drift (later important for “freedom” craving).
+
+7) First-session goals (tutorial beats ~20 min)
+
+Stabilize food: Build 2 Farms, Mill, Bakery → keep Biological ≥70 for peasants.
+
+Light the night: Apiary → Candlemaker → enact Night Watch (Safety ≥60, riot chance low).
+
+Open the market: Place Market Stalls on road; set Bread export to 0%, Pottery 25% to attract a caravan.
+
+Handle jealousy: Build Common Fountain (Visual) or Public Feast edict to offset elite display.
+
+Welcome a family: Newcomer arrives wanting spice tea (Exotic/Taste). Trade for 1 Spice; unlock Belonging buff.
+
+Fork to era gate: Choose (A) Guild Charter path (Weavery + Kiln + Market upgraded) or (B) Fortified Keep path (Palisade→Keep + Barracks). Either unlocks Era 1.
+
+8) Era progression to Industrial
+
+Era 1 — Market Town (Guilds & Coinage)
+
+Unlocks: Caravanserai, Guild Halls, Bridge, Dyer’s Workshop, Town Charter (rights vs taxes tradeoff).
+
+New cravings: Fairness (proto-freedom), better Touch/Visual for middle classes.
+
+Era 2 — Proto-Industry (Water & Charcoal)
+
+Unlocks: Fulling Mill, Glassworks, Charcoal Kiln, Foundry (bronze/iron), Print Shop (pamphlets → Emotional/Political).
+
+Side effects: Smoke & Noise penalties; Police Watch appears to counter tavern unrest.
+
+Immigration surges; need Hostel and Cultural Quarter.
+
+Era 3 — Industrial Dawn (Coal & Steam)
+
+Unlocks: Coal Mine, Textile Mill, Rail Yard, Bank, Union Hall.
+
+New cravings: Freedom/Voice, Education; elites push Order/Monopoly. Your meta-problem: Safety craving (fortification→military→monarchy) flips into mass Freedom craving—manage reforms vs repression.
+
+9) Event seeds (early deck)
+
+Poor Harvest (Bio shock) → rationing minigame.
+
+Noble Wedding (Status spike) → jealousy tick.
+
+Visiting Guru (Emotional) → temporary calm, unlocks “Fasting Festival” (Bio down, Emotional up).
+
+Skulking Smuggler → cheap exotics at law/order cost.
+
+Fires at the Kiln → Aromatic -; requires Well upgrades.
+
+Refugee Caravan → labor boon + Belonging test.
+
+10) Minimal art + sound checklist (prototype-friendly)
+
+Tiles: farm, path, river edge, meadow, forest, clay, quarry, hill.
+
+Buildings (iconic silhouettes): cottage, loft, manor, mill wheel, kiln dome, apiary boxes, palisade, shrine obelisk, market awning, tavern sign.
+
+Goods icons: bread, cloth bolt, pot, candle, bead, spice pouch, mead mug, coin stack.
+
+FX: candle glow radius at night, smokestack puffs from kiln, market crowd murmur loop, tavern lute loop.
+
+UI meters: 5 class badges with craving bars; export sliders per good; unrest flame icon.
+
+11) Balancing loops to try first
+
+Export temptation: More exotics → elite/merchant up, but local shortages → peasant unrest.
+
+Safety spiral: More watch/barracks lowers riots but grows Freedom craving over eras.
+
+Fashion spillover: Displayed status items create downstream desires; add “Public Counter-Status” (fountain, feast, festival) to cool it.
+
+If you want, I can turn this into a living design sheet (with tables for goods → buildings → cravings, plus era unlock trees) or a first-session script your prototype can follow beat-by-beat.

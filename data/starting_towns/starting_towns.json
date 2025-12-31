@@ -1,0 +1,689 @@
+{
+  "version": "1.0.0",
+  "description": "Specialty starter towns - CFP prototype (no gold/currency)",
+  "note": "Uses detailed schema with positions, worker assignments, and family relations. All towns designed for 20+ production cycle survival.",
+  "towns": [
+    {
+      "id": "vada_pav_mumbai",
+      "name": "Vada Pav Town",
+      "displayName": "Mumbai - Street Food Capital",
+      "city": "Mumbai",
+      "specialty": "vada_pav",
+      "difficulty": "easy",
+      "difficultyScore": 16.5,
+      "description": "Mumbai's beloved street snack comes alive in this bustling town. The sharp crack of fried vada contrasts with the soft warmth of freshly baked pav buns. Chutney vendors add their secret blends as workers shuttle between fryers and ovens, creating the perfect harmony of crispy and fluffy.",
+      "starterBuildings": [
+        {
+          "typeId": "farm",
+          "recipeName": "Lentil Farming",
+          "workers": 2,
+          "position": {"x": 100, "y": 100}
+        },
+        {
+          "typeId": "farm",
+          "recipeName": "Wheat Farming",
+          "workers": 2,
+          "position": {"x": 250, "y": 100}
+        },
+        {
+          "typeId": "farm",
+          "recipeName": "Groundnut Farming",
+          "workers": 1,
+          "position": {"x": 400, "y": 100}
+        },
+        {
+          "typeId": "flour_mill",
+          "recipeName": "Flour Milling",
+          "workers": 1,
+          "position": {"x": 250, "y": 250}
+        },
+        {
+          "typeId": "oil_press",
+          "recipeName": "Groundnut Oil Pressing",
+          "workers": 1,
+          "position": {"x": 400, "y": 250}
+        },
+        {
+          "typeId": "bakery",
+          "recipeName": "Pav Baking",
+          "workers": 1,
+          "position": {"x": 150, "y": 400}
+        },
+        {
+          "typeId": "street_food_kitchen",
+          "recipeName": "Vada Making",
+          "workers": 2,
+          "ownerCitizenIndex": 0,
+          "position": {"x": 350, "y": 400}
+        },
+        {
+          "typeId": "lodge",
+          "position": {"x": 550, "y": 250},
+          "initialOccupants": [4, 5, 6, 7, 8, 9]
+        },
+        {
+          "typeId": "cottage",
+          "position": {"x": 550, "y": 400},
+          "initialOccupants": [0, 1, 2, 3]
+        }
+      ],
+      "starterCitizens": [
+        {
+          "name": "Ganesh Pawar",
+          "vocation": "street_food_cook",
+          "class": "middle",
+          "age": 38,
+          "workplaceIndex": 6,
+          "housingIndex": 8,
+          "familyRelation": {"type": "spouse", "targetIndex": 1}
+        },
+        {
+          "name": "Sushila Pawar",
+          "vocation": "street_food_cook",
+          "class": "middle",
+          "age": 35,
+          "workplaceIndex": 6,
+          "housingIndex": 8,
+          "familyRelation": {"type": "spouse", "targetIndex": 0}
+        },
+        {
+          "name": "Rahul Pawar",
+          "vocation": "apprentice",
+          "class": "lower",
+          "age": 15,
+          "workplaceIndex": 6,
+          "housingIndex": 8,
+          "familyRelation": {"type": "child", "targetIndex": 0}
+        },
+        {
+          "name": "Meera Pawar",
+          "vocation": "apprentice",
+          "class": "lower",
+          "age": 8,
+          "workplaceIndex": -1,
+          "housingIndex": 8,
+          "familyRelation": {"type": "child", "targetIndex": 0}
+        },
+        {
+          "name": "Ramesh Yadav",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 28,
+          "workplaceIndex": 0,
+          "housingIndex": 7
+        },
+        {
+          "name": "Priya Yadav",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 26,
+          "workplaceIndex": 1,
+          "housingIndex": 7,
+          "familyRelation": {"type": "spouse", "targetIndex": 4}
+        },
+        {
+          "name": "Vijay Kumar",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 24,
+          "workplaceIndex": 2,
+          "housingIndex": 7
+        },
+        {
+          "name": "Sunita Sharma",
+          "vocation": "grain_processor",
+          "class": "lower",
+          "age": 30,
+          "workplaceIndex": 3,
+          "housingIndex": 7
+        },
+        {
+          "name": "Anil Gupta",
+          "vocation": "oil_presser",
+          "class": "lower",
+          "age": 32,
+          "workplaceIndex": 4,
+          "housingIndex": 7
+        },
+        {
+          "name": "Kavita Desai",
+          "vocation": "baker",
+          "class": "lower",
+          "age": 29,
+          "workplaceIndex": 5,
+          "housingIndex": 7
+        }
+      ],
+      "starterInventory": [
+        {"commodityId": "lentil_seed", "quantity": 60},
+        {"commodityId": "wheat_seed", "quantity": 80},
+        {"commodityId": "groundnut_seed", "quantity": 60},
+        {"commodityId": "lentils", "quantity": 150},
+        {"commodityId": "wheat", "quantity": 200},
+        {"commodityId": "groundnut", "quantity": 200},
+        {"commodityId": "flour", "quantity": 100},
+        {"commodityId": "oil", "quantity": 50},
+        {"commodityId": "spices", "quantity": 40},
+        {"commodityId": "vada", "quantity": 120},
+        {"commodityId": "pav", "quantity": 120},
+        {"commodityId": "water", "quantity": 500},
+        {"commodityId": "bread", "quantity": 80},
+        {"commodityId": "cloth", "quantity": 40},
+        {"commodityId": "thread", "quantity": 30}
+      ],
+      "population": {
+        "initialCount": 10,
+        "targetSurvivalCycles": 30,
+        "cycleDefinition": "25 minutes (Vada Making production time)"
+      }
+    },
+    {
+      "id": "poha_indore",
+      "name": "Poha Town",
+      "displayName": "Indore - Breakfast Haven",
+      "city": "Indore",
+      "specialty": "poha",
+      "difficulty": "easy",
+      "difficultyScore": 17.4,
+      "description": "Dawn breaks over Indore, and the city awakens to the gentle sizzle of flattened rice in kadhai pans. This is poha country - where every morning begins with golden beaten rice cooked with onions, turmeric, and curry leaves. Your town has mastered the art of the perfect breakfast: rice mills that flatten grains just right, vegetable farms providing fresh onions, and skilled cooks who know that poha is more than food - it's a way of life.",
+      "starterBuildings": [
+        {
+          "typeId": "farm",
+          "recipeName": "Rice Farming",
+          "workers": 2,
+          "position": {"x": 100, "y": 100}
+        },
+        {
+          "typeId": "farm",
+          "recipeName": "Onion Farming",
+          "workers": 2,
+          "position": {"x": 250, "y": 100}
+        },
+        {
+          "typeId": "farm",
+          "recipeName": "Groundnut Farming",
+          "workers": 1,
+          "position": {"x": 400, "y": 100}
+        },
+        {
+          "typeId": "rice_mill",
+          "recipeName": "Rice Flattening",
+          "workers": 1,
+          "position": {"x": 175, "y": 250}
+        },
+        {
+          "typeId": "oil_press",
+          "recipeName": "Groundnut Oil Pressing",
+          "workers": 1,
+          "position": {"x": 400, "y": 250}
+        },
+        {
+          "typeId": "street_food_kitchen",
+          "recipeName": "Poha Making",
+          "workers": 2,
+          "ownerCitizenIndex": 0,
+          "position": {"x": 275, "y": 400}
+        },
+        {
+          "typeId": "lodge",
+          "position": {"x": 550, "y": 250},
+          "initialOccupants": [3, 4, 5, 6, 7, 8, 9]
+        },
+        {
+          "typeId": "cottage",
+          "position": {"x": 550, "y": 400},
+          "initialOccupants": [0, 1, 2]
+        }
+      ],
+      "starterCitizens": [
+        {
+          "name": "Deepak Malhotra",
+          "vocation": "street_food_cook",
+          "class": "middle",
+          "age": 40,
+          "workplaceIndex": 5,
+          "housingIndex": 7,
+          "familyRelation": {"type": "spouse", "targetIndex": 1}
+        },
+        {
+          "name": "Pooja Malhotra",
+          "vocation": "street_food_cook",
+          "class": "middle",
+          "age": 37,
+          "workplaceIndex": 5,
+          "housingIndex": 7,
+          "familyRelation": {"type": "spouse", "targetIndex": 0}
+        },
+        {
+          "name": "Aarav Malhotra",
+          "vocation": "apprentice",
+          "class": "lower",
+          "age": 12,
+          "workplaceIndex": 5,
+          "housingIndex": 7,
+          "familyRelation": {"type": "child", "targetIndex": 0}
+        },
+        {
+          "name": "Sanjay Thakur",
+          "vocation": "grain_processor",
+          "class": "lower",
+          "age": 33,
+          "workplaceIndex": 3,
+          "housingIndex": 6
+        },
+        {
+          "name": "Rekha Chauhan",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 27,
+          "workplaceIndex": 0,
+          "housingIndex": 6
+        },
+        {
+          "name": "Manoj Yadav",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 29,
+          "workplaceIndex": 0,
+          "housingIndex": 6
+        },
+        {
+          "name": "Geeta Pandey",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 25,
+          "workplaceIndex": 1,
+          "housingIndex": 6
+        },
+        {
+          "name": "Ramesh Tiwari",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 31,
+          "workplaceIndex": 1,
+          "housingIndex": 6
+        },
+        {
+          "name": "Nisha Jain",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 26,
+          "workplaceIndex": 2,
+          "housingIndex": 6
+        },
+        {
+          "name": "Divya Agarwal",
+          "vocation": "oil_presser",
+          "class": "lower",
+          "age": 28,
+          "workplaceIndex": 4,
+          "housingIndex": 6
+        }
+      ],
+      "starterInventory": [
+        {"commodityId": "rice_seed", "quantity": 80},
+        {"commodityId": "onion_seed", "quantity": 80},
+        {"commodityId": "groundnut_seed", "quantity": 60},
+        {"commodityId": "rice", "quantity": 280},
+        {"commodityId": "onion", "quantity": 200},
+        {"commodityId": "groundnut", "quantity": 180},
+        {"commodityId": "flattened_rice", "quantity": 150},
+        {"commodityId": "oil", "quantity": 60},
+        {"commodityId": "poha", "quantity": 240},
+        {"commodityId": "spices", "quantity": 50},
+        {"commodityId": "water", "quantity": 500},
+        {"commodityId": "bread", "quantity": 100},
+        {"commodityId": "cloth", "quantity": 40},
+        {"commodityId": "thread", "quantity": 30}
+      ],
+      "population": {
+        "initialCount": 10,
+        "targetSurvivalCycles": 30,
+        "cycleDefinition": "40 minutes (Rice Flattening production time)"
+      }
+    },
+    {
+      "id": "dosa_bangalore",
+      "name": "Dosa Town",
+      "displayName": "Bangalore - Silicon Valley of South India",
+      "city": "Bangalore",
+      "specialty": "dosa",
+      "difficulty": "medium",
+      "difficultyScore": 29.3,
+      "description": "The sound of batter spreading on hot griddles echoes through Bangalore's morning air. Here, dosa is an art form - the thin, crispy rice crepe that fuels the city's tech workers and traditionalists alike. Your town combines old and new: rice mills grinding grain, lentil farms supplying protein, and restaurants perfecting the fermentation that makes dosa irresistible. Whether served plain, masala, or paper-thin, each dosa tells a story of South Indian culinary excellence.",
+      "starterBuildings": [
+        {
+          "typeId": "farm",
+          "recipeName": "Rice Farming",
+          "workers": 2,
+          "position": {"x": 100, "y": 100}
+        },
+        {
+          "typeId": "farm",
+          "recipeName": "Lentil Farming",
+          "workers": 2,
+          "position": {"x": 250, "y": 100}
+        },
+        {
+          "typeId": "farm",
+          "recipeName": "Groundnut Farming",
+          "workers": 1,
+          "position": {"x": 400, "y": 100}
+        },
+        {
+          "typeId": "oil_press",
+          "recipeName": "Groundnut Oil Pressing",
+          "workers": 1,
+          "position": {"x": 400, "y": 250}
+        },
+        {
+          "typeId": "restaurant",
+          "recipeName": "Dosa Making",
+          "workers": 2,
+          "ownerCitizenIndex": 0,
+          "position": {"x": 250, "y": 400}
+        },
+        {
+          "typeId": "lodge",
+          "position": {"x": 550, "y": 250},
+          "initialOccupants": [4, 5, 6, 7, 8, 9]
+        },
+        {
+          "typeId": "cottage",
+          "position": {"x": 550, "y": 400},
+          "initialOccupants": [0, 1, 2, 3]
+        }
+      ],
+      "starterCitizens": [
+        {
+          "name": "Suresh Krishnan",
+          "vocation": "restaurant_cook",
+          "class": "middle",
+          "age": 42,
+          "workplaceIndex": 4,
+          "housingIndex": 6,
+          "familyRelation": {"type": "spouse", "targetIndex": 1}
+        },
+        {
+          "name": "Lakshmi Krishnan",
+          "vocation": "restaurant_cook",
+          "class": "middle",
+          "age": 39,
+          "workplaceIndex": 4,
+          "housingIndex": 6,
+          "familyRelation": {"type": "spouse", "targetIndex": 0}
+        },
+        {
+          "name": "Arjun Krishnan",
+          "vocation": "apprentice",
+          "class": "lower",
+          "age": 14,
+          "workplaceIndex": 4,
+          "housingIndex": 6,
+          "familyRelation": {"type": "child", "targetIndex": 0}
+        },
+        {
+          "name": "Priya Krishnan",
+          "vocation": "apprentice",
+          "class": "lower",
+          "age": 9,
+          "workplaceIndex": -1,
+          "housingIndex": 6,
+          "familyRelation": {"type": "child", "targetIndex": 0}
+        },
+        {
+          "name": "Venkat Reddy",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 34,
+          "workplaceIndex": 0,
+          "housingIndex": 5
+        },
+        {
+          "name": "Bhavani Menon",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 30,
+          "workplaceIndex": 0,
+          "housingIndex": 5
+        },
+        {
+          "name": "Ganesh Rao",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 28,
+          "workplaceIndex": 1,
+          "housingIndex": 5
+        },
+        {
+          "name": "Vasantha Kumar",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 26,
+          "workplaceIndex": 1,
+          "housingIndex": 5
+        },
+        {
+          "name": "Prakash Shetty",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 32,
+          "workplaceIndex": 2,
+          "housingIndex": 5
+        },
+        {
+          "name": "Sharada Bhat",
+          "vocation": "oil_presser",
+          "class": "lower",
+          "age": 29,
+          "workplaceIndex": 3,
+          "housingIndex": 5
+        }
+      ],
+      "starterInventory": [
+        {"commodityId": "rice_seed", "quantity": 80},
+        {"commodityId": "lentil_seed", "quantity": 60},
+        {"commodityId": "groundnut_seed", "quantity": 60},
+        {"commodityId": "rice", "quantity": 400},
+        {"commodityId": "lentils", "quantity": 200},
+        {"commodityId": "groundnut", "quantity": 200},
+        {"commodityId": "oil", "quantity": 80},
+        {"commodityId": "dosa", "quantity": 800},
+        {"commodityId": "spices", "quantity": 50},
+        {"commodityId": "water", "quantity": 500},
+        {"commodityId": "bread", "quantity": 200},
+        {"commodityId": "cloth", "quantity": 50},
+        {"commodityId": "thread", "quantity": 40}
+      ],
+      "population": {
+        "initialCount": 10,
+        "targetSurvivalCycles": 20,
+        "cycleDefinition": "180 minutes (Dosa fermentation time)"
+      }
+    },
+    {
+      "id": "rasogulla_kolkata",
+      "name": "Rasogulla Town",
+      "displayName": "Kolkata - Sweet City of Joy",
+      "city": "Kolkata",
+      "specialty": "rasogulla",
+      "difficulty": "hard",
+      "difficultyScore": 35.8,
+      "description": "In the City of Joy, sweetness isn't just a flavor - it's a philosophy. Kolkata's rasogulla, those spongy white spheres soaked in sugar syrup, represent Bengali culinary genius at its finest. Your town faces a delicious challenge: maintaining dairy supply for fresh paneer, managing sugar production, and perfecting the delicate art of rasogulla-making. The process is complex, requiring patience and skill, but when done right, each bite is pure bliss.",
+      "starterBuildings": [
+        {
+          "typeId": "dairy_farm",
+          "recipeName": "Milk Production",
+          "workers": 0,
+          "position": {"x": 100, "y": 100}
+        },
+        {
+          "typeId": "farm",
+          "recipeName": "Sugarcane Farming",
+          "workers": 2,
+          "position": {"x": 250, "y": 100}
+        },
+        {
+          "typeId": "farm",
+          "recipeName": "Wheat Farming",
+          "workers": 2,
+          "position": {"x": 400, "y": 100}
+        },
+        {
+          "typeId": "dairy",
+          "recipeName": "Paneer Making",
+          "workers": 2,
+          "position": {"x": 175, "y": 250}
+        },
+        {
+          "typeId": "sugar_mill",
+          "recipeName": "Sugar Refining",
+          "workers": 1,
+          "position": {"x": 250, "y": 250}
+        },
+        {
+          "typeId": "flour_mill",
+          "recipeName": "Flour Milling",
+          "workers": 1,
+          "position": {"x": 400, "y": 250}
+        },
+        {
+          "typeId": "sweet_shop",
+          "recipeName": "Rasogulla Making",
+          "workers": 2,
+          "ownerCitizenIndex": 0,
+          "position": {"x": 250, "y": 400}
+        },
+        {
+          "typeId": "lodge",
+          "position": {"x": 550, "y": 200},
+          "initialOccupants": [0, 1, 2, 3, 4, 5]
+        },
+        {
+          "typeId": "lodge",
+          "position": {"x": 550, "y": 350},
+          "initialOccupants": [6, 7, 8, 9, 10, 11]
+        }
+      ],
+      "starterCitizens": [
+        {
+          "name": "Subhash Bose",
+          "vocation": "sweet_maker",
+          "class": "middle",
+          "age": 45,
+          "workplaceIndex": 6,
+          "housingIndex": 7
+        },
+        {
+          "name": "Mala Chatterjee",
+          "vocation": "sweet_maker",
+          "class": "middle",
+          "age": 42,
+          "workplaceIndex": 6,
+          "housingIndex": 7
+        },
+        {
+          "name": "Partha Banerjee",
+          "vocation": "dairy_worker",
+          "class": "lower",
+          "age": 36,
+          "workplaceIndex": 3,
+          "housingIndex": 7
+        },
+        {
+          "name": "Rina Mukherjee",
+          "vocation": "dairy_worker",
+          "class": "lower",
+          "age": 33,
+          "workplaceIndex": 3,
+          "housingIndex": 7
+        },
+        {
+          "name": "Tapan Dutta",
+          "vocation": "sugar_processor",
+          "class": "lower",
+          "age": 38,
+          "workplaceIndex": 4,
+          "housingIndex": 7
+        },
+        {
+          "name": "Suchitra Sen",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 29,
+          "workplaceIndex": 1,
+          "housingIndex": 7
+        },
+        {
+          "name": "Ranjan Das",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 31,
+          "workplaceIndex": 1,
+          "housingIndex": 8
+        },
+        {
+          "name": "Kabita Ghosh",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 27,
+          "workplaceIndex": 2,
+          "housingIndex": 8
+        },
+        {
+          "name": "Biswajit Roy",
+          "vocation": "farmer",
+          "class": "lower",
+          "age": 34,
+          "workplaceIndex": 2,
+          "housingIndex": 8
+        },
+        {
+          "name": "Ananya Sinha",
+          "vocation": "animal_herder",
+          "class": "lower",
+          "age": 26,
+          "workplaceIndex": 0,
+          "housingIndex": 8
+        },
+        {
+          "name": "Somnath Basu",
+          "vocation": "animal_herder",
+          "class": "lower",
+          "age": 30,
+          "workplaceIndex": 0,
+          "housingIndex": 8
+        },
+        {
+          "name": "Tandra Sarkar",
+          "vocation": "grain_processor",
+          "class": "lower",
+          "age": 28,
+          "workplaceIndex": 5,
+          "housingIndex": 8
+        }
+      ],
+      "starterInventory": [
+        {"commodityId": "sugarcane_cutting", "quantity": 30},
+        {"commodityId": "wheat_seed", "quantity": 60},
+        {"commodityId": "milk", "quantity": 200},
+        {"commodityId": "sugar_cane", "quantity": 150},
+        {"commodityId": "wheat", "quantity": 150},
+        {"commodityId": "paneer", "quantity": 32},
+        {"commodityId": "sugar", "quantity": 36},
+        {"commodityId": "flour", "quantity": 60},
+        {"commodityId": "rasogulla", "quantity": 480},
+        {"commodityId": "feed", "quantity": 200},
+        {"commodityId": "water", "quantity": 600},
+        {"commodityId": "bread", "quantity": 100},
+        {"commodityId": "cloth", "quantity": 30},
+        {"commodityId": "thread", "quantity": 20}
+      ],
+      "population": {
+        "initialCount": 12,
+        "targetSurvivalCycles": 10,
+        "cycleDefinition": "180 minutes (Sugarcane farming time)"
+      }
+    }
+  ]
+}

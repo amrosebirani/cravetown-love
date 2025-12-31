@@ -1,6 +1,12 @@
 # Cravetown Implementation Plans
 
-> **Note:** For a comprehensive presentation-ready overview of the development strategy, see [`cravetown_development_plan.md`](./cravetown_development_plan.md). This file contains the detailed technical implementation notes and specifications.
+**Created:** 2024-11-22
+**Last Updated:** 2025-12-31
+**Type:** AI Assistant Instructions / Implementation Guide
+**Purpose:** Comprehensive technical implementation notes and specifications for Claude AI assistant working on Cravetown codebase
+
+> **Note:** For presentation-ready overview of development strategy, see [`cravetown_development_plan.md`](./chain-of-thought/todo-lists/cravetown_development_plan.md).
+> **Note:** For complete project structure, see [`STRUCTURE.md`](./STRUCTURE.md).
 
 ---
 

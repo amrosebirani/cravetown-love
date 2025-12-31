@@ -22,6 +22,7 @@ require("code/Prototype1State")
 require("code/Prototype2State")
 require("code/InfoSystemState")
 require("code/AlphaPrototypeState")
+require("code/SpecialtyTownsState")
 
 -- Consumption test states
 local TestCharacterV2State = require("code/consumption/TestCharacterV2State")
@@ -66,7 +67,7 @@ function love.load()
     gMousePressed = nil
     gMouseReleased = nil
 
-    -- Global mode: "version_select", "launcher", "main", "prototype2", "test_character_v2", "test_allocation_v2", "test_cache", "alpha"
+    -- Global mode: "version_select", "launcher", "main", "prototype2", "test_character_v2", "test_allocation_v2", "test_cache", "alpha", "specialty_towns"
     gMode = "version_select"
     gVersionSelector = VersionSelector:Create()
     gPrototypeLauncher = nil
@@ -80,6 +81,7 @@ function love.load()
     gPrototype2 = nil
     gInfoSystem = nil
     gAlphaPrototype = nil
+    gSpecialtyTowns = nil
     gTestCharacterV2 = nil
     gTestAllocationV2 = nil
     gTestCache = nil
@@ -209,6 +211,13 @@ function InitializeTestCache()
     gMode = "test_cache"
 end
 
+function InitializeSpecialtyTowns()
+    print("Initializing Specialty Towns (CFP Prototype)...")
+    gSpecialtyTowns = SpecialtyTownsState:Create()
+    gSpecialtyTowns:Enter()
+    gMode = "specialty_towns"
+end
+
 function ReturnToLauncher()
     print("Returning to launcher...")
     -- Clean up current mode
@@ -221,6 +230,7 @@ function ReturnToLauncher()
     gPrototype2 = nil
     gInfoSystem = nil
     gAlphaPrototype = nil
+    gSpecialtyTowns = nil
     gMode = "launcher"
 
     -- Recreate launcher if needed
@@ -273,6 +283,8 @@ function love.update(dt)
             local selected = gPrototypeLauncher:GetSelectedPrototype()
             if selected == "alpha" then
                 InitializeAlphaPrototype()
+            elseif selected == "specialty_towns" then
+                InitializeSpecialtyTowns()
             elseif selected == "main" then
                 InitializeMainGame()
             elseif selected == "infosystem" then
@@ -338,6 +350,11 @@ function love.update(dt)
     elseif gMode == "alpha" then
         if gAlphaPrototype then
             gAlphaPrototype:Update(dt)
+        end
+
+    elseif gMode == "specialty_towns" then
+        if gSpecialtyTowns then
+            gSpecialtyTowns:Update(dt)
         end
 
     elseif gMode == "test_character_v2" then
@@ -437,6 +454,11 @@ function love.draw()
             gAlphaPrototype:Render()
         end
 
+    elseif gMode == "specialty_towns" then
+        if gSpecialtyTowns then
+            gSpecialtyTowns:Render()
+        end
+
     elseif gMode == "test_character_v2" then
         if gTestCharacterV2 then
             gTestCharacterV2:draw()
@@ -514,6 +536,10 @@ function love.mousepressed(x, y, button, istouch, presses)
         if gAlphaPrototype and gAlphaPrototype.mousepressed then
             gAlphaPrototype:mousepressed(x, y, button)
         end
+    elseif gMode == "specialty_towns" then
+        if gSpecialtyTowns and gSpecialtyTowns.mousepressed then
+            gSpecialtyTowns:mousepressed(x, y, button)
+        end
     elseif gMode == "test_cache" then
         if gTestCache and gTestCache.prototype then
             gTestCache.prototype:MousePressed(x, y, button)
@@ -529,6 +555,10 @@ function love.mousereleased(x, y, button, istouch, presses)
     if gMode == "prototype1" then
         if gPrototype1 and gPrototype1.prototype then
             gPrototype1.prototype:MouseReleased(x, y, button)
+        end
+    elseif gMode == "specialty_towns" then
+        if gSpecialtyTowns and gSpecialtyTowns.mousereleased then
+            gSpecialtyTowns:mousereleased(x, y, button)
         end
     elseif gMode == "test_cache" then
         if gTestCache and gTestCache.prototype then
@@ -569,6 +599,10 @@ function love.wheelmoved(dx, dy)
     elseif gMode == "alpha" then
         if gAlphaPrototype and gAlphaPrototype.wheelmoved then
             gAlphaPrototype:wheelmoved(dx, dy)
+        end
+    elseif gMode == "specialty_towns" then
+        if gSpecialtyTowns and gSpecialtyTowns.wheelmoved then
+            gSpecialtyTowns:wheelmoved(dx, dy)
         end
     elseif gMode == "test_cache" then
         if gTestCache and gTestCache.prototype and gTestCache.prototype.OnMouseWheel then
@@ -656,6 +690,13 @@ function love.keypressed(key)
     elseif gMode == "alpha" then
         if gAlphaPrototype and gAlphaPrototype.keypressed then
             local handled = gAlphaPrototype:keypressed(key)
+            if handled then
+                keyHandled = true
+            end
+        end
+    elseif gMode == "specialty_towns" then
+        if gSpecialtyTowns and gSpecialtyTowns.keypressed then
+            local handled = gSpecialtyTowns:keypressed(key)
             if handled then
                 keyHandled = true
             end
