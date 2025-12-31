@@ -1130,6 +1130,81 @@
       ]
     },
     {
+      "id": "butcher",
+      "name": "Butcher",
+      "category": "production",
+      "label": "Bu",
+      "color": [
+        0.7,
+        0.2,
+        0.2
+      ],
+      "description": "Processes livestock into meat products",
+      "workCategories": [
+        "Meat Processing",
+        "Animal Husbandry",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Meat Processing": 1,
+        "Animal Husbandry": 0.8,
+        "General Labor": 0.4
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Butcher",
+          "description": "A basic butcher shop with 2 work stations",
+          "stations": 2,
+          "width": 56,
+          "height": 56,
+          "constructionMaterials": {
+            "wood": 40,
+            "stone": 30,
+            "knife": 2
+          },
+          "storage": {
+            "inputCapacity": 180,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Butcher",
+          "description": "An improved butcher shop with 4 work stations",
+          "stations": 4,
+          "width": 80,
+          "height": 80,
+          "upgradeMaterials": {
+            "wood": 20,
+            "stone": 15,
+            "knife": 2
+          },
+          "storage": {
+            "inputCapacity": 300,
+            "outputCapacity": 300
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Butcher",
+          "description": "An advanced butcher shop with 8 work stations and modern equipment",
+          "stations": 8,
+          "width": 120,
+          "height": 120,
+          "upgradeMaterials": {
+            "wood": 32,
+            "stone": 24,
+            "knife": 4
+          },
+          "storage": {
+            "inputCapacity": 480,
+            "outputCapacity": 600
+          }
+        }
+      ]
+    },
+    {
       "id": "shoe_factory",
       "name": "Shoe Factory",
       "category": "production",
@@ -3323,6 +3398,78 @@
           "storage": {
             "inputCapacity": 900,
             "outputCapacity": 800
+          }
+        }
+      ]
+    },
+    {
+      "id": "rice_mill",
+      "name": "Rice Mill",
+      "category": "production",
+      "label": "RM",
+      "color": [
+        0.9,
+        0.85,
+        0.75
+      ],
+      "description": "Processes rice into flour or flattened rice",
+      "workCategories": [
+        "Grain Processing",
+        "General Labor"
+      ],
+      "workerEfficiency": {
+        "Grain Processing": 1,
+        "General Labor": 0.5
+      },
+      "upgradeLevels": [
+        {
+          "level": 0,
+          "name": "Basic Rice Mill",
+          "description": "A basic rice mill with 2 work stations",
+          "stations": 2,
+          "width": 56,
+          "height": 56,
+          "constructionMaterials": {
+            "wood": 40,
+            "stone": 30
+          },
+          "storage": {
+            "inputCapacity": 200,
+            "outputCapacity": 180
+          }
+        },
+        {
+          "level": 1,
+          "name": "Improved Rice Mill",
+          "description": "An improved rice mill with 4 work stations",
+          "stations": 4,
+          "width": 82,
+          "height": 82,
+          "upgradeMaterials": {
+            "wood": 30,
+            "stone": 25,
+            "iron": 12
+          },
+          "storage": {
+            "inputCapacity": 350,
+            "outputCapacity": 320
+          }
+        },
+        {
+          "level": 2,
+          "name": "Advanced Rice Mill",
+          "description": "An advanced rice mill with 6 work stations and mechanical flattening",
+          "stations": 6,
+          "width": 118,
+          "height": 118,
+          "upgradeMaterials": {
+            "wood": 45,
+            "stone": 40,
+            "iron": 22
+          },
+          "storage": {
+            "inputCapacity": 550,
+            "outputCapacity": 500
           }
         }
       ]

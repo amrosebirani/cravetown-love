@@ -241,6 +241,16 @@
       "quality": "luxury"
     },
     {
+      "id": "goat",
+      "name": "Goat",
+      "category": "livestock",
+      "icon": "Go",
+      "stackSize": 100,
+      "baseValue": 40,
+      "description": "Livestock for meat production",
+      "quality": "good"
+    },
+    {
       "id": "feathers",
       "name": "Feathers",
       "category": "animal_product",
@@ -354,6 +364,13 @@
       "description": "Sheep meat - rich and flavorful"
     },
     {
+      "id": "goat_meat",
+      "name": "Goat Meat",
+      "category": "animal_product",
+      "quality": "good",
+      "description": "Goat meat - tender and flavorful protein source"
+    },
+    {
       "id": "beef",
       "name": "Beef",
       "category": "animal_product",
@@ -369,6 +386,17 @@
       "baseValue": 15,
       "isRaw": true,
       "description": "Tanned hide",
+      "quality": "basic"
+    },
+    {
+      "id": "bone",
+      "name": "Bone",
+      "category": "animal_product",
+      "icon": "Bn",
+      "stackSize": 500,
+      "baseValue": 5,
+      "isRaw": true,
+      "description": "Animal bones - used for tools, fertilizer, and crafting",
       "quality": "basic"
     },
     {
@@ -405,6 +433,35 @@
       "perishable": true,
       "description": "Baked wheat",
       "quality": "basic"
+    },
+    {
+      "id": "pav",
+      "name": "Pav",
+      "category": "processed_food",
+      "icon": "Pv",
+      "stackSize": 1200,
+      "baseValue": 3,
+      "dependencies": [
+        "flour"
+      ],
+      "perishable": true,
+      "description": "Soft bread bun - perfect for vada pav",
+      "quality": "basic"
+    },
+    {
+      "id": "cured_meat",
+      "name": "Cured Meat",
+      "category": "processed_food",
+      "icon": "CM",
+      "stackSize": 800,
+      "baseValue": 12,
+      "dependencies": [
+        "mutton",
+        "salt"
+      ],
+      "perishable": false,
+      "description": "Salt-preserved meat - long-lasting protein source",
+      "quality": "good"
     },
     {
       "id": "flour",
@@ -1116,6 +1173,39 @@
       "baseValue": 6,
       "isRaw": true,
       "description": "Copper bearing ore",
+      "quality": "basic"
+    },
+    {
+      "id": "salt",
+      "name": "Salt",
+      "category": "raw_mineral",
+      "icon": "Sa",
+      "stackSize": 5000,
+      "baseValue": 4,
+      "isRaw": true,
+      "description": "Mineral salt - used for preservation and seasoning",
+      "quality": "basic"
+    },
+    {
+      "id": "spices",
+      "name": "Spices",
+      "category": "seasoning",
+      "icon": "Sp",
+      "stackSize": 2000,
+      "baseValue": 6,
+      "isRaw": false,
+      "description": "Mixed spices - turmeric, cumin, coriander, and chili for Indian cooking",
+      "quality": "good"
+    },
+    {
+      "id": "water",
+      "name": "Water",
+      "category": "liquid",
+      "icon": "Wt",
+      "stackSize": 10000,
+      "baseValue": 1,
+      "isRaw": true,
+      "description": "Fresh water from wells and rivers - essential for life",
       "quality": "basic"
     },
     {
@@ -2570,6 +2660,19 @@
       "quality": "basic"
     },
     {
+      "id": "flattened_rice",
+      "name": "Flattened Rice",
+      "category": "processed_food",
+      "icon": "FR",
+      "stackSize": 2000,
+      "baseValue": 4,
+      "dependencies": [
+        "rice"
+      ],
+      "description": "Beaten rice - used for making poha",
+      "quality": "basic"
+    },
+    {
       "id": "cornmeal",
       "name": "Cornmeal",
       "category": "processed_food",
@@ -2731,6 +2834,22 @@
       "quality": "basic"
     },
     {
+      "id": "poha",
+      "name": "Poha",
+      "category": "prepared_food",
+      "icon": "Po",
+      "stackSize": 600,
+      "baseValue": 6,
+      "dependencies": [
+        "flattened_rice",
+        "onion",
+        "oil"
+      ],
+      "perishable": true,
+      "description": "Flattened rice breakfast dish with onions and spices",
+      "quality": "good"
+    },
+    {
       "id": "idli",
       "name": "Idli",
       "category": "prepared_food",
@@ -2834,6 +2953,21 @@
       "category": "sweet",
       "quality": "good",
       "description": "Sweet semolina pudding"
+    },
+    {
+      "id": "rasogulla",
+      "name": "Rasogulla",
+      "category": "sweet",
+      "icon": "Rg",
+      "stackSize": 500,
+      "baseValue": 8,
+      "dependencies": [
+        "paneer",
+        "sugar"
+      ],
+      "perishable": false,
+      "description": "Spongy milk-based sweet in sugar syrup - Kolkata's pride",
+      "quality": "luxury"
     },
     {
       "id": "fruit_juice",
