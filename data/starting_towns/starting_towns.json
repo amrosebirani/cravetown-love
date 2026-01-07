@@ -33,7 +33,7 @@
         },
         {
           "typeId": "flour_mill",
-          "recipeName": "Flour Milling",
+          "recipeName": "Wheat Milling",
           "workers": 1,
           "position": {"x": 250, "y": 250}
         },
@@ -543,7 +543,7 @@
         },
         {
           "typeId": "flour_mill",
-          "recipeName": "Flour Milling",
+          "recipeName": "Wheat Milling",
           "workers": 1,
           "position": {"x": 400, "y": 250}
         },

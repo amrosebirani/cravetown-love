@@ -1,4 +1,4 @@
-# CRAVE-11: Town Template Data Design
+`# CRAVE-11: Town Template Data Design
 
 **Created:** 2025-12-31
 **Status:** Implementation Ready

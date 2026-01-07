@@ -648,6 +648,12 @@ function love.keypressed(key)
         return
     end
 
+    -- F12 to toggle debug panel (alpha mode only)
+    if key == "f12" and gMode == "alpha" and gAlphaPrototype and gAlphaPrototype.mUI and gAlphaPrototype.mUI.debugPanel then
+        gAlphaPrototype.mUI.debugPanel:Toggle()
+        return
+    end
+
     -- Forward keypressed to states first (they may handle escape)
     local keyHandled = false
 

@@ -151,8 +151,10 @@ end
 -- Async world loading with progress updates
 function AlphaPrototypeState:LoadWorldAsync()
     local yield = coroutine.yield
+    local startTime = love.timer.getTime()
 
     -- Step 1: Load configuration (5%)
+    local t0 = love.timer.getTime()
     self.mLoadingScreen:SetProgress(0.05, "Loading configuration...")
     yield()
 
@@ -164,12 +166,16 @@ function AlphaPrototypeState:LoadWorldAsync()
     if startingLocation and startingLocation.terrain then
         terrainConfig = startingLocation.terrain
     end
+    print(string.format("[Profile] Config load: %.3fs", love.timer.getTime() - t0))
 
     -- Step 2: Create world zones (15%)
+    t0 = love.timer.getTime()
     self.mLoadingScreen:SetProgress(0.15, "Generating world zones...")
     yield()
+    print(string.format("[Profile] World zones: %.3fs", love.timer.getTime() - t0))
 
     -- Step 3: Initialize world (25%)
+    t0 = love.timer.getTime()
     self.mLoadingScreen:SetProgress(0.25, "Creating world...", "Initializing terrain")
     yield()
 
@@ -177,9 +183,12 @@ function AlphaPrototypeState:LoadWorldAsync()
         -- Callback from AlphaWorld for progress updates (25% - 60%)
         local scaledProgress = 0.25 + progress * 0.35
         self.mLoadingScreen:SetProgress(scaledProgress, "Creating world...", message)
+        coroutine.yield()  -- ADD YIELD on each progress update from AlphaWorld
     end)
+    print(string.format("[Profile] AlphaWorld:Create: %.3fs", love.timer.getTime() - t0))
 
     -- Step 4: Apply configuration (65%)
+    t0 = love.timer.getTime()
     self.mLoadingScreen:SetProgress(0.65, "Applying configuration...")
     yield()
 
@@ -191,8 +200,10 @@ function AlphaPrototypeState:LoadWorldAsync()
     if startingLocation and startingLocation.productionModifiers then
         self.mWorld.productionModifiers = startingLocation.productionModifiers
     end
+    print(string.format("[Profile] Apply config: %.3fs", love.timer.getTime() - t0))
 
     -- Step 5: Initialize UI (70%)
+    t0 = love.timer.getTime()
     self.mLoadingScreen:SetProgress(0.70, "Initializing interface...")
     yield()
 
@@ -212,12 +223,15 @@ function AlphaPrototypeState:LoadWorldAsync()
         end
         -- "full" mode is the default (already enabled)
     end
+    print(string.format("[Profile] UI init: %.3fs", love.timer.getTime() - t0))
 
     -- Step 6: Setup starter content (75% - 95%)
+    t0 = love.timer.getTime()
     self.mLoadingScreen:SetProgress(0.75, "Setting up starter content...")
     yield()
 
     self:SetupStarterContentAsync()
+    print(string.format("[Profile] Starter content: %.3fs", love.timer.getTime() - t0))
 
     -- Step 7: Finalize (100%)
     self.mLoadingScreen:SetProgress(1.0, "Ready!")
@@ -228,6 +242,8 @@ function AlphaPrototypeState:LoadWorldAsync()
 
     -- Small delay to show 100%
     self.mLoadingComplete = true
+
+    print(string.format("[Profile] TOTAL LOAD TIME: %.3fs", love.timer.getTime() - startTime))
 end
 
 -- Async version of SetupStarterContent with progress updates

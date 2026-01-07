@@ -129,6 +129,10 @@ function SpecialtyTownsState:LoadWorldAsync()
     self.mLoadingScreen:SetProgress(0.10, "Loading " .. townData.displayName .. "...")
     yield()
 
+    -- CRITICAL: Set active version to "alpha" so building types load correctly
+    DataLoader.setActiveVersion("alpha")
+    print("[SpecialtyTownsState] Set DataLoader activeVersion to 'alpha'")
+
     -- No terrain for CFP prototype (pure production-consumption)
     local terrainConfig = nil
 

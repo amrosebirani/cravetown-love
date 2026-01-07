@@ -26,6 +26,9 @@ local HousingOverviewPanel = require("code.HousingOverviewPanel")
 local HousingAssignmentModal = require("code.HousingAssignmentModal")
 local CharacterDetailPanel = require("code.CharacterDetailPanel")
 
+-- CRAVE-6: Debug Panel
+local DebugPanel = require("code.DebugPanel")
+
 -- New systems: Notifications, Tutorial, Visual indicators
 local NotificationSystem = require("code.NotificationSystem")
 local TutorialSystem = require("code.TutorialSystem")
@@ -188,6 +191,9 @@ function AlphaUI:Create(world)
 
     -- Character detail panel state
     ui.characterDetailPanel = CharacterDetailPanel:Create(world)
+
+    -- Debug panel state (CRAVE-6)
+    ui.debugPanel = DebugPanel:Create(world)
 
     -- Notification system
     ui.notificationSystem = NotificationSystem:Create(world)
@@ -421,6 +427,11 @@ function AlphaUI:Render()
     -- Render notification toasts (almost on top)
     if self.notificationSystem then
         self.notificationSystem:Render()
+    end
+
+    -- Render debug panel (CRAVE-6) - on top but below tutorial
+    if self.debugPanel and self.debugPanel:IsVisible() then
+        self.debugPanel:Render()
     end
 
     -- Render tutorial overlay (on very top)
@@ -5696,6 +5707,13 @@ function AlphaUI:HandleClick(x, y, button)
         end
     end
 
+    -- Handle debug panel clicks (CRAVE-6) - high priority
+    if self.debugPanel and self.debugPanel:IsVisible() then
+        if self.debugPanel:HandleMousePress(x, y, button) then
+            return true
+        end
+    end
+
     -- Handle character detail panel clicks (highest priority modal)
     if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
         if self.characterDetailPanel:HandleClick(x, y) then
@@ -7011,6 +7029,11 @@ function AlphaUI:Update(dt)
         self.tutorialSystem:Update(dt)
     end
 
+    -- Update debug panel (CRAVE-6)
+    if self.debugPanel then
+        self.debugPanel:Update(dt)
+    end
+
     -- Update placement mode (track mouse position)
     if self.placementMode then
         local mx, my = love.mouse.getPosition()
@@ -7052,7 +7075,14 @@ function AlphaUI:Update(dt)
 end
 
 function AlphaUI:HandleMouseWheel(x, y)
-    -- Handle character detail panel scroll (highest priority)
+    -- Handle debug panel scroll (CRAVE-6) - highest priority
+    if self.debugPanel and self.debugPanel:IsVisible() then
+        if self.debugPanel:HandleMouseWheel(x, y) then
+            return
+        end
+    end
+
+    -- Handle character detail panel scroll
     if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
         if self.characterDetailPanel:HandleMouseWheel(y) then
             return
@@ -7204,6 +7234,13 @@ function AlphaUI:HandleMouseWheel(x, y)
 end
 
 function AlphaUI:HandleMouseMove(x, y)
+    -- Handle debug panel dragging (CRAVE-6) - high priority
+    if self.debugPanel and self.debugPanel:IsVisible() then
+        if self.debugPanel:HandleMouseMove(x, y) then
+            return
+        end
+    end
+
     -- Handle plot selection modal mouse move (highest priority)
     if self.showPlotSelectionModal and self.plotSelectionModal then
         -- Calculate dx, dy for drag handling
