@@ -1,6 +1,11 @@
-``# WARP.md
+# WARP.md
 
-This file provides guidance to WARP (warp.dev) when working with code in this repository.
+**Created:** 2024-12-20
+**Last Updated:** 2025-12-31
+**Type:** Development Guide / Quick Reference
+**Purpose:** Commands, architecture overview, and conventions for Warp terminal and general development
+
+This file provides guidance when working with code in this repository.
 
 ## Common commands
 

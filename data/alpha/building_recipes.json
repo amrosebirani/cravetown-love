@@ -59,6 +59,20 @@
       "notes": "3 minutes. 10 wheat produces 8 bread loaves."
     },
     {
+      "buildingType": "bakery",
+      "name": "Bakery",
+      "recipeName": "Pav Baking",
+      "category": "Consumable",
+      "productionTime": 240,
+      "inputs": {
+        "flour": 12
+      },
+      "outputs": {
+        "pav": 20
+      },
+      "notes": "4 minutes. 12 kg flour produces 20 pav buns."
+    },
+    {
       "buildingType": "restaurant",
       "name": "Restaurant",
       "recipeName": "Meal Preparation",
@@ -101,6 +115,70 @@
         "whiskey": 20
       },
       "notes": "4 hours distilling. 30 rye produces 20 whiskey bottles."
+    },
+    {
+      "buildingType": "butcher",
+      "name": "Butcher",
+      "recipeName": "Chicken Processing",
+      "category": "Consumable",
+      "productionTime": 600,
+      "inputs": {
+        "hen": 5
+      },
+      "outputs": {
+        "chicken": 12,
+        "feathers": 8,
+        "bone": 3
+      },
+      "notes": "10 minutes. Processes 5 hens into 12 chicken meat, 8 feathers, and 3 bones."
+    },
+    {
+      "buildingType": "butcher",
+      "name": "Butcher",
+      "recipeName": "Mutton Processing",
+      "category": "Consumable",
+      "productionTime": 1200,
+      "inputs": {
+        "sheep": 3
+      },
+      "outputs": {
+        "mutton": 20,
+        "wool": 6,
+        "leather": 4,
+        "bone": 5
+      },
+      "notes": "20 minutes. Processes 3 sheep into 20 mutton, 6 wool, 4 leather, and 5 bones."
+    },
+    {
+      "buildingType": "butcher",
+      "name": "Butcher",
+      "recipeName": "Goat Processing",
+      "category": "Consumable",
+      "productionTime": 1200,
+      "inputs": {
+        "goat": 3
+      },
+      "outputs": {
+        "goat_meat": 18,
+        "leather": 5,
+        "bone": 5
+      },
+      "notes": "20 minutes. Processes 3 goats into 18 goat meat, 5 leather, and 5 bones."
+    },
+    {
+      "buildingType": "butcher",
+      "name": "Butcher",
+      "recipeName": "Meat Curing",
+      "category": "Consumable",
+      "productionTime": 3600,
+      "inputs": {
+        "mutton": 10,
+        "salt": 2
+      },
+      "outputs": {
+        "cured_meat": 8
+      },
+      "notes": "1 hour. Cures 10 mutton with 2 salt into 8 preserved cured meat."
     },
     {
       "buildingType": "shoe_factory",
@@ -2132,6 +2210,34 @@
       "notes": "30 minutes. 40 kg lentils produces 35 kg lentil flour."
     },
     {
+      "buildingType": "rice_mill",
+      "name": "Rice Mill",
+      "recipeName": "Rice Milling",
+      "category": "Production",
+      "productionTime": 1800,
+      "inputs": {
+        "rice": 40
+      },
+      "outputs": {
+        "rice_flour": 36
+      },
+      "notes": "30 minutes. 40 kg rice produces 36 kg rice flour."
+    },
+    {
+      "buildingType": "rice_mill",
+      "name": "Rice Mill",
+      "recipeName": "Rice Flattening",
+      "category": "Production",
+      "productionTime": 2400,
+      "inputs": {
+        "rice": 35
+      },
+      "outputs": {
+        "flattened_rice": 30
+      },
+      "notes": "40 minutes. 35 kg rice produces 30 kg flattened rice (poha/chiwda)."
+    },
+    {
       "buildingType": "oil_press",
       "name": "Oil Press",
       "recipeName": "Mustard Oil Pressing",
@@ -2470,6 +2576,21 @@
       "notes": "35 minutes. Flour + ghee + sugar produces 10 servings halwa."
     },
     {
+      "buildingType": "sweet_shop",
+      "name": "Sweet Shop",
+      "recipeName": "Rasogulla Making",
+      "category": "Production",
+      "productionTime": 3600,
+      "inputs": {
+        "paneer": 8,
+        "sugar": 6
+      },
+      "outputs": {
+        "rasogulla": 15
+      },
+      "notes": "1 hour. 8 kg paneer + 6 kg sugar produces 15 servings of rasogulla."
+    },
+    {
       "buildingType": "street_food_kitchen",
       "name": "Street Food Kitchen",
       "recipeName": "Samosa Making",
@@ -2534,6 +2655,23 @@
         "vada": 20
       },
       "notes": "25 minutes. Lentils + oil + spices produces 20 vadas."
+    },
+    {
+      "buildingType": "street_food_kitchen",
+      "name": "Street Food Kitchen",
+      "recipeName": "Poha Making",
+      "category": "Production",
+      "productionTime": 900,
+      "inputs": {
+        "flattened_rice": 10,
+        "onion": 3,
+        "oil": 1,
+        "spices": 1
+      },
+      "outputs": {
+        "poha": 18
+      },
+      "notes": "15 minutes. Flattened rice + onion + oil + spices produces 18 servings of poha."
     },
     {
       "buildingType": "restaurant",

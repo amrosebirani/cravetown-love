@@ -87,6 +87,42 @@
         "luxury": 2
       }
     },
+    "pav": {
+      "id": "pav",
+      "fulfillmentVector": {
+        "coarse": [
+          10,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_grain": 12,
+          "biological_nutrition_protein": 1,
+          "touch_sensory_taste": 2,
+          "touch_sensory_luxury": 2
+        }
+      },
+      "tags": [
+        "grain",
+        "nutrition",
+        "processed_food",
+        "street_food",
+        "comfort"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.3,
+        "luxury": 1.8
+      }
+    },
     "meat": {
       "id": "meat",
       "fulfillmentVector": {
@@ -118,6 +154,209 @@
         "basic": 1,
         "good": 1.5,
         "luxury": 2.2
+      }
+    },
+    "chicken": {
+      "id": "chicken",
+      "fulfillmentVector": {
+        "coarse": [
+          15,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_protein": 18,
+          "biological_nutrition_grain": 2,
+          "touch_sensory_luxury": 2
+        }
+      },
+      "tags": [
+        "protein",
+        "nutrition",
+        "poultry",
+        "affordable_food"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.5,
+        "basic": 1,
+        "good": 1.5,
+        "luxury": 2.0
+      }
+    },
+    "mutton": {
+      "id": "mutton",
+      "fulfillmentVector": {
+        "coarse": [
+          15,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_protein": 20,
+          "biological_nutrition_grain": 2,
+          "biological_nutrition_fat": 3,
+          "touch_sensory_luxury": 2
+        }
+      },
+      "tags": [
+        "protein",
+        "nutrition",
+        "luxury_food",
+        "red_meat"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.5,
+        "basic": 1,
+        "good": 1.5,
+        "luxury": 2.2
+      }
+    },
+    "goat_meat": {
+      "id": "goat_meat",
+      "fulfillmentVector": {
+        "coarse": [
+          15,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_protein": 19,
+          "biological_nutrition_grain": 2,
+          "touch_sensory_luxury": 2
+        }
+      },
+      "tags": [
+        "protein",
+        "nutrition",
+        "specialty_food",
+        "red_meat"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.5,
+        "basic": 1,
+        "good": 1.5,
+        "luxury": 2.1
+      }
+    },
+    "bone": {
+      "id": "bone",
+      "fulfillmentVector": {
+        "coarse": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {}
+      },
+      "tags": [
+        "byproduct",
+        "crafting_material",
+        "raw_material"
+      ],
+      "durability": "permanent",
+      "qualityMultipliers": {
+        "poor": 0.8,
+        "basic": 1,
+        "good": 1.2,
+        "luxury": 1.5
+      }
+    },
+    "salt": {
+      "id": "salt",
+      "fulfillmentVector": {
+        "coarse": [
+          2,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_mineral": 3,
+          "touch_sensory_taste": 2
+        }
+      },
+      "tags": [
+        "seasoning",
+        "preservation",
+        "mineral",
+        "essential"
+      ],
+      "durability": "permanent",
+      "qualityMultipliers": {
+        "poor": 0.7,
+        "basic": 1,
+        "good": 1.3,
+        "luxury": 1.6
+      }
+    },
+    "cured_meat": {
+      "id": "cured_meat",
+      "fulfillmentVector": {
+        "coarse": [
+          18,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_protein": 22,
+          "biological_nutrition_fat": 4,
+          "touch_sensory_luxury": 5,
+          "touch_sensory_taste": 3
+        }
+      },
+      "tags": [
+        "protein",
+        "nutrition",
+        "preserved_food",
+        "luxury_food",
+        "long_lasting"
+      ],
+      "durability": "durable",
+      "durationCycles": 100,
+      "effectDecayRate": 0.01,
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.4,
+        "luxury": 2.0
       }
     },
     "vegetable": {
@@ -8384,6 +8623,80 @@
       "effectDecayRate": 0.05,
       "notes": "Basic grain - staple food"
     },
+    "flattened_rice": {
+      "id": "flattened_rice",
+      "fulfillmentVector": {
+        "coarse": [
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_grain": 8,
+          "biological_nutrition_protein": 0.5
+        }
+      },
+      "tags": [
+        "grain",
+        "nutrition",
+        "intermediate_product",
+        "raw_material"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.7,
+        "basic": 1,
+        "good": 1.2,
+        "luxury": 1.4
+      },
+      "notes": "Intermediate product - beaten rice for poha"
+    },
+    "poha": {
+      "id": "poha",
+      "fulfillmentVector": {
+        "coarse": [
+          18,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_grain": 15,
+          "biological_nutrition_produce": 3,
+          "biological_energy_stimulation": 2,
+          "touch_sensory_taste": 4,
+          "touch_sensory_luxury": 3
+        }
+      },
+      "tags": [
+        "grain",
+        "nutrition",
+        "street_food",
+        "breakfast",
+        "comfort"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.6,
+        "basic": 1,
+        "good": 1.5,
+        "luxury": 2.0
+      },
+      "durationCycles": 30,
+      "effectDecayRate": 0.06,
+      "notes": "Popular breakfast dish - flattened rice with spices"
+    },
     "kachori": {
       "id": "kachori",
       "fulfillmentVector": {
@@ -8832,6 +9145,52 @@
       "durationCycles": null,
       "effectDecayRate": null,
       "notes": "Basic grain - staple food"
+    },
+    "rasogulla": {
+      "id": "rasogulla",
+      "fulfillmentVector": {
+        "coarse": [
+          14,
+          0,
+          5,
+          3,
+          0,
+          0,
+          8,
+          5,
+          0
+        ],
+        "fine": {
+          "biological_nutrition_protein": 5,
+          "biological_nutrition_fat": 2,
+          "biological_energy_stimulation": 3,
+          "touch_sensory_luxury": 6,
+          "touch_sensory_taste": 5,
+          "psychological_detstress_relax": 3,
+          "exotic_goods_rare": 4,
+          "exotic_goods_imported": 4,
+          "shiny_objects_treasures": 5,
+          "vice_indulgence_sweets": 12
+        }
+      },
+      "tags": [
+        "sweet",
+        "luxury",
+        "dessert",
+        "specialty",
+        "comfort",
+        "celebration"
+      ],
+      "durability": "durable",
+      "qualityMultipliers": {
+        "poor": 0.7,
+        "basic": 1,
+        "good": 1.6,
+        "luxury": 2.3
+      },
+      "durationCycles": 80,
+      "effectDecayRate": 0.02,
+      "notes": "Premium Bengali sweet - spongy milk balls in sugar syrup"
     },
     "halwa": {
       "id": "halwa",

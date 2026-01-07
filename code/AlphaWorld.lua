@@ -7,6 +7,7 @@
 local CharacterV3 = require("code.consumption.CharacterV3")
 local AllocationEngineV2 = require("code.consumption.AllocationEngineV2")
 local CommodityCache = require("code.consumption.CommodityCache")
+local CharacterMovement = require("code.CharacterMovement")
 -- TownConsequences not used in alpha (no emigration/riots/protests)
 local DataLoader = require("code.DataLoader")
 local TimeManager = require("code.TimeManager")
@@ -42,7 +43,7 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
 
     -- Load all game data
     reportProgress(0.0, "Loading game data...")
-    world:LoadData()
+    world:LoadData(reportProgress)
 
     -- Initialize consumption subsystems
     reportProgress(0.1, "Initializing character system...")
@@ -281,7 +282,7 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
 
     -- Mark blocked terrain in land system (water, mountains)
     reportProgress(0.85, "Marking terrain plots...")
-    world:InitializeLandTerrain()
+    world:InitializeLandTerrain(reportProgress)
 
     -- Ownership Manager - tracks building/land ownership
     reportProgress(0.9, "Initializing ownership system...")
@@ -300,13 +301,18 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
 end
 
 -- Initialize land terrain based on water, mountains, and forests
-function AlphaWorld:InitializeLandTerrain()
+function AlphaWorld:InitializeLandTerrain(progressCallback)
     if not self.landSystem then return end
 
+    local t0 = love.timer and love.timer.getTime() or 0
     local gridColumns = self.landSystem.gridColumns
     local gridRows = self.landSystem.gridRows
     local plotWidth = self.landSystem.plotWidth
     local plotHeight = self.landSystem.plotHeight
+    local totalPlots = gridColumns * gridRows
+
+    local plotsProcessed = 0
+    local yieldEvery = 50  -- Yield every 50 plots to keep UI responsive
 
     for gx = 0, gridColumns - 1 do
         for gy = 0, gridRows - 1 do
@@ -330,10 +336,20 @@ function AlphaWorld:InitializeLandTerrain()
                 -- Set natural resources for forest plots
                 self.landSystem:SetPlotResources(plotId, {"timber"})
             end
+
+            plotsProcessed = plotsProcessed + 1
+
+            -- Yield every N plots for smooth progress
+            if progressCallback and plotsProcessed % yieldEvery == 0 then
+                local progress = 0.85 + (plotsProcessed / totalPlots) * 0.05  -- 85% to 90%
+                local message = string.format("Marking terrain... (%d/%d plots)", plotsProcessed, totalPlots)
+                progressCallback(progress, message)
+            end
         end
     end
 
-    print("[AlphaWorld] Initialized land terrain for " .. gridColumns * gridRows .. " plots")
+    local terrainTime = love.timer and (love.timer.getTime() - t0) or 0
+    print(string.format("[Profile] InitializeLandTerrain: %.3fs for %d plots", terrainTime, totalPlots))
 end
 
 -- Mask out resources in areas covered by water or forest
@@ -381,29 +397,46 @@ function AlphaWorld:MaskResourcesInBlockedAreas()
     print("[AlphaWorld] Masked resources in water and forest areas")
 end
 
-function AlphaWorld:LoadData()
-    -- Consumption data
+function AlphaWorld:LoadData(progressCallback)
+    local t0 = love.timer and love.timer.getTime() or 0
+    local function report(progress, msg)
+        if progressCallback then progressCallback(progress, msg) end
+    end
+
+    -- Consumption data (0.01 - 0.05)
+    report(0.01, "Loading consumption mechanics...")
     self.consumptionMechanics = DataLoader.loadConsumptionMechanics()
+
+    report(0.02, "Loading fulfillment vectors...")
     self.fulfillmentVectors = DataLoader.loadFulfillmentVectors()
+
+    report(0.03, "Loading character traits...")
     self.characterTraits = DataLoader.loadCharacterTraits()
     self.characterClasses = DataLoader.loadCharacterClasses()
+
+    report(0.04, "Loading dimension definitions...")
     self.dimensionDefinitions = DataLoader.loadDimensionDefinitions()
     self.commodityFatigueRates = DataLoader.loadCommodityFatigueRates()
+
+    report(0.05, "Loading rules...")
     self.enablementRules = DataLoader.loadEnablementRules()
     self.substitutionRules = DataLoader.loadSubstitutionRules()
 
-    -- Economics data (Phase 3)
+    -- Economics data (Phase 3) (0.06)
+    report(0.06, "Loading economics data...")
     self.classThresholds = DataLoader.loadClassThresholds()
     self.economicSystemsConfig = DataLoader.loadEconomicSystems()
     self.landConfig = DataLoader.loadLandConfig()
 
-    -- Production data
+    -- Production data (0.07 - 0.09)
+    report(0.07, "Loading building types...")
     self.buildingTypes = DataLoader.loadBuildingTypes() or {}
     self.buildingTypesById = {}
     for _, bt in ipairs(self.buildingTypes) do
         self.buildingTypesById[bt.id] = bt
     end
 
+    report(0.08, "Loading recipes...")
     self.buildingRecipes = DataLoader.loadBuildingRecipes() or {}
     self.recipesById = {}
     for _, recipe in ipairs(self.buildingRecipes) do
@@ -414,6 +447,7 @@ function AlphaWorld:LoadData()
         end
     end
 
+    report(0.09, "Loading commodities...")
     self.commodities = DataLoader.loadCommodities() or {}
     self.commoditiesById = {}
     for _, c in ipairs(self.commodities) do
@@ -427,6 +461,7 @@ function AlphaWorld:LoadData()
         self.commodityCategoriesById[cat.id] = cat
     end
 
+    report(0.095, "Loading worker types...")
     self.workerTypes = DataLoader.loadWorkerTypes() or {}
 
     -- Build vocation-to-workCategories lookup (matches vocation name to work categories)
@@ -438,7 +473,8 @@ function AlphaWorld:LoadData()
         self.vocationWorkCategories[wt.name:lower()] = wt.workCategories or {}
     end
 
-    -- Time slots - load via DataLoader
+    -- Time slots - load via DataLoader (0.098)
+    report(0.098, "Loading time slots...")
     local timeSlots = DataLoader.loadTimeSlots()
     if timeSlots and #timeSlots > 0 then
         self.timeSlots = timeSlots
@@ -485,8 +521,9 @@ function AlphaWorld:LoadData()
         end
     end
 
-    print("AlphaWorld loaded: " .. #self.buildingTypes .. " building types, " ..
-          #self.commodities .. " commodities, " .. #self.timeSlots .. " time slots")
+    local loadTime = love.timer and (love.timer.getTime() - t0) or 0
+    print(string.format("[Profile] LoadData complete in %.3fs: %d building types, %d commodities, %d time slots",
+        loadTime, #self.buildingTypes, #self.commodities, #self.timeSlots))
 
     -- Log slot-craving mappings
     for slotId, cravings in pairs(self.slotToCravings) do
@@ -905,6 +942,9 @@ function AlphaWorld:AddCitizen(class, name, traits, options)
     citizen.targetX = citizen.x
     citizen.targetY = citizen.y
 
+    -- Initialize movement system
+    CharacterMovement.InitializeCitizen(citizen)
+
     -- Work assignment
     citizen.workplace = nil
     citizen.workStation = nil
@@ -1096,7 +1136,20 @@ function AlphaWorld:AssignWorkerToBuilding(citizen, building)
     citizen.workplace = building
     table.insert(building.workers, citizen)
 
+    -- Send citizen to building entrance
+    CharacterMovement.SetDestinationToBuilding(citizen, building)
+
     return true
+end
+
+-- Send a citizen to a specific location
+function AlphaWorld:SendCitizenToLocation(citizen, x, y)
+    return CharacterMovement.SetDestination(citizen, x, y, nil)
+end
+
+-- Send a citizen to a building
+function AlphaWorld:SendCitizenToBuilding(citizen, building)
+    return CharacterMovement.SetDestinationToBuilding(citizen, building)
 end
 
 -- =============================================================================
@@ -1741,61 +1794,18 @@ end
 
 function AlphaWorld:UpdateCitizenPositions(dt)
     for _, citizen in ipairs(self.citizens) do
-        -- Initialize target position if not set
-        if not citizen.targetX or not citizen.targetY then
-            citizen.targetX = citizen.x or 100
-            citizen.targetY = citizen.y or 100
+        -- Initialize movement fields if not present (for legacy saves)
+        if not citizen.movementState then
+            CharacterMovement.InitializeCitizen(citizen)
         end
 
-        -- Simple wandering behavior
-        if math.random() < 0.01 then
-            -- Find a valid target that doesn't collide with river
-            local attempts = 0
-            local validTarget = false
-            local newX, newY
-
-            while not validTarget and attempts < 10 do
-                newX = math.random(100, 700)
-                newY = math.random(100, 500)
-
-                -- Check river collision
-                local inRiver = false
-                if self.river then
-                    inRiver = self.river:IsPointNear(newX - self.worldWidth * 0.5, newY - self.worldHeight * 0.5, 30)
-                end
-
-                if not inRiver then
-                    validTarget = true
-                end
-                attempts = attempts + 1
-            end
-
-            if validTarget then
-                citizen.targetX = newX
-                citizen.targetY = newY
-            end
+        -- Random wandering behavior (1% chance per frame to start wandering)
+        if CharacterMovement.IsIdle(citizen) and math.random() < 0.01 then
+            CharacterMovement.StartWandering(citizen, self)
         end
 
-        local dx = citizen.targetX - citizen.x
-        local dy = citizen.targetY - citizen.y
-        local dist = math.sqrt(dx * dx + dy * dy)
-
-        if dist > 5 then
-            local speed = 50 * dt
-            local newX = citizen.x + (dx / dist) * speed
-            local newY = citizen.y + (dy / dist) * speed
-
-            -- Check if new position is in river
-            local inRiver = false
-            if self.river then
-                inRiver = self.river:IsPointNear(newX - self.worldWidth * 0.5, newY - self.worldHeight * 0.5, 20)
-            end
-
-            if not inRiver then
-                citizen.x = newX
-                citizen.y = newY
-            end
-        end
+        -- Update movement using CharacterMovement system
+        CharacterMovement.UpdateMovement(citizen, dt, self)
     end
 end
 

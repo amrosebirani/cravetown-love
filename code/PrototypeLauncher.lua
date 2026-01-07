@@ -16,6 +16,13 @@ function PrototypeLauncher:Create()
                 highlight = true
             },
             {
+                id = "specialty_towns",
+                name = "Specialty Towns (CFP Prototype)",
+                description = "Choose from 4 Indian specialty towns: Mumbai (Vada Pav), Indore (Poha), Bangalore (Dosa), Kolkata (Rasogulla)",
+                color = {0.95, 0.7, 0.3},
+                highlight = true
+            },
+            {
                 id = "main",
                 name = "Main Game",
                 description = "Full game with geography, buildings, and town management",

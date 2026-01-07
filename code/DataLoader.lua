@@ -367,6 +367,35 @@ function DataLoader.getStartingLocationById(locationId)
 end
 
 -- =============================================================================
+-- SPECIALTY TOWNS (CFP Prototype)
+-- =============================================================================
+
+function DataLoader.loadSpecialtyTowns()
+    local filepath = "data/starting_towns/starting_towns.json"
+    print("Loading specialty towns from " .. filepath .. "...")
+    local success, data = pcall(function()
+        return DataLoader.loadJSON(filepath)
+    end)
+    if success and data then
+        print("  Loaded " .. #data.towns .. " specialty towns")
+        return data.towns or {}
+    else
+        print("  WARNING: Could not load specialty towns, returning empty")
+        return {}
+    end
+end
+
+function DataLoader.getSpecialtyTownById(townId)
+    local towns = DataLoader.loadSpecialtyTowns()
+    for _, town in ipairs(towns) do
+        if town.id == townId then
+            return town
+        end
+    end
+    return nil
+end
+
+-- =============================================================================
 -- LAND & OWNERSHIP SYSTEM DATA
 -- =============================================================================
 

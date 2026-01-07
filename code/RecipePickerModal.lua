@@ -143,8 +143,21 @@ function RecipePickerModal:Update(dt)
     end
 
     -- Check recipe buttons (account for scroll offset)
+    -- Calculate viewport boundaries to prevent clicks on scrolled-out buttons
+    local viewportTop = modalY + 60      -- Content area starts 60px from modal top
+    local viewportBottom = modalY + self.mModalHeight - 10  -- Leave 10px margin at bottom
+
     for _, btn in ipairs(self.mRecipeButtons) do
         local btnY = btn.y - self.mScrollOffset
+
+        -- Skip buttons that are scrolled out of viewport (CRAVE-9 fix)
+        local btnBottom = btnY + btn.height
+        if btnBottom < viewportTop or btnY > viewportBottom then
+            -- Button is not visible, skip click detection
+            goto continue
+        end
+
+        -- Check click only for visible buttons
         if mx >= btn.x and mx <= btn.x + btn.width and
            my >= btnY and my <= btnY + btn.height then
             -- Recipe selected
@@ -163,6 +176,8 @@ function RecipePickerModal:Update(dt)
             gStateStack:Pop()
             return false
         end
+
+        ::continue::
     end
 
     return true
@@ -237,12 +252,19 @@ function RecipePickerModal:Render()
     love.graphics.setScissor(modalX, modalY + 60, self.mModalWidth, self.mModalHeight - 70)
 
     -- Draw recipe buttons
+    -- Calculate viewport boundaries for hover detection
+    local viewportTop = modalY + 60
+    local viewportBottom = modalY + self.mModalHeight - 10
+
     for i, btn in ipairs(self.mRecipeButtons) do
         local recipe = self.mRecipes[i]
         local btnY = btn.y - self.mScrollOffset
 
-        -- Check hover
-        local hoveringRecipe = mx >= btn.x and mx <= btn.x + btn.width and
+        -- Check hover (only for visible buttons - CRAVE-9 fix)
+        local btnBottom = btnY + btn.height
+        local isVisible = not (btnBottom < viewportTop or btnY > viewportBottom)
+        local hoveringRecipe = isVisible and
+                               mx >= btn.x and mx <= btn.x + btn.width and
                                my >= btnY and my <= btnY + btn.height
 
         -- Button background
