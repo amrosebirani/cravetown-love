@@ -998,12 +998,10 @@
       "description": "Prepares and serves meals",
       "workCategories": [
         "Food Preparation",
-        "Hospitality",
         "General Labor"
       ],
       "workerEfficiency": {
         "Food Preparation": 1,
-        "Hospitality": 0.8,
         "General Labor": 0.4
       },
       "upgradeLevels": [
@@ -3846,13 +3844,11 @@
       ],
       "description": "Makes traditional Indian sweets like ladoo, jalebi, and halwa",
       "workCategories": [
-        "Confectionery",
-        "Baking",
+        "Food Preparation",
         "General Labor"
       ],
       "workerEfficiency": {
-        "Confectionery": 1,
-        "Baking": 0.8,
+        "Food Preparation": 1,
         "General Labor": 0.3
       },
       "upgradeLevels": [
@@ -3916,13 +3912,13 @@
         0.6,
         0.3
       ],
-      "description": "Makes Indian street food like samosa, kachori, pakora, and vada",
+      "description": "Makes Indian street food like samosa, kachori, pakora, and vada pav",
       "workCategories": [
-        "Cooking",
+        "Food Preparation",
         "General Labor"
       ],
       "workerEfficiency": {
-        "Cooking": 1,
+        "Food Preparation": 1,
         "General Labor": 0.35
       },
       "upgradeLevels": [

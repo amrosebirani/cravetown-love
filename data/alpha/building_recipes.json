@@ -123,31 +123,12 @@
       "category": "Consumable",
       "productionTime": 600,
       "inputs": {
-        "hen": 5
+        "chicken": 5
       },
       "outputs": {
-        "chicken": 12,
-        "feathers": 8,
-        "bone": 3
+        "chicken_meat": 12
       },
-      "notes": "10 minutes. Processes 5 hens into 12 chicken meat, 8 feathers, and 3 bones."
-    },
-    {
-      "buildingType": "butcher",
-      "name": "Butcher",
-      "recipeName": "Mutton Processing",
-      "category": "Consumable",
-      "productionTime": 1200,
-      "inputs": {
-        "sheep": 3
-      },
-      "outputs": {
-        "mutton": 20,
-        "wool": 6,
-        "leather": 4,
-        "bone": 5
-      },
-      "notes": "20 minutes. Processes 3 sheep into 20 mutton, 6 wool, 4 leather, and 5 bones."
+      "notes": "10 minutes. Processes 5 chickens into 12 chicken meat."
     },
     {
       "buildingType": "butcher",
@@ -159,26 +140,9 @@
         "goat": 3
       },
       "outputs": {
-        "goat_meat": 18,
-        "leather": 5,
-        "bone": 5
+        "goat_meat": 18
       },
-      "notes": "20 minutes. Processes 3 goats into 18 goat meat, 5 leather, and 5 bones."
-    },
-    {
-      "buildingType": "butcher",
-      "name": "Butcher",
-      "recipeName": "Meat Curing",
-      "category": "Consumable",
-      "productionTime": 3600,
-      "inputs": {
-        "mutton": 10,
-        "salt": 2
-      },
-      "outputs": {
-        "cured_meat": 8
-      },
-      "notes": "1 hour. Cures 10 mutton with 2 salt into 8 preserved cured meat."
+      "notes": "20 minutes. Processes 3 goats into 18 goat meat."
     },
     {
       "buildingType": "shoe_factory",
@@ -1037,23 +1001,10 @@
       "productionTime": 3600,
       "inputs": {},
       "outputs": {
-        "chicken": 8,
+        "chicken_meat": 8,
         "feathers": 12
       },
-      "notes": "1 hour. Hunts wild fowl, produces 8 chicken and 12 feathers."
-    },
-    {
-      "buildingType": "hunting_lodge",
-      "name": "Hunting Lodge",
-      "recipeName": "Sheep Hunting",
-      "category": "Production",
-      "productionTime": 7200,
-      "inputs": {},
-      "outputs": {
-        "mutton": 15,
-        "wool": 8
-      },
-      "notes": "2 hours. Hunts wild sheep, produces 15 mutton and 8 wool."
+      "notes": "1 hour. Hunts wild fowl, produces 8 chicken meat and 12 feathers."
     },
     {
       "buildingType": "hunting_lodge",
@@ -2047,10 +1998,9 @@
       },
       "outputs": {
         "sheep": 6,
-        "wool": 30,
-        "mutton": 15
+        "wool": 30
       },
-      "notes": "3 days. 4 sheep breeds to 6 sheep, plus wool and some meat."
+      "notes": "3 days. 4 sheep breeds to 6 sheep plus 30 kg wool."
     },
     {
       "buildingType": "sheep_farm",
@@ -2643,18 +2593,19 @@
     {
       "buildingType": "street_food_kitchen",
       "name": "Street Food Kitchen",
-      "recipeName": "Vada Making",
+      "recipeName": "Vada Pav Making",
       "category": "Production",
       "productionTime": 1500,
       "inputs": {
         "lentils": 5,
+        "pav": 20,
         "oil": 2,
         "spices": 1
       },
       "outputs": {
-        "vada": 20
+        "vada_pav": 20
       },
-      "notes": "25 minutes. Lentils + oil + spices produces 20 vadas."
+      "notes": "25 minutes. Lentils + pav + oil + spices produces 20 vada pav servings."
     },
     {
       "buildingType": "street_food_kitchen",
@@ -2728,14 +2679,14 @@
       "productionTime": 3600,
       "inputs": {
         "rice": 5,
-        "chicken": 5,
+        "chicken_meat": 5,
         "ghee": 2,
         "spices": 2
       },
       "outputs": {
         "biryani": 10
       },
-      "notes": "1 hour. Rice + chicken + ghee + spices produces 10 servings biryani."
+      "notes": "1 hour. Rice + chicken meat + ghee + spices produces 10 servings biryani."
     },
     {
       "buildingType": "restaurant",
@@ -2896,6 +2847,21 @@
     {
       "buildingType": "farm",
       "name": "Farm",
+      "recipeName": "Goat Raising",
+      "category": "Production",
+      "productionTime": 259200,
+      "inputs": {
+        "goat": 4,
+        "feed": 30
+      },
+      "outputs": {
+        "goat": 10
+      },
+      "notes": "3 days. 4 goats breed to 10 goats with proper feed."
+    },
+    {
+      "buildingType": "farm",
+      "name": "Farm",
       "recipeName": "Indigo Farming",
       "category": "Production",
       "productionTime": 7200,
@@ -2930,14 +2896,14 @@
       "category": "Production",
       "productionTime": 86400,
       "inputs": {
-        "hen": 20,
+        "chicken": 20,
         "feed": 10
       },
       "outputs": {
         "eggs": 80,
-        "hen": 20
+        "chicken": 20
       },
-      "notes": "1 day. 20 hens produce 80 eggs. Non-destructive."
+      "notes": "1 day. 20 chickens produce 80 eggs. Non-destructive."
     },
     {
       "buildingType": "poultry_farm",
@@ -2946,15 +2912,14 @@
       "category": "Production",
       "productionTime": 172800,
       "inputs": {
-        "hen": 10,
+        "chicken": 10,
         "feed": 20
       },
       "outputs": {
-        "hen": 12,
-        "chicken": 15,
+        "chicken": 22,
         "eggs": 30
       },
-      "notes": "2 days. 10 hens breed to 12 hens plus 15 chicken meat and 30 eggs."
+      "notes": "2 days. 10 chickens breed to 22 chickens plus 30 eggs."
     },
     {
       "buildingType": "apiary",

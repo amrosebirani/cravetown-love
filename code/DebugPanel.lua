@@ -19,18 +19,18 @@ function DebugPanel:Create(world)
     local panel = setmetatable({}, DebugPanel)
 
     panel.world = world
-    panel.visible = false
-    panel.collapsed = true  -- Start collapsed
+    panel.visible = false  -- Start hidden, only toggle button visible
+    panel.collapsed = false  -- When shown, start expanded
     panel.currentTab = "overview"  -- "overview", "citizens", "buildings", "economy", "events"
 
-    -- Panel position and dimensions
-    panel.x = love.graphics.getWidth() - 420  -- Right side of screen
-    panel.y = 60  -- Below top bar
-    panel.width = 400
-    panel.height = math.min(700, love.graphics.getHeight() - 100)  -- Adaptive height
+    -- Panel position and dimensions (fixed centered modal)
+    panel.width = 800
+    panel.height = math.min(600, love.graphics.getHeight() - 100)  -- Adaptive height
+    panel.x = (love.graphics.getWidth() - panel.width) / 2  -- Centered
+    panel.y = (love.graphics.getHeight() - panel.height) / 2  -- Centered
     panel.collapsedHeight = 45
 
-    -- Dragging state
+    -- No dragging (fixed modal)
     panel.isDragging = false
     panel.dragOffsetX = 0
     panel.dragOffsetY = 0
@@ -55,13 +55,13 @@ function DebugPanel:Create(world)
         info = {0.4, 0.6, 0.9, 1},
     }
 
-    -- Tab definitions
+    -- Tab definitions (no emojis, text only)
     panel.tabs = {
-        {id = "overview", label = "Overview", icon = "📊"},
-        {id = "citizens", label = "Citizens", icon = "👥"},
-        {id = "buildings", label = "Buildings", icon = "🏛️"},
-        {id = "economy", label = "Economy", icon = "💰"},
-        {id = "events", label = "Events", icon = "📝"}
+        {id = "overview", label = "Overview"},
+        {id = "citizens", label = "Citizens"},
+        {id = "buildings", label = "Buildings"},
+        {id = "economy", label = "Economy"},
+        {id = "events", label = "Events"}
     }
 
     -- Fonts (initialized on first render)
@@ -127,16 +127,19 @@ function DebugPanel:Update(dt)
 end
 
 function DebugPanel:Render()
-    if not self.visible then return end
-
     self:InitFonts()
     self.buttons = {}
 
+    -- Always render the toggle button (even when panel hidden)
+    self:RenderToggleButton()
+
+    if not self.visible then return end
+
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
 
-    -- Ensure panel stays within screen bounds
-    self.x = math.max(0, math.min(self.x, screenW - self.width))
-    self.y = math.max(0, math.min(self.y, screenH - (self.collapsed and self.collapsedHeight or self.height)))
+    -- Fixed centered position (recalculate in case window resized)
+    self.x = (screenW - self.width) / 2
+    self.y = (screenH - self.height) / 2
 
     local panelHeight = self.collapsed and self.collapsedHeight or self.height
 
@@ -189,6 +192,46 @@ function DebugPanel:Render()
 end
 
 -- =============================================================================
+-- TOGGLE BUTTON (Always Visible)
+-- =============================================================================
+function DebugPanel:RenderToggleButton()
+    -- Position in top-right corner, below speed selector (to avoid overlap)
+    local btnW = 100
+    local btnH = 30
+    local btnX = love.graphics.getWidth() - btnW - 10
+    local btnY = 50  -- Moved down to avoid speed selector
+
+    local mx, my = love.mouse.getPosition()
+    local isHover = mx >= btnX and mx <= btnX + btnW and my >= btnY and my <= btnY + btnH
+
+    -- Button background
+    if isHover then
+        love.graphics.setColor(0.4, 0.6, 0.8, 0.95)
+    else
+        love.graphics.setColor(0.3, 0.5, 0.7, 0.9)
+    end
+    love.graphics.rectangle("fill", btnX, btnY, btnW, btnH, 4, 4)
+
+    -- Button border
+    love.graphics.setColor(0.5, 0.7, 0.9, 1)
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", btnX, btnY, btnW, btnH, 4, 4)
+
+    -- Button text
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(1, 1, 1, 1)
+    local text = "Debug View"
+    local textW = self.fonts.small:getWidth(text)
+    love.graphics.print(text, btnX + (btnW - textW) / 2, btnY + 9)
+
+    -- Store for click handling
+    table.insert(self.buttons, {
+        x = btnX, y = btnY, w = btnW, h = btnH,
+        onClick = function() self:Toggle() end
+    })
+end
+
+-- =============================================================================
 -- HEADER
 -- =============================================================================
 function DebugPanel:RenderHeader()
@@ -207,18 +250,9 @@ function DebugPanel:RenderHeader()
     love.graphics.setColor(self.colors.textDim)
     love.graphics.print("Press F12 to toggle", self.x + 115, self.y + 11)
 
-    -- Buttons in header
+    -- Close button (only button in header)
     local btnY = self.y + 7
     local btnH = 22
-
-    -- Expand/Collapse button
-    local expandLabel = self.collapsed and "Expand" or "Collapse"
-    local expandIcon = self.collapsed and "▼" or "▲"
-    self:RenderButton(expandIcon .. " " .. expandLabel, self.x + self.width - 120, btnY, 75, btnH, function()
-        self:ToggleCollapse()
-    end, {0.4, 0.5, 0.6})
-
-    -- Close button
     self:RenderButton("X", self.x + self.width - 40, btnY, 30, btnH, function()
         self:Hide()
     end, {0.7, 0.3, 0.3})
@@ -250,12 +284,12 @@ function DebugPanel:RenderTabs()
         love.graphics.rectangle("line", tabX, tabY, tabW, tabH)
 
         -- Tab text
-        love.graphics.setFont(self.fonts.tiny)
+        love.graphics.setFont(self.fonts.small)
         local textColor = isActive and self.colors.text or self.colors.textDim
         love.graphics.setColor(textColor)
-        local text = tab.icon .. " " .. tab.label
-        local textW = self.fonts.tiny:getWidth(text)
-        love.graphics.print(text, tabX + (tabW - textW) / 2, tabY + 10)
+        local text = tab.label
+        local textW = self.fonts.small:getWidth(text)
+        love.graphics.print(text, tabX + (tabW - textW) / 2, tabY + 8)
 
         -- Store button for click handling
         table.insert(self.buttons, {
@@ -671,18 +705,7 @@ function DebugPanel:RenderButton(text, x, y, w, h, onClick, color)
 end
 
 function DebugPanel:HandleMousePress(x, y, button)
-    if not self.visible then return false end
-
-    -- Check if clicking header (drag handle)
-    if button == 1 and y >= self.y and y <= self.y + 35 and
-       x >= self.x and x <= self.x + self.width then
-        self.isDragging = true
-        self.dragOffsetX = x - self.x
-        self.dragOffsetY = y - self.y
-        return true
-    end
-
-    -- Check button clicks
+    -- Always check button clicks (including toggle button when hidden)
     for _, btn in ipairs(self.buttons) do
         if x >= btn.x and x <= btn.x + btn.w and
            y >= btn.y and y <= btn.y + btn.h then
@@ -693,6 +716,9 @@ function DebugPanel:HandleMousePress(x, y, button)
         end
     end
 
+    if not self.visible then return false end
+
+    -- No dragging - panel is fixed modal
     -- Check if click is within panel bounds (consume event)
     local panelHeight = self.collapsed and self.collapsedHeight or self.height
     if x >= self.x and x <= self.x + self.width and

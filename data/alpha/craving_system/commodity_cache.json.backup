@@ -50,7 +50,7 @@
           "value": 27
         },
         {
-          "id": "chicken_meat",
+          "id": "chicken",
           "value": 25
         },
         {
@@ -79,6 +79,10 @@
         },
         {
           "id": "beans",
+          "value": 22
+        },
+        {
+          "id": "mutton",
           "value": 22
         },
         {
@@ -449,7 +453,7 @@
         "kachori",
         "pakora",
         "biryani",
-        "chicken_meat",
+        "chicken",
         "samosa",
         "ghee",
         "rice_flour",
@@ -457,6 +461,7 @@
         "ladoo",
         "meat",
         "beans",
+        "mutton",
         "beef",
         "paratha",
         "mango",
@@ -892,6 +897,10 @@
           "value": 3
         },
         {
+          "id": "mutton",
+          "value": 3
+        },
+        {
           "id": "pastries",
           "value": 3
         },
@@ -1048,6 +1057,7 @@
         "beer",
         "wine",
         "flowers",
+        "mutton",
         "pastries",
         "preserved_food",
         "hat",
@@ -1970,7 +1980,11 @@
           "value": 2
         },
         {
-          "id": "chicken_meat",
+          "id": "chicken",
+          "value": 2
+        },
+        {
+          "id": "mutton",
           "value": 2
         },
         {
@@ -2040,7 +2054,8 @@
         "cream",
         "meat",
         "milk",
-        "chicken_meat",
+        "chicken",
+        "mutton",
         "beef",
         "eggs"
       ]
@@ -2052,7 +2067,11 @@
           "value": 20
         },
         {
-          "id": "chicken_meat",
+          "id": "chicken",
+          "value": 20
+        },
+        {
+          "id": "mutton",
           "value": 20
         },
         {
@@ -2278,7 +2297,8 @@
       ],
       "sortedByValue": [
         "meat",
-        "chicken_meat",
+        "chicken",
+        "mutton",
         "beef",
         "cheese",
         "eggs",
@@ -3562,6 +3582,10 @@
           "value": 3
         },
         {
+          "id": "mutton",
+          "value": 3
+        },
+        {
           "id": "pastries",
           "value": 3
         },
@@ -3699,6 +3723,7 @@
         "beer",
         "wine",
         "flowers",
+        "mutton",
         "pastries",
         "preserved_food",
         "cloth",
@@ -4885,7 +4910,7 @@
           "value": 3.5
         },
         {
-          "id": "chicken_meat",
+          "id": "chicken",
           "value": 3
         },
         {
@@ -4924,7 +4949,7 @@
         "milk",
         "paratha",
         "naan",
-        "chicken_meat",
+        "chicken",
         "curd",
         "ladoo",
         "khichdi"
