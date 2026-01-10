@@ -750,22 +750,23 @@ function AlphaUI:RenderMiniMap(x, y, w, h)
     local halfW = self.worldWidth / 2
     local halfH = self.worldHeight / 2
 
-    -- Draw forests (if available)
-    if self.world.forests then
-        love.graphics.setColor(0.2, 0.4, 0.2, 0.7)
-        for _, forest in ipairs(self.world.forests) do
-            if forest.regions then
-                for _, region in ipairs(forest.regions) do
-                    local fx = x + (region.x + halfW) * scaleX
-                    local fy = y + (region.y + halfH) * scaleY
-                    local fw = (region.width or 100) * scaleX
-                    local fh = (region.height or 100) * scaleY
-                    love.graphics.rectangle("fill", fx, fy, math.max(4, fw), math.max(4, fh))
-                end
-            elseif forest.x and forest.y then
-                local fx = x + (forest.x + halfW) * scaleX
-                local fy = y + (forest.y + halfH) * scaleY
-                local fr = (forest.radius or 50) * math.min(scaleX, scaleY)
+    -- Draw forest (if available)
+    if self.world.forest and self.world.forest.mRegions then
+        love.graphics.setColor(0.2, 0.5, 0.2, 0.7)
+        for _, region in ipairs(self.world.forest.mRegions) do
+            -- Check if region has zone bounds (rectangular) or is circular
+            if region.zoneX and region.zoneY then
+                -- Zone-based rectangular region
+                local fx = x + region.zoneX * scaleX
+                local fy = y + region.zoneY * scaleY
+                local fw = region.zoneWidth * scaleX
+                local fh = region.zoneHeight * scaleY
+                love.graphics.rectangle("fill", fx, fy, math.max(4, fw), math.max(4, fh))
+            elseif region.centerX and region.centerY then
+                -- Circular region
+                local fx = x + region.centerX * scaleX
+                local fy = y + region.centerY * scaleY
+                local fr = (region.radius or 50) * math.min(scaleX, scaleY)
                 love.graphics.circle("fill", fx, fy, math.max(3, fr))
             end
         end
@@ -1102,7 +1103,7 @@ function AlphaUI:RenderImmigrationModal()
     local bulkBtnY = modalY + 44
     local bulkBtnH = 22
     local bulkBtnSpacing = 5
-    local bulkStartX = modalX + 530
+    local bulkStartX = modalX + 580
 
     -- Accept All (70%+) button
     local applicants = immigrationSystem and immigrationSystem:GetApplicants() or {}
@@ -6871,17 +6872,31 @@ function AlphaUI:HandleKeyPress(key)
     end
 
     if key == "m" then
-        -- Immigration (M for migrants)
         local immigrationSystem = self.world.immigrationSystem
         if immigrationSystem then
-            self.showImmigrationModal = not self.showImmigrationModal
-            if self.showImmigrationModal then
+            local isShiftHeld = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+            if isShiftHeld then
+                -- SHIFT+M: Regenerate immigration queue (for testing)
+                immigrationSystem:RegenerateQueue()
+                self.selectedApplicant = nil
+                self.immigrationScrollOffset = 0
+                -- Auto-open the immigration modal to see results
+                self.showImmigrationModal = true
                 self.showBuildMenuModal = false
                 self.showCitizensPanel = false
                 self.showAnalyticsPanel = false
                 self.showProductionAnalyticsPanel = false
-                self.selectedApplicant = nil
-                self.immigrationScrollOffset = 0
+            else
+                -- M: Toggle Immigration modal
+                self.showImmigrationModal = not self.showImmigrationModal
+                if self.showImmigrationModal then
+                    self.showBuildMenuModal = false
+                    self.showCitizensPanel = false
+                    self.showAnalyticsPanel = false
+                    self.showProductionAnalyticsPanel = false
+                    self.selectedApplicant = nil
+                    self.immigrationScrollOffset = 0
+                end
             end
             return true
         end
