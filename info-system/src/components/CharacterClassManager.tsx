@@ -54,11 +54,16 @@ const CharacterClassManager: React.FC = () => {
   const handleAdd = () => {
     setEditing(null);
     form.resetFields();
-    // Set default vectors (all zeros)
+    // Get the required size from dimension definitions
+    const maxDimensionIndex = dimensions ? Math.max(...dimensions.fineDimensions.map(d => d.index), 0) : 65;
+    const requiredFineSize = maxDimensionIndex + 1;
+    const requiredCoarseSize = dimensions ? dimensions.coarseDimensions.length : 10;
+
+    // Set default vectors (all zeros) with proper sizes
     form.setFieldsValue({
       baseCravingVector: {
-        coarse: new Array(9).fill(0),
-        fine: new Array(50).fill(0),
+        coarse: new Array(requiredCoarseSize).fill(0),
+        fine: new Array(requiredFineSize).fill(0),
       },
       thresholds: {
         emigration: 50,
@@ -73,17 +78,20 @@ const CharacterClassManager: React.FC = () => {
 
   const handleEdit = (record: CharacterClass) => {
     setEditing(record);
-    // Ensure baseCravingVector.fine is properly sized (50 dimensions)
+    // Get the required size from dimension definitions
+    const maxDimensionIndex = dimensions ? Math.max(...dimensions.fineDimensions.map(d => d.index), 0) : 65;
+    const requiredFineSize = maxDimensionIndex + 1;
+    const requiredCoarseSize = dimensions ? dimensions.coarseDimensions.length : 10;
+
+    // Ensure baseCravingVector arrays are properly sized
+    const existingFine = record.baseCravingVector?.fine || [];
+    const existingCoarse = record.baseCravingVector?.coarse || [];
+
+    // Extend arrays to required size (never trim - preserve all data)
     const baseCravingVector = {
-      coarse: record.baseCravingVector?.coarse || new Array(9).fill(0),
-      fine: record.baseCravingVector?.fine || new Array(50).fill(0),
+      coarse: [...existingCoarse, ...new Array(Math.max(0, requiredCoarseSize - existingCoarse.length)).fill(0)],
+      fine: [...existingFine, ...new Array(Math.max(0, requiredFineSize - existingFine.length)).fill(0)],
     };
-    // Pad or trim to exactly 50 dimensions
-    if (baseCravingVector.fine.length < 50) {
-      baseCravingVector.fine = [...baseCravingVector.fine, ...new Array(50 - baseCravingVector.fine.length).fill(0)];
-    } else if (baseCravingVector.fine.length > 50) {
-      baseCravingVector.fine = baseCravingVector.fine.slice(0, 50);
-    }
 
     form.setFieldsValue({
       ...record,
@@ -111,40 +119,40 @@ const CharacterClassManager: React.FC = () => {
   const handleModalOk = async () => {
     try {
       const values = await form.validateFields();
-      if (!data) return;
+      if (!data || !dimensions) return;
 
       // Ensure baseCravingVector has both coarse and fine arrays
       if (values.baseCravingVector) {
-        if (!values.baseCravingVector.coarse) {
-          // Calculate coarse from fine by aggregating
-          const fine = values.baseCravingVector.fine || new Array(50).fill(0);
-          const coarse = new Array(9).fill(0);
+        // Always recalculate coarse from fine using dimension definitions
+        const fine = values.baseCravingVector.fine || [];
+        const coarseCount = dimensions.coarseDimensions.length;
+        const coarse = new Array(coarseCount).fill(0);
+        const coarseCounts = new Array(coarseCount).fill(0);
 
-          // Aggregate fine to coarse (biological=0-7, safety=8-12, etc.)
-          const fineToCoarseRanges = [
-            [0, 7],   // biological
-            [8, 12],  // safety
-            [13, 17], // touch
-            [18, 23], // psychological
-            [24, 28], // social_status
-            [29, 33], // social_connection
-            [34, 39], // exotic_goods
-            [40, 44], // shiny_objects
-            [45, 49]  // vice
-          ];
+        // Build coarse index lookup from dimension definitions
+        const coarseIdToIndex: Record<string, number> = {};
+        dimensions.coarseDimensions.forEach(cd => {
+          coarseIdToIndex[cd.id] = cd.index;
+        });
 
-          fineToCoarseRanges.forEach((range, coarseIdx) => {
-            let sum = 0;
-            let count = 0;
-            for (let i = range[0]; i <= range[1]; i++) {
-              sum += fine[i] || 0;
-              count++;
-            }
-            coarse[coarseIdx] = count > 0 ? sum / count : 0;
-          });
+        // Aggregate fine to coarse using dimension definitions
+        dimensions.fineDimensions.forEach(fineDim => {
+          const fineValue = fine[fineDim.index] || 0;
+          const coarseIdx = coarseIdToIndex[fineDim.parentCoarse];
+          if (coarseIdx !== undefined) {
+            coarse[coarseIdx] += fineValue;
+            coarseCounts[coarseIdx] += 1;
+          }
+        });
 
-          values.baseCravingVector.coarse = coarse;
+        // Calculate averages
+        for (let i = 0; i < coarseCount; i++) {
+          if (coarseCounts[i] > 0) {
+            coarse[i] = coarse[i] / coarseCounts[i];
+          }
         }
+
+        values.baseCravingVector.coarse = coarse;
       }
 
       let newClasses: CharacterClass[];
@@ -406,16 +414,6 @@ const CharacterClassManager: React.FC = () => {
           >
             <VectorEditor
               dimensions={dimensions.fineDimensions}
-              values={form.getFieldValue(['baseCravingVector', 'fine']) || new Array(50).fill(0)}
-              onChange={(values) => {
-                const currentValues = form.getFieldsValue();
-                form.setFieldsValue({
-                  baseCravingVector: {
-                    ...currentValues.baseCravingVector,
-                    fine: values,
-                  }
-                });
-              }}
               min={0}
               max={10}
               step={0.1}
