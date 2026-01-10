@@ -25,6 +25,11 @@ local OwnershipManager = require("code.OwnershipManager")
 local EconomicsSystem = require("code.EconomicsSystem")
 local HousingSystem = require("code.HousingSystem")
 
+-- Pathfinding & Collision Systems
+local NavigationGrid = require("code.NavigationGrid")
+local Pathfinder = require("code.Pathfinder")
+local SpatialHash = require("code.SpatialHash")
+
 AlphaWorld = {}
 AlphaWorld.__index = AlphaWorld
 
@@ -293,8 +298,23 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
     world.economicsSystem = EconomicsSystem:Create(world.ownershipManager)
 
     -- Housing System - housing assignment and satisfaction
-    reportProgress(0.97, "Configuring housing system...")
+    reportProgress(0.95, "Configuring housing system...")
     world.housingSystem = HousingSystem:Create(nil, world.economicsSystem, nil)
+
+    -- ==========================================================================
+    -- PATHFINDING & COLLISION SYSTEMS
+    -- ==========================================================================
+    reportProgress(0.97, "Building navigation grid...")
+
+    -- Navigation Grid - walkability map for A* pathfinding
+    world.navigationGrid = NavigationGrid:Create(world)
+    world.navigationGrid:Generate()
+
+    -- Pathfinder - A* algorithm
+    world.pathfinder = Pathfinder:Create(world.navigationGrid)
+
+    -- Spatial Hash - efficient citizen neighbor queries for separation
+    world.citizenHash = SpatialHash:Create(50, world.worldWidth, world.worldHeight)
 
     reportProgress(1.0, "World ready!")
     return world
@@ -892,7 +912,7 @@ function AlphaWorld:AddCitizen(class, name, traits, options)
         end
     end
 
-    -- Position for visual display (random within building area, avoiding water and trees)
+    -- Position for visual display (near existing buildings, avoiding water and trees)
     local maxAttempts = 100
     local attempt = 0
     local x, y
@@ -908,11 +928,29 @@ function AlphaWorld:AddCitizen(class, name, traits, options)
         return true
     end
 
+    -- If there are existing buildings, spawn citizens around them
+    local hasBuildings = #self.buildings > 0
+
     while attempt < maxAttempts and not validPosition do
-        if buildingArea then
-            -- Spawn within the designated building area
-            x = buildingArea.x + math.random(20, buildingArea.width - 40)
-            y = buildingArea.y + math.random(20, buildingArea.height - 40)
+        if hasBuildings then
+            -- Pick a random building and spawn near it
+            local building = self.buildings[math.random(#self.buildings)]
+            local spawnRadius = 80 + math.random(0, 60)  -- 80-140 pixels from building
+            local angle = math.random() * 2 * math.pi
+            x = building.x + 30 + math.cos(angle) * spawnRadius  -- 30 = half building width (approximate center)
+            y = building.y + 30 + math.sin(angle) * spawnRadius
+
+            -- Clamp to world bounds
+            x = math.max(20, math.min(self.worldWidth - 20, x))
+            y = math.max(20, math.min(self.worldHeight - 20, y))
+        elseif buildingArea then
+            -- No buildings yet, spawn within the designated building area center
+            local centerX = buildingArea.x + buildingArea.width / 2
+            local centerY = buildingArea.y + buildingArea.height / 2
+            local spawnRadius = math.random(20, 150)
+            local angle = math.random() * 2 * math.pi
+            x = centerX + math.cos(angle) * spawnRadius
+            y = centerY + math.sin(angle) * spawnRadius
         else
             -- Fallback: left side of map (original behavior)
             if attempt < 50 then
@@ -926,9 +964,13 @@ function AlphaWorld:AddCitizen(class, name, traits, options)
         attempt = attempt + 1
     end
 
-    -- Fallback: if still invalid, use building area center or left side
+    -- Fallback: if still invalid, use first building's location or building area center
     if not validPosition then
-        if buildingArea then
+        if hasBuildings then
+            local building = self.buildings[1]
+            x = building.x + 30 + math.random(-50, 50)
+            y = building.y + 30 + math.random(-50, 50)
+        elseif buildingArea then
             x = buildingArea.x + buildingArea.width / 2
             y = buildingArea.y + buildingArea.height / 2
         else
@@ -1097,6 +1139,13 @@ function AlphaWorld:AddBuilding(buildingTypeId, x, y, options)
         end
     end
 
+    -- Mark building area as blocked in navigation grid
+    if self.navigationGrid then
+        local width = buildingType.width or 60
+        local height = buildingType.height or 60
+        self.navigationGrid:MarkBuildingArea(x, y, width, height, true)
+    end
+
     self:LogEvent("construction", building.name .. " built", {type = buildingTypeId})
 
     return building
@@ -1136,8 +1185,11 @@ function AlphaWorld:AssignWorkerToBuilding(citizen, building)
     citizen.workplace = building
     table.insert(building.workers, citizen)
 
-    -- Send citizen to building entrance
-    CharacterMovement.SetDestinationToBuilding(citizen, building)
+    -- Redistribute all workers to their new spread positions
+    -- This ensures existing workers reposition when a new worker joins
+    for _, worker in ipairs(building.workers) do
+        CharacterMovement.SetDestinationToBuilding(worker, building)
+    end
 
     return true
 end
@@ -1793,10 +1845,29 @@ function AlphaWorld:Update(dt)
 end
 
 function AlphaWorld:UpdateCitizenPositions(dt)
+    -- Rebuild spatial hash for efficient neighbor queries
+    if self.citizenHash then
+        self.citizenHash:Clear()
+        for _, citizen in ipairs(self.citizens) do
+            self.citizenHash:Insert(citizen, citizen.x, citizen.y)
+        end
+    end
+
+    -- Process pathfinding requests (staggered to avoid performance spikes)
+    self:UpdatePathfinding(dt)
+
     for _, citizen in ipairs(self.citizens) do
         -- Initialize movement fields if not present (for legacy saves)
         if not citizen.movementState then
             CharacterMovement.InitializeCitizen(citizen)
+        end
+
+        -- Age the current path
+        citizen.pathAge = (citizen.pathAge or 0) + dt
+
+        -- Request new path if current path is too old
+        if citizen.path and citizen.pathAge > (citizen.pathMaxAge or 5.0) then
+            citizen.needsPath = true
         end
 
         -- Random wandering behavior (1% chance per frame to start wandering)
@@ -1806,6 +1877,43 @@ function AlphaWorld:UpdateCitizenPositions(dt)
 
         -- Update movement using CharacterMovement system
         CharacterMovement.UpdateMovement(citizen, dt, self)
+    end
+end
+
+-- Process pathfinding requests for citizens (max N per frame for performance)
+function AlphaWorld:UpdatePathfinding(dt)
+    if not self.pathfinder then return end
+
+    local maxPerFrame = 3  -- Limit path calculations per frame
+    local count = 0
+
+    for _, citizen in ipairs(self.citizens) do
+        if count >= maxPerFrame then break end
+
+        -- Check if citizen needs a new path
+        if citizen.needsPath and citizen.targetX and citizen.targetY then
+            local path = self.pathfinder:FindPath(
+                citizen.x, citizen.y,
+                citizen.targetX, citizen.targetY
+            )
+
+            if path then
+                citizen.path = path
+                citizen.pathIndex = 1
+                citizen.pathAge = 0
+                print(string.format("[Pathfinding] %s: Found path with %d waypoints from (%.0f,%.0f) to (%.0f,%.0f)",
+                    citizen.name, #path, citizen.x, citizen.y, citizen.targetX, citizen.targetY))
+            else
+                -- No path found - clear path and let citizen try direct movement
+                citizen.path = nil
+                citizen.pathIndex = 1
+                print(string.format("[Pathfinding] %s: NO PATH from (%.0f,%.0f) to (%.0f,%.0f)",
+                    citizen.name, citizen.x, citizen.y, citizen.targetX, citizen.targetY))
+            end
+
+            citizen.needsPath = false
+            count = count + 1
+        end
     end
 end
 

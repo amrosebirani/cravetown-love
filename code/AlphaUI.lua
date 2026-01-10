@@ -122,6 +122,9 @@ function AlphaUI:Create(world)
     ui.placementBreakdown = {}
     ui.placementErrors = {}
 
+    -- Debug: Spawn citizen mode (press 'C' to toggle, click to spawn)
+    ui.spawnCitizenMode = false
+
     -- Build menu modal
     ui.showBuildMenuModal = false
     ui.buildMenuScrollOffset = 0
@@ -366,6 +369,11 @@ function AlphaUI:Render()
         self:RenderPlacementInstructions()
     end
 
+    -- Render spawn citizen mode indicator
+    if self.spawnCitizenMode then
+        self:RenderSpawnCitizenModeIndicator()
+    end
+
     -- Render resource overlay panel (screen space, not world space)
     if self.showResourceOverlay and self.resourceOverlay then
         self.resourceOverlay:renderPanel()
@@ -384,11 +392,6 @@ function AlphaUI:Render()
     -- Render housing assignment modal
     if self.showHousingAssignmentModal and self.housingAssignmentModal then
         self.housingAssignmentModal:Render()
-    end
-
-    -- Render character detail panel
-    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
-        self.characterDetailPanel:Render()
     end
 
     -- Render inventory panel
@@ -424,6 +427,11 @@ function AlphaUI:Render()
     -- Render recipe picker modal (on top of building modal)
     if self.showRecipeModal and self.selectedBuildingForModal then
         self:RenderRecipeModal()
+    end
+
+    -- Render character detail panel (on top of citizens panel)
+    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
+        self.characterDetailPanel:Render()
     end
 
     -- Render help overlay on top of everything
@@ -1923,6 +1931,56 @@ function AlphaUI:RenderProductionBuildingDetails(x, y, w, building)
                 love.graphics.print(string.format("  Progress: %.0f%%", station.progress * 100), x + 10, y)
                 y = y + 14
             end
+
+            -- Show recipe details (inputs and outputs)
+            if station.recipe then
+                -- Show inputs
+                local inputsText = "  In: "
+                local inputCount = 0
+                for inputId, qty in pairs(station.recipe.inputs or {}) do
+                    if inputCount > 0 then inputsText = inputsText .. ", " end
+                    local inputName = self:GetCommodityDisplayName(inputId)
+                    inputsText = inputsText .. inputName .. " x" .. qty
+                    inputCount = inputCount + 1
+                end
+                if inputCount == 0 then inputsText = inputsText .. "None" end
+                love.graphics.setColor(0.8, 0.7, 0.6)
+                love.graphics.print(inputsText, x + 10, y)
+                y = y + 14
+
+                -- Show outputs
+                local outputsText = "  Out: "
+                local outputCount = 0
+                for outputId, qty in pairs(station.recipe.outputs or {}) do
+                    if outputCount > 0 then outputsText = outputsText .. ", " end
+                    local outputName = self:GetCommodityDisplayName(outputId)
+                    outputsText = outputsText .. outputName .. " x" .. qty
+                    outputCount = outputCount + 1
+                end
+                if outputCount == 0 then outputsText = outputsText .. "None" end
+                love.graphics.setColor(0.6, 0.9, 0.7)
+                love.graphics.print(outputsText, x + 10, y)
+                y = y + 14
+
+                -- When NO_MATERIALS, show what's missing
+                if station.state == "NO_MATERIALS" then
+                    y = y + 2
+                    love.graphics.setColor(self.colors.danger)
+                    love.graphics.print("  Missing materials:", x + 10, y)
+                    y = y + 14
+                    for inputId, required in pairs(station.recipe.inputs or {}) do
+                        local available = self.world.inventory[inputId] or 0
+                        if available < required then
+                            local inputName = self:GetCommodityDisplayName(inputId)
+                            local missingText = string.format("    %s: %d / %d needed", inputName, available, required)
+                            love.graphics.print(missingText, x + 10, y)
+                            y = y + 14
+                        end
+                    end
+                end
+            end
+
+            y = y + 5  -- Small gap between stations
         end
 
         y = y + 15
@@ -3158,6 +3216,52 @@ function AlphaUI:RenderPlacementInstructions()
     local instructions = "[Left-Click] Place   [Right-Click] Cancel   [R] Toggle Resources"
     local textW = self.fonts.small:getWidth(instructions)
     love.graphics.print(instructions, barX + (barW - textW) / 2, barY + 7)
+end
+
+function AlphaUI:RenderSpawnCitizenModeIndicator()
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+
+    -- Instruction bar at bottom of world view (similar to placement mode)
+    local barX = self.leftPanelWidth
+    local barY = screenH - self.bottomBarHeight - 30
+    local barW = screenW - self.leftPanelWidth - self.rightPanelWidth
+    local barH = 28
+
+    -- Background with cyan/teal tint for debug mode
+    love.graphics.setColor(0.1, 0.15, 0.2, 0.9)
+    love.graphics.rectangle("fill", barX, barY, barW, barH)
+
+    -- Border to highlight debug mode
+    love.graphics.setColor(0.2, 0.8, 0.8, 0.8)
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", barX, barY, barW, barH)
+    love.graphics.setLineWidth(1)
+
+    -- Instructions
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.3, 1, 1)
+
+    local instructions = "[SPAWN CITIZEN MODE] Click anywhere to spawn a citizen - Press [SHIFT+C] to exit"
+    local textW = self.fonts.small:getWidth(instructions)
+    love.graphics.print(instructions, barX + (barW - textW) / 2, barY + 7)
+
+    -- Also draw at mouse position for visual feedback
+    local mx, my = love.mouse.getPosition()
+    local worldX = self.leftPanelWidth
+    local worldY = self.topBarHeight
+    local worldW = screenW - self.leftPanelWidth - self.rightPanelWidth
+    local worldH = screenH - self.topBarHeight - self.bottomBarHeight
+
+    if mx >= worldX and mx < worldX + worldW and
+       my >= worldY and my < worldY + worldH then
+        -- Draw citizen preview at mouse
+        love.graphics.setColor(0.2, 0.8, 0.8, 0.6)
+        love.graphics.circle("fill", mx, my, 10)
+        love.graphics.setColor(0.3, 1, 1, 0.8)
+        love.graphics.circle("line", mx, my, 10)
+    end
+
+    love.graphics.setColor(1, 1, 1)
 end
 
 function AlphaUI:RenderBuildMenuModal()
@@ -5773,6 +5877,13 @@ function AlphaUI:HandleClick(x, y, button)
         return self:HandleBuildingModalClick(x, y)
     end
 
+    -- Handle character detail panel clicks FIRST (appears on top of citizens panel)
+    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
+        if self.characterDetailPanel:HandleClick(x, y) then
+            return true
+        end
+    end
+
     -- Handle inventory panel clicks
     if self.showInventoryPanel then
         return self:HandleInventoryPanelClick(x, y)
@@ -5819,13 +5930,6 @@ function AlphaUI:HandleClick(x, y, button)
     -- Handle debug panel clicks (CRAVE-6) - high priority
     if self.debugPanel and self.debugPanel:IsVisible() then
         if self.debugPanel:HandleMousePress(x, y, button) then
-            return true
-        end
-    end
-
-    -- Handle character detail panel clicks (highest priority modal)
-    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
-        if self.characterDetailPanel:HandleClick(x, y) then
             return true
         end
     end
@@ -6008,6 +6112,32 @@ function AlphaUI:HandleClick(x, y, button)
         -- Convert to world coordinates
         local wx = (x - worldX) + self.cameraX
         local wy = (y - worldY) + self.cameraY
+
+        -- Handle spawn citizen mode (debug feature)
+        if self.spawnCitizenMode then
+            -- Spawn a citizen at the clicked world position
+            -- AddCitizen signature: (class, name, traits, options)
+            local citizen = self.world:AddCitizen(nil, nil, nil, {})
+            if citizen then
+                -- Override position to clicked location
+                citizen.x = wx
+                citizen.y = wy
+                citizen.targetX = wx
+                citizen.targetY = wy
+
+                -- Set them to walking state so they pathfind back to town center
+                local CharacterMovement = require("code.CharacterMovement")
+                local townCenterX = self.world.worldWidth / 2
+                local townCenterY = self.world.worldHeight / 2
+                CharacterMovement.SetDestination(citizen, townCenterX, townCenterY)
+
+                print(string.format("[Debug] Spawned citizen '%s' at (%.0f, %.0f) - walking to town center (%.0f, %.0f)",
+                    citizen.name, wx, wy, townCenterX, townCenterY))
+                -- Select the newly spawned citizen
+                self.world:SelectEntity(citizen, "citizen")
+            end
+            return true
+        end
 
         -- Check for citizen click
         local citizen = self.world:GetCitizenAt(wx, wy, 15)
@@ -6303,20 +6433,11 @@ function AlphaUI:HandleCitizensPanelClick(x, y)
     -- Check citizen card clicks
     for _, btn in ipairs(self.citizensCardBtns or {}) do
         if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
-            -- Select this citizen and show details in right panel
+            -- Select this citizen and show details
             self.world.selectedEntity = btn.citizen
             self.selectedCitizenForModal = btn.citizen
-            -- Double-click opens detail panel
-            local currentTime = love.timer.getTime()
-            if self.lastCitizenClickTime and self.lastCitizenClicked == btn.citizen and
-               (currentTime - self.lastCitizenClickTime) < 0.4 then
-                -- Double-click: Open CharacterDetailPanel
-                self:OpenCharacterDetailPanel(btn.citizen)
-                self.lastCitizenClickTime = nil
-            else
-                self.lastCitizenClickTime = currentTime
-                self.lastCitizenClicked = btn.citizen
-            end
+            -- Single-click opens detail panel
+            self:OpenCharacterDetailPanel(btn.citizen)
             return true
         end
     end
@@ -7004,6 +7125,24 @@ function AlphaUI:HandleKeyPress(key)
             self.housingOverviewPanel:Hide()
         end
         return true
+    end
+
+    -- Handle 'SHIFT+C' for Spawn Citizen mode (debug/test feature)
+    if key == "c" and not self.buildMenuSearchActive then
+        local isShiftHeld = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+        if isShiftHeld then
+            self.spawnCitizenMode = not self.spawnCitizenMode
+            if self.spawnCitizenMode then
+                -- Exit placement mode if active
+                if self.placementMode then
+                    self:ExitPlacementMode()
+                end
+                print("[Debug] Spawn Citizen mode ENABLED - Click anywhere on the map to spawn a citizen")
+            else
+                print("[Debug] Spawn Citizen mode DISABLED")
+            end
+            return true
+        end
     end
 
     -- Forward number keys to resource overlay when panel is visible

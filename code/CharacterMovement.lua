@@ -2,7 +2,10 @@
 -- CharacterMovement.lua
 -- Character movement state machine and pathfinding logic
 -- CRAVE-7: Movement State Tracking
+-- Updated: A* pathfinding and citizen separation
 --
+
+local CitizenSeparation = require("code.CitizenSeparation")
 
 CharacterMovement = {}
 
@@ -47,6 +50,15 @@ function CharacterMovement.InitializeCitizen(citizen)
 
     -- Arrival threshold (how close counts as "arrived")
     citizen.arrivalThreshold = citizen.arrivalThreshold or 5
+
+    -- Pathfinding state
+    citizen.path = nil              -- Array of {x, y} waypoints
+    citizen.pathIndex = 1           -- Current waypoint index
+    citizen.pathTarget = nil        -- {x, y} final destination for path
+    citizen.pathAge = 0             -- Time since path was calculated
+    citizen.pathMaxAge = 5.0        -- Recalculate path after this many seconds
+    citizen.needsPath = false       -- Flag to request new path calculation
+    citizen.blockedTime = 0         -- Time spent blocked by obstacles
 end
 
 -- =============================================================================
@@ -76,6 +88,13 @@ function CharacterMovement.SetDestination(citizen, x, y, buildingId)
 
         -- Update facing direction
         citizen.facing = math.atan2(dy, dx)
+
+        -- Request pathfinding for this destination
+        citizen.pathTarget = {x = x, y = y}
+        citizen.needsPath = true
+        citizen.pathAge = 0
+        citizen.path = nil
+        citizen.pathIndex = 1
     else
         -- Already at destination
         citizen.movementState = CharacterMovement.States.IDLE
@@ -90,8 +109,10 @@ end
 
 -- Get the entrance point for a building (where citizens should walk to)
 -- @param building - the building object
+-- @param workerIndex - optional index of worker in building's worker list (1-based)
+-- @param totalWorkers - optional total number of workers for spreading calculation
 -- @return x, y - entrance coordinates
-function CharacterMovement.GetBuildingEntrancePoint(building)
+function CharacterMovement.GetBuildingEntrancePoint(building, workerIndex, totalWorkers)
     if not building then return 0, 0 end
 
     -- Default building dimensions (can be overridden by building type)
@@ -104,9 +125,22 @@ function CharacterMovement.GetBuildingEntrancePoint(building)
         height = building.type.height or height
     end
 
-    -- Entrance is at the center-bottom of the building
+    -- Base entrance is at the center-bottom of the building
     local entranceX = building.x + width / 2
     local entranceY = building.y + height
+
+    -- If worker index provided, spread workers in a semicircle in front of building
+    if workerIndex and totalWorkers and totalWorkers > 1 then
+        local spreadRadius = 25  -- Distance from entrance point
+        local arcAngle = math.pi * 0.8  -- 144 degrees arc (semicircle facing away from building)
+        local startAngle = math.pi / 2 - arcAngle / 2  -- Center the arc below building
+
+        local angleStep = arcAngle / (totalWorkers - 1)
+        local angle = startAngle + (workerIndex - 1) * angleStep
+
+        entranceX = entranceX + math.cos(angle) * spreadRadius
+        entranceY = entranceY + math.sin(angle) * spreadRadius
+    end
 
     return entranceX, entranceY
 end
@@ -117,7 +151,22 @@ end
 function CharacterMovement.SetDestinationToBuilding(citizen, building)
     if not citizen or not building then return false end
 
-    local entranceX, entranceY = CharacterMovement.GetBuildingEntrancePoint(building)
+    -- Find this worker's index in the building's worker list for position spreading
+    local workerIndex = 1
+    local totalWorkers = building.maxWorkers or 2
+
+    if building.workers then
+        for i, worker in ipairs(building.workers) do
+            if worker.id == citizen.id then
+                workerIndex = i
+                break
+            end
+        end
+        -- Use actual worker count or maxWorkers, whichever is larger
+        totalWorkers = math.max(#building.workers, building.maxWorkers or 2)
+    end
+
+    local entranceX, entranceY = CharacterMovement.GetBuildingEntrancePoint(building, workerIndex, totalWorkers)
     return CharacterMovement.SetDestination(citizen, entranceX, entranceY, building.id)
 end
 
@@ -125,10 +174,10 @@ end
 -- MOVEMENT UPDATE
 -- =============================================================================
 
--- Update citizen movement (linear interpolation toward target)
+-- Update citizen movement with pathfinding and separation
 -- @param citizen - the citizen object
 -- @param dt - delta time in seconds
--- @param world - optional world object for collision detection
+-- @param world - world object for collision and spatial hash
 function CharacterMovement.UpdateMovement(citizen, dt, world)
     if not citizen then return end
 
@@ -138,27 +187,80 @@ function CharacterMovement.UpdateMovement(citizen, dt, world)
         return
     end
 
+    -- Get current target (waypoint from path, or final destination)
+    local targetX, targetY = citizen.targetX, citizen.targetY
+
+    if citizen.path and citizen.pathIndex and citizen.pathIndex <= #citizen.path then
+        local waypoint = citizen.path[citizen.pathIndex]
+        targetX = waypoint.x
+        targetY = waypoint.y
+
+        -- Check if reached current waypoint
+        local wpDx = citizen.x - targetX
+        local wpDy = citizen.y - targetY
+        local wpDist = math.sqrt(wpDx * wpDx + wpDy * wpDy)
+
+        if wpDist < 10 then
+            -- Advance to next waypoint
+            citizen.pathIndex = citizen.pathIndex + 1
+
+            -- If we've reached the end of path, use final target
+            if citizen.pathIndex > #citizen.path then
+                targetX = citizen.targetX
+                targetY = citizen.targetY
+            else
+                local nextWaypoint = citizen.path[citizen.pathIndex]
+                targetX = nextWaypoint.x
+                targetY = nextWaypoint.y
+            end
+        end
+    end
+
     -- Calculate direction to target
-    local dx = citizen.targetX - citizen.x
-    local dy = citizen.targetY - citizen.y
+    local dx = targetX - citizen.x
+    local dy = targetY - citizen.y
     local distance = math.sqrt(dx * dx + dy * dy)
 
-    -- Check if arrived
-    if distance <= citizen.arrivalThreshold then
+    -- Check if arrived at final destination
+    local finalDx = citizen.targetX - citizen.x
+    local finalDy = citizen.targetY - citizen.y
+    local finalDistance = math.sqrt(finalDx * finalDx + finalDy * finalDy)
+
+    if finalDistance <= citizen.arrivalThreshold then
         CharacterMovement.OnArrival(citizen)
         return
     end
 
-    -- Normalize direction and apply speed
-    local moveSpeed = citizen.speed * dt
-    local moveX = (dx / distance) * moveSpeed
-    local moveY = (dy / distance) * moveSpeed
+    -- Calculate movement direction
+    local moveX, moveY = 0, 0
+    if distance > 0.1 then
+        moveX = dx / distance
+        moveY = dy / distance
+    end
 
-    -- Calculate new position
-    local newX = citizen.x + moveX
-    local newY = citizen.y + moveY
+    -- Apply separation force from nearby citizens
+    if world and world.citizenHash then
+        local nearby = world.citizenHash:GetNearby(citizen.x, citizen.y, 50)
+        local sepX, sepY = CitizenSeparation.CalculateWithAvoidance(citizen, nearby, moveX, moveY)
 
-    -- Collision detection (if world is provided)
+        -- Blend separation with movement direction
+        moveX = moveX + sepX * dt
+        moveY = moveY + sepY * dt
+
+        -- Re-normalize
+        local moveLen = math.sqrt(moveX * moveX + moveY * moveY)
+        if moveLen > 0.1 then
+            moveX = moveX / moveLen
+            moveY = moveY / moveLen
+        end
+    end
+
+    -- Apply speed
+    local speed = citizen.speed * dt
+    local newX = citizen.x + moveX * speed
+    local newY = citizen.y + moveY * speed
+
+    -- Collision detection with world obstacles
     local blocked = false
     if world then
         blocked = CharacterMovement.CheckCollision(world, newX, newY, citizen)
@@ -168,12 +270,16 @@ function CharacterMovement.UpdateMovement(citizen, dt, world)
     if not blocked then
         citizen.x = newX
         citizen.y = newY
+        citizen.blockedTime = 0
 
         -- Update facing direction
-        citizen.facing = math.atan2(dy, dx)
+        if math.abs(moveX) > 0.01 or math.abs(moveY) > 0.01 then
+            citizen.facing = math.atan2(moveY, moveX)
+        end
     else
-        -- If blocked, try to find alternate path or stop
-        CharacterMovement.OnBlocked(citizen, world)
+        -- Track blocked time and request new path if stuck
+        citizen.blockedTime = (citizen.blockedTime or 0) + dt
+        CharacterMovement.OnBlocked(citizen, world, dt)
     end
 end
 
@@ -207,12 +313,43 @@ function CharacterMovement.OnArrival(citizen)
 end
 
 -- Handle being blocked by obstacles
-function CharacterMovement.OnBlocked(citizen, world)
-    -- For now, simply stop and go idle
-    -- TODO: Implement pathfinding around obstacles
-    citizen.movementState = CharacterMovement.States.IDLE
-    citizen.targetX = citizen.x
-    citizen.targetY = citizen.y
+-- @param citizen - the citizen object
+-- @param world - the world object
+-- @param dt - delta time (optional, for blocked time tracking)
+function CharacterMovement.OnBlocked(citizen, world, dt)
+    dt = dt or 0.016  -- Default to ~60fps if not provided
+
+    -- Track blocked time
+    citizen.blockedTime = (citizen.blockedTime or 0) + dt
+
+    -- If blocked for too long, request new path
+    if citizen.blockedTime > 0.5 then
+        citizen.needsPath = true
+        citizen.blockedTime = 0
+        citizen.path = nil  -- Clear old path
+
+        -- Try a small random offset to get unstuck
+        local offsetX = (math.random() - 0.5) * 20
+        local offsetY = (math.random() - 0.5) * 20
+        local testX = citizen.x + offsetX
+        local testY = citizen.y + offsetY
+
+        -- Only apply offset if it's valid
+        if world and not CharacterMovement.CheckCollision(world, testX, testY, citizen) then
+            citizen.x = testX
+            citizen.y = testY
+        end
+    end
+
+    -- If blocked for very long, give up and go idle
+    if citizen.blockedTime > 3.0 then
+        citizen.movementState = CharacterMovement.States.IDLE
+        citizen.targetX = citizen.x
+        citizen.targetY = citizen.y
+        citizen.path = nil
+        citizen.needsPath = false
+        citizen.blockedTime = 0
+    end
 end
 
 -- =============================================================================
