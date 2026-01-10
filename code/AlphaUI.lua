@@ -33,6 +33,9 @@ local DebugPanel = require("code.DebugPanel")
 local NotificationSystem = require("code.NotificationSystem")
 local TutorialSystem = require("code.TutorialSystem")
 
+-- Cheat Console
+local CheatConsole = require("code.CheatConsole")
+
 AlphaUI = {}
 AlphaUI.__index = AlphaUI
 
@@ -295,6 +298,15 @@ function AlphaUI:Create(world)
     ui.emigrationCitizenBtns = {}
     ui.emigrationPrioritizeBtns = {}
 
+    -- Cheat console state
+    ui.showCheatConsole = false
+    ui.cheatConsoleInput = ""
+    ui.cheatConsoleHistory = {}  -- {input, output} pairs
+    ui.cheatConsoleHistoryMax = 20
+    ui.cheatConsoleCursorVisible = true
+    ui.cheatConsoleCursorTimer = 0
+    ui.cheatConsoleScrollOffset = 0
+
     return ui
 end
 
@@ -432,6 +444,11 @@ function AlphaUI:Render()
     -- Render debug panel (CRAVE-6) - on top but below tutorial
     if self.debugPanel and self.debugPanel:IsVisible() then
         self.debugPanel:Render()
+    end
+
+    -- Render cheat console (on top of most things)
+    if self.showCheatConsole then
+        self:RenderCheatConsole()
     end
 
     -- Render tutorial overlay (on very top)
@@ -2629,29 +2646,45 @@ function AlphaUI:RenderCitizen(citizen)
         love.graphics.circle("fill", cx, cy, radius + 6)
     end
 
-    -- Status circle (outer ring showing happiness)
-    love.graphics.setColor(satColor[1] * r * 0.7, satColor[2] * g * 0.7, satColor[3] * b * 0.7)
-    love.graphics.circle("fill", cx, cy, radius + 2)
+    -- Get satisfaction gradient color (red to green)
+    local gradientColor = self:GetSatisfactionGradientColor(sat)
 
-    -- Body (inner circle)
-    local bodyColor = {0.9, 0.8, 0.7}  -- Skin tone
-    love.graphics.setColor(bodyColor[1] * r, bodyColor[2] * g, bodyColor[3] * b)
-    love.graphics.circle("fill", cx, cy, radius - 1)
+    -- Determine shape based on class (circular for lower, squarish for upper)
+    -- Use emergentClass first (new system), fall back to class (legacy)
+    local rawClass = citizen.emergentClass or citizen.class or "middle"
+    local classLower = string.lower(rawClass)
 
-    -- Head
-    love.graphics.circle("fill", cx, cy - radius + 2, radius * 0.6)
+    -- Circular for lower classes (poor, working, lower)
+    local isCircular = (classLower == "poor" or classLower == "working" or classLower == "lower")
+    local cornerRadius
+    if isCircular then
+        cornerRadius = radius
+    elseif classLower == "middle" then
+        cornerRadius = radius * 0.5
+    else  -- elite, upper
+        cornerRadius = radius * 0.2
+    end
 
-    -- Class indicator (colored band)
-    local classColors = {
-        Elite = {0.6, 0.4, 0.8},
-        Upper = {0.4, 0.4, 0.8},
-        Middle = {0.4, 0.6, 0.4},
-        Working = {0.7, 0.5, 0.3},
-        Poor = {0.5, 0.4, 0.3}
-    }
-    local classColor = classColors[citizen.class] or {0.5, 0.5, 0.5}
-    love.graphics.setColor(classColor[1] * r, classColor[2] * g, classColor[3] * b)
-    love.graphics.rectangle("fill", cx - radius * 0.5, cy + radius * 0.2, radius, 4, 2, 2)
+    -- Face background with satisfaction gradient color and day/night tint
+    love.graphics.setColor(gradientColor[1] * r, gradientColor[2] * g, gradientColor[3] * b)
+    if isCircular then
+        love.graphics.circle("fill", cx, cy, radius)
+    else
+        love.graphics.rectangle("fill", cx - radius, cy - radius, radius * 2, radius * 2, cornerRadius, cornerRadius)
+    end
+
+    -- Border (darker version of face color)
+    love.graphics.setColor(gradientColor[1] * 0.6 * r, gradientColor[2] * 0.6 * g, gradientColor[3] * 0.6 * b)
+    love.graphics.setLineWidth(1.5)
+    if isCircular then
+        love.graphics.circle("line", cx, cy, radius)
+    else
+        love.graphics.rectangle("line", cx - radius, cy - radius, radius * 2, radius * 2, cornerRadius, cornerRadius)
+    end
+    love.graphics.setLineWidth(1)
+
+    -- Draw emoticon expression (eyes and mouth based on satisfaction)
+    self:DrawEmoticonExpression(cx, cy, radius, sat)
 
     -- Status indicator with speech bubble
     if statusIndicator then
@@ -2692,17 +2725,25 @@ function AlphaUI:RenderCitizen(citizen)
         love.graphics.circle("fill", cx + radius, cy - radius, 4)
     end
 
-    -- Selection highlight
+    -- Selection highlight (match shape to class)
     if self.world.selectedEntity == citizen then
         love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], 0.9)
         love.graphics.setLineWidth(3)
-        love.graphics.circle("line", cx, cy, radius + 6)
+        if isCircular then
+            love.graphics.circle("line", cx, cy, radius + 6)
+        else
+            love.graphics.rectangle("line", cx - radius - 6, cy - radius - 6, (radius + 6) * 2, (radius + 6) * 2, cornerRadius + 2, cornerRadius + 2)
+        end
         love.graphics.setLineWidth(1)
 
         -- Pulsing effect using game time
         local pulse = math.sin(love.timer.getTime() * 4) * 0.3 + 0.7
         love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], pulse * 0.5)
-        love.graphics.circle("line", cx, cy, radius + 10)
+        if isCircular then
+            love.graphics.circle("line", cx, cy, radius + 10)
+        else
+            love.graphics.rectangle("line", cx - radius - 10, cy - radius - 10, (radius + 10) * 2, (radius + 10) * 2, cornerRadius + 4, cornerRadius + 4)
+        end
     end
 end
 
@@ -4792,6 +4833,73 @@ function AlphaUI:GetClassColor(class)
     end
 end
 
+-- Helper function to get satisfaction gradient color (red to green)
+function AlphaUI:GetSatisfactionGradientColor(satisfaction)
+    local sat = math.max(0, math.min(100, satisfaction))
+    local r, g, b
+
+    if sat < 25 then
+        -- Red to Orange
+        local t = sat / 25
+        r, g, b = 0.9, 0.2 + t * 0.4, 0.2
+    elseif sat < 50 then
+        -- Orange to Yellow
+        local t = (sat - 25) / 25
+        r, g, b = 0.9, 0.6 + t * 0.3, 0.2
+    elseif sat < 75 then
+        -- Yellow to Light Green
+        local t = (sat - 50) / 25
+        r, g, b = 0.9 - t * 0.5, 0.9, 0.2 + t * 0.2
+    else
+        -- Light Green to Green
+        local t = (sat - 75) / 25
+        r, g, b = 0.4 - t * 0.1, 0.9, 0.4 - t * 0.1
+    end
+
+    return {r, g, b}
+end
+
+-- Helper function to draw emoticon expression based on satisfaction
+function AlphaUI:DrawEmoticonExpression(cx, cy, radius, satisfaction)
+    local eyeOffsetX = radius * 0.35
+    local eyeOffsetY = radius * 0.15
+    local eyeRadius = radius * 0.12
+
+    -- Draw eyes (black dots)
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.circle("fill", cx - eyeOffsetX, cy - eyeOffsetY, eyeRadius)
+    love.graphics.circle("fill", cx + eyeOffsetX, cy - eyeOffsetY, eyeRadius)
+
+    -- Draw mouth based on satisfaction
+    local mouthY = cy + radius * 0.25
+    local mouthWidth = radius * 0.5
+    love.graphics.setLineWidth(2)
+
+    if satisfaction >= 70 then
+        -- Big smile
+        love.graphics.arc("line", "open", cx, mouthY - radius * 0.1, mouthWidth, 0.2, math.pi - 0.2)
+    elseif satisfaction >= 50 then
+        -- Small smile
+        love.graphics.arc("line", "open", cx, mouthY - radius * 0.05, mouthWidth * 0.7, 0.3, math.pi - 0.3)
+    elseif satisfaction >= 30 then
+        -- Neutral line
+        love.graphics.line(cx - mouthWidth * 0.4, mouthY, cx + mouthWidth * 0.4, mouthY)
+    elseif satisfaction >= 15 then
+        -- Slight frown
+        love.graphics.arc("line", "open", cx, mouthY + radius * 0.15, mouthWidth * 0.6, math.pi + 0.4, 2 * math.pi - 0.4)
+    else
+        -- Big frown + worried eyebrows
+        love.graphics.arc("line", "open", cx, mouthY + radius * 0.25, mouthWidth * 0.8, math.pi + 0.2, 2 * math.pi - 0.2)
+        -- Worried eyebrows
+        love.graphics.line(cx - eyeOffsetX - eyeRadius, cy - eyeOffsetY - eyeRadius * 2,
+                          cx - eyeOffsetX + eyeRadius, cy - eyeOffsetY - eyeRadius)
+        love.graphics.line(cx + eyeOffsetX - eyeRadius, cy - eyeOffsetY - eyeRadius,
+                          cx + eyeOffsetX + eyeRadius, cy - eyeOffsetY - eyeRadius * 2)
+    end
+
+    love.graphics.setLineWidth(1)
+end
+
 -- Get filtered citizens based on current filter settings
 function AlphaUI:GetFilteredCitizens()
     local filtered = {}
@@ -6661,6 +6769,66 @@ function AlphaUI:GetBuildingTypeForQuickBuild(btnId)
 end
 
 function AlphaUI:HandleKeyPress(key)
+    -- Handle cheat console FIRST (highest priority when open)
+    -- Toggle cheat console with backtick/grave or F10
+    if key == "`" or key == "grave" or key == "f10" then
+        self.showCheatConsole = not self.showCheatConsole
+        if self.showCheatConsole then
+            self.cheatConsoleInput = ""
+            self.cheatConsoleScrollOffset = 0
+        end
+        return true
+    end
+
+    -- When cheat console is open, capture ALL input
+    if self.showCheatConsole then
+        if key == "escape" then
+            self.showCheatConsole = false
+            return true
+        elseif key == "return" then
+            -- Execute command
+            if self.cheatConsoleInput ~= "" then
+                local result = CheatConsole:ParseAndExecute(self.cheatConsoleInput, self.world)
+                table.insert(self.cheatConsoleHistory, {
+                    input = self.cheatConsoleInput,
+                    output = result or ""
+                })
+                -- Trim history if too long
+                while #self.cheatConsoleHistory > self.cheatConsoleHistoryMax do
+                    table.remove(self.cheatConsoleHistory, 1)
+                end
+                self.cheatConsoleInput = ""
+                self.cheatConsoleScrollOffset = 0
+            end
+            return true
+        elseif key == "backspace" then
+            if #self.cheatConsoleInput > 0 then
+                self.cheatConsoleInput = self.cheatConsoleInput:sub(1, -2)
+            end
+            return true
+        elseif key == "up" then
+            -- Scroll history up
+            if #self.cheatConsoleHistory > 0 then
+                self.cheatConsoleScrollOffset = math.min(self.cheatConsoleScrollOffset + 1, #self.cheatConsoleHistory * 2)
+            end
+            return true
+        elseif key == "down" then
+            -- Scroll history down
+            self.cheatConsoleScrollOffset = math.max(self.cheatConsoleScrollOffset - 1, 0)
+            return true
+        elseif key == "pageup" then
+            -- Scroll history up faster
+            self.cheatConsoleScrollOffset = self.cheatConsoleScrollOffset + 5
+            return true
+        elseif key == "pagedown" then
+            -- Scroll history down faster
+            self.cheatConsoleScrollOffset = math.max(self.cheatConsoleScrollOffset - 5, 0)
+            return true
+        end
+        -- Consume ALL other keys when console is open (prevent game input)
+        return true
+    end
+
     -- Handle plot selection modal keys (highest priority)
     if self.showPlotSelectionModal and self.plotSelectionModal then
         if self.plotSelectionModal:HandleKeyPress(key) then
@@ -7090,6 +7258,18 @@ function AlphaUI:Update(dt)
 end
 
 function AlphaUI:HandleMouseWheel(x, y)
+    -- Handle cheat console scroll (highest priority when open)
+    if self.showCheatConsole then
+        if y > 0 then
+            -- Scroll up (show older history)
+            self.cheatConsoleScrollOffset = self.cheatConsoleScrollOffset + 3
+        elseif y < 0 then
+            -- Scroll down (show newer history)
+            self.cheatConsoleScrollOffset = math.max(self.cheatConsoleScrollOffset - 3, 0)
+        end
+        return
+    end
+
     -- Handle debug panel scroll (CRAVE-6) - highest priority
     if self.debugPanel and self.debugPanel:IsVisible() then
         if self.debugPanel:HandleMouseWheel(x, y) then
@@ -7435,7 +7615,8 @@ function AlphaUI:RenderHelpOverlay()
         {"Right-click", "Context menu"},
         {"Click empty", "Deselect"},
         {"F5", "Quicksave"},
-        {"F9", "Quickload"}
+        {"F9", "Quickload"},
+        {"`", "Cheat console"}
     }
 
     for _, shortcut in ipairs(shortcuts4) do
@@ -7473,6 +7654,99 @@ function AlphaUI:RenderHelpOverlay()
     local closeText = "Press H or any key to close"
     local closeW = self.fonts.small:getWidth(closeText)
     love.graphics.print(closeText, panelX + (panelW - closeW) / 2, panelY + panelH - 30)
+
+    -- Reset color
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
+-- =============================================================================
+-- CHEAT CONSOLE
+-- =============================================================================
+
+function AlphaUI:RenderCheatConsole()
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+    local consoleH = 220
+    local consoleY = screenH - consoleH
+
+    -- Update cursor blink
+    self.cheatConsoleCursorTimer = self.cheatConsoleCursorTimer + love.timer.getDelta()
+    if self.cheatConsoleCursorTimer > 0.5 then
+        self.cheatConsoleCursorTimer = 0
+        self.cheatConsoleCursorVisible = not self.cheatConsoleCursorVisible
+    end
+
+    -- Semi-transparent background
+    love.graphics.setColor(0, 0, 0, 0.9)
+    love.graphics.rectangle("fill", 0, consoleY, screenW, consoleH)
+
+    -- Top border
+    love.graphics.setColor(0.3, 1, 0.3, 0.8)
+    love.graphics.setLineWidth(2)
+    love.graphics.line(0, consoleY, screenW, consoleY)
+
+    -- Title
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.3, 1, 0.3)
+    love.graphics.print("CHEAT CONSOLE (type 'help' for commands, ` to close)", 10, consoleY + 5)
+
+    -- History area
+    local historyY = consoleY + 25
+    local historyH = consoleH - 55
+    local lineHeight = 18
+    local maxVisibleLines = math.floor(historyH / lineHeight)
+
+    love.graphics.setFont(self.fonts.small)
+
+    -- Render history (newest at bottom)
+    local visibleHistory = {}
+    for i, entry in ipairs(self.cheatConsoleHistory) do
+        table.insert(visibleHistory, {type = "input", text = "> " .. entry.input})
+        if entry.output and entry.output ~= "" then
+            -- Split multi-line output
+            for line in entry.output:gmatch("[^\n]+") do
+                table.insert(visibleHistory, {type = "output", text = "  " .. line})
+            end
+        end
+    end
+
+    -- Calculate scroll
+    local totalLines = #visibleHistory
+    local startLine = math.max(1, totalLines - maxVisibleLines + 1 - self.cheatConsoleScrollOffset)
+    local endLine = math.min(totalLines, startLine + maxVisibleLines - 1)
+
+    local y = historyY
+    for i = startLine, endLine do
+        local entry = visibleHistory[i]
+        if entry then
+            if entry.type == "input" then
+                love.graphics.setColor(0.3, 1, 0.3)  -- Green for input
+            else
+                love.graphics.setColor(0.8, 0.8, 0.8)  -- Gray for output
+            end
+            love.graphics.print(entry.text, 10, y)
+            y = y + lineHeight
+        end
+    end
+
+    -- Scroll indicator
+    if totalLines > maxVisibleLines then
+        love.graphics.setColor(0.5, 0.5, 0.5)
+        local scrollText = string.format("[%d/%d lines - Up/Down to scroll]",
+            totalLines - self.cheatConsoleScrollOffset, totalLines)
+        love.graphics.print(scrollText, screenW - 250, consoleY + 5)
+    end
+
+    -- Input line
+    local inputY = screenH - 28
+    love.graphics.setColor(0.2, 0.2, 0.2)
+    love.graphics.rectangle("fill", 0, inputY - 4, screenW, 32)
+
+    love.graphics.setColor(0.3, 1, 0.3)
+    love.graphics.setFont(self.fonts.normal)
+
+    -- Prompt and input
+    local cursor = self.cheatConsoleCursorVisible and "_" or ""
+    love.graphics.print("> " .. self.cheatConsoleInput .. cursor, 10, inputY)
 
     -- Reset color
     love.graphics.setColor(1, 1, 1, 1)
@@ -8636,6 +8910,18 @@ end
 -- =============================================================================
 
 function AlphaUI:HandleTextInput(text)
+    -- Handle cheat console input (highest priority when open)
+    if self.showCheatConsole then
+        -- Skip backtick to avoid adding it to input
+        if text ~= "`" and text ~= "~" then
+            -- Only allow printable characters
+            if text:match("^[%w%s%p]$") then
+                self.cheatConsoleInput = self.cheatConsoleInput .. text
+            end
+        end
+        return true
+    end
+
     -- Handle build menu search input
     if self.showBuildMenuModal and self.buildMenuSearchActive then
         -- Only allow printable characters (no control chars)
