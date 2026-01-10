@@ -54,11 +54,16 @@ const TraitManager: React.FC = () => {
   const handleAdd = () => {
     setEditing(null);
     form.resetFields();
-    // Set default multipliers (all 1.0)
+    // Get the required size from dimension definitions
+    const maxDimensionIndex = dimensions ? Math.max(...dimensions.fineDimensions.map(d => d.index), 0) : 65;
+    const requiredFineSize = maxDimensionIndex + 1;
+    const requiredCoarseSize = dimensions ? dimensions.coarseDimensions.length : 10;
+
+    // Set default multipliers (all 1.0) with proper sizes
     form.setFieldsValue({
       cravingMultipliers: {
-        coarse: new Array(9).fill(1.0),
-        fine: new Array(50).fill(1.0),
+        coarse: new Array(requiredCoarseSize).fill(1.0),
+        fine: new Array(requiredFineSize).fill(1.0),
       },
     });
     setIsModalVisible(true);
@@ -66,7 +71,25 @@ const TraitManager: React.FC = () => {
 
   const handleEdit = (record: CharacterTrait) => {
     setEditing(record);
-    form.setFieldsValue(record);
+    // Get the required size from dimension definitions
+    const maxDimensionIndex = dimensions ? Math.max(...dimensions.fineDimensions.map(d => d.index), 0) : 65;
+    const requiredFineSize = maxDimensionIndex + 1;
+    const requiredCoarseSize = dimensions ? dimensions.coarseDimensions.length : 10;
+
+    // Ensure cravingMultipliers arrays are properly sized (extend, never trim)
+    const existingFine = record.cravingMultipliers?.fine || [];
+    const existingCoarse = record.cravingMultipliers?.coarse || [];
+
+    // For multipliers, default is 1.0 (no change), not 0
+    const cravingMultipliers = {
+      coarse: [...existingCoarse, ...new Array(Math.max(0, requiredCoarseSize - existingCoarse.length)).fill(1.0)],
+      fine: [...existingFine, ...new Array(Math.max(0, requiredFineSize - existingFine.length)).fill(1.0)],
+    };
+
+    form.setFieldsValue({
+      ...record,
+      cravingMultipliers,
+    });
     setIsModalVisible(true);
   };
 
@@ -278,25 +301,15 @@ const TraitManager: React.FC = () => {
 
           <Form.Item
             name={['cravingMultipliers', 'fine']}
-            label="Craving Multipliers (Fine - 50D)"
+            label="Craving Multipliers (Fine)"
             help="Multipliers modify base craving values. 1.0 = no change, >1.0 = amplified, <1.0 = reduced"
           >
             <VectorEditor
               dimensions={dimensions.fineDimensions}
-              values={form.getFieldValue(['cravingMultipliers', 'fine']) || new Array(50).fill(1.0)}
-              onChange={(values) => {
-                const currentValues = form.getFieldsValue();
-                form.setFieldsValue({
-                  cravingMultipliers: {
-                    ...currentValues.cravingMultipliers,
-                    fine: values,
-                  }
-                });
-              }}
               min={0}
               max={3}
               step={0.1}
-              title="Fine Craving Multipliers (50D)"
+              title="Fine Craving Multipliers"
               showCoarseView={true}
               groupByParent={true}
             />
@@ -344,7 +357,7 @@ const TraitManager: React.FC = () => {
               key={`viz-${viewing.id}`}
               dimensions={dimensions.coarseDimensions}
               values={viewing.cravingMultipliers?.coarse ?? []}
-              title="Coarse Craving Multipliers (9D)"
+              title={`Coarse Craving Multipliers (${dimensions.coarseDimensions.length}D)`}
               maxValue={3}
             />
 
@@ -352,7 +365,7 @@ const TraitManager: React.FC = () => {
               key={`heatmap-${viewing.id}`}
               dimensions={dimensions.fineDimensions}
               values={viewing.cravingMultipliers?.fine ?? []}
-              title="Fine Craving Multipliers (50D)"
+              title={`Fine Craving Multipliers (${dimensions.fineDimensions.length}D)`}
               maxValue={3}
               colorScheme="purple"
             />

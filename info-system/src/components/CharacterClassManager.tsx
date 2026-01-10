@@ -410,14 +410,14 @@ const CharacterClassManager: React.FC = () => {
 
           <Form.Item
             name={['baseCravingVector', 'fine']}
-            label="Base Craving Vector (Fine - 50D)"
+            label="Base Craving Vector (Fine)"
           >
             <VectorEditor
               dimensions={dimensions.fineDimensions}
               min={0}
               max={10}
               step={0.1}
-              title="Fine Craving Vector (50D)"
+              title="Fine Craving Vector"
               showCoarseView={true}
               groupByParent={true}
             />
@@ -477,14 +477,14 @@ const CharacterClassManager: React.FC = () => {
             <VectorVisualization
               dimensions={dimensions.coarseDimensions}
               values={viewing.baseCravingVector.coarse}
-              title="Coarse Craving Profile (9D)"
+              title={`Coarse Craving Profile (${dimensions.coarseDimensions.length}D)`}
               maxValue={10}
             />
 
             <VectorHeatmap
               dimensions={dimensions.fineDimensions}
               values={viewing.baseCravingVector.fine}
-              title="Fine Craving Vector (50D)"
+              title={`Fine Craving Vector (${dimensions.fineDimensions.length}D)`}
               maxValue={10}
               colorScheme="blue"
             />
