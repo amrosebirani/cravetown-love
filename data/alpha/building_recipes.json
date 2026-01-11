@@ -476,12 +476,12 @@
       "name": "Farm",
       "recipeName": "Wheat Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 2880,
       "inputs": {
         "wheat_seed": 20
       },
       "outputs": {
-        "wheat": 10,
+        "wheat": 100,
         "wheat_seed": 30
       },
       "notes": "2 hours. 20 seeds produces 10 wheat and 30 seeds."
@@ -626,7 +626,7 @@
       "name": "Farm",
       "recipeName": "Cotton Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 2880,
       "inputs": {
         "cotton_seed": 10
       },
@@ -641,7 +641,7 @@
       "name": "Farm",
       "recipeName": "Flax Farming",
       "category": "Production",
-      "productionTime": 6300,
+      "productionTime": 2520,
       "inputs": {
         "flax_seed": 15
       },
@@ -656,12 +656,12 @@
       "name": "Farm",
       "recipeName": "Maize Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 2880,
       "inputs": {
         "maize_seed": 20
       },
       "outputs": {
-        "maize": 10,
+        "maize": 100,
         "maize_seed": 30
       },
       "notes": "2 hours. 20 seeds produces 10 maize and 30 seeds."
@@ -671,12 +671,12 @@
       "name": "Farm",
       "recipeName": "Rice Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 2880,
       "inputs": {
         "rice_seed": 20
       },
       "outputs": {
-        "rice": 10,
+        "rice": 100,
         "rice_seed": 30
       },
       "notes": "2 hours. 20 seeds produces 10 rice and 30 seeds."
@@ -686,12 +686,12 @@
       "name": "Farm",
       "recipeName": "Barley Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 2880,
       "inputs": {
         "barley_seeds": 20
       },
       "outputs": {
-        "barley": 10,
+        "barley": 100,
         "barley_seeds": 30
       },
       "notes": "2 hours. 20 seeds produces 10 barley and 30 seeds."
@@ -701,12 +701,12 @@
       "name": "Farm",
       "recipeName": "Oats Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 2880,
       "inputs": {
         "oats_seeds": 20
       },
       "outputs": {
-        "oats": 10,
+        "oats": 100,
         "oats_seeds": 30
       },
       "notes": "2 hours. 20 seeds produces 10 oats and 30 seeds."
@@ -716,12 +716,12 @@
       "name": "Farm",
       "recipeName": "Rye Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 2880,
       "inputs": {
         "rye_seeds": 20
       },
       "outputs": {
-        "rye": 10,
+        "rye": 90,
         "rye_seeds": 30
       },
       "notes": "2 hours. 20 seeds produces 10 rye and 30 seeds."
@@ -731,9 +731,9 @@
       "name": "Farm",
       "recipeName": "Ragi Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 2990,
       "inputs": {
-        "ragi_seeds": 20
+        "ragi_seeds": 85
       },
       "outputs": {
         "ragi": 10,
@@ -746,7 +746,7 @@
       "name": "Farm",
       "recipeName": "Potato Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 2880,
       "inputs": {
         "potato_seed": 15
       },
@@ -761,7 +761,7 @@
       "name": "Farm",
       "recipeName": "Carrot Farming",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 2700,
       "inputs": {
         "carrot_seed": 20
       },
@@ -776,7 +776,7 @@
       "name": "Farm",
       "recipeName": "Onion Farming",
       "category": "Production",
-      "productionTime": 6300,
+      "productionTime": 3150,
       "inputs": {
         "onion_seed": 20
       },
@@ -791,7 +791,7 @@
       "name": "Farm",
       "recipeName": "Cabbage Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 3600,
       "inputs": {
         "cabbage_seed": 15
       },
@@ -806,7 +806,7 @@
       "name": "Farm",
       "recipeName": "Tomato Farming",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 2700,
       "inputs": {
         "tomato_seed": 12
       },
@@ -851,7 +851,7 @@
       "name": "Farm",
       "recipeName": "Pumpkin Farming",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 5400,
       "inputs": {
         "pumpkin_seed": 10
       },
@@ -896,7 +896,7 @@
       "name": "Farm",
       "recipeName": "Lentil Farming",
       "category": "Production",
-      "productionTime": 6300,
+      "productionTime": 3150,
       "inputs": {
         "lentil_seed": 15
       },
@@ -939,7 +939,7 @@
       "name": "Farm",
       "recipeName": "Groundnut Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 3600,
       "inputs": {
         "groundnut_seed": 15
       },
@@ -1612,12 +1612,12 @@
       "name": "Farm",
       "recipeName": "Sugarcane Farming",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 5400,
       "inputs": {
         "sugarcane_cutting": 10
       },
       "outputs": {
-        "sugar_cane": 80,
+        "sugar_cane": 90,
         "sugarcane_cutting": 15
       },
       "notes": "3 hours. 10 cuttings produces 80 kg sugarcane and 15 new cuttings."
@@ -1992,7 +1992,7 @@
       "name": "Sheep Farm",
       "recipeName": "Sheep Breeding",
       "category": "Production",
-      "productionTime": 259200,
+      "productionTime": 7200,
       "inputs": {
         "sheep": 4
       },
@@ -2007,7 +2007,7 @@
       "name": "Sheep Farm",
       "recipeName": "Wool Shearing",
       "category": "Production",
-      "productionTime": 86400,
+      "productionTime": 6100,
       "inputs": {
         "sheep": 10
       },
@@ -2864,7 +2864,7 @@
       "name": "Farm",
       "recipeName": "Indigo Farming",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 3600,
       "inputs": {
         "indigo_seed": 10
       },
@@ -2894,7 +2894,7 @@
       "name": "Poultry Farm",
       "recipeName": "Egg Collection",
       "category": "Production",
-      "productionTime": 86400,
+      "productionTime": 8640,
       "inputs": {
         "chicken": 20,
         "feed": 10
@@ -2910,13 +2910,14 @@
       "name": "Poultry Farm",
       "recipeName": "Chicken Raising",
       "category": "Production",
-      "productionTime": 172800,
+      "productionTime": 9100,
       "inputs": {
         "chicken": 10,
         "feed": 20
       },
       "outputs": {
-        "chicken": 22,
+        "hen": 12,
+        "chicken": 25,
         "eggs": 30
       },
       "notes": "2 days. 10 chickens breed to 22 chickens plus 30 eggs."

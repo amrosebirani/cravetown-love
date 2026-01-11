@@ -29,9 +29,15 @@ local CharacterDetailPanel = require("code.CharacterDetailPanel")
 -- CRAVE-6: Debug Panel
 local DebugPanel = require("code.DebugPanel")
 
+-- Supply Chain Viewer
+local SupplyChainViewer = require("code.SupplyChainViewer")
+
 -- New systems: Notifications, Tutorial, Visual indicators
 local NotificationSystem = require("code.NotificationSystem")
 local TutorialSystem = require("code.TutorialSystem")
+
+-- Cheat Console
+local CheatConsole = require("code.CheatConsole")
 
 AlphaUI = {}
 AlphaUI.__index = AlphaUI
@@ -119,6 +125,9 @@ function AlphaUI:Create(world)
     ui.placementBreakdown = {}
     ui.placementErrors = {}
 
+    -- Debug: Spawn citizen mode (press 'C' to toggle, click to spawn)
+    ui.spawnCitizenMode = false
+
     -- Build menu modal
     ui.showBuildMenuModal = false
     ui.buildMenuScrollOffset = 0
@@ -194,6 +203,11 @@ function AlphaUI:Create(world)
 
     -- Debug panel state (CRAVE-6)
     ui.debugPanel = DebugPanel:Create(world)
+
+    -- Supply chain viewer (shows commodity production DAGs)
+    ui.supplyChainViewer = SupplyChainViewer:Create(world)
+    -- Make globally accessible for InventoryDrawer
+    gSupplyChainViewer = ui.supplyChainViewer
 
     -- Notification system
     ui.notificationSystem = NotificationSystem:Create(world)
@@ -295,6 +309,15 @@ function AlphaUI:Create(world)
     ui.emigrationCitizenBtns = {}
     ui.emigrationPrioritizeBtns = {}
 
+    -- Cheat console state
+    ui.showCheatConsole = false
+    ui.cheatConsoleInput = ""
+    ui.cheatConsoleHistory = {}  -- {input, output} pairs
+    ui.cheatConsoleHistoryMax = 20
+    ui.cheatConsoleCursorVisible = true
+    ui.cheatConsoleCursorTimer = 0
+    ui.cheatConsoleScrollOffset = 0
+
     return ui
 end
 
@@ -354,6 +377,11 @@ function AlphaUI:Render()
         self:RenderPlacementInstructions()
     end
 
+    -- Render spawn citizen mode indicator
+    if self.spawnCitizenMode then
+        self:RenderSpawnCitizenModeIndicator()
+    end
+
     -- Render resource overlay panel (screen space, not world space)
     if self.showResourceOverlay and self.resourceOverlay then
         self.resourceOverlay:renderPanel()
@@ -372,11 +400,6 @@ function AlphaUI:Render()
     -- Render housing assignment modal
     if self.showHousingAssignmentModal and self.housingAssignmentModal then
         self.housingAssignmentModal:Render()
-    end
-
-    -- Render character detail panel
-    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
-        self.characterDetailPanel:Render()
     end
 
     -- Render inventory panel
@@ -414,6 +437,11 @@ function AlphaUI:Render()
         self:RenderRecipeModal()
     end
 
+    -- Render character detail panel (on top of citizens panel)
+    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
+        self.characterDetailPanel:Render()
+    end
+
     -- Render help overlay on top of everything
     if self.showHelpOverlay then
         self:RenderHelpOverlay()
@@ -432,6 +460,16 @@ function AlphaUI:Render()
     -- Render debug panel (CRAVE-6) - always render toggle button, panel when visible
     if self.debugPanel then
         self.debugPanel:Render()
+    end
+
+    -- Render supply chain viewer (on top of most things)
+    if self.supplyChainViewer and self.supplyChainViewer.isVisible then
+        self.supplyChainViewer:Render()
+    end
+
+    -- Render cheat console (on top of most things)
+    if self.showCheatConsole then
+        self:RenderCheatConsole()
     end
 
     -- Render tutorial overlay (on very top)
@@ -750,22 +788,23 @@ function AlphaUI:RenderMiniMap(x, y, w, h)
     local halfW = self.worldWidth / 2
     local halfH = self.worldHeight / 2
 
-    -- Draw forests (if available)
-    if self.world.forests then
-        love.graphics.setColor(0.2, 0.4, 0.2, 0.7)
-        for _, forest in ipairs(self.world.forests) do
-            if forest.regions then
-                for _, region in ipairs(forest.regions) do
-                    local fx = x + (region.x + halfW) * scaleX
-                    local fy = y + (region.y + halfH) * scaleY
-                    local fw = (region.width or 100) * scaleX
-                    local fh = (region.height or 100) * scaleY
-                    love.graphics.rectangle("fill", fx, fy, math.max(4, fw), math.max(4, fh))
-                end
-            elseif forest.x and forest.y then
-                local fx = x + (forest.x + halfW) * scaleX
-                local fy = y + (forest.y + halfH) * scaleY
-                local fr = (forest.radius or 50) * math.min(scaleX, scaleY)
+    -- Draw forest (if available)
+    if self.world.forest and self.world.forest.mRegions then
+        love.graphics.setColor(0.2, 0.5, 0.2, 0.7)
+        for _, region in ipairs(self.world.forest.mRegions) do
+            -- Check if region has zone bounds (rectangular) or is circular
+            if region.zoneX and region.zoneY then
+                -- Zone-based rectangular region
+                local fx = x + region.zoneX * scaleX
+                local fy = y + region.zoneY * scaleY
+                local fw = region.zoneWidth * scaleX
+                local fh = region.zoneHeight * scaleY
+                love.graphics.rectangle("fill", fx, fy, math.max(4, fw), math.max(4, fh))
+            elseif region.centerX and region.centerY then
+                -- Circular region
+                local fx = x + region.centerX * scaleX
+                local fy = y + region.centerY * scaleY
+                local fr = (region.radius or 50) * math.min(scaleX, scaleY)
                 love.graphics.circle("fill", fx, fy, math.max(3, fr))
             end
         end
@@ -1102,7 +1141,7 @@ function AlphaUI:RenderImmigrationModal()
     local bulkBtnY = modalY + 44
     local bulkBtnH = 22
     local bulkBtnSpacing = 5
-    local bulkStartX = modalX + 530
+    local bulkStartX = modalX + 580
 
     -- Accept All (70%+) button
     local applicants = immigrationSystem and immigrationSystem:GetApplicants() or {}
@@ -1905,6 +1944,56 @@ function AlphaUI:RenderProductionBuildingDetails(x, y, w, building)
                 love.graphics.print(string.format("  Progress: %.0f%%", station.progress * 100), x + 10, y)
                 y = y + 14
             end
+
+            -- Show recipe details (inputs and outputs)
+            if station.recipe then
+                -- Show inputs
+                local inputsText = "  In: "
+                local inputCount = 0
+                for inputId, qty in pairs(station.recipe.inputs or {}) do
+                    if inputCount > 0 then inputsText = inputsText .. ", " end
+                    local inputName = self:GetCommodityDisplayName(inputId)
+                    inputsText = inputsText .. inputName .. " x" .. qty
+                    inputCount = inputCount + 1
+                end
+                if inputCount == 0 then inputsText = inputsText .. "None" end
+                love.graphics.setColor(0.8, 0.7, 0.6)
+                love.graphics.print(inputsText, x + 10, y)
+                y = y + 14
+
+                -- Show outputs
+                local outputsText = "  Out: "
+                local outputCount = 0
+                for outputId, qty in pairs(station.recipe.outputs or {}) do
+                    if outputCount > 0 then outputsText = outputsText .. ", " end
+                    local outputName = self:GetCommodityDisplayName(outputId)
+                    outputsText = outputsText .. outputName .. " x" .. qty
+                    outputCount = outputCount + 1
+                end
+                if outputCount == 0 then outputsText = outputsText .. "None" end
+                love.graphics.setColor(0.6, 0.9, 0.7)
+                love.graphics.print(outputsText, x + 10, y)
+                y = y + 14
+
+                -- When NO_MATERIALS, show what's missing
+                if station.state == "NO_MATERIALS" then
+                    y = y + 2
+                    love.graphics.setColor(self.colors.danger)
+                    love.graphics.print("  Missing materials:", x + 10, y)
+                    y = y + 14
+                    for inputId, required in pairs(station.recipe.inputs or {}) do
+                        local available = self.world.inventory[inputId] or 0
+                        if available < required then
+                            local inputName = self:GetCommodityDisplayName(inputId)
+                            local missingText = string.format("    %s: %d / %d needed", inputName, available, required)
+                            love.graphics.print(missingText, x + 10, y)
+                            y = y + 14
+                        end
+                    end
+                end
+            end
+
+            y = y + 5  -- Small gap between stations
         end
 
         y = y + 15
@@ -2628,29 +2717,45 @@ function AlphaUI:RenderCitizen(citizen)
         love.graphics.circle("fill", cx, cy, radius + 6)
     end
 
-    -- Status circle (outer ring showing happiness)
-    love.graphics.setColor(satColor[1] * r * 0.7, satColor[2] * g * 0.7, satColor[3] * b * 0.7)
-    love.graphics.circle("fill", cx, cy, radius + 2)
+    -- Get satisfaction gradient color (red to green)
+    local gradientColor = self:GetSatisfactionGradientColor(sat)
 
-    -- Body (inner circle)
-    local bodyColor = {0.9, 0.8, 0.7}  -- Skin tone
-    love.graphics.setColor(bodyColor[1] * r, bodyColor[2] * g, bodyColor[3] * b)
-    love.graphics.circle("fill", cx, cy, radius - 1)
+    -- Determine shape based on class (circular for lower, squarish for upper)
+    -- Use emergentClass first (new system), fall back to class (legacy)
+    local rawClass = citizen.emergentClass or citizen.class or "middle"
+    local classLower = string.lower(rawClass)
 
-    -- Head
-    love.graphics.circle("fill", cx, cy - radius + 2, radius * 0.6)
+    -- Circular for lower classes (poor, working, lower)
+    local isCircular = (classLower == "poor" or classLower == "working" or classLower == "lower")
+    local cornerRadius
+    if isCircular then
+        cornerRadius = radius
+    elseif classLower == "middle" then
+        cornerRadius = radius * 0.5
+    else  -- elite, upper
+        cornerRadius = radius * 0.2
+    end
 
-    -- Class indicator (colored band)
-    local classColors = {
-        Elite = {0.6, 0.4, 0.8},
-        Upper = {0.4, 0.4, 0.8},
-        Middle = {0.4, 0.6, 0.4},
-        Working = {0.7, 0.5, 0.3},
-        Poor = {0.5, 0.4, 0.3}
-    }
-    local classColor = classColors[citizen.class] or {0.5, 0.5, 0.5}
-    love.graphics.setColor(classColor[1] * r, classColor[2] * g, classColor[3] * b)
-    love.graphics.rectangle("fill", cx - radius * 0.5, cy + radius * 0.2, radius, 4, 2, 2)
+    -- Face background with satisfaction gradient color and day/night tint
+    love.graphics.setColor(gradientColor[1] * r, gradientColor[2] * g, gradientColor[3] * b)
+    if isCircular then
+        love.graphics.circle("fill", cx, cy, radius)
+    else
+        love.graphics.rectangle("fill", cx - radius, cy - radius, radius * 2, radius * 2, cornerRadius, cornerRadius)
+    end
+
+    -- Border (darker version of face color)
+    love.graphics.setColor(gradientColor[1] * 0.6 * r, gradientColor[2] * 0.6 * g, gradientColor[3] * 0.6 * b)
+    love.graphics.setLineWidth(1.5)
+    if isCircular then
+        love.graphics.circle("line", cx, cy, radius)
+    else
+        love.graphics.rectangle("line", cx - radius, cy - radius, radius * 2, radius * 2, cornerRadius, cornerRadius)
+    end
+    love.graphics.setLineWidth(1)
+
+    -- Draw emoticon expression (eyes and mouth based on satisfaction)
+    self:DrawEmoticonExpression(cx, cy, radius, sat)
 
     -- Status indicator with speech bubble
     if statusIndicator then
@@ -2691,17 +2796,25 @@ function AlphaUI:RenderCitizen(citizen)
         love.graphics.circle("fill", cx + radius, cy - radius, 4)
     end
 
-    -- Selection highlight
+    -- Selection highlight (match shape to class)
     if self.world.selectedEntity == citizen then
         love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], 0.9)
         love.graphics.setLineWidth(3)
-        love.graphics.circle("line", cx, cy, radius + 6)
+        if isCircular then
+            love.graphics.circle("line", cx, cy, radius + 6)
+        else
+            love.graphics.rectangle("line", cx - radius - 6, cy - radius - 6, (radius + 6) * 2, (radius + 6) * 2, cornerRadius + 2, cornerRadius + 2)
+        end
         love.graphics.setLineWidth(1)
 
         -- Pulsing effect using game time
         local pulse = math.sin(love.timer.getTime() * 4) * 0.3 + 0.7
         love.graphics.setColor(self.colors.accent[1], self.colors.accent[2], self.colors.accent[3], pulse * 0.5)
-        love.graphics.circle("line", cx, cy, radius + 10)
+        if isCircular then
+            love.graphics.circle("line", cx, cy, radius + 10)
+        else
+            love.graphics.rectangle("line", cx - radius - 10, cy - radius - 10, (radius + 10) * 2, (radius + 10) * 2, cornerRadius + 4, cornerRadius + 4)
+        end
     end
 end
 
@@ -3116,6 +3229,52 @@ function AlphaUI:RenderPlacementInstructions()
     local instructions = "[Left-Click] Place   [Right-Click] Cancel   [R] Toggle Resources"
     local textW = self.fonts.small:getWidth(instructions)
     love.graphics.print(instructions, barX + (barW - textW) / 2, barY + 7)
+end
+
+function AlphaUI:RenderSpawnCitizenModeIndicator()
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+
+    -- Instruction bar at bottom of world view (similar to placement mode)
+    local barX = self.leftPanelWidth
+    local barY = screenH - self.bottomBarHeight - 30
+    local barW = screenW - self.leftPanelWidth - self.rightPanelWidth
+    local barH = 28
+
+    -- Background with cyan/teal tint for debug mode
+    love.graphics.setColor(0.1, 0.15, 0.2, 0.9)
+    love.graphics.rectangle("fill", barX, barY, barW, barH)
+
+    -- Border to highlight debug mode
+    love.graphics.setColor(0.2, 0.8, 0.8, 0.8)
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", barX, barY, barW, barH)
+    love.graphics.setLineWidth(1)
+
+    -- Instructions
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.3, 1, 1)
+
+    local instructions = "[SPAWN CITIZEN MODE] Click anywhere to spawn a citizen - Press [SHIFT+C] to exit"
+    local textW = self.fonts.small:getWidth(instructions)
+    love.graphics.print(instructions, barX + (barW - textW) / 2, barY + 7)
+
+    -- Also draw at mouse position for visual feedback
+    local mx, my = love.mouse.getPosition()
+    local worldX = self.leftPanelWidth
+    local worldY = self.topBarHeight
+    local worldW = screenW - self.leftPanelWidth - self.rightPanelWidth
+    local worldH = screenH - self.topBarHeight - self.bottomBarHeight
+
+    if mx >= worldX and mx < worldX + worldW and
+       my >= worldY and my < worldY + worldH then
+        -- Draw citizen preview at mouse
+        love.graphics.setColor(0.2, 0.8, 0.8, 0.6)
+        love.graphics.circle("fill", mx, my, 10)
+        love.graphics.setColor(0.3, 1, 1, 0.8)
+        love.graphics.circle("line", mx, my, 10)
+    end
+
+    love.graphics.setColor(1, 1, 1)
 end
 
 function AlphaUI:RenderBuildMenuModal()
@@ -4120,6 +4279,21 @@ function AlphaUI:RenderInventoryPanel()
             local catName = item.commodity.category or "misc"
             love.graphics.print(catName, listX + 40, y + 18)
 
+            -- "?" button for supply chain viewer
+            local infoSize = 18
+            local infoX = listX + listW - 85
+            local infoY = y + 6
+            local mx, my = love.mouse.getPosition()
+            local isHoveringInfo = mx >= infoX and mx <= infoX + infoSize and
+                                   my >= infoY and my <= infoY + infoSize
+
+            love.graphics.setColor(isHoveringInfo and 0.4 or 0.3, isHoveringInfo and 0.6 or 0.5, isHoveringInfo and 0.9 or 0.8, 0.9)
+            love.graphics.circle("fill", infoX + infoSize/2, infoY + infoSize/2, infoSize/2)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.setFont(self.fonts.small)
+            local qWidth = self.fonts.small:getWidth("?")
+            love.graphics.print("?", infoX + (infoSize - qWidth)/2, infoY + 1)
+
             -- Quantity
             love.graphics.setFont(self.fonts.normal)
             local quantity = item.quantity or 0
@@ -4129,7 +4303,12 @@ function AlphaUI:RenderInventoryPanel()
             local textWidth = self.fonts.normal:getWidth(quantityText)
             love.graphics.print(quantityText, listX + listW - textWidth - 12, y + 7)
 
-            self.inventoryItemBtns[i] = {x = listX + 3, y = y, w = listW - 6, h = itemHeight - 2, commodity = item.commodity}
+            -- Store item bounds with info button area
+            self.inventoryItemBtns[i] = {
+                x = listX + 3, y = y, w = listW - 6, h = itemHeight - 2,
+                commodity = item.commodity,
+                infoBtn = {x = infoX, y = infoY, w = infoSize, h = infoSize}
+            }
         end
 
         y = y + itemHeight
@@ -4789,6 +4968,73 @@ function AlphaUI:GetClassColor(class)
     else
         return {0.6, 0.6, 0.6}  -- Gray for lower
     end
+end
+
+-- Helper function to get satisfaction gradient color (red to green)
+function AlphaUI:GetSatisfactionGradientColor(satisfaction)
+    local sat = math.max(0, math.min(100, satisfaction))
+    local r, g, b
+
+    if sat < 25 then
+        -- Red to Orange
+        local t = sat / 25
+        r, g, b = 0.9, 0.2 + t * 0.4, 0.2
+    elseif sat < 50 then
+        -- Orange to Yellow
+        local t = (sat - 25) / 25
+        r, g, b = 0.9, 0.6 + t * 0.3, 0.2
+    elseif sat < 75 then
+        -- Yellow to Light Green
+        local t = (sat - 50) / 25
+        r, g, b = 0.9 - t * 0.5, 0.9, 0.2 + t * 0.2
+    else
+        -- Light Green to Green
+        local t = (sat - 75) / 25
+        r, g, b = 0.4 - t * 0.1, 0.9, 0.4 - t * 0.1
+    end
+
+    return {r, g, b}
+end
+
+-- Helper function to draw emoticon expression based on satisfaction
+function AlphaUI:DrawEmoticonExpression(cx, cy, radius, satisfaction)
+    local eyeOffsetX = radius * 0.35
+    local eyeOffsetY = radius * 0.15
+    local eyeRadius = radius * 0.12
+
+    -- Draw eyes (black dots)
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.circle("fill", cx - eyeOffsetX, cy - eyeOffsetY, eyeRadius)
+    love.graphics.circle("fill", cx + eyeOffsetX, cy - eyeOffsetY, eyeRadius)
+
+    -- Draw mouth based on satisfaction
+    local mouthY = cy + radius * 0.25
+    local mouthWidth = radius * 0.5
+    love.graphics.setLineWidth(2)
+
+    if satisfaction >= 70 then
+        -- Big smile
+        love.graphics.arc("line", "open", cx, mouthY - radius * 0.1, mouthWidth, 0.2, math.pi - 0.2)
+    elseif satisfaction >= 50 then
+        -- Small smile
+        love.graphics.arc("line", "open", cx, mouthY - radius * 0.05, mouthWidth * 0.7, 0.3, math.pi - 0.3)
+    elseif satisfaction >= 30 then
+        -- Neutral line
+        love.graphics.line(cx - mouthWidth * 0.4, mouthY, cx + mouthWidth * 0.4, mouthY)
+    elseif satisfaction >= 15 then
+        -- Slight frown
+        love.graphics.arc("line", "open", cx, mouthY + radius * 0.15, mouthWidth * 0.6, math.pi + 0.4, 2 * math.pi - 0.4)
+    else
+        -- Big frown + worried eyebrows
+        love.graphics.arc("line", "open", cx, mouthY + radius * 0.25, mouthWidth * 0.8, math.pi + 0.2, 2 * math.pi - 0.2)
+        -- Worried eyebrows
+        love.graphics.line(cx - eyeOffsetX - eyeRadius, cy - eyeOffsetY - eyeRadius * 2,
+                          cx - eyeOffsetX + eyeRadius, cy - eyeOffsetY - eyeRadius)
+        love.graphics.line(cx + eyeOffsetX - eyeRadius, cy - eyeOffsetY - eyeRadius,
+                          cx + eyeOffsetX + eyeRadius, cy - eyeOffsetY - eyeRadius * 2)
+    end
+
+    love.graphics.setLineWidth(1)
 end
 
 -- Get filtered citizens based on current filter settings
@@ -5649,6 +5895,11 @@ function AlphaUI:HandleClick(x, y, button)
         return self.saveLoadModal:HandleClick(x, y, button)
     end
 
+    -- Handle supply chain viewer clicks (high priority when visible)
+    if self.supplyChainViewer and self.supplyChainViewer.isVisible then
+        return self.supplyChainViewer:HandleClick(x, y)
+    end
+
     -- Handle recipe modal clicks (on top of building modal)
     if self.showRecipeModal then
         if not self.modalJustOpened then
@@ -5662,6 +5913,13 @@ function AlphaUI:HandleClick(x, y, button)
     -- Handle building modal clicks
     if self.showBuildingModal then
         return self:HandleBuildingModalClick(x, y)
+    end
+
+    -- Handle character detail panel clicks FIRST (appears on top of citizens panel)
+    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
+        if self.characterDetailPanel:HandleClick(x, y) then
+            return true
+        end
     end
 
     -- Handle inventory panel clicks
@@ -5711,13 +5969,6 @@ function AlphaUI:HandleClick(x, y, button)
     -- Always check debug panel (toggle button always visible)
     if self.debugPanel then
         if self.debugPanel:HandleMousePress(x, y, button) then
-            return true
-        end
-    end
-
-    -- Handle character detail panel clicks (highest priority modal)
-    if self.characterDetailPanel and self.characterDetailPanel:IsVisible() then
-        if self.characterDetailPanel:HandleClick(x, y) then
             return true
         end
     end
@@ -5900,6 +6151,32 @@ function AlphaUI:HandleClick(x, y, button)
         -- Convert to world coordinates
         local wx = (x - worldX) + self.cameraX
         local wy = (y - worldY) + self.cameraY
+
+        -- Handle spawn citizen mode (debug feature)
+        if self.spawnCitizenMode then
+            -- Spawn a citizen at the clicked world position
+            -- AddCitizen signature: (class, name, traits, options)
+            local citizen = self.world:AddCitizen(nil, nil, nil, {})
+            if citizen then
+                -- Override position to clicked location
+                citizen.x = wx
+                citizen.y = wy
+                citizen.targetX = wx
+                citizen.targetY = wy
+
+                -- Set them to walking state so they pathfind back to town center
+                local CharacterMovement = require("code.CharacterMovement")
+                local townCenterX = self.world.worldWidth / 2
+                local townCenterY = self.world.worldHeight / 2
+                CharacterMovement.SetDestination(citizen, townCenterX, townCenterY)
+
+                print(string.format("[Debug] Spawned citizen '%s' at (%.0f, %.0f) - walking to town center (%.0f, %.0f)",
+                    citizen.name, wx, wy, townCenterX, townCenterY))
+                -- Select the newly spawned citizen
+                self.world:SelectEntity(citizen, "citizen")
+            end
+            return true
+        end
 
         -- Check for citizen click
         local citizen = self.world:GetCitizenAt(wx, wy, 15)
@@ -6110,6 +6387,20 @@ function AlphaUI:HandleInventoryPanelClick(x, y)
         end
     end
 
+    -- Check "?" info buttons for supply chain viewer
+    for i, btn in ipairs(self.inventoryItemBtns or {}) do
+        if btn.infoBtn then
+            local info = btn.infoBtn
+            if x >= info.x and x < info.x + info.w and y >= info.y and y < info.y + info.h then
+                -- Open supply chain viewer for this commodity
+                if self.supplyChainViewer and btn.commodity then
+                    self.supplyChainViewer:Open(btn.commodity.id)
+                    return true
+                end
+            end
+        end
+    end
+
     -- Click outside panel = close
     if x < panelX then
         self.showInventoryPanel = false
@@ -6195,20 +6486,11 @@ function AlphaUI:HandleCitizensPanelClick(x, y)
     -- Check citizen card clicks
     for _, btn in ipairs(self.citizensCardBtns or {}) do
         if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
-            -- Select this citizen and show details in right panel
+            -- Select this citizen and show details
             self.world.selectedEntity = btn.citizen
             self.selectedCitizenForModal = btn.citizen
-            -- Double-click opens detail panel
-            local currentTime = love.timer.getTime()
-            if self.lastCitizenClickTime and self.lastCitizenClicked == btn.citizen and
-               (currentTime - self.lastCitizenClickTime) < 0.4 then
-                -- Double-click: Open CharacterDetailPanel
-                self:OpenCharacterDetailPanel(btn.citizen)
-                self.lastCitizenClickTime = nil
-            else
-                self.lastCitizenClickTime = currentTime
-                self.lastCitizenClicked = btn.citizen
-            end
+            -- Single-click opens detail panel
+            self:OpenCharacterDetailPanel(btn.citizen)
             return true
         end
     end
@@ -6661,6 +6943,66 @@ function AlphaUI:GetBuildingTypeForQuickBuild(btnId)
 end
 
 function AlphaUI:HandleKeyPress(key)
+    -- Handle cheat console FIRST (highest priority when open)
+    -- Toggle cheat console with backtick/grave or F10
+    if key == "`" or key == "grave" or key == "f10" then
+        self.showCheatConsole = not self.showCheatConsole
+        if self.showCheatConsole then
+            self.cheatConsoleInput = ""
+            self.cheatConsoleScrollOffset = 0
+        end
+        return true
+    end
+
+    -- When cheat console is open, capture ALL input
+    if self.showCheatConsole then
+        if key == "escape" then
+            self.showCheatConsole = false
+            return true
+        elseif key == "return" then
+            -- Execute command
+            if self.cheatConsoleInput ~= "" then
+                local result = CheatConsole:ParseAndExecute(self.cheatConsoleInput, self.world)
+                table.insert(self.cheatConsoleHistory, {
+                    input = self.cheatConsoleInput,
+                    output = result or ""
+                })
+                -- Trim history if too long
+                while #self.cheatConsoleHistory > self.cheatConsoleHistoryMax do
+                    table.remove(self.cheatConsoleHistory, 1)
+                end
+                self.cheatConsoleInput = ""
+                self.cheatConsoleScrollOffset = 0
+            end
+            return true
+        elseif key == "backspace" then
+            if #self.cheatConsoleInput > 0 then
+                self.cheatConsoleInput = self.cheatConsoleInput:sub(1, -2)
+            end
+            return true
+        elseif key == "up" then
+            -- Scroll history up
+            if #self.cheatConsoleHistory > 0 then
+                self.cheatConsoleScrollOffset = math.min(self.cheatConsoleScrollOffset + 1, #self.cheatConsoleHistory * 2)
+            end
+            return true
+        elseif key == "down" then
+            -- Scroll history down
+            self.cheatConsoleScrollOffset = math.max(self.cheatConsoleScrollOffset - 1, 0)
+            return true
+        elseif key == "pageup" then
+            -- Scroll history up faster
+            self.cheatConsoleScrollOffset = self.cheatConsoleScrollOffset + 5
+            return true
+        elseif key == "pagedown" then
+            -- Scroll history down faster
+            self.cheatConsoleScrollOffset = math.max(self.cheatConsoleScrollOffset - 5, 0)
+            return true
+        end
+        -- Consume ALL other keys when console is open (prevent game input)
+        return true
+    end
+
     -- Handle plot selection modal keys (highest priority)
     if self.showPlotSelectionModal and self.plotSelectionModal then
         if self.plotSelectionModal:HandleKeyPress(key) then
@@ -6838,6 +7180,24 @@ function AlphaUI:HandleKeyPress(key)
         return true
     end
 
+    -- Handle 'SHIFT+C' for Spawn Citizen mode (debug/test feature)
+    if key == "c" and not self.buildMenuSearchActive then
+        local isShiftHeld = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+        if isShiftHeld then
+            self.spawnCitizenMode = not self.spawnCitizenMode
+            if self.spawnCitizenMode then
+                -- Exit placement mode if active
+                if self.placementMode then
+                    self:ExitPlacementMode()
+                end
+                print("[Debug] Spawn Citizen mode ENABLED - Click anywhere on the map to spawn a citizen")
+            else
+                print("[Debug] Spawn Citizen mode DISABLED")
+            end
+            return true
+        end
+    end
+
     -- Forward number keys to resource overlay when panel is visible
     if self.showResourceOverlay and self.resourceOverlay then
         local num = tonumber(key)
@@ -6872,17 +7232,31 @@ function AlphaUI:HandleKeyPress(key)
     end
 
     if key == "m" then
-        -- Immigration (M for migrants)
         local immigrationSystem = self.world.immigrationSystem
         if immigrationSystem then
-            self.showImmigrationModal = not self.showImmigrationModal
-            if self.showImmigrationModal then
+            local isShiftHeld = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+            if isShiftHeld then
+                -- SHIFT+M: Regenerate immigration queue (for testing)
+                immigrationSystem:RegenerateQueue()
+                self.selectedApplicant = nil
+                self.immigrationScrollOffset = 0
+                -- Auto-open the immigration modal to see results
+                self.showImmigrationModal = true
                 self.showBuildMenuModal = false
                 self.showCitizensPanel = false
                 self.showAnalyticsPanel = false
                 self.showProductionAnalyticsPanel = false
-                self.selectedApplicant = nil
-                self.immigrationScrollOffset = 0
+            else
+                -- M: Toggle Immigration modal
+                self.showImmigrationModal = not self.showImmigrationModal
+                if self.showImmigrationModal then
+                    self.showBuildMenuModal = false
+                    self.showCitizensPanel = false
+                    self.showAnalyticsPanel = false
+                    self.showProductionAnalyticsPanel = false
+                    self.selectedApplicant = nil
+                    self.immigrationScrollOffset = 0
+                end
             end
             return true
         end
@@ -7076,11 +7450,29 @@ function AlphaUI:Update(dt)
 end
 
 function AlphaUI:HandleMouseWheel(x, y)
+    -- Handle cheat console scroll (highest priority when open)
+    if self.showCheatConsole then
+        if y > 0 then
+            -- Scroll up (show older history)
+            self.cheatConsoleScrollOffset = self.cheatConsoleScrollOffset + 3
+        elseif y < 0 then
+            -- Scroll down (show newer history)
+            self.cheatConsoleScrollOffset = math.max(self.cheatConsoleScrollOffset - 3, 0)
+        end
+        return
+    end
+
     -- Handle debug panel scroll (CRAVE-6) - highest priority
     if self.debugPanel and self.debugPanel:IsVisible() then
         if self.debugPanel:HandleMouseWheel(x, y) then
             return
         end
+    end
+
+    -- Handle supply chain viewer scroll
+    if self.supplyChainViewer and self.supplyChainViewer.isVisible then
+        self.supplyChainViewer:OnMouseWheel(x, y)
+        return
     end
 
     -- Handle character detail panel scroll
@@ -7433,7 +7825,8 @@ function AlphaUI:RenderHelpOverlay()
         {"Right-click", "Context menu"},
         {"Click empty", "Deselect"},
         {"F5", "Quicksave"},
-        {"F9", "Quickload"}
+        {"F9", "Quickload"},
+        {"`", "Cheat console"}
     }
 
     for _, shortcut in ipairs(shortcuts4) do
@@ -7471,6 +7864,99 @@ function AlphaUI:RenderHelpOverlay()
     local closeText = "Press H or any key to close"
     local closeW = self.fonts.small:getWidth(closeText)
     love.graphics.print(closeText, panelX + (panelW - closeW) / 2, panelY + panelH - 30)
+
+    -- Reset color
+    love.graphics.setColor(1, 1, 1, 1)
+end
+
+-- =============================================================================
+-- CHEAT CONSOLE
+-- =============================================================================
+
+function AlphaUI:RenderCheatConsole()
+    local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
+    local consoleH = 220
+    local consoleY = screenH - consoleH
+
+    -- Update cursor blink
+    self.cheatConsoleCursorTimer = self.cheatConsoleCursorTimer + love.timer.getDelta()
+    if self.cheatConsoleCursorTimer > 0.5 then
+        self.cheatConsoleCursorTimer = 0
+        self.cheatConsoleCursorVisible = not self.cheatConsoleCursorVisible
+    end
+
+    -- Semi-transparent background
+    love.graphics.setColor(0, 0, 0, 0.9)
+    love.graphics.rectangle("fill", 0, consoleY, screenW, consoleH)
+
+    -- Top border
+    love.graphics.setColor(0.3, 1, 0.3, 0.8)
+    love.graphics.setLineWidth(2)
+    love.graphics.line(0, consoleY, screenW, consoleY)
+
+    -- Title
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.3, 1, 0.3)
+    love.graphics.print("CHEAT CONSOLE (type 'help' for commands, ` to close)", 10, consoleY + 5)
+
+    -- History area
+    local historyY = consoleY + 25
+    local historyH = consoleH - 55
+    local lineHeight = 18
+    local maxVisibleLines = math.floor(historyH / lineHeight)
+
+    love.graphics.setFont(self.fonts.small)
+
+    -- Render history (newest at bottom)
+    local visibleHistory = {}
+    for i, entry in ipairs(self.cheatConsoleHistory) do
+        table.insert(visibleHistory, {type = "input", text = "> " .. entry.input})
+        if entry.output and entry.output ~= "" then
+            -- Split multi-line output
+            for line in entry.output:gmatch("[^\n]+") do
+                table.insert(visibleHistory, {type = "output", text = "  " .. line})
+            end
+        end
+    end
+
+    -- Calculate scroll
+    local totalLines = #visibleHistory
+    local startLine = math.max(1, totalLines - maxVisibleLines + 1 - self.cheatConsoleScrollOffset)
+    local endLine = math.min(totalLines, startLine + maxVisibleLines - 1)
+
+    local y = historyY
+    for i = startLine, endLine do
+        local entry = visibleHistory[i]
+        if entry then
+            if entry.type == "input" then
+                love.graphics.setColor(0.3, 1, 0.3)  -- Green for input
+            else
+                love.graphics.setColor(0.8, 0.8, 0.8)  -- Gray for output
+            end
+            love.graphics.print(entry.text, 10, y)
+            y = y + lineHeight
+        end
+    end
+
+    -- Scroll indicator
+    if totalLines > maxVisibleLines then
+        love.graphics.setColor(0.5, 0.5, 0.5)
+        local scrollText = string.format("[%d/%d lines - Up/Down to scroll]",
+            totalLines - self.cheatConsoleScrollOffset, totalLines)
+        love.graphics.print(scrollText, screenW - 250, consoleY + 5)
+    end
+
+    -- Input line
+    local inputY = screenH - 28
+    love.graphics.setColor(0.2, 0.2, 0.2)
+    love.graphics.rectangle("fill", 0, inputY - 4, screenW, 32)
+
+    love.graphics.setColor(0.3, 1, 0.3)
+    love.graphics.setFont(self.fonts.normal)
+
+    -- Prompt and input
+    local cursor = self.cheatConsoleCursorVisible and "_" or ""
+    love.graphics.print("> " .. self.cheatConsoleInput .. cursor, 10, inputY)
 
     -- Reset color
     love.graphics.setColor(1, 1, 1, 1)
@@ -8634,6 +9120,18 @@ end
 -- =============================================================================
 
 function AlphaUI:HandleTextInput(text)
+    -- Handle cheat console input (highest priority when open)
+    if self.showCheatConsole then
+        -- Skip backtick to avoid adding it to input
+        if text ~= "`" and text ~= "~" then
+            -- Only allow printable characters
+            if text:match("^[%w%s%p]$") then
+                self.cheatConsoleInput = self.cheatConsoleInput .. text
+            end
+        end
+        return true
+    end
+
     -- Handle build menu search input
     if self.showBuildMenuModal and self.buildMenuSearchActive then
         -- Only allow printable characters (no control chars)

@@ -519,6 +519,17 @@ function ImmigrationSystem:RemoveFromQueue(applicant)
     end
 end
 
+function ImmigrationSystem:RegenerateQueue()
+    -- Clear existing queue and generate a fresh batch
+    self.queue = {}
+    local currentDay = self.world.timeSystem and self.world.timeSystem.mDay or 1
+    local count = self.config.generation.queueCapacity or 10
+    self:GenerateApplicants(count, currentDay)
+    self.lastGenerationDay = currentDay
+    print("ImmigrationSystem: Regenerated queue with " .. #self.queue .. " new applicants")
+    return #self.queue
+end
+
 -- =============================================================================
 -- APPLICANT GENERATION
 -- =============================================================================
@@ -789,107 +800,181 @@ function ImmigrationSystem:CalculateCompatibility(applicant)
 end
 
 function ImmigrationSystem:CalculateCravingSatisfactionPotential(applicant)
-    -- Get top cravings from profile
-    local topCravings = self:GetTopCravings(applicant.cravingProfile, 5)
-    local totalScore = 0
-
-    for i, craving in ipairs(topCravings) do
-        local canFulfill = self:CanTownFulfillCraving(craving)
-        local weight = (6 - i) / 15  -- 5/15, 4/15, 3/15, 2/15, 1/15
-        totalScore = totalScore + (canFulfill * 100 * weight)
-    end
-
-    return totalScore
-end
-
-function ImmigrationSystem:CanTownFulfillCraving(craving)
-    -- Check if town produces commodities that fulfill this craving
-    -- Simplified: check inventory levels
+    -- Check if town inventory has commodities that satisfy applicant's craving dimensions
+    local profile = applicant.cravingProfile or {}  -- 9 coarse dimensions
     local inventory = self.world.inventory or {}
-    local productionBuildings = self.world.buildings or {}
 
-    local score = 0.3  -- Base score
+    -- Map craving dimensions to commodities that fulfill them
+    local dimensionMap = {
+        Biological = {"wheat", "bread", "meat", "milk", "vegetables", "fruit", "water", "medicine", "flour", "cheese", "eggs", "fish", "honey", "preserved_food"},
+        Safety = {"tools", "weapons", "clothing", "simple_clothes", "work_clothes", "medicine", "soap", "axe", "hammer", "pickaxe"},
+        Touch = {"cloth", "furniture", "bed", "chair", "clothing", "simple_clothes", "work_clothes", "fine_clothes", "wool", "cotton", "linen", "silk"},
+        Psychological = {"book", "painting", "sculpture", "pottery", "music_instrument"},
+        Status = {"jewelry", "fine_clothes", "luxury_clothes", "gold", "silver", "perfume", "silk"},
+        Social = {},  -- Based on population, not inventory
+        Exotic = {"spices", "silk", "wine", "perfume", "tea", "coffee", "cocoa"},
+        Shiny = {"gold", "silver", "jewelry", "gems", "copper", "iron"},
+        Vice = {"beer", "wine", "whiskey", "tobacco"}
+    }
 
-    -- Check if we have production buildings
-    if #productionBuildings > 2 then
-        score = score + 0.3
-    end
+    local totalScore = 0
+    local totalWeight = 0
 
-    -- Check inventory diversity
-    local inventoryCount = 0
-    for _, count in pairs(inventory) do
-        if count > 0 then
-            inventoryCount = inventoryCount + 1
+    for dimension, intensity in pairs(profile) do
+        if type(intensity) == "number" and intensity > 0 then
+            local commodities = dimensionMap[dimension] or {}
+            local hasAny = false
+            local hasMultiple = 0
+
+            -- Check inventory for matching commodities
+            for _, commodityId in ipairs(commodities) do
+                local invCount = inventory[commodityId] or 0
+                if invCount > 0 then
+                    hasAny = true
+                    hasMultiple = hasMultiple + 1
+                end
+            end
+
+            local weight = intensity / 100
+            local dimScore = 0.3  -- Base 30% even without stock
+
+            if dimension == "Social" then
+                -- Social dimension based on population instead of inventory
+                local popSize = #(self.world.citizens or {})
+                dimScore = math.min(1.0, 0.3 + popSize * 0.05)
+            elseif hasAny then
+                -- Has at least one commodity for this dimension
+                dimScore = 0.7
+                -- Bonus for multiple matching commodities
+                if hasMultiple >= 3 then
+                    dimScore = 1.0
+                elseif hasMultiple >= 2 then
+                    dimScore = 0.85
+                end
+            end
+
+            totalScore = totalScore + (dimScore * weight)
+            totalWeight = totalWeight + weight
         end
     end
-    if inventoryCount > 3 then
-        score = score + 0.4
-    end
 
-    return math.min(1, score)
+    -- Return score scaled to 0-100, with base of 40 for moderate spread
+    local rawScore = totalWeight > 0 and (totalScore / totalWeight * 100) or 50
+    return math.max(40, math.min(95, rawScore))  -- Clamp to 40-95 range
 end
 
 function ImmigrationSystem:CalculateHousingMatch(applicant)
     local class = applicant.class
+    local wealth = applicant.wealth or 100
     local vacantHousing = self:GetVacantHousingByClass()
 
-    -- Exact class match
+    -- Base score from housing availability
+    local score = 0
+
     if vacantHousing[class] and vacantHousing[class] > 0 then
-        return 100
+        score = 75  -- Class-matched housing available
+    elseif self:GetTotalVacantHousing() > 0 then
+        score = 50  -- Some housing available but not class-matched
+    else
+        return 20  -- No housing but don't completely reject
     end
 
-    -- Any housing available (simplified for alpha)
-    local totalVacant = 0
-    for _, count in pairs(vacantHousing) do
-        totalVacant = totalVacant + count
+    -- Affordability check using housing system
+    if self.world.housingSystem then
+        local available = nil
+        -- Try to get available housing for the class
+        if self.world.housingSystem.GetAvailableHousing then
+            available = self.world.housingSystem:GetAvailableHousing(class)
+        elseif self.world.housingSystem.GetAvailableHousingForClass then
+            available = self.world.housingSystem:GetAvailableHousingForClass(class)
+        end
+
+        if available and #available > 0 then
+            -- Get cheapest option (assume list sorted by quality desc, so last is cheapest)
+            local cheapest = available[#available]
+            local rentPerDay = cheapest.rent or cheapest.rentPerOccupant or 5
+            local monthlyRent = rentPerDay * 30
+
+            if wealth >= monthlyRent * 6 then
+                score = score + 25  -- Can afford 6+ months = very stable
+            elseif wealth >= monthlyRent * 3 then
+                score = score + 15  -- Can afford 3-6 months = stable
+            elseif wealth >= monthlyRent then
+                score = score + 5   -- Can afford 1-3 months = marginal
+            else
+                score = score - 15  -- Can't even afford 1 month
+            end
+        else
+            -- No specific housing data, give moderate bonus
+            score = score + 10
+        end
+    else
+        -- No housing system available - give benefit of doubt
+        score = score + 10
     end
 
-    if totalVacant > 0 then
-        return 60  -- Some housing, not ideal
-    end
-
-    return 0  -- No housing
+    return math.max(20, math.min(100, score))
 end
 
 function ImmigrationSystem:CalculateJobMatch(applicant)
     local vocation = applicant.vocation
-    local openings = self:GetJobOpeningsForVocation(vocation)
+    local class = applicant.class
 
-    if openings > 0 then
+    -- Exact vocation match = best
+    local exactOpenings = self:GetJobOpeningsForVocation(vocation)
+    if exactOpenings > 0 then
         return 100
     end
 
-    -- Check for any jobs
+    -- Check total job openings
     local totalOpenings = self:GetTotalJobOpenings()
+
     if totalOpenings > 0 then
-        return 40  -- Can work, not ideal vocation
+        -- Jobs exist - score based on class fit
+        -- Lower classes are more flexible with job types
+        if class == "Poor" or class == "Working" then
+            return 65  -- Can do most manual labor
+        elseif class == "Middle" then
+            return 55  -- Somewhat flexible
+        else
+            return 45  -- Elite/Upper need specific roles
+        end
     end
 
-    return 10  -- No jobs, but can be unemployed
+    -- No jobs available
+    -- Still allow immigration but with low job score
+    return 25
 end
 
 function ImmigrationSystem:CalculateSocialFit(applicant)
-    local score = 50  -- Base neutral fit
+    local score = 45  -- Base score
 
-    -- Bonus for others of same class
+    -- Same class citizens bonus
     local sameClassCount = 0
     for _, citizen in ipairs(self.world.citizens or {}) do
         if citizen.class == applicant.class then
             sameClassCount = sameClassCount + 1
         end
     end
-    score = score + math.min(sameClassCount * 5, 25)
+    score = score + math.min(sameClassCount * 3, 15)
 
-    -- Bonus for existing population (not too small)
+    -- Population size bonus
     local popSize = #(self.world.citizens or {})
-    if popSize >= 5 then
-        score = score + 15
-    end
-    if popSize >= 10 then
-        score = score + 10
+    if popSize >= 5 then score = score + 8 end
+    if popSize >= 10 then score = score + 7 end
+    if popSize >= 20 then score = score + 5 end
+
+    -- Town stability (satisfaction) factor
+    local avgSatisfaction = self.world.stats and self.world.stats.averageSatisfaction or 50
+    if avgSatisfaction >= 70 then
+        score = score + 15  -- Very happy town
+    elseif avgSatisfaction >= 55 then
+        score = score + 8   -- Content town
+    elseif avgSatisfaction < 35 then
+        score = score - 10  -- Struggling town
     end
 
-    return math.min(100, score)
+    return math.max(30, math.min(100, score))
 end
 
 -- =============================================================================
@@ -1278,12 +1363,26 @@ function ImmigrationSystem:GetOverallAttractiveness()
 end
 
 function ImmigrationSystem:GetTotalVacantHousing()
-    local vacant = self:GetVacantHousingByClass()
-    local total = 0
-    for _, count in pairs(vacant) do
-        total = total + count
+    -- Use HousingSystem statistics if available (avoids double counting)
+    if self.world.housingSystem then
+        local stats = self.world.housingSystem:GetHousingStatistics()
+        return stats.totalVacant or 0
     end
-    return total
+
+    -- Fallback: Calculate from buildings directly (no double counting)
+    local totalCapacity = 0
+    local totalOccupied = 0
+
+    for _, building in ipairs(self.world.buildings or {}) do
+        if building.type and building.type.category == "housing" then
+            local capacity = building.capacity or 4
+            local residents = building.residents and #building.residents or 0
+            totalCapacity = totalCapacity + capacity
+            totalOccupied = totalOccupied + residents
+        end
+    end
+
+    return totalCapacity - totalOccupied
 end
 
 return ImmigrationSystem

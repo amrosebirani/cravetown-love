@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, Slider, InputNumber, Row, Col, Typography, Space, Button, Collapse, Badge } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import type { FineDimension } from '../types';
@@ -8,8 +8,9 @@ const { Panel } = Collapse;
 
 interface VectorEditorProps {
   dimensions: FineDimension[];
-  values: number[];
-  onChange: (values: number[]) => void;
+  values?: number[];  // Legacy prop - prefer using 'value' for Ant Design Form compatibility
+  value?: number[];   // Ant Design Form controlled component prop
+  onChange?: (values: number[]) => void;  // Optional - Ant Design Form injects this automatically
   min?: number;
   max?: number;
   step?: number;
@@ -20,7 +21,8 @@ interface VectorEditorProps {
 
 const VectorEditor: React.FC<VectorEditorProps> = ({
   dimensions,
-  values,
+  values: valuesProp,
+  value: valueProp,  // Ant Design Form passes this
   onChange,
   min = 0,
   max = 10,
@@ -29,42 +31,74 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
   showCoarseView = true,
   groupByParent = true,
 }) => {
-  const [localValues, setLocalValues] = useState<number[]>(values);
+  // Calculate the max index from dimensions to size the array correctly
+  const maxDimensionIndex = Math.max(...dimensions.map(d => d.index), 0);
+  const requiredArraySize = maxDimensionIndex + 1;
 
-  // No useEffect sync - we manage our own state
-  // The key prop on VectorEditor handles commodity switches by remounting
+  // Support both 'value' (Ant Design Form) and 'values' (legacy) props
+  // Ensure array is sized to accommodate all dimension indices
+  const rawExternalValues = valueProp ?? valuesProp ?? [];
+  const externalValues = [...rawExternalValues];
+  // Extend array if needed to cover all dimension indices
+  while (externalValues.length < requiredArraySize) {
+    externalValues.push(0);
+  }
 
-  const handleChange = (index: number, value: number | null) => {
+  const [localValues, setLocalValues] = useState<number[]>(externalValues);
+
+  // Sync local state when external values change (e.g., when form resets or loads new data)
+  // This is needed because Ant Design Form may update 'value' prop after initial render
+  useEffect(() => {
+    // Extend incoming values to required size
+    const extendedValues = [...(valueProp ?? valuesProp ?? [])];
+    while (extendedValues.length < requiredArraySize) {
+      extendedValues.push(0);
+    }
+    if (JSON.stringify(localValues) !== JSON.stringify(extendedValues)) {
+      setLocalValues(extendedValues);
+    }
+  }, [valueProp, valuesProp, requiredArraySize]);
+
+  const handleChange = (dimensionIndex: number, value: number | null) => {
     // Treat null as 0 (when user clears the input)
     const actualValue = value ?? 0;
 
     const newValues = [...localValues];
-    newValues[index] = actualValue;
+    // Ensure array is large enough for this index
+    while (newValues.length <= dimensionIndex) {
+      newValues.push(0);
+    }
+    newValues[dimensionIndex] = actualValue;
     setLocalValues(newValues);
-    onChange(newValues);
+    onChange?.(newValues);
   };
 
   const handleResetAll = () => {
-    const resetValues = new Array(dimensions.length).fill(0);
+    const resetValues = new Array(requiredArraySize).fill(0);
     setLocalValues(resetValues);
-    onChange(resetValues);
+    onChange?.(resetValues);
   };
 
   const handleSetAll = (value: number) => {
-    const newValues = new Array(dimensions.length).fill(value);
+    // Only set values for actual dimensions, leave gaps as 0
+    const newValues = new Array(requiredArraySize).fill(0);
+    dimensions.forEach(dim => {
+      newValues[dim.index] = value;
+    });
     setLocalValues(newValues);
-    onChange(newValues);
+    onChange?.(newValues);
   };
 
   // Calculate coarse aggregates
   const calculateCoarseAggregates = () => {
     const coarseGroups: Record<string, { sum: number; count: number; name: string }> = {};
 
-    dimensions.forEach((dim, index) => {
+    dimensions.forEach((dim) => {
       if (!coarseGroups[dim.parentCoarse]) {
         coarseGroups[dim.parentCoarse] = { sum: 0, count: 0, name: dim.parentCoarse };
       }
-      coarseGroups[dim.parentCoarse].sum += localValues[index] || 0;
+      // Use dim.index to access the correct value in the array
+      coarseGroups[dim.parentCoarse].sum += localValues[dim.index] || 0;
       coarseGroups[dim.parentCoarse].count += 1;
     });
 
@@ -78,14 +112,13 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
 
   // Group dimensions by parent coarse category
   const groupedDimensions = () => {
-    const groups: Record<string, { dimensions: FineDimension[]; indices: number[] }> = {};
+    const groups: Record<string, { dimensions: FineDimension[] }> = {};
 
-    dimensions.forEach((dim, index) => {
+    dimensions.forEach((dim) => {
       if (!groups[dim.parentCoarse]) {
-        groups[dim.parentCoarse] = { dimensions: [], indices: [] };
+        groups[dim.parentCoarse] = { dimensions: [] };
       }
       groups[dim.parentCoarse].dimensions.push(dim);
-      groups[dim.parentCoarse].indices.push(index);
     });
 
     return groups;
@@ -94,8 +127,10 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
   const coarseAggregates = showCoarseView ? calculateCoarseAggregates() : [];
   const groups = groupByParent ? groupedDimensions() : null;
 
-  const renderSlider = (dim: FineDimension, index: number) => {
-    const value = localValues[index] || 0;
+  // Render a slider for a dimension - uses dim.index to access the value array
+  const renderSlider = (dim: FineDimension) => {
+    const dimIndex = dim.index;
+    const value = localValues[dimIndex] || 0;
     const isNonZero = value > 0.01;
 
     return (
@@ -115,7 +150,7 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
             max={max}
             step={step}
             value={value}
-            onChange={(val) => handleChange(index, val)}
+            onChange={(val) => handleChange(dimIndex, val)}
             marks={{
               [min]: min.toString(),
               [(min + max) / 2]: ((min + max) / 2).toFixed(1),
@@ -129,7 +164,7 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
             max={max}
             step={step}
             value={value}
-            onChange={(val) => handleChange(index, val)}
+            onChange={(val) => handleChange(dimIndex, val)}
             style={{ width: '100%' }}
           />
         </Col>
@@ -145,7 +180,7 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
               padding: '4px 8px',
               cursor: value === 0 ? 'not-allowed' : 'pointer',
             }}
-            onClick={() => handleChange(index, 0)}
+            onClick={() => handleChange(dimIndex, 0)}
           >
             ×
           </button>
@@ -154,12 +189,15 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
     );
   };
 
+  // Count non-zero values only for dimensions that exist (not gaps in the array)
+  const nonZeroCount = dimensions.filter(dim => (localValues[dim.index] || 0) > 0.01).length;
+
   return (
     <Card
       title={
         <Space>
           <span>{title}</span>
-          <Badge count={localValues.filter(v => v > 0.01).length} showZero />
+          <Badge count={nonZeroCount} showZero />
         </Space>
       }
       extra={
@@ -201,7 +239,8 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
       {groupByParent && groups ? (
         <Collapse defaultActiveKey={Object.keys(groups).slice(0, 2)}>
           {Object.entries(groups).map(([parentId, group]) => {
-            const activeCount = group.indices.filter(i => localValues[i] > 0.01).length;
+            // Count non-zero values using dimension indices
+            const activeCount = group.dimensions.filter(dim => (localValues[dim.index] || 0) > 0.01).length;
             return (
               <Panel
                 header={
@@ -214,9 +253,7 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
                 forceRender={true}
               >
                 <div onClick={(e) => e.stopPropagation()}>
-                  {group.dimensions.map((dim, idx) =>
-                    renderSlider(dim, group.indices[idx])
-                  )}
+                  {group.dimensions.map((dim) => renderSlider(dim))}
                 </div>
               </Panel>
             );
@@ -224,7 +261,7 @@ const VectorEditor: React.FC<VectorEditorProps> = ({
         </Collapse>
       ) : (
         <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-          {dimensions.map((dim, index) => renderSlider(dim, index))}
+          {dimensions.map((dim) => renderSlider(dim))}
         </div>
       )}
     </Card>

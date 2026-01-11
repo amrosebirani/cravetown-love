@@ -56,6 +56,33 @@
       }
     },
     {
+      "id": "forest_density",
+      "name": "Forest Density",
+      "category": "continuous",
+      "description": "Dense forest areas suitable for hunting and timber harvesting",
+      "distribution": {
+        "type": "perlin_hybrid",
+        "perlinWeight": 1.0,
+        "hotspotWeight": 0.4,
+        "frequency": 0.004,
+        "octaves": 3,
+        "persistence": 0.6,
+        "hotspotCount": [5, 10],
+        "hotspotRadius": [150, 400],
+        "hotspotIntensity": [0.5, 1.0]
+      },
+      "riverInfluence": {
+        "enabled": true,
+        "range": 100,
+        "boost": 0.15
+      },
+      "visualization": {
+        "color": [0.1, 0.4, 0.15],
+        "opacity": 0.5,
+        "showThreshold": 0.1
+      }
+    },
+    {
       "id": "iron_ore",
       "name": "Iron Ore",
       "category": "discrete",

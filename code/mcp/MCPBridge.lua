@@ -89,8 +89,17 @@ function MCPBridge:update(dt)
     end
 
     -- Accept new connections
+    -- Guard against corrupted server socket (can happen after hot-reload)
     if not self.connected and self.server then
-        local client, err = self.server:accept()
+        local ok, client, err = pcall(function()
+            return self.server:accept()
+        end)
+        if not ok then
+            -- Server socket is corrupted, try to restart
+            print("[MCP] Server socket corrupted, attempting restart...")
+            self:startServer()
+            return
+        end
         if client then
             self.client = client
             self.client:settimeout(0)
