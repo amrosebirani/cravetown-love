@@ -16,6 +16,8 @@ function InventoryDrawer:Create()
         mMaxScroll = 0,
         mItemHeight = 30,
         mFilter = "all",  -- "all", "nonzero", or category name
+        mInfoButtons = {},  -- Store "?" button positions for click detection
+        mSupplyChainViewer = nil,  -- Reference to supply chain viewer
         mCategories = {
             {id = "all", name = "All"},
             {id = "nonzero", name = "In Stock"},
@@ -46,6 +48,11 @@ function InventoryDrawer:Enter()
 end
 
 function InventoryDrawer:Exit()
+end
+
+-- Set reference to supply chain viewer for "?" button clicks
+function InventoryDrawer:SetSupplyChainViewer(viewer)
+    self.mSupplyChainViewer = viewer
 end
 
 function InventoryDrawer:GetFilteredCommodities()
@@ -114,6 +121,19 @@ function InventoryDrawer:Update(dt)
                 self.mFilter = category.id
                 self.mScrollOffset = 0
                 return false
+            end
+        end
+
+        -- Handle "?" info buttons for supply chain viewer
+        for commodityId, btn in pairs(self.mInfoButtons) do
+            if mx >= btn.x and mx <= btn.x + btn.w and
+               my >= btn.y and my <= btn.y + btn.h then
+                -- Use global or instance viewer
+                local viewer = self.mSupplyChainViewer or gSupplyChainViewer
+                if viewer then
+                    viewer:Open(commodityId)
+                    return false
+                end
             end
         end
     end
@@ -197,6 +217,9 @@ function InventoryDrawer:Render()
     local items = self:GetFilteredCommodities()
     local y = listY - self.mScrollOffset
 
+    -- Clear info buttons for this frame
+    self.mInfoButtons = {}
+
     for i, item in ipairs(items) do
         if y + self.mItemHeight >= listY and y <= listY + listHeight then
             -- Draw item background
@@ -217,6 +240,32 @@ function InventoryDrawer:Render()
             love.graphics.setColor(1, 1, 1)
             love.graphics.print(item.commodity.name, listX + 30, y + 5)
 
+            -- Draw "?" info button (for supply chain viewer)
+            local infoSize = 18
+            local infoX = listX + listWidth - 65
+            local infoY = y + 5
+
+            -- Check if hovering
+            local mx, my = love.mouse.getPosition()
+            local isHoveringInfo = mx >= infoX and mx <= infoX + infoSize and
+                                   my >= infoY and my <= infoY + infoSize
+
+            -- Draw info button circle
+            love.graphics.setColor(isHoveringInfo and 0.4 or 0.3, isHoveringInfo and 0.6 or 0.5, isHoveringInfo and 0.9 or 0.8, 0.9)
+            love.graphics.circle("fill", infoX + infoSize/2, infoY + infoSize/2, infoSize/2)
+            love.graphics.setColor(1, 1, 1)
+            local font = love.graphics.getFont()
+            local qWidth = font:getWidth("?")
+            love.graphics.print("?", infoX + (infoSize - qWidth)/2, infoY + 1)
+
+            -- Store button position for click detection
+            self.mInfoButtons[item.commodity.id] = {
+                x = infoX,
+                y = infoY,
+                w = infoSize,
+                h = infoSize
+            }
+
             -- Draw quantity (round to 2 decimal places)
             local roundedQuantity = math.floor(item.quantity * 100 + 0.5) / 100
             local quantityText = tostring(roundedQuantity)
@@ -226,7 +275,7 @@ function InventoryDrawer:Render()
             else
                 quantityText = string.format("%.2f", roundedQuantity)
             end
-            
+
             local quantityColor = item.quantity > 0 and {0.4, 1, 0.4} or {0.6, 0.6, 0.6}
             love.graphics.setColor(quantityColor[1], quantityColor[2], quantityColor[3])
             local textWidth = love.graphics.getFont():getWidth(quantityText)

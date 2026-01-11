@@ -44,6 +44,90 @@
       "color": "#daa520"
     },
     {
+      "id": "prepared_food",
+      "name": "Prepared Foods",
+      "description": "Samosa, curry, and other cooked meals",
+      "tags": ["food", "prepared", "meal"],
+      "color": "#e07020"
+    },
+    {
+      "id": "beverage",
+      "name": "Beverages",
+      "description": "Tea, coffee, juice and other drinks",
+      "tags": ["food", "drink", "beverage"],
+      "color": "#4169e1"
+    },
+    {
+      "id": "alcohol",
+      "name": "Alcoholic Beverages",
+      "description": "Wine, beer, and spirits",
+      "tags": ["drink", "alcohol", "luxury"],
+      "color": "#722f37"
+    },
+    {
+      "id": "sweet",
+      "name": "Sweets & Desserts",
+      "description": "Sugar, candy, and sweet treats",
+      "tags": ["food", "sweet", "dessert"],
+      "color": "#ffb6c1"
+    },
+    {
+      "id": "raw_food",
+      "name": "Raw Foods",
+      "description": "Unprocessed food ingredients",
+      "tags": ["food", "raw", "ingredient"],
+      "color": "#d2b48c"
+    },
+    {
+      "id": "seasoning",
+      "name": "Seasonings & Spices",
+      "description": "Salt, pepper, and spices",
+      "tags": ["food", "spice", "seasoning"],
+      "color": "#cd853f"
+    },
+    {
+      "id": "livestock",
+      "name": "Livestock",
+      "description": "Cattle, sheep, and other farm animals",
+      "tags": ["animal", "livestock", "farming"],
+      "color": "#8b4513"
+    },
+    {
+      "id": "jewelry",
+      "name": "Jewelry",
+      "description": "Rings, necklaces, and precious accessories",
+      "tags": ["luxury", "jewelry", "accessory"],
+      "color": "#e5c100"
+    },
+    {
+      "id": "household",
+      "name": "Household Items",
+      "description": "Candles, soap, and household goods",
+      "tags": ["household", "domestic", "utility"],
+      "color": "#778899"
+    },
+    {
+      "id": "container",
+      "name": "Containers",
+      "description": "Barrels, crates, and storage containers",
+      "tags": ["container", "storage", "utility"],
+      "color": "#8b7355"
+    },
+    {
+      "id": "liquid",
+      "name": "Liquids",
+      "description": "Water, oil, and other liquids",
+      "tags": ["liquid", "fluid", "resource"],
+      "color": "#00bfff"
+    },
+    {
+      "id": "byproduct",
+      "name": "Byproducts",
+      "description": "Waste and secondary materials from production",
+      "tags": ["byproduct", "waste", "secondary"],
+      "color": "#a9a9a9"
+    },
+    {
       "id": "textile_raw",
       "name": "Raw Textiles",
       "description": "Cotton, wool, and other raw textile materials",

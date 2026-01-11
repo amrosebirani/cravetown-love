@@ -29,6 +29,9 @@ local CharacterDetailPanel = require("code.CharacterDetailPanel")
 -- CRAVE-6: Debug Panel
 local DebugPanel = require("code.DebugPanel")
 
+-- Supply Chain Viewer
+local SupplyChainViewer = require("code.SupplyChainViewer")
+
 -- New systems: Notifications, Tutorial, Visual indicators
 local NotificationSystem = require("code.NotificationSystem")
 local TutorialSystem = require("code.TutorialSystem")
@@ -200,6 +203,11 @@ function AlphaUI:Create(world)
 
     -- Debug panel state (CRAVE-6)
     ui.debugPanel = DebugPanel:Create(world)
+
+    -- Supply chain viewer (shows commodity production DAGs)
+    ui.supplyChainViewer = SupplyChainViewer:Create(world)
+    -- Make globally accessible for InventoryDrawer
+    gSupplyChainViewer = ui.supplyChainViewer
 
     -- Notification system
     ui.notificationSystem = NotificationSystem:Create(world)
@@ -452,6 +460,11 @@ function AlphaUI:Render()
     -- Render debug panel (CRAVE-6) - on top but below tutorial
     if self.debugPanel and self.debugPanel:IsVisible() then
         self.debugPanel:Render()
+    end
+
+    -- Render supply chain viewer (on top of most things)
+    if self.supplyChainViewer and self.supplyChainViewer.isVisible then
+        self.supplyChainViewer:Render()
     end
 
     -- Render cheat console (on top of most things)
@@ -4266,6 +4279,21 @@ function AlphaUI:RenderInventoryPanel()
             local catName = item.commodity.category or "misc"
             love.graphics.print(catName, listX + 40, y + 18)
 
+            -- "?" button for supply chain viewer
+            local infoSize = 18
+            local infoX = listX + listW - 85
+            local infoY = y + 6
+            local mx, my = love.mouse.getPosition()
+            local isHoveringInfo = mx >= infoX and mx <= infoX + infoSize and
+                                   my >= infoY and my <= infoY + infoSize
+
+            love.graphics.setColor(isHoveringInfo and 0.4 or 0.3, isHoveringInfo and 0.6 or 0.5, isHoveringInfo and 0.9 or 0.8, 0.9)
+            love.graphics.circle("fill", infoX + infoSize/2, infoY + infoSize/2, infoSize/2)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.setFont(self.fonts.small)
+            local qWidth = self.fonts.small:getWidth("?")
+            love.graphics.print("?", infoX + (infoSize - qWidth)/2, infoY + 1)
+
             -- Quantity
             love.graphics.setFont(self.fonts.normal)
             local quantity = item.quantity or 0
@@ -4275,7 +4303,12 @@ function AlphaUI:RenderInventoryPanel()
             local textWidth = self.fonts.normal:getWidth(quantityText)
             love.graphics.print(quantityText, listX + listW - textWidth - 12, y + 7)
 
-            self.inventoryItemBtns[i] = {x = listX + 3, y = y, w = listW - 6, h = itemHeight - 2, commodity = item.commodity}
+            -- Store item bounds with info button area
+            self.inventoryItemBtns[i] = {
+                x = listX + 3, y = y, w = listW - 6, h = itemHeight - 2,
+                commodity = item.commodity,
+                infoBtn = {x = infoX, y = infoY, w = infoSize, h = infoSize}
+            }
         end
 
         y = y + itemHeight
@@ -5862,6 +5895,11 @@ function AlphaUI:HandleClick(x, y, button)
         return self.saveLoadModal:HandleClick(x, y, button)
     end
 
+    -- Handle supply chain viewer clicks (high priority when visible)
+    if self.supplyChainViewer and self.supplyChainViewer.isVisible then
+        return self.supplyChainViewer:HandleClick(x, y)
+    end
+
     -- Handle recipe modal clicks (on top of building modal)
     if self.showRecipeModal then
         if not self.modalJustOpened then
@@ -6345,6 +6383,20 @@ function AlphaUI:HandleInventoryPanelClick(x, y)
             self.inventoryFilter = btn.categoryId
             self.inventoryScrollOffset = 0
             return true
+        end
+    end
+
+    -- Check "?" info buttons for supply chain viewer
+    for i, btn in ipairs(self.inventoryItemBtns or {}) do
+        if btn.infoBtn then
+            local info = btn.infoBtn
+            if x >= info.x and x < info.x + info.w and y >= info.y and y < info.y + info.h then
+                -- Open supply chain viewer for this commodity
+                if self.supplyChainViewer and btn.commodity then
+                    self.supplyChainViewer:Open(btn.commodity.id)
+                    return true
+                end
+            end
         end
     end
 
@@ -7414,6 +7466,12 @@ function AlphaUI:HandleMouseWheel(x, y)
         if self.debugPanel:HandleMouseWheel(x, y) then
             return
         end
+    end
+
+    -- Handle supply chain viewer scroll
+    if self.supplyChainViewer and self.supplyChainViewer.isVisible then
+        self.supplyChainViewer:OnMouseWheel(x, y)
+        return
     end
 
     -- Handle character detail panel scroll

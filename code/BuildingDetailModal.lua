@@ -22,7 +22,8 @@ function BuildingDetailModal:Create(building)
         mMaxScroll = 0,
         mStationButtons = {},  -- Store button positions for click detection
         mCloseButton = nil,
-        mJustOpened = true  -- Prevent closing on the same click that opened the modal
+        mJustOpened = true,  -- Prevent closing on the same click that opened the modal
+        mCommodityInfoButtons = {}  -- "?" buttons for supply chain viewer
     }
 
     setmetatable(this, self)
@@ -133,6 +134,18 @@ function BuildingDetailModal:Update(dt)
             -- Open recipe picker for this station
             self:OpenRecipePicker(btn.stationIndex)
             return false
+        end
+    end
+
+    -- Check commodity "?" info buttons for supply chain viewer
+    for commodityId, btn in pairs(self.mCommodityInfoButtons) do
+        if mx >= btn.x and mx <= btn.x + btn.w and
+           my >= btn.y and my <= btn.y + btn.h then
+            -- Open supply chain viewer
+            if gSupplyChainViewer then
+                gSupplyChainViewer:Open(commodityId)
+                return false
+            end
         end
     end
 
@@ -302,13 +315,33 @@ function BuildingDetailModal:Render()
         self.mBuilding.mStorage.outputCapacity)
     love.graphics.print(outputText, modalX + 20, storageY + 45)
 
-    -- Draw input/output commodity counts
+    -- Clear commodity info buttons
+    self.mCommodityInfoButtons = {}
+
+    -- Draw input/output commodity counts with "?" buttons
     local inputX = modalX + 150
     for commodityId, amount in pairs(self.mBuilding.mStorage.inputs) do
         if amount > 0 then
             love.graphics.setColor(0.5, 0.7, 0.9)
             love.graphics.print(commodityId .. ": " .. amount, inputX, storageY + 25)
-            inputX = inputX + 80
+
+            -- Draw "?" button for supply chain
+            local infoSize = 14
+            local infoX = inputX + 60
+            local infoY = storageY + 25
+            local isHoveringInfo = mx >= infoX and mx <= infoX + infoSize and
+                                   my >= infoY and my <= infoY + infoSize
+
+            love.graphics.setColor(isHoveringInfo and 0.4 or 0.3, isHoveringInfo and 0.6 or 0.5, isHoveringInfo and 0.9 or 0.8, 0.9)
+            love.graphics.circle("fill", infoX + infoSize/2, infoY + infoSize/2, infoSize/2)
+            love.graphics.setColor(1, 1, 1)
+            local qWidth = font:getWidth("?")
+            love.graphics.print("?", infoX + (infoSize - qWidth)/2, infoY)
+
+            -- Store button position
+            self.mCommodityInfoButtons[commodityId] = {x = infoX, y = infoY, w = infoSize, h = infoSize}
+
+            inputX = inputX + 90
         end
     end
 
@@ -317,7 +350,24 @@ function BuildingDetailModal:Render()
         if amount > 0 then
             love.graphics.setColor(0.7, 0.9, 0.5)
             love.graphics.print(commodityId .. ": " .. amount, outputX, storageY + 45)
-            outputX = outputX + 80
+
+            -- Draw "?" button for supply chain
+            local infoSize = 14
+            local infoX = outputX + 60
+            local infoY = storageY + 45
+            local isHoveringInfo = mx >= infoX and mx <= infoX + infoSize and
+                                   my >= infoY and my <= infoY + infoSize
+
+            love.graphics.setColor(isHoveringInfo and 0.4 or 0.3, isHoveringInfo and 0.6 or 0.5, isHoveringInfo and 0.9 or 0.8, 0.9)
+            love.graphics.circle("fill", infoX + infoSize/2, infoY + infoSize/2, infoSize/2)
+            love.graphics.setColor(1, 1, 1)
+            local qWidth = font:getWidth("?")
+            love.graphics.print("?", infoX + (infoSize - qWidth)/2, infoY)
+
+            -- Store button position
+            self.mCommodityInfoButtons[commodityId] = {x = infoX, y = infoY, w = infoSize, h = infoSize}
+
+            outputX = outputX + 90
         end
     end
 
