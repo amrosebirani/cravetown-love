@@ -1647,6 +1647,11 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
             local hasWorker = #building.workers > 0
             if not hasWorker then
                 station.state = "NO_WORKER"
+                -- Record blocked state if we were producing
+                if station.cycleStartTime then
+                    self:RecordProductionHistory(building, station, "blocked_no_worker", {}, {})
+                    station.cycleStartTime = nil
+                end
             else
                 -- Check if we have materials
                 -- Recipe inputs can be dictionary format {commodityId: quantity} or array format [{commodityId, quantity}]
@@ -1664,8 +1669,18 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
 
                 if not hasMaterials then
                     station.state = "NO_MATERIALS"
+                    -- Record blocked state if we were producing
+                    if station.cycleStartTime then
+                        self:RecordProductionHistory(building, station, "blocked_no_materials", {}, {})
+                        station.cycleStartTime = nil
+                    end
                 else
                     station.state = "PRODUCING"
+
+                    -- Track cycle start time for history
+                    if not station.cycleStartTime then
+                        station.cycleStartTime = love.timer.getTime()
+                    end
 
                     -- Progress production
                     local productionTime = station.recipe.productionTime or 10
@@ -1678,11 +1693,16 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
                     if station.progress >= 1 then
                         station.progress = 0
 
+                        -- Track inputs consumed for history
+                        local inputsConsumed = {}
+                        local outputsProduced = {}
+
                         -- Consume inputs and record stats
                         for commodityId, quantity in pairs(station.recipe.inputs or {}) do
                             local inputId = type(commodityId) == "string" and commodityId or (quantity.commodityId or commodityId)
                             local inputQty = type(quantity) == "number" and quantity or (quantity.quantity or 1)
                             self:RemoveFromInventory(inputId, inputQty)
+                            inputsConsumed[inputId] = inputQty
                             -- Record consumption in production stats
                             if self.productionStats then
                                 self.productionStats:recordConsumption(inputId, inputQty)
@@ -1694,11 +1714,16 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
                             local outputId = type(commodityId) == "string" and commodityId or (quantity.commodityId or commodityId)
                             local outputQty = type(quantity) == "number" and quantity or (quantity.quantity or 1)
                             self:AddToInventory(outputId, outputQty)
+                            outputsProduced[outputId] = outputQty
                             -- Record production in production stats
                             if self.productionStats then
                                 self.productionStats:recordProduction(outputId, outputQty, building.id)
                             end
                         end
+
+                        -- Record production history
+                        self:RecordProductionHistory(building, station, "completed", inputsConsumed, outputsProduced)
+                        station.cycleStartTime = nil  -- Reset for next cycle
 
                         self:LogEvent("production", building.name .. " produced " .. station.recipe.name, {})
                     end
@@ -1708,6 +1733,41 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
             station.state = "IDLE"
         end
     end
+end
+
+-- Record production cycle in building's history
+function AlphaWorld:RecordProductionHistory(building, station, status, inputs, outputs)
+    if not building.RecordProductionCycle then
+        return -- Building doesn't support history tracking
+    end
+
+    local now = love.timer.getTime()
+    local duration = 0
+    if station.cycleStartTime then
+        duration = now - station.cycleStartTime
+    end
+
+    -- Calculate current game cycle
+    local day = self.timeManager:GetDay() or 1
+    local slotIndex = self.timeManager.currentSlotIndex or 1
+    local slotsPerDay = #(self.timeManager.timeSlots or {}) or 6
+    local currentCycle = (day - 1) * slotsPerDay + slotIndex
+
+    local resourceEfficiency = building.resourceEfficiency or 1.0
+    local efficiency = self.stats.productivityMultiplier * resourceEfficiency
+
+    building:RecordProductionCycle({
+        cycle = currentCycle,
+        timestamp = now,
+        stationId = station.id,
+        recipeId = station.recipe and station.recipe.id or "unknown",
+        recipeName = station.recipe and station.recipe.name or "Unknown",
+        duration = duration,
+        inputs = inputs,
+        outputs = outputs,
+        efficiency = efficiency,
+        status = status
+    })
 end
 
 -- =============================================================================

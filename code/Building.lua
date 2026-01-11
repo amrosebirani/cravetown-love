@@ -67,6 +67,9 @@ function Building:Create(params)
             outputCapacity = outputCapacity,
             outputUsed = 0
         },
+        -- Production history (ring buffer, last 10 cycles)
+        mProductionHistory = {},
+        mMaxHistorySize = 10,
         -- Legacy production system (for backwards compatibility)
         mProductionTimer = 0,
         mFirstProduction = true,
@@ -333,6 +336,37 @@ function Building:GetProductionInfo()
     end
 
     return nil
+end
+
+-- Record a production cycle in history (ring buffer)
+function Building:RecordProductionCycle(entry)
+    -- entry = {
+    --     cycle = number,          -- Game cycle when production completed
+    --     timestamp = number,      -- love.timer.getTime() when completed
+    --     stationId = number,      -- Which station produced
+    --     recipeId = string,       -- Recipe that was executed
+    --     duration = number,       -- Seconds this cycle took
+    --     inputs = {},             -- {commodityId = amount} consumed
+    --     outputs = {},            -- {commodityId = amount} produced
+    --     efficiency = number,     -- 0.0 to 1.0
+    --     status = string          -- "completed", "blocked_no_materials", "blocked_no_worker"
+    -- }
+
+    table.insert(self.mProductionHistory, entry)
+
+    -- Keep only last N entries (ring buffer)
+    while #self.mProductionHistory > self.mMaxHistorySize do
+        table.remove(self.mProductionHistory, 1)
+    end
+end
+
+-- Get production history (most recent first)
+function Building:GetProductionHistory()
+    local history = {}
+    for i = #self.mProductionHistory, 1, -1 do
+        table.insert(history, self.mProductionHistory[i])
+    end
+    return history
 end
 
 function Building:IsMouseOver(mx, my)
