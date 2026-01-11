@@ -237,7 +237,7 @@
       "icon": "Sp",
       "stackSize": 100,
       "baseValue": 50,
-      "description": "Livestock for wool and meat production",
+      "description": "Livestock for wool production",
       "quality": "luxury"
     },
     {
@@ -249,6 +249,16 @@
       "baseValue": 40,
       "description": "Livestock for meat production",
       "quality": "good"
+    },
+    {
+      "id": "chicken",
+      "name": "Chicken",
+      "category": "livestock",
+      "icon": "Ch",
+      "stackSize": 200,
+      "baseValue": 15,
+      "description": "Poultry livestock for meat production",
+      "quality": "basic"
     },
     {
       "id": "feathers",
@@ -286,21 +296,11 @@
       "quality": "basic"
     },
     {
-      "id": "chicken",
-      "name": "Chicken",
+      "id": "chicken_meat",
+      "name": "Chicken Meat",
       "category": "animal_product",
       "quality": "good",
       "description": "Poultry meat - common and affordable protein source"
-    },
-    {
-      "id": "hen",
-      "name": "Hen",
-      "category": "livestock",
-      "icon": "Hn",
-      "stackSize": 200,
-      "baseValue": 15,
-      "description": "Egg-laying chicken for poultry farming",
-      "quality": "basic"
     },
     {
       "id": "feed",
@@ -355,13 +355,6 @@
       ],
       "description": "High quality tanned leather",
       "quality": "good"
-    },
-    {
-      "id": "mutton",
-      "name": "Mutton",
-      "category": "animal_product",
-      "quality": "good",
-      "description": "Sheep meat - rich and flavorful"
     },
     {
       "id": "goat_meat",
@@ -2821,16 +2814,17 @@
       "quality": "basic"
     },
     {
-      "id": "vada",
-      "name": "Vada",
+      "id": "vada_pav",
+      "name": "Vada Pav",
       "category": "prepared_food",
-      "icon": "Vd",
+      "icon": "VP",
       "stackSize": 500,
-      "baseValue": 6,
+      "baseValue": 8,
       "dependencies": [
-        "lentils"
+        "lentils",
+        "pav"
       ],
-      "description": "Fried savory lentil doughnut",
+      "description": "Popular Mumbai street food - spiced potato fritter in a bread roll",
       "quality": "basic"
     },
     {

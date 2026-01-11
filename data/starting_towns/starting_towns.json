@@ -70,7 +70,7 @@
       "starterCitizens": [
         {
           "name": "Ganesh Pawar",
-          "vocation": "street_food_cook",
+          "vocation": "cook",
           "class": "middle",
           "age": 38,
           "workplaceIndex": 6,
@@ -79,7 +79,7 @@
         },
         {
           "name": "Sushila Pawar",
-          "vocation": "street_food_cook",
+          "vocation": "cook",
           "class": "middle",
           "age": 35,
           "workplaceIndex": 6,
@@ -238,7 +238,7 @@
       "starterCitizens": [
         {
           "name": "Deepak Malhotra",
-          "vocation": "street_food_cook",
+          "vocation": "cook",
           "class": "middle",
           "age": 40,
           "workplaceIndex": 5,
@@ -247,7 +247,7 @@
         },
         {
           "name": "Pooja Malhotra",
-          "vocation": "street_food_cook",
+          "vocation": "cook",
           "class": "middle",
           "age": 37,
           "workplaceIndex": 5,
@@ -397,7 +397,7 @@
       "starterCitizens": [
         {
           "name": "Suresh Krishnan",
-          "vocation": "restaurant_cook",
+          "vocation": "cook",
           "class": "middle",
           "age": 42,
           "workplaceIndex": 4,
@@ -406,7 +406,7 @@
         },
         {
           "name": "Lakshmi Krishnan",
-          "vocation": "restaurant_cook",
+          "vocation": "cook",
           "class": "middle",
           "age": 39,
           "workplaceIndex": 4,
@@ -568,7 +568,7 @@
       "starterCitizens": [
         {
           "name": "Subhash Bose",
-          "vocation": "sweet_maker",
+          "vocation": "cook",
           "class": "middle",
           "age": 45,
           "workplaceIndex": 6,
@@ -576,7 +576,7 @@
         },
         {
           "name": "Mala Chatterjee",
-          "vocation": "sweet_maker",
+          "vocation": "cook",
           "class": "middle",
           "age": 42,
           "workplaceIndex": 6,

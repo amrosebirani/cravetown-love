@@ -156,8 +156,8 @@
         "luxury": 2.2
       }
     },
-    "chicken": {
-      "id": "chicken",
+    "chicken_meat": {
+      "id": "chicken_meat",
       "fulfillmentVector": {
         "coarse": [
           15,
@@ -188,41 +188,6 @@
         "basic": 1,
         "good": 1.5,
         "luxury": 2.0
-      }
-    },
-    "mutton": {
-      "id": "mutton",
-      "fulfillmentVector": {
-        "coarse": [
-          15,
-          0,
-          1,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ],
-        "fine": {
-          "biological_nutrition_protein": 20,
-          "biological_nutrition_grain": 2,
-          "biological_nutrition_fat": 3,
-          "touch_sensory_luxury": 2
-        }
-      },
-      "tags": [
-        "protein",
-        "nutrition",
-        "luxury_food",
-        "red_meat"
-      ],
-      "durability": "consumable",
-      "qualityMultipliers": {
-        "poor": 0.5,
-        "basic": 1,
-        "good": 1.5,
-        "luxury": 2.2
       }
     },
     "goat_meat": {
@@ -1871,32 +1836,29 @@
           0,
           0,
           0,
-          0,
-          0,
+          1,
           0,
           0,
           0,
           0
         ],
-        "fine": {}
+        "fine": {
+          "biological_resource_livestock": 10
+        }
       },
       "tags": [
-        "grain",
-        "nutrition",
-        "basic_food",
-        "raw_material"
+        "livestock",
+        "animal",
+        "wool_production"
       ],
-      "durability": "consumable",
+      "durability": "durable",
       "qualityMultipliers": {
-        "poor": 0.5,
+        "poor": 0.8,
         "basic": 1,
-        "good": 1.5,
-        "luxury": 2.2,
-        "masterwork": 3
+        "good": 1.2,
+        "luxury": 1.5
       },
-      "durationCycles": 55,
-      "effectDecayRate": 0.02,
-      "notes": "Basic grain - staple food"
+      "notes": "Livestock for wool production"
     },
     "feathers": {
       "id": "feathers",
@@ -2007,71 +1969,33 @@
       "id": "chicken",
       "fulfillmentVector": {
         "coarse": [
-          25,
           0,
           0,
           0,
           0,
+          1,
           0,
           0,
           0,
           0
         ],
         "fine": {
-          "biological_nutrition_grain": 2,
-          "biological_nutrition_protein": 20,
-          "biological_nutrition_fat": 3
+          "biological_resource_livestock": 10
         }
       },
       "tags": [
-        "protein",
-        "nutrition",
-        "animal_product"
+        "livestock",
+        "poultry",
+        "animal"
       ],
-      "durability": "consumable",
+      "durability": "durable",
       "qualityMultipliers": {
-        "poor": 0.6,
+        "poor": 0.8,
         "basic": 1,
-        "good": 1.3,
-        "luxury": 1.6,
-        "masterwork": 2
+        "good": 1.2,
+        "luxury": 1.5
       },
-      "notes": "Meat, dairy, eggs"
-    },
-    "hen": {
-      "id": "hen",
-      "fulfillmentVector": {
-        "coarse": [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ],
-        "fine": {}
-      },
-      "tags": [
-        "grain",
-        "nutrition",
-        "basic_food",
-        "raw_material"
-      ],
-      "durability": "consumable",
-      "qualityMultipliers": {
-        "poor": 0.5,
-        "basic": 1,
-        "good": 1.5,
-        "luxury": 2.2,
-        "masterwork": 3
-      },
-      "durationCycles": 20,
-      "effectDecayRate": 0.07,
-      "notes": "Basic grain - staple food"
+      "notes": "Poultry livestock for meat production"
     },
     "feed": {
       "id": "feed",
@@ -2233,41 +2157,6 @@
       },
       "durationCycles": 200,
       "effectDecayRate": 0.001,
-      "notes": "Meat, dairy, eggs"
-    },
-    "mutton": {
-      "id": "mutton",
-      "fulfillmentVector": {
-        "coarse": [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
-        ],
-        "fine": {
-          "biological_nutrition_protein": 20,
-          "biological_nutrition_grain": 2,
-          "touch_sensory_luxury": 3
-        }
-      },
-      "tags": [
-        "protein",
-        "nutrition",
-        "animal_product"
-      ],
-      "durability": "consumable",
-      "qualityMultipliers": {
-        "poor": 0.6,
-        "basic": 1,
-        "good": 1.3,
-        "luxury": 1.6,
-        "masterwork": 2
-      },
       "notes": "Meat, dairy, eggs"
     },
     "beef": {

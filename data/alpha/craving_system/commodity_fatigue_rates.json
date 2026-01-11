@@ -231,14 +231,6 @@
         "ascetic": 1.8
       }
     },
-    "mutton": {
-      "baseFatigueRate": 0.11,
-      "fatigueModifiers": {
-        "frugal": 1.0,
-        "hedonist": 1.1,
-        "glutton": 1.4
-      }
-    },
     "beef": {
       "baseFatigueRate": 0.11,
       "fatigueModifiers": {
@@ -247,13 +239,17 @@
         "glutton": 1.5
       }
     },
-    "chicken": {
+    "chicken_meat": {
       "baseFatigueRate": 0.12,
       "fatigueModifiers": {
         "frugal": 0.9,
         "hedonist": 1.2,
         "glutton": 1.4
       }
+    },
+    "chicken": {
+      "baseFatigueRate": 0.01,
+      "fatigueModifiers": {}
     },
     "eggs": {
       "baseFatigueRate": 0.13,
@@ -1352,7 +1348,6 @@
 
     "_comment_animals": "Animals - no fatigue (not consumed directly for satisfaction)",
     "sheep": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
-    "hen": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
     "bee_colony": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
     "feathers": {"baseFatigueRate": 0.01, "fatigueModifiers": {}},
     "feed": {"baseFatigueRate": 0.01, "fatigueModifiers": {}}

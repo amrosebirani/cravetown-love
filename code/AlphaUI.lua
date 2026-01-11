@@ -457,8 +457,8 @@ function AlphaUI:Render()
         self.notificationSystem:Render()
     end
 
-    -- Render debug panel (CRAVE-6) - on top but below tutorial
-    if self.debugPanel and self.debugPanel:IsVisible() then
+    -- Render debug panel (CRAVE-6) - always render toggle button, panel when visible
+    if self.debugPanel then
         self.debugPanel:Render()
     end
 
@@ -5966,7 +5966,8 @@ function AlphaUI:HandleClick(x, y, button)
     end
 
     -- Handle debug panel clicks (CRAVE-6) - high priority
-    if self.debugPanel and self.debugPanel:IsVisible() then
+    -- Always check debug panel (toggle button always visible)
+    if self.debugPanel then
         if self.debugPanel:HandleMousePress(x, y, button) then
             return true
         end
@@ -7681,6 +7682,18 @@ function AlphaUI:HandleMouseMove(x, y)
             break
         end
     end
+end
+
+function AlphaUI:HandleMouseRelease(x, y, button)
+    -- Forward to debug panel for drag handling (CRAVE-6)
+    if self.debugPanel then
+        if self.debugPanel:HandleMouseRelease(x, y, button) then
+            return true
+        end
+    end
+
+    -- Other mouse release handling can be added here in the future
+    return false
 end
 
 -- =============================================================================

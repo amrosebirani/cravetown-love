@@ -29,47 +29,24 @@
       "category": "Food Production",
       "minimumWage": 12,
       "skillLevel": "Intermediate",
-      "description": "Prepares meals in restaurants",
+      "description": "Prepares various Indian dishes including street food (poha, samosa, vada pav), restaurant meals (dosa, idli, biryani), and sweets (rasogulla, ladoo, jalebi)",
       "workCategories": [
-        "Food Preparation",
-        "Hospitality"
-      ]
-    },
-    {
-      "id": "street_food_cook",
-      "name": "Street Food Cook",
-      "category": "Food Production",
-      "minimumWage": 10,
-      "skillLevel": "Intermediate",
-      "description": "Specializes in Indian street food like samosa, vada, pakora, and poha",
-      "workCategories": [
-        "Cooking",
-        "General Labor"
-      ]
-    },
-    {
-      "id": "restaurant_cook",
-      "name": "Restaurant Cook",
-      "category": "Food Production",
-      "minimumWage": 13,
-      "skillLevel": "Skilled",
-      "description": "Prepares complex restaurant dishes like dosa, idli, and biryani",
-      "workCategories": [
-        "Food Preparation",
-        "Hospitality"
-      ]
-    },
-    {
-      "id": "sweet_maker",
-      "name": "Sweet Maker",
-      "category": "Food Production",
-      "minimumWage": 14,
-      "skillLevel": "Skilled",
-      "description": "Crafts Indian sweets like rasogulla, ladoo, jalebi, and halwa",
-      "workCategories": [
-        "Confectionery",
         "Food Preparation"
-      ]
+      ],
+      "skillLevels": {
+        "Basic": {
+          "description": "Entry-level cook, can prepare simple street foods",
+          "efficiencyModifier": 0.85
+        },
+        "Intermediate": {
+          "description": "Experienced cook, handles most common dishes and sweets",
+          "efficiencyModifier": 1.0
+        },
+        "Advanced": {
+          "description": "Master cook, excels at complex fermented dishes and intricate sweets",
+          "efficiencyModifier": 1.2
+        }
+      }
     },
     {
       "id": "barman",

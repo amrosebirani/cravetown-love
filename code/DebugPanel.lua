@@ -30,7 +30,7 @@ function DebugPanel:Create(world)
     panel.height = math.min(850, love.graphics.getHeight() - 80)  -- Adaptive height, larger
     panel.collapsedHeight = 45
 
-    -- Dragging state
+    -- No dragging (fixed modal)
     panel.isDragging = false
     panel.dragOffsetX = 0
     panel.dragOffsetY = 0
@@ -139,16 +139,19 @@ function DebugPanel:Update(dt)
 end
 
 function DebugPanel:Render()
-    if not self.visible then return end
-
     self:InitFonts()
     self.buttons = {}
 
+    -- Always render the toggle button (even when panel hidden)
+    self:RenderToggleButton()
+
+    if not self.visible then return end
+
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
 
-    -- Ensure panel stays within screen bounds
-    self.x = math.max(0, math.min(self.x, screenW - self.width))
-    self.y = math.max(0, math.min(self.y, screenH - (self.collapsed and self.collapsedHeight or self.height)))
+    -- Fixed centered position (recalculate in case window resized)
+    self.x = (screenW - self.width) / 2
+    self.y = (screenH - self.height) / 2
 
     local panelHeight = self.collapsed and self.collapsedHeight or self.height
 
@@ -201,6 +204,46 @@ function DebugPanel:Render()
 end
 
 -- =============================================================================
+-- TOGGLE BUTTON (Always Visible)
+-- =============================================================================
+function DebugPanel:RenderToggleButton()
+    -- Position in top-right corner, below speed selector (to avoid overlap)
+    local btnW = 100
+    local btnH = 30
+    local btnX = love.graphics.getWidth() - btnW - 10
+    local btnY = 50  -- Moved down to avoid speed selector
+
+    local mx, my = love.mouse.getPosition()
+    local isHover = mx >= btnX and mx <= btnX + btnW and my >= btnY and my <= btnY + btnH
+
+    -- Button background
+    if isHover then
+        love.graphics.setColor(0.4, 0.6, 0.8, 0.95)
+    else
+        love.graphics.setColor(0.3, 0.5, 0.7, 0.9)
+    end
+    love.graphics.rectangle("fill", btnX, btnY, btnW, btnH, 4, 4)
+
+    -- Button border
+    love.graphics.setColor(0.5, 0.7, 0.9, 1)
+    love.graphics.setLineWidth(2)
+    love.graphics.rectangle("line", btnX, btnY, btnW, btnH, 4, 4)
+
+    -- Button text
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(1, 1, 1, 1)
+    local text = "Debug View"
+    local textW = self.fonts.small:getWidth(text)
+    love.graphics.print(text, btnX + (btnW - textW) / 2, btnY + 9)
+
+    -- Store for click handling
+    table.insert(self.buttons, {
+        x = btnX, y = btnY, w = btnW, h = btnH,
+        onClick = function() self:Toggle() end
+    })
+end
+
+-- =============================================================================
 -- HEADER
 -- =============================================================================
 function DebugPanel:RenderHeader()
@@ -219,7 +262,7 @@ function DebugPanel:RenderHeader()
     love.graphics.setColor(self.colors.textDim)
     love.graphics.print("Press F12 to toggle", self.x + 115, self.y + 11)
 
-    -- Buttons in header
+    -- Close button (only button in header)
     local btnY = self.y + 7
     local btnH = 22
 
@@ -262,12 +305,12 @@ function DebugPanel:RenderTabs()
         love.graphics.rectangle("line", tabX, tabY, tabW, tabH)
 
         -- Tab text
-        love.graphics.setFont(self.fonts.tiny)
+        love.graphics.setFont(self.fonts.small)
         local textColor = isActive and self.colors.text or self.colors.textDim
         love.graphics.setColor(textColor)
-        local text = tab.icon .. " " .. tab.label
-        local textW = self.fonts.tiny:getWidth(text)
-        love.graphics.print(text, tabX + (tabW - textW) / 2, tabY + 10)
+        local text = tab.label
+        local textW = self.fonts.small:getWidth(text)
+        love.graphics.print(text, tabX + (tabW - textW) / 2, tabY + 8)
 
         -- Store button for click handling
         table.insert(self.buttons, {

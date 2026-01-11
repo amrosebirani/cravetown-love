@@ -580,8 +580,12 @@ function SpecialtyTownsState:mousepressed(x, y, button)
 end
 
 function SpecialtyTownsState:mousereleased(x, y, button)
-    -- AlphaUI handles clicks on press, not release
-    -- No action needed here for now
+    -- Forward to AlphaUI for debug panel dragging (CRAVE-6)
+    if self.mUI and self.mUI.HandleMouseRelease then
+        if self.mUI:HandleMouseRelease(x, y, button) then
+            return true
+        end
+    end
     return false
 end
 
