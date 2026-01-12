@@ -142,8 +142,7 @@ function DebugPanel:Render()
     self:InitFonts()
     self.buttons = {}
 
-    -- Always render the toggle button (even when panel hidden)
-    self:RenderToggleButton()
+    -- Toggle button removed - use F12 hotkey instead
 
     if not self.visible then return end
 

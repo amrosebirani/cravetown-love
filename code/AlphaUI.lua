@@ -544,12 +544,14 @@ function AlphaUI:RenderTopBar()
 
     -- Speed selector
     love.graphics.setFont(self.fonts.small)
-    local speeds = {"normal", "fast", "faster"}
-    local speedLabels = {"1x", "2x", "5x"}
+    local speeds = {"normal", "fast", "faster", "fastest", "turbo"}
+    local speedLabels = {"1x", "2x", "5x", "10x", "20x"}
+    local speedBtnSpacing = 30  -- Spacing between speed buttons
+    local currentSpeed = self.world.timeManager.currentSpeed
     for i, speed in ipairs(speeds) do
-        local bx = speedX + (i - 1) * 40
+        local bx = speedX + (i - 1) * speedBtnSpacing
         local by = 32
-        local isActive = self.world.timeManager.currentSpeed == speed
+        local isActive = currentSpeed == speed
 
         if isActive then
             love.graphics.setColor(self.colors.accent)
@@ -6019,6 +6021,26 @@ function AlphaUI:HandleClick(x, y, button)
         return self:HandlePlacementClick(x, y)
     end
 
+    -- Check top bar speed controls FIRST (before action buttons)
+    if y < self.topBarHeight then
+        local speedX = screenW - 200
+        -- Pause/Play toggle
+        if x >= speedX and x < speedX + 80 and y >= 10 and y < 30 then
+            self.world:TogglePause()
+            return true
+        end
+        -- Speed buttons (use same spacing as rendering)
+        local speeds = {"normal", "fast", "faster", "fastest", "turbo"}
+        local speedBtnSpacing = 30  -- Must match rendering spacing
+        for i, speed in ipairs(speeds) do
+            local bx = speedX + (i - 1) * speedBtnSpacing
+            if x >= bx and x < bx + speedBtnSpacing and y >= 32 and y < 50 then
+                self.world:SetTimeScale(speed)
+                return true
+            end
+        end
+    end
+
     -- Check top bar action buttons
     for btnId, btn in pairs(self.topBarButtons) do
         if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
@@ -6195,26 +6217,6 @@ function AlphaUI:HandleClick(x, y, button)
         -- Clear selection
         self.world:ClearSelection()
         return true
-    end
-
-    -- Check top bar clicks (speed controls)
-    if y < self.topBarHeight then
-        local speedX = screenW - 200
-        if x >= speedX and x < speedX + 80 and y >= 10 and y < 30 then
-            -- Toggle pause
-            self.world:TogglePause()
-            return true
-        end
-
-        -- Speed buttons
-        local speeds = {"normal", "fast", "faster"}
-        for i, speed in ipairs(speeds) do
-            local bx = speedX + (i - 1) * 40
-            if x >= bx and x < bx + 35 and y >= 32 and y < 48 then
-                self.world:SetTimeScale(speed)
-                return true
-            end
-        end
     end
 
     return false
@@ -7383,6 +7385,9 @@ function AlphaUI:HandleKeyPress(key)
     elseif key == "4" then
         self.world:SetTimeScale("fastest")
         return true
+    elseif key == "5" then
+        self.world:SetTimeScale("turbo")
+        return true
     end
 
     return false
@@ -7746,7 +7751,8 @@ function AlphaUI:RenderHelpOverlay()
         {"1", "Normal speed (1x)"},
         {"2", "Fast speed (2x)"},
         {"3", "Faster speed (5x)"},
-        {"4", "Fastest speed (10x)"}
+        {"4", "Fastest speed (10x)"},
+        {"5", "Turbo speed (20x)"}
     }
 
     for _, shortcut in ipairs(shortcuts1) do

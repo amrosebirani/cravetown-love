@@ -1635,8 +1635,14 @@ end
 -- =============================================================================
 
 function AlphaWorld:UpdateProduction(dt)
+    -- Scale dt by game speed so production matches simulation speed
+    -- At 1x (300s/day), speedMultiplier = 1
+    -- At 20x (15s/day), speedMultiplier = 20
+    local speedMultiplier = 300 / self.timeManager.secondsPerDay
+    local scaledDt = dt * speedMultiplier
+
     for _, building in ipairs(self.buildings) do
-        self:UpdateBuildingProduction(building, dt)
+        self:UpdateBuildingProduction(building, scaledDt)
     end
 end
 
@@ -1775,11 +1781,15 @@ end
 -- =============================================================================
 
 function AlphaWorld:UpdateConsumption(dt)
+    -- Scale dt by game speed so consumption/cravings match simulation speed
+    local speedMultiplier = 300 / self.timeManager.secondsPerDay
+    local scaledDt = dt * speedMultiplier
+
     -- Accumulate cravings for each citizen
     -- Pass active cravings for current slot for slot-based accumulation
     local activeCravings = self:GetActiveCravingsForSlot()
     for _, citizen in ipairs(self.citizens) do
-        citizen:UpdateCurrentCravings(dt, activeCravings)
+        citizen:UpdateCurrentCravings(scaledDt, activeCravings)
     end
 end
 
