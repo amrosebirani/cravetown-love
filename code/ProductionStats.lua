@@ -310,4 +310,170 @@ function ProductionStats:getMetricsSummary()
     }
 end
 
+-- =============================================================================
+-- CRAVE-19: Economy Flow Visualization Helper Methods
+-- =============================================================================
+
+-- Get aggregated production data for last N samples (for sparklines)
+-- Returns: { commodityId -> {values array} }
+function ProductionStats:getRecentProductionByCommodity(numSamples)
+    numSamples = numSamples or 10
+    local result = {}
+    local history = self.history.commodityProduction
+    local startIdx = math.max(1, #history - numSamples * 10 + 1)  -- Approximate, gather more than needed
+
+    -- Gather all entries
+    for i = startIdx, #history do
+        local entry = history[i]
+        if entry and entry.commodity then
+            result[entry.commodity] = result[entry.commodity] or {}
+            table.insert(result[entry.commodity], entry.quantity or 0)
+        end
+    end
+
+    -- Trim to last numSamples for each commodity
+    for commodityId, values in pairs(result) do
+        if #values > numSamples then
+            local trimmed = {}
+            for i = #values - numSamples + 1, #values do
+                table.insert(trimmed, values[i])
+            end
+            result[commodityId] = trimmed
+        end
+    end
+
+    return result
+end
+
+-- Get aggregated consumption data for last N samples (for sparklines)
+-- Returns: { commodityId -> {values array} }
+function ProductionStats:getRecentConsumptionByCommodity(numSamples)
+    numSamples = numSamples or 10
+    local result = {}
+    local history = self.history.commodityConsumption
+    local startIdx = math.max(1, #history - numSamples * 10 + 1)
+
+    for i = startIdx, #history do
+        local entry = history[i]
+        if entry and entry.commodity then
+            result[entry.commodity] = result[entry.commodity] or {}
+            table.insert(result[entry.commodity], entry.quantity or 0)
+        end
+    end
+
+    -- Trim to last numSamples for each commodity
+    for commodityId, values in pairs(result) do
+        if #values > numSamples then
+            local trimmed = {}
+            for i = #values - numSamples + 1, #values do
+                table.insert(trimmed, values[i])
+            end
+            result[commodityId] = trimmed
+        end
+    end
+
+    return result
+end
+
+-- Get stockpile delta for a commodity over last N samples
+-- Returns: { startValue, endValue, delta }
+function ProductionStats:getStockpileDelta(commodityId, numSamples)
+    numSamples = numSamples or 10
+    local history = self.history.stockpiles
+    local values = {}
+
+    -- Gather stockpile values for this commodity
+    for i = #history, math.max(1, #history - numSamples * 5), -1 do
+        local entry = history[i]
+        if entry and entry.commodity == commodityId then
+            table.insert(values, 1, entry.quantity or 0)
+            if #values >= numSamples then break end
+        end
+    end
+
+    if #values == 0 then
+        return { startValue = 0, endValue = 0, delta = 0 }
+    elseif #values == 1 then
+        return { startValue = values[1], endValue = values[1], delta = 0 }
+    else
+        local startValue = values[1]
+        local endValue = values[#values]
+        return {
+            startValue = startValue,
+            endValue = endValue,
+            delta = endValue - startValue
+        }
+    end
+end
+
+-- Get combined net flow data for all active commodities
+-- Returns: array of { id, prodRate, consRate, netRate, stock }
+function ProductionStats:getFlowSummary(inventory)
+    local summary = {}
+    local allCommodities = {}
+
+    -- Collect all tracked commodities (from rates)
+    for id in pairs(self.metrics.productionRate) do
+        allCommodities[id] = true
+    end
+    for id in pairs(self.metrics.consumptionRate) do
+        allCommodities[id] = true
+    end
+
+    -- Also include commodities that exist in inventory (even without rates)
+    if inventory then
+        for id, qty in pairs(inventory) do
+            if qty and qty > 0 then
+                allCommodities[id] = true
+            end
+        end
+    end
+
+    -- Build summary for each commodity
+    for commodityId in pairs(allCommodities) do
+        local prodRate = self.metrics.productionRate[commodityId] or 0
+        local consRate = self.metrics.consumptionRate[commodityId] or 0
+        local stock = inventory and inventory[commodityId] or 0
+
+        table.insert(summary, {
+            id = commodityId,
+            prodRate = prodRate,
+            consRate = consRate,
+            netRate = prodRate - consRate,
+            stock = stock
+        })
+    end
+
+    -- Sort by total flow volume (highest first), then by stock
+    table.sort(summary, function(a, b)
+        local aFlow = a.prodRate + a.consRate
+        local bFlow = b.prodRate + b.consRate
+        if aFlow ~= bFlow then
+            return aFlow > bFlow
+        end
+        return a.stock > b.stock
+    end)
+
+    return summary
+end
+
+-- Get total production and consumption rates across all commodities
+function ProductionStats:getTotalFlowRates()
+    local totalProd = 0
+    local totalCons = 0
+
+    for _, rate in pairs(self.metrics.productionRate) do
+        totalProd = totalProd + rate
+    end
+    for _, rate in pairs(self.metrics.consumptionRate) do
+        totalCons = totalCons + rate
+    end
+
+    return {
+        totalProduction = totalProd,
+        totalConsumption = totalCons,
+        netFlow = totalProd - totalCons
+    }
+end
+
 return ProductionStats

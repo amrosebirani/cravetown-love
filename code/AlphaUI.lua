@@ -139,8 +139,7 @@ function AlphaUI:Create(world)
     ui.resourceOverlay = nil
     if world.naturalResources then
         ui.resourceOverlay = ResourceOverlay:Create(world.naturalResources)
-        -- Position panel on left side, below top bar
-        ui.resourceOverlay:setPanelPosition(10, 70)
+        -- Position is set dynamically in Render() to be on right side
     end
 
     -- Immigration panel state
@@ -382,8 +381,22 @@ function AlphaUI:Render()
         self:RenderSpawnCitizenModeIndicator()
     end
 
-    -- Render resource overlay panel (screen space, not world space)
+    -- Render resource overlay panel (screen space, inside right panel)
     if self.showResourceOverlay and self.resourceOverlay then
+        -- Position inside right panel, below placement content or at top if not placing
+        local screenW = love.graphics.getWidth()
+        local screenH = love.graphics.getHeight()
+        local rightPanelX = screenW - self.rightPanelWidth
+
+        if self.placementMode then
+            -- Position below the cost section (set in RenderPlacementPanel)
+            -- Use stored position or default
+            local overlayY = self.resourceOverlayY or (self.topBarHeight + 280)
+            self.resourceOverlay:setPanelPosition(rightPanelX + 10, overlayY)
+        else
+            -- When not placing, position at top of right panel
+            self.resourceOverlay:setPanelPosition(rightPanelX + 10, self.topBarHeight + 10)
+        end
         self.resourceOverlay:renderPanel()
     end
 
@@ -1675,6 +1688,10 @@ function AlphaUI:RenderRightPanel()
         contentY = contentY + 16
         love.graphics.print("building to view details", x + 10, contentY)
     end
+
+    -- Debug Panel button at bottom of right panel
+    local btnY = y + h - 40
+    self:RenderDebugPanelButtonRight(x + 10, btnY, w - 20)
 
     love.graphics.setColor(1, 1, 1)
 end
@@ -3206,7 +3223,49 @@ function AlphaUI:RenderPlacementPanel()
         contentY = contentY + 16
     end
 
+    -- Resource Overlay panel (rendered inside right panel, below costs)
+    contentY = contentY + 20
+    if self.showResourceOverlay and self.resourceOverlay then
+        self.resourceOverlay:setPanelPosition(x + 10, contentY)
+        -- Render is called separately in main Render()
+        self.resourceOverlayInRightPanel = true
+        self.resourceOverlayY = contentY
+    end
+
+    -- Debug Panel button at bottom of right panel
+    local btnY = y + h - 40
+    self:RenderDebugPanelButtonRight(x + 10, btnY, w - 20)
+
     love.graphics.setColor(1, 1, 1)
+end
+
+function AlphaUI:RenderDebugPanelButtonRight(x, y, w)
+    local btnH = 28
+    local mx, my = love.mouse.getPosition()
+    local isHover = mx >= x and mx <= x + w and my >= y and my <= y + btnH
+
+    -- Button background (brown/dark theme to match panel)
+    if isHover then
+        love.graphics.setColor(0.3, 0.25, 0.2, 0.95)
+    else
+        love.graphics.setColor(0.2, 0.18, 0.15, 0.9)
+    end
+    love.graphics.rectangle("fill", x, y, w, btnH, 4, 4)
+
+    -- Button border
+    love.graphics.setColor(0.4, 0.35, 0.3, 1)
+    love.graphics.setLineWidth(1)
+    love.graphics.rectangle("line", x, y, w, btnH, 4, 4)
+
+    -- Button text
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.9, 0.85, 0.7, 1)
+    local text = "Debug Panel (F12)"
+    local textW = self.fonts.small:getWidth(text)
+    love.graphics.print(text, x + (w - textW) / 2, y + 7)
+
+    -- Store bounds for click handling
+    self.debugPanelButtonBounds = {x = x, y = y, w = w, h = btnH}
 end
 
 function AlphaUI:RenderPlacementInstructions()
@@ -5969,6 +6028,17 @@ function AlphaUI:HandleClick(x, y, button)
     -- Always check debug panel (toggle button always visible)
     if self.debugPanel then
         if self.debugPanel:HandleMousePress(x, y, button) then
+            return true
+        end
+    end
+
+    -- Handle debug panel button click (in right panel)
+    if self.debugPanelButtonBounds then
+        local btn = self.debugPanelButtonBounds
+        if x >= btn.x and x < btn.x + btn.w and y >= btn.y and y < btn.y + btn.h then
+            if self.debugPanel then
+                self.debugPanel:Toggle()
+            end
             return true
         end
     end

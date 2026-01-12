@@ -127,6 +127,12 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
     world.productionStats = ProductionStats.new()
     world.productionStatsTick = 0
 
+    -- Debug satisfaction override (for testing F1: satisfaction → production)
+    world.debugSatisfactionOverride = {
+        active = false,
+        value = 50  -- Default to 50% satisfaction when override is active
+    }
+
     -- Event log
     world.eventLog = {}
     world.maxEvents = 100
@@ -2018,6 +2024,20 @@ function AlphaWorld:UpdateStats()
     self.stats.satisfactionByClass = {}
     for class, total in pairs(classSat) do
         self.stats.satisfactionByClass[class] = classCount[class] > 0 and (total / classCount[class]) or 0
+    end
+
+    -- Calculate productivity multiplier from satisfaction
+    -- Formula: If satisfaction < 50: multiplier = satisfaction/50, else: multiplier = 1.0
+    -- Floor at 0.1 to prevent total shutdown
+    local avgSat = self.stats.averageSatisfaction
+    if self.debugSatisfactionOverride and self.debugSatisfactionOverride.active then
+        -- Use debug override value instead of actual satisfaction
+        avgSat = self.debugSatisfactionOverride.value
+    end
+    if avgSat < 50 then
+        self.stats.productivityMultiplier = math.max(0.1, avgSat / 50)
+    else
+        self.stats.productivityMultiplier = 1.0
     end
 
     -- Calculate housing capacity

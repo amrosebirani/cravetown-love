@@ -76,6 +76,38 @@ function DebugPanel:Create(world)
     panel.cravingsDimensionPickerOpen = false  -- Whether dimension picker dropdown is open
     panel.cravingsCoarseFilter = "all"  -- Filter dimensions in picker by coarse parent
 
+    -- Economy tab state (CRAVE-19: Economy Flow Visualization)
+    panel.economyFilter = "active"  -- "active", "top20", "all"
+    panel.economyFilterDropdownOpen = false
+    panel.economyCache = {
+        lastRefreshCycle = 0,
+        filteredCommodities = {},
+        sankeyData = {
+            production = {},   -- {commodityId, rate, category}
+            consumption = {},  -- {commodityId, rate, category}
+            totalStock = 0,
+            totalProduction = 0,
+            totalConsumption = 0
+        },
+        commodityDetails = {}, -- sorted array of {id, prodRate, consRate, stock, delta, trend}
+        sparklineData = {}     -- commodityId -> {values}
+    }
+
+    -- Category colors for Sankey diagram
+    panel.categoryColors = {
+        biological = {0.4, 0.7, 0.3, 1},      -- Green
+        touch = {0.3, 0.5, 0.8, 1},           -- Blue
+        safety = {0.8, 0.6, 0.2, 1},          -- Orange
+        psychological = {0.7, 0.4, 0.7, 1},   -- Purple
+        social_status = {0.8, 0.7, 0.3, 1},   -- Gold
+        social_connection = {0.5, 0.7, 0.8, 1}, -- Cyan
+        exotic_goods = {0.9, 0.4, 0.4, 1},    -- Red
+        shiny_objects = {0.9, 0.8, 0.3, 1},   -- Yellow
+        vice = {0.5, 0.3, 0.5, 1},            -- Dark purple
+        utility = {0.5, 0.5, 0.5, 1},         -- Gray
+        default = {0.6, 0.6, 0.6, 1}          -- Light gray
+    }
+
     -- Fonts (initialized on first render)
     panel.fonts = nil
 
@@ -142,8 +174,7 @@ function DebugPanel:Render()
     self:InitFonts()
     self.buttons = {}
 
-    -- Always render the toggle button (even when panel hidden)
-    self:RenderToggleButton()
+    -- Toggle button now in left panel (AlphaUI), no longer rendered here
 
     if not self.visible then return end
 
@@ -443,8 +474,125 @@ function DebugPanel:RenderOverviewTab(x, startY, w)
         end
     end
 
+    y = y + 10
+
+    -- Testing section (for CRAVE-10 verification)
+    y = self:RenderTestingSection(x, y, w)
+
     -- Set max scroll
     self.maxScroll = math.max(0, y - startY - (self.height - 80))
+end
+
+-- =============================================================================
+-- TESTING SECTION (for CRAVE-10 verification)
+-- =============================================================================
+function DebugPanel:RenderTestingSection(x, y, w)
+    love.graphics.setFont(self.fonts.header)
+    love.graphics.setColor(0.9, 0.6, 0.3)
+    love.graphics.print("TESTING (F1: Satisfaction -> Production)", x, y)
+    y = y + 20
+
+    -- Current productivity multiplier display
+    local productivityMult = (self.world and self.world.stats and self.world.stats.productivityMultiplier) or 1.0
+    local avgSat = (self.world and self.world.stats and self.world.stats.averageSatisfaction) or 50
+
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Productivity Multiplier:", x, y)
+    local prodColor = productivityMult >= 0.8 and self.colors.success or
+                     (productivityMult >= 0.5 and self.colors.warning or self.colors.error)
+    love.graphics.setColor(prodColor)
+    love.graphics.print(string.format("%.2fx (%.0f%% production)", productivityMult, productivityMult * 100), x + 140, y)
+    y = y + 16
+
+    -- Override checkbox
+    local override = self.world and self.world.debugSatisfactionOverride
+    local isOverrideActive = override and override.active or false
+
+    -- Checkbox
+    local checkboxX = x
+    local checkboxY = y
+    local checkboxSize = 14
+
+    love.graphics.setColor(0.2, 0.25, 0.3)
+    love.graphics.rectangle("fill", checkboxX, checkboxY, checkboxSize, checkboxSize, 2, 2)
+    love.graphics.setColor(0.5, 0.55, 0.6)
+    love.graphics.rectangle("line", checkboxX, checkboxY, checkboxSize, checkboxSize, 2, 2)
+
+    if isOverrideActive then
+        love.graphics.setColor(0.3, 0.7, 0.4)
+        love.graphics.rectangle("fill", checkboxX + 3, checkboxY + 3, checkboxSize - 6, checkboxSize - 6, 1, 1)
+    end
+
+    love.graphics.setColor(self.colors.text)
+    love.graphics.print("Override Satisfaction", checkboxX + checkboxSize + 6, checkboxY)
+
+    -- Checkbox click handler
+    table.insert(self.buttons, {
+        x = checkboxX, y = checkboxY, w = checkboxSize + 120, h = checkboxSize,
+        onClick = function()
+            if self.world and self.world.debugSatisfactionOverride then
+                self.world.debugSatisfactionOverride.active = not self.world.debugSatisfactionOverride.active
+            end
+        end
+    })
+    y = y + 20
+
+    -- Slider (only show if override is active)
+    if isOverrideActive and override then
+        love.graphics.setFont(self.fonts.tiny)
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print("Override Value:", x, y + 2)
+
+        local sliderX = x + 90
+        local sliderW = w - 140
+        local sliderH = 12
+        local sliderValue = override.value or 50
+
+        -- Slider track
+        love.graphics.setColor(0.2, 0.2, 0.25)
+        love.graphics.rectangle("fill", sliderX, y, sliderW, sliderH, 3, 3)
+
+        -- Slider fill (colored by value)
+        local fillColor = sliderValue >= 50 and {0.3, 0.6, 0.3} or
+                         (sliderValue >= 25 and {0.7, 0.6, 0.2} or {0.7, 0.3, 0.3})
+        love.graphics.setColor(fillColor)
+        local fillW = (sliderValue / 100) * sliderW
+        love.graphics.rectangle("fill", sliderX, y, fillW, sliderH, 3, 3)
+
+        -- Slider handle
+        local handleX = sliderX + fillW - 4
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.rectangle("fill", handleX, y - 2, 8, sliderH + 4, 2, 2)
+
+        -- Value display
+        love.graphics.setColor(self.colors.text)
+        love.graphics.print(string.format("%d%%", sliderValue), sliderX + sliderW + 8, y)
+
+        -- Slider click/drag handler
+        table.insert(self.buttons, {
+            x = sliderX, y = y - 2, w = sliderW, h = sliderH + 4,
+            onClick = function()
+                -- Calculate new value based on mouse position
+                local mx = love.mouse.getX()
+                local newValue = math.floor(((mx - sliderX) / sliderW) * 100)
+                newValue = math.max(0, math.min(100, newValue))
+                if self.world and self.world.debugSatisfactionOverride then
+                    self.world.debugSatisfactionOverride.value = newValue
+                end
+            end
+        })
+        y = y + 18
+
+        -- Expected productivity based on override
+        local expectedProd = sliderValue < 50 and math.max(0.1, sliderValue / 50) or 1.0
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print(string.format("Expected Production: %.0f%% (multiplier: %.2fx)", expectedProd * 100, expectedProd), x, y)
+        y = y + 14
+    end
+
+    y = y + 5
+    return y
 end
 
 -- =============================================================================
@@ -681,6 +829,60 @@ function DebugPanel:RenderBuildingDetailView(x, y, w, building)
         love.graphics.setColor(self.colors.textDim)
         love.graphics.print("  Recipe: " .. recipeName, x + 5, y)
         y = y + 12
+    end
+    y = y + 5
+
+    -- Location Efficiency (F2: Terrain -> Production)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.4, 0.8, 0.6)
+    love.graphics.print("Location Efficiency (F2)", x, y)
+    y = y + 14
+
+    local resourceEfficiency = building.resourceEfficiency or 1.0
+    local productivityMult = (self.world and self.world.stats and self.world.stats.productivityMultiplier) or 1.0
+    local effectiveRate = resourceEfficiency * productivityMult
+
+    love.graphics.setFont(self.fonts.tiny)
+
+    -- Resource efficiency (terrain-based)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("  Terrain Efficiency:", x + 5, y)
+    local effColor = resourceEfficiency >= 0.7 and self.colors.success or
+                    (resourceEfficiency >= 0.4 and self.colors.warning or self.colors.error)
+    love.graphics.setColor(effColor)
+    love.graphics.print(string.format("%.0f%%", resourceEfficiency * 100), x + 130, y)
+    y = y + 11
+
+    -- Productivity multiplier (satisfaction-based)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("  Productivity (Sat):", x + 5, y)
+    local prodColor = productivityMult >= 0.8 and self.colors.success or
+                     (productivityMult >= 0.5 and self.colors.warning or self.colors.error)
+    love.graphics.setColor(prodColor)
+    love.graphics.print(string.format("%.0f%%", productivityMult * 100), x + 130, y)
+    y = y + 11
+
+    -- Effective production rate
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("  Effective Rate:", x + 5, y)
+    local rateColor = effectiveRate >= 0.6 and self.colors.success or
+                     (effectiveRate >= 0.3 and self.colors.warning or self.colors.error)
+    love.graphics.setColor(rateColor)
+    love.graphics.print(string.format("%.0f%% (%.2f x %.2f)", effectiveRate * 100, resourceEfficiency, productivityMult), x + 130, y)
+    y = y + 14
+
+    -- Show resource breakdown if available
+    if building.efficiencyBreakdown then
+        love.graphics.setColor(self.colors.textMuted)
+        love.graphics.print("  Resource Breakdown:", x + 5, y)
+        y = y + 11
+        for resource, data in pairs(building.efficiencyBreakdown) do
+            love.graphics.setColor(self.colors.textDim)
+            local val = type(data) == "table" and (data.value or 0) or data
+            local wgt = type(data) == "table" and (data.weight or 0) or 1
+            love.graphics.print(string.format("    %s: %.2f (wt: %.1f)", resource, val, wgt), x + 5, y)
+            y = y + 10
+        end
     end
     y = y + 5
 
@@ -1276,45 +1478,624 @@ function DebugPanel:RenderCitizenListForDimension(x, y, w, citizens, fineIdx, fi
 end
 
 -- =============================================================================
--- ECONOMY TAB
+-- ECONOMY TAB (CRAVE-19: Economy Flow Visualization)
 -- =============================================================================
 function DebugPanel:RenderEconomyTab(x, startY, w)
     local y = startY + 10
 
+    -- Header
     love.graphics.setFont(self.fonts.header)
     love.graphics.setColor(0.9, 0.8, 0.4)
-    love.graphics.print("ECONOMY", x, y)
+    love.graphics.print("ECONOMY FLOW VISUALIZATION", x, y)
     y = y + 22
 
-    local gold = (self.world and self.world.gold) or 0
-
-    love.graphics.setFont(self.fonts.normal)
-    love.graphics.setColor(self.colors.textDim)
-    love.graphics.print("Town Gold:", x, y)
-    love.graphics.setColor(0.9, 0.8, 0.4)
-    love.graphics.print(string.format("%d", gold), x + 100, y)
-    y = y + 20
-
-    -- Wealth distribution (if economySystem available)
-    if self.world and self.world.economySystem then
-        love.graphics.setFont(self.fonts.header)
-        love.graphics.setColor(0.7, 0.7, 0.9)
-        love.graphics.print("WEALTH DISTRIBUTION", x, y)
-        y = y + 18
-
-        -- TODO: Calculate wealth distribution from economySystem
+    -- Check if production stats available
+    if not self.world or not self.world.productionStats then
         love.graphics.setFont(self.fonts.small)
         love.graphics.setColor(self.colors.textMuted)
-        love.graphics.print("Wealth analysis coming soon", x, y)
-        y = y + 20
-    else
-        love.graphics.setFont(self.fonts.small)
-        love.graphics.setColor(self.colors.textMuted)
-        love.graphics.print("Economy system not initialized", x, y)
-        y = y + 20
+        love.graphics.print("Production stats not initialized", x, y)
+        self.maxScroll = 0
+        return
     end
 
+    -- Refresh economy data
+    self:RefreshEconomyData()
+
+    -- Filter dropdown
+    y = self:RenderEconomyFilter(x, y, w)
+    y = y + 10
+
+    -- Sankey diagram (Production -> Inventory -> Consumption)
+    y = self:RenderSankeyDiagram(x, y, w, 160)
+    y = y + 15
+
+    -- Commodity details table with sparklines
+    y = self:RenderCommodityTable(x, y, w)
+
     self.maxScroll = math.max(0, y - startY - (self.height - 80))
+end
+
+-- Refresh economy data cache
+function DebugPanel:RefreshEconomyData()
+    if not self.world or not self.world.productionStats then return end
+
+    local stats = self.world.productionStats
+    local inventory = self.world.inventory or {}
+
+    -- Get flow summary
+    local flowSummary = stats:getFlowSummary(inventory)
+    local totalFlows = stats:getTotalFlowRates()
+
+    -- Calculate total stock
+    local totalStock = 0
+    for _, qty in pairs(inventory) do
+        totalStock = totalStock + (qty or 0)
+    end
+
+    -- Update sankey data
+    self.economyCache.sankeyData.totalProduction = totalFlows.totalProduction
+    self.economyCache.sankeyData.totalConsumption = totalFlows.totalConsumption
+    self.economyCache.sankeyData.totalStock = totalStock
+
+    -- Filter commodities based on current filter
+    local filtered = {}
+    if self.economyFilter == "active" then
+        -- Show commodities with any production, consumption, OR stock > 0
+        for _, item in ipairs(flowSummary) do
+            if item.prodRate > 0 or item.consRate > 0 or item.stock > 0 then
+                table.insert(filtered, item)
+            end
+        end
+    elseif self.economyFilter == "top20" then
+        -- Show top 20 by flow volume + stock (already sorted)
+        for i = 1, math.min(20, #flowSummary) do
+            if flowSummary[i] then
+                table.insert(filtered, flowSummary[i])
+            end
+        end
+    else
+        -- Show all
+        filtered = flowSummary
+    end
+
+    self.economyCache.commodityDetails = filtered
+
+    -- Get sparkline data (dual: production and consumption separately)
+    local recentProd = stats:getRecentProductionByCommodity(10)
+    local recentCons = stats:getRecentConsumptionByCommodity(10)
+
+    self.economyCache.sparklineData = {}
+    for _, item in ipairs(filtered) do
+        local prodValues = recentProd[item.id] or {}
+        local consValues = recentCons[item.id] or {}
+
+        -- Store both production and consumption separately for dual sparklines
+        local maxLen = math.max(#prodValues, #consValues, 1)
+        local sparkData = {
+            production = {},
+            consumption = {}
+        }
+
+        for i = 1, maxLen do
+            table.insert(sparkData.production, prodValues[i] or 0)
+            table.insert(sparkData.consumption, consValues[i] or 0)
+        end
+
+        self.economyCache.sparklineData[item.id] = sparkData
+    end
+end
+
+-- Render filter dropdown
+function DebugPanel:RenderEconomyFilter(x, y, w)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Filter:", x, y + 3)
+
+    -- Dropdown button
+    local btnX = x + 50
+    local btnW = 180
+    local btnH = 22
+
+    local filterLabels = {
+        active = "Active (recent flow)",
+        top20 = "Top 20 by volume",
+        all = "All commodities"
+    }
+
+    local currentLabel = filterLabels[self.economyFilter] or "Active"
+
+    -- Button background
+    local dropdownColor = self.economyFilterDropdownOpen and {0.4, 0.45, 0.5} or {0.25, 0.3, 0.35}
+    love.graphics.setColor(dropdownColor)
+    love.graphics.rectangle("fill", btnX, y, btnW, btnH, 3, 3)
+    love.graphics.setColor(0.5, 0.55, 0.6)
+    love.graphics.rectangle("line", btnX, y, btnW, btnH, 3, 3)
+
+    love.graphics.setColor(self.colors.text)
+    love.graphics.print(currentLabel, btnX + 8, y + 4)
+
+    local arrow = self.economyFilterDropdownOpen and "[-]" or "[v]"
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print(arrow, btnX + btnW - 25, y + 4)
+
+    -- Toggle dropdown on click
+    table.insert(self.buttons, {
+        x = btnX, y = y, w = btnW, h = btnH,
+        onClick = function()
+            self.economyFilterDropdownOpen = not self.economyFilterDropdownOpen
+        end
+    })
+
+    y = y + btnH + 2
+
+    -- Dropdown list (if open)
+    if self.economyFilterDropdownOpen then
+        local filters = {
+            {id = "active", label = "Active (recent flow)"},
+            {id = "top20", label = "Top 20 by volume"},
+            {id = "all", label = "All commodities"}
+        }
+
+        love.graphics.setColor(0.15, 0.18, 0.22, 0.98)
+        love.graphics.rectangle("fill", btnX, y, btnW, #filters * 20 + 4, 3, 3)
+        love.graphics.setColor(0.4, 0.45, 0.5)
+        love.graphics.rectangle("line", btnX, y, btnW, #filters * 20 + 4, 3, 3)
+
+        local listY = y + 2
+        love.graphics.setFont(self.fonts.tiny)
+        for _, filter in ipairs(filters) do
+            local isSelected = self.economyFilter == filter.id
+
+            if isSelected then
+                love.graphics.setColor(0.3, 0.4, 0.5, 0.5)
+                love.graphics.rectangle("fill", btnX + 2, listY, btnW - 4, 18)
+            end
+
+            love.graphics.setColor(self.colors.text)
+            love.graphics.print(filter.label, btnX + 8, listY + 2)
+
+            table.insert(self.buttons, {
+                x = btnX + 2, y = listY, w = btnW - 4, h = 18,
+                onClick = function()
+                    self.economyFilter = filter.id
+                    self.economyFilterDropdownOpen = false
+                end
+            })
+
+            listY = listY + 20
+        end
+
+        y = y + #filters * 20 + 6
+    end
+
+    return y
+end
+
+-- Render Sankey-style flow diagram
+function DebugPanel:RenderSankeyDiagram(x, y, w, h)
+    -- Three columns: Production | Inventory | Consumption
+    local midCol = x + w / 2
+    local rightCol = x + w - 50
+
+    local sankeyData = self.economyCache.sankeyData
+    local totalProd = sankeyData.totalProduction or 0
+    local totalCons = sankeyData.totalConsumption or 0
+    local totalStock = sankeyData.totalStock or 0
+
+    -- Summary boxes - horizontal layout
+    local boxW = 100
+    local boxH = 38
+    local boxY = y
+
+    -- Production box (left)
+    love.graphics.setColor(0.18, 0.28, 0.18, 0.9)
+    love.graphics.rectangle("fill", x, boxY, boxW, boxH, 4, 4)
+    love.graphics.setColor(0.4, 0.65, 0.4)
+    love.graphics.rectangle("line", x, boxY, boxW, boxH, 4, 4)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.5, 0.85, 0.5)
+    love.graphics.print("PRODUCTION", x + 8, boxY + 3)
+    love.graphics.setFont(self.fonts.tiny)
+    love.graphics.setColor(self.colors.text)
+    love.graphics.print(string.format("%.1f / min", totalProd), x + 8, boxY + 20)
+
+    -- Arrow 1
+    love.graphics.setColor(0.45, 0.5, 0.45, 0.7)
+    love.graphics.print("->", x + boxW + 8, boxY + 12)
+
+    -- Inventory box (center)
+    local invBoxX = midCol - boxW / 2
+    love.graphics.setColor(0.18, 0.22, 0.32, 0.9)
+    love.graphics.rectangle("fill", invBoxX, boxY, boxW, boxH, 4, 4)
+    love.graphics.setColor(0.45, 0.55, 0.75)
+    love.graphics.rectangle("line", invBoxX, boxY, boxW, boxH, 4, 4)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.6, 0.75, 0.95)
+    love.graphics.print("INVENTORY", invBoxX + 10, boxY + 3)
+    love.graphics.setFont(self.fonts.tiny)
+    love.graphics.setColor(self.colors.text)
+    love.graphics.print(string.format("%d units", totalStock), invBoxX + 10, boxY + 20)
+
+    -- Arrow 2
+    love.graphics.setColor(0.5, 0.45, 0.45, 0.7)
+    love.graphics.print("->", invBoxX + boxW + 8, boxY + 12)
+
+    -- Consumption box (right)
+    local consBoxX = rightCol - boxW
+    love.graphics.setColor(0.32, 0.18, 0.18, 0.9)
+    love.graphics.rectangle("fill", consBoxX, boxY, boxW, boxH, 4, 4)
+    love.graphics.setColor(0.75, 0.45, 0.4)
+    love.graphics.rectangle("line", consBoxX, boxY, boxW, boxH, 4, 4)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.95, 0.55, 0.5)
+    love.graphics.print("CONSUMPTION", consBoxX + 5, boxY + 3)
+    love.graphics.setFont(self.fonts.tiny)
+    love.graphics.setColor(self.colors.text)
+    love.graphics.print(string.format("%.1f / min", totalCons), consBoxX + 5, boxY + 20)
+
+    y = boxY + boxH + 8
+
+    -- Net flow indicator (centered, separate line)
+    local netFlow = totalProd - totalCons
+    love.graphics.setFont(self.fonts.tiny)
+    local netText, netColor
+    if netFlow > 0.1 then
+        netColor = {0.4, 0.75, 0.4}
+        netText = string.format("Net Flow: +%.1f/min (surplus)", netFlow)
+    elseif netFlow < -0.1 then
+        netColor = {0.85, 0.45, 0.4}
+        netText = string.format("Net Flow: %.1f/min (deficit)", netFlow)
+    else
+        netColor = {0.55, 0.55, 0.55}
+        netText = "Net Flow: 0.0/min (balanced)"
+    end
+    love.graphics.setColor(netColor)
+    love.graphics.print(netText, x, y)
+    y = y + 18
+
+    -- Separator line
+    love.graphics.setColor(0.3, 0.32, 0.38, 0.5)
+    love.graphics.line(x, y, x + w, y)
+    y = y + 8
+
+    -- Flow diagram section header
+    love.graphics.setFont(self.fonts.tiny)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Active Flows (top 6 commodities):", x, y)
+    y = y + 14
+
+    -- Draw flow lines (Sankey-style)
+    local flowY = y
+    local commodities = self.economyCache.commodityDetails or {}
+    local maxRate = 0
+    for _, item in ipairs(commodities) do
+        maxRate = math.max(maxRate, item.prodRate, item.consRate)
+    end
+    if maxRate < 1 then maxRate = 1 end
+
+    -- Also calculate max stock for stock-based flow width when no rates
+    local maxStock = 1
+    for _, item in ipairs(commodities) do
+        maxStock = math.max(maxStock, item.stock or 0)
+    end
+
+    -- Draw flow lines for top commodities (limit to avoid clutter)
+    local flowCount = math.min(6, #commodities)
+    local flowSpacing = 18
+
+    for i = 1, flowCount do
+        local item = commodities[i]
+        if item then
+            local yOffset = flowY + (i - 1) * flowSpacing
+
+            -- Get category color
+            local category = self:GetCommodityCategory(item.id)
+            local color = self.categoryColors[category] or self.categoryColors.default
+
+            local hasActiveFlow = item.prodRate > 0 or item.consRate > 0
+
+            -- Commodity label with indicator dot (left side)
+            love.graphics.setColor(color)
+            love.graphics.circle("fill", x + 4, yOffset + 5, 3)
+            love.graphics.setFont(self.fonts.tiny)
+            local shortName = item.id
+            if #shortName > 12 then shortName = shortName:sub(1, 10) .. ".." end
+            love.graphics.print(shortName, x + 12, yOffset)
+
+            -- Production flow bar (green)
+            local prodBarX = x + 110
+            local barMaxW = 80
+            if item.prodRate > 0 then
+                local barW = math.max(4, (item.prodRate / maxRate) * barMaxW)
+                love.graphics.setColor(0.35, 0.7, 0.4, 0.85)
+                love.graphics.rectangle("fill", prodBarX, yOffset + 1, barW, 8, 2, 2)
+                -- Arrow tip
+                love.graphics.polygon("fill", prodBarX + barW, yOffset + 5, prodBarX + barW - 4, yOffset + 1, prodBarX + barW - 4, yOffset + 9)
+            end
+
+            -- Consumption flow bar (red)
+            local consBarX = x + 200
+            if item.consRate > 0 then
+                local barW = math.max(4, (item.consRate / maxRate) * barMaxW)
+                love.graphics.setColor(0.8, 0.4, 0.35, 0.85)
+                love.graphics.rectangle("fill", consBarX, yOffset + 1, barW, 8, 2, 2)
+                -- Arrow tip
+                love.graphics.polygon("fill", consBarX + barW, yOffset + 5, consBarX + barW - 4, yOffset + 1, consBarX + barW - 4, yOffset + 9)
+            end
+
+            -- Stock indicator (if has stock but no flow)
+            if not hasActiveFlow and item.stock and item.stock > 0 then
+                local stockW = math.max(4, (item.stock / maxStock) * 40)
+                love.graphics.setColor(0.4, 0.5, 0.65, 0.5)
+                love.graphics.rectangle("fill", prodBarX, yOffset + 1, stockW, 8, 2, 2)
+            end
+
+            -- Rate labels on the right
+            love.graphics.setFont(self.fonts.tiny)
+            if item.prodRate > 0 or item.consRate > 0 then
+                love.graphics.setColor(self.colors.textDim)
+                local rateStr = ""
+                if item.prodRate > 0 then rateStr = rateStr .. "+" .. string.format("%.0f", item.prodRate) end
+                if item.consRate > 0 then
+                    if #rateStr > 0 then rateStr = rateStr .. " " end
+                    rateStr = rateStr .. "-" .. string.format("%.0f", item.consRate)
+                end
+                love.graphics.print(rateStr, x + 290, yOffset)
+            end
+        end
+    end
+
+    return flowY + flowCount * flowSpacing + 10
+end
+
+-- Draw a Bezier curve flow line with arrow
+function DebugPanel:DrawBezierFlow(x1, y1, x2, y2, width, color, showArrow)
+    love.graphics.setColor(color[1], color[2], color[3], 0.6)
+    love.graphics.setLineWidth(width)
+
+    -- Simple bezier with control points for smooth S-curve
+    local cx1 = x1 + (x2 - x1) * 0.35
+    local cx2 = x1 + (x2 - x1) * 0.65
+
+    local points = {}
+    local lastX, lastY, secondLastX, secondLastY
+
+    for t = 0, 1, 0.04 do
+        local px = (1-t)^3 * x1 + 3*(1-t)^2*t * cx1 + 3*(1-t)*t^2 * cx2 + t^3 * x2
+        local py = (1-t)^3 * y1 + 3*(1-t)^2*t * y1 + 3*(1-t)*t^2 * y2 + t^3 * y2
+        table.insert(points, px)
+        table.insert(points, py)
+        secondLastX, secondLastY = lastX, lastY
+        lastX, lastY = px, py
+    end
+
+    if #points >= 4 then
+        love.graphics.line(points)
+    end
+
+    -- Draw arrowhead at the end
+    if showArrow ~= false and lastX and secondLastX then
+        local angle = math.atan2(lastY - secondLastY, lastX - secondLastX)
+        local arrowSize = math.max(6, width * 1.5)
+
+        love.graphics.setColor(color[1], color[2], color[3], 0.85)
+
+        -- Arrow triangle
+        local ax1 = lastX - arrowSize * math.cos(angle - 0.4)
+        local ay1 = lastY - arrowSize * math.sin(angle - 0.4)
+        local ax2 = lastX - arrowSize * math.cos(angle + 0.4)
+        local ay2 = lastY - arrowSize * math.sin(angle + 0.4)
+
+        love.graphics.polygon("fill", lastX, lastY, ax1, ay1, ax2, ay2)
+    end
+
+    love.graphics.setLineWidth(1)
+end
+
+-- Render commodity details table
+function DebugPanel:RenderCommodityTable(x, y, w)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.7, 0.8, 0.9)
+    love.graphics.print("COMMODITY DETAILS", x, y)
+    y = y + 18
+
+    -- Column headers
+    love.graphics.setFont(self.fonts.tiny)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Commodity", x + 5, y)
+    love.graphics.print("Prod", x + 130, y)
+    love.graphics.print("Cons", x + 175, y)
+    love.graphics.print("Stock", x + 220, y)
+    love.graphics.print("Net", x + 270, y)
+
+    -- Sparkline legend header
+    love.graphics.setColor(0.3, 0.7, 0.35)
+    love.graphics.rectangle("fill", x + 320, y + 2, 6, 6)
+    love.graphics.setColor(0.8, 0.35, 0.35)
+    love.graphics.rectangle("fill", x + 328, y + 2, 6, 6)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Trend", x + 338, y)
+    y = y + 14
+
+    -- Separator
+    love.graphics.setColor(0.3, 0.35, 0.4)
+    love.graphics.line(x, y, x + w, y)
+    y = y + 4
+
+    local commodities = self.economyCache.commodityDetails or {}
+
+    if #commodities == 0 then
+        love.graphics.setColor(self.colors.textMuted)
+        love.graphics.print("No commodity data available", x + 10, y)
+        y = y + 20
+        return y
+    end
+
+    -- Render each commodity row
+    love.graphics.setFont(self.fonts.tiny)
+    for i, item in ipairs(commodities) do
+        if i > 30 then break end  -- Limit rows to avoid performance issues
+
+        -- Row background (alternating)
+        if i % 2 == 0 then
+            love.graphics.setColor(0.15, 0.17, 0.2, 0.5)
+            love.graphics.rectangle("fill", x, y - 1, w, 16)
+        end
+
+        -- Category color indicator
+        local category = self:GetCommodityCategory(item.id)
+        local catColor = self.categoryColors[category] or self.categoryColors.default
+        love.graphics.setColor(catColor)
+        love.graphics.circle("fill", x + 8, y + 6, 4)
+
+        -- Commodity name
+        love.graphics.setColor(self.colors.text)
+        local displayName = item.id
+        if #displayName > 16 then displayName = displayName:sub(1, 14) .. ".." end
+        love.graphics.print(displayName, x + 18, y)
+
+        -- Production rate
+        love.graphics.setColor(0.5, 0.8, 0.5)
+        love.graphics.print(string.format("%.1f", item.prodRate), x + 130, y)
+
+        -- Consumption rate
+        love.graphics.setColor(0.8, 0.5, 0.5)
+        love.graphics.print(string.format("%.1f", item.consRate), x + 175, y)
+
+        -- Stock
+        love.graphics.setColor(self.colors.textDim)
+        love.graphics.print(string.format("%d", item.stock), x + 220, y)
+
+        -- Net rate with surplus/deficit indicator
+        local netRate = item.netRate or (item.prodRate - item.consRate)
+        if netRate > 0.1 then
+            love.graphics.setColor(self.colors.success)
+            love.graphics.print(string.format("+%.1f", netRate), x + 270, y)
+        elseif netRate < -0.1 then
+            love.graphics.setColor(self.colors.error)
+            love.graphics.print(string.format("%.1f", netRate), x + 270, y)
+        else
+            love.graphics.setColor(self.colors.textMuted)
+            love.graphics.print("0.0", x + 270, y)
+        end
+
+        -- Sparkline (trend)
+        local sparkData = self.economyCache.sparklineData[item.id] or {}
+        self:RenderSparkline(x + 320, y + 1, 60, 12, sparkData)
+
+        y = y + 16
+    end
+
+    return y + 10
+end
+
+-- Render dual sparkline (production + consumption as separate bars)
+function DebugPanel:RenderSparkline(x, y, w, h, sparkData)
+    -- Handle both old format (array) and new format (table with production/consumption)
+    local prodData = {}
+    local consData = {}
+
+    if sparkData then
+        if sparkData.production then
+            prodData = sparkData.production
+            consData = sparkData.consumption or {}
+        elseif type(sparkData) == "table" and #sparkData > 0 then
+            -- Fallback: old format (net values only)
+            for _, val in ipairs(sparkData) do
+                if val > 0 then
+                    table.insert(prodData, val)
+                    table.insert(consData, 0)
+                else
+                    table.insert(prodData, 0)
+                    table.insert(consData, -val)
+                end
+            end
+        end
+    end
+
+    local numBars = math.max(#prodData, #consData)
+
+    if numBars == 0 then
+        -- Empty placeholder with hint text
+        love.graphics.setColor(0.15, 0.17, 0.2)
+        love.graphics.rectangle("fill", x, y, w, h)
+        love.graphics.setColor(0.3, 0.32, 0.35)
+        love.graphics.setFont(self.fonts.tiny)
+        love.graphics.print("--", x + w/2 - 5, y + 1)
+        return
+    end
+
+    -- Background
+    love.graphics.setColor(0.12, 0.14, 0.17)
+    love.graphics.rectangle("fill", x, y, w, h)
+
+    -- Find max value for scaling (across both production and consumption)
+    local maxVal = 0.1
+    for i = 1, numBars do
+        maxVal = math.max(maxVal, prodData[i] or 0, consData[i] or 0)
+    end
+
+    -- Calculate bar dimensions
+    local barGroupWidth = (w - 2) / numBars
+    local barWidth = math.max(1, (barGroupWidth - 1) / 2)  -- Two bars per slot
+
+    -- Draw bars for each time period
+    for i = 1, numBars do
+        local groupX = x + 1 + (i - 1) * barGroupWidth
+        local prod = prodData[i] or 0
+        local cons = consData[i] or 0
+
+        -- Production bar (green, left side of each slot)
+        if prod > 0 then
+            local barH = math.max(1, (prod / maxVal) * (h - 2))
+            love.graphics.setColor(0.3, 0.7, 0.35, 0.9)
+            love.graphics.rectangle("fill", groupX, y + h - 1 - barH, barWidth, barH)
+        end
+
+        -- Consumption bar (red, right side of each slot)
+        if cons > 0 then
+            local barH = math.max(1, (cons / maxVal) * (h - 2))
+            love.graphics.setColor(0.8, 0.35, 0.35, 0.9)
+            love.graphics.rectangle("fill", groupX + barWidth, y + h - 1 - barH, barWidth, barH)
+        end
+    end
+
+    -- Subtle baseline
+    love.graphics.setColor(0.3, 0.32, 0.35, 0.4)
+    love.graphics.line(x, y + h - 1, x + w, y + h - 1)
+end
+
+-- Get commodity category for coloring
+function DebugPanel:GetCommodityCategory(commodityId)
+    -- Try to get category from fulfillment vectors if available
+    if self.world and self.world.fulfillmentVectors and self.world.fulfillmentVectors.commodities then
+        local commodityData = self.world.fulfillmentVectors.commodities[commodityId]
+        if commodityData and commodityData.category then
+            return commodityData.category
+        end
+    end
+
+    -- Fallback: infer from commodity name
+    local id = commodityId:lower()
+    if id:find("wheat") or id:find("bread") or id:find("meat") or id:find("food") or id:find("vegetable") or id:find("fruit") or id:find("grain") then
+        return "biological"
+    elseif id:find("cloth") or id:find("wool") or id:find("cotton") or id:find("textile") or id:find("leather") then
+        return "touch"
+    elseif id:find("tool") or id:find("weapon") or id:find("medicine") or id:find("armor") then
+        return "safety"
+    elseif id:find("book") or id:find("art") or id:find("music") or id:find("paint") then
+        return "psychological"
+    elseif id:find("gold") or id:find("silver") or id:find("gem") or id:find("jewel") then
+        return "shiny_objects"
+    elseif id:find("wine") or id:find("beer") or id:find("spice") or id:find("silk") or id:find("exotic") then
+        return "exotic_goods"
+    elseif id:find("furniture") or id:find("luxury") or id:find("fine") then
+        return "social_status"
+    elseif id:find("tobacco") or id:find("alcohol") then
+        return "vice"
+    else
+        return "utility"
+    end
 end
 
 -- =============================================================================

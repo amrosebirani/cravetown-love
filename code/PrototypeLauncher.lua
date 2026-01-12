@@ -63,19 +63,35 @@ function PrototypeLauncher:Update(dt)
     self.mHoveredIndex = nil
 
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
-    local cardWidth = 400
-    local cardHeight = 150
-    local spacing = 30
-    local totalHeight = (#self.mPrototypes * cardHeight) + ((#self.mPrototypes - 1) * spacing)
-    local startY = (screenH - totalHeight) / 2
-    local startX = (screenW - cardWidth) / 2
+    local cardWidth = 340
+    local cardHeight = 130
+    local spacingX = 30
+    local spacingY = 25
+    local startY = 150
+
+    -- Grid layout: 2 cards in row 1, 3 cards in row 2
+    local gridPositions = {
+        -- Row 1: 2 cards centered
+        {row = 0, col = 0, totalInRow = 2},
+        {row = 0, col = 1, totalInRow = 2},
+        -- Row 2: 3 cards centered
+        {row = 1, col = 0, totalInRow = 3},
+        {row = 1, col = 1, totalInRow = 3},
+        {row = 1, col = 2, totalInRow = 3},
+    }
 
     for i, proto in ipairs(self.mPrototypes) do
-        local y = startY + (i - 1) * (cardHeight + spacing)
+        if gridPositions[i] then
+            local pos = gridPositions[i]
+            local rowWidth = pos.totalInRow * cardWidth + (pos.totalInRow - 1) * spacingX
+            local rowStartX = (screenW - rowWidth) / 2
+            local x = rowStartX + pos.col * (cardWidth + spacingX)
+            local y = startY + pos.row * (cardHeight + spacingY)
 
-        if mx >= startX and mx <= startX + cardWidth and
-           my >= y and my <= y + cardHeight then
-            self.mHoveredIndex = i
+            if mx >= x and mx <= x + cardWidth and
+               my >= y and my <= y + cardHeight then
+                self.mHoveredIndex = i
+            end
         end
     end
 
@@ -98,47 +114,64 @@ function PrototypeLauncher:Render()
     love.graphics.setFont(self.mFonts.title)
     local title = "CraveTown - Select Prototype"
     local titleWidth = self.mFonts.title:getWidth(title)
-    love.graphics.print(title, (screenW - titleWidth) / 2, 80)
+    love.graphics.print(title, (screenW - titleWidth) / 2, 50)
 
-    -- Prototype cards
-    local cardWidth = 400
-    local cardHeight = 150
-    local spacing = 30
-    local totalHeight = (#self.mPrototypes * cardHeight) + ((#self.mPrototypes - 1) * spacing)
-    local startY = (screenH - totalHeight) / 2
-    local startX = (screenW - cardWidth) / 2
+    -- Grid layout cards
+    local cardWidth = 340
+    local cardHeight = 130
+    local spacingX = 30
+    local spacingY = 25
+    local startY = 150
+
+    -- Grid layout: 2 cards in row 1, 3 cards in row 2
+    local gridPositions = {
+        {row = 0, col = 0, totalInRow = 2},
+        {row = 0, col = 1, totalInRow = 2},
+        {row = 1, col = 0, totalInRow = 3},
+        {row = 1, col = 1, totalInRow = 3},
+        {row = 1, col = 2, totalInRow = 3},
+    }
 
     for i, proto in ipairs(self.mPrototypes) do
-        local y = startY + (i - 1) * (cardHeight + spacing)
-        local isHovered = (self.mHoveredIndex == i)
+        if gridPositions[i] then
+            local pos = gridPositions[i]
+            local rowWidth = pos.totalInRow * cardWidth + (pos.totalInRow - 1) * spacingX
+            local rowStartX = (screenW - rowWidth) / 2
+            local x = rowStartX + pos.col * (cardWidth + spacingX)
+            local y = startY + pos.row * (cardHeight + spacingY)
+            local isHovered = (self.mHoveredIndex == i)
 
-        -- Card background
-        if isHovered then
-            love.graphics.setColor(proto.color[1] * 0.9, proto.color[2] * 0.9, proto.color[3] * 0.9)
-        else
-            love.graphics.setColor(proto.color[1] * 0.7, proto.color[2] * 0.7, proto.color[3] * 0.7)
-        end
-        love.graphics.rectangle("fill", startX, y, cardWidth, cardHeight, 10, 10)
+            -- Card background
+            if isHovered then
+                love.graphics.setColor(proto.color[1] * 0.9, proto.color[2] * 0.9, proto.color[3] * 0.9)
+            else
+                love.graphics.setColor(proto.color[1] * 0.7, proto.color[2] * 0.7, proto.color[3] * 0.7)
+            end
+            love.graphics.rectangle("fill", x, y, cardWidth, cardHeight, 10, 10)
 
-        -- Card border
-        love.graphics.setColor(0.3, 0.3, 0.3)
-        love.graphics.setLineWidth(isHovered and 3 or 2)
-        love.graphics.rectangle("line", startX, y, cardWidth, cardHeight, 10, 10)
+            -- Card border
+            love.graphics.setColor(0.3, 0.3, 0.3)
+            love.graphics.setLineWidth(isHovered and 3 or 2)
+            love.graphics.rectangle("line", x, y, cardWidth, cardHeight, 10, 10)
 
-        -- Card content
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.setFont(self.mFonts.cardTitle)
-        love.graphics.print(proto.name, startX + 20, y + 20)
-
-        love.graphics.setColor(0.95, 0.95, 0.95)
-        love.graphics.setFont(self.mFonts.cardDesc)
-        love.graphics.printf(proto.description, startX + 20, y + 60, cardWidth - 40)
-
-        -- Hover instruction
-        if isHovered then
+            -- Card content
             love.graphics.setColor(1, 1, 1)
-            love.graphics.setFont(self.mFonts.hover)
-            love.graphics.print("Click to launch", startX + 20, y + cardHeight - 35)
+            love.graphics.setFont(self.mFonts.cardTitle)
+            -- Truncate name if too long for card
+            local displayName = proto.name
+            if #displayName > 28 then displayName = displayName:sub(1, 25) .. "..." end
+            love.graphics.print(displayName, x + 15, y + 15)
+
+            love.graphics.setColor(0.95, 0.95, 0.95)
+            love.graphics.setFont(self.mFonts.cardDesc)
+            love.graphics.printf(proto.description, x + 15, y + 50, cardWidth - 30)
+
+            -- Hover instruction
+            if isHovered then
+                love.graphics.setColor(1, 1, 1)
+                love.graphics.setFont(self.mFonts.hover)
+                love.graphics.print("Click to launch", x + 15, y + cardHeight - 30)
+            end
         end
     end
 
