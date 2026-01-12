@@ -11235,6 +11235,41 @@
         "good": 1.5,
         "luxury": 2
       }
+    },
+    "water": {
+      "id": "water",
+      "fulfillmentVector": {
+        "coarse": [
+          15,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "fine": {
+          "biological_hydration": 20,
+          "biological_health_hygiene": 5
+        }
+      },
+      "tags": [
+        "beverage",
+        "basic",
+        "essential",
+        "hydration"
+      ],
+      "durability": "consumable",
+      "qualityMultipliers": {
+        "poor": 0.5,
+        "basic": 1,
+        "good": 1.2,
+        "luxury": 1.5
+      },
+      "notes": "Basic hydration - essential for survival"
     }
   }
 }

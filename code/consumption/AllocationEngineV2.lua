@@ -341,9 +341,10 @@ function AllocationEngineV2.SelectTargetCraving(character, townInventory, curren
         print(string.format("    %s: %.2f", coarseName, cravingValue))
     end
 
-    -- Iterate through fine dimensions (0-48) and find best available commodity
+    -- Iterate through fine dimensions and find best available commodity
     -- This avoids the problem where high-value items (medicine=50) dominate coarse categories
-    for fineIdx = 0, 48 do
+    local fineMaxIdx = CharacterV2.GetFineMaxIndex and CharacterV2.GetFineMaxIndex() or 48
+    for fineIdx = 0, fineMaxIdx do
         local fineCraving = character.currentCravings[fineIdx] or 0
 
         if fineCraving > 0 then
