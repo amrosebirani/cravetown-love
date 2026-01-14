@@ -1833,22 +1833,31 @@ function AlphaWorld:UpdateConsumption(dt)
 end
 
 function AlphaWorld:ProcessSlotConsumption()
-    -- Run allocation engine at end of each slot
+    -- Run V2 allocation engine at end of each slot
+    -- V2 loops by active cravings (not all 49), uses pre-filtered commodity cache
     -- Calculate cycle number: (day - 1) * slotsPerDay + currentSlotIndex
     local day = self.timeManager:GetDay() or 1
     local slotIndex = self.timeManager.currentSlotIndex or 1
     local slotsPerDay = #(self.timeManager.timeSlots or {}) or 6
     local currentCycle = (day - 1) * slotsPerDay + slotIndex
-    local allocations = AllocationEngineV2.AllocateCycle(self.citizens, self.inventory, currentCycle, "need_based", {
-        fairnessEnabled = true
-    })
 
-    -- Note: AllocateCycle already handles inventory modification and craving fulfillment
-    -- via AllocateForCharacter -> ProcessAllocation -> FulfillCraving
-    -- We just need to log the summary here
+    -- Get active cravings for current slot (fine dimension IDs like "biological_nutrition_grain")
+    local activeCravings = self:GetActiveCravingsForSlot()
 
-    if allocations and #allocations > 0 then
-        self:LogEvent("consumption", #allocations .. " allocations made", {})
+    -- Use V2 allocation which processes only active cravings
+    local allocations = AllocationEngineV2.AllocateCycleV2(
+        self.citizens,
+        self.inventory,
+        currentCycle,
+        activeCravings,
+        "need_based",
+        { fairnessEnabled = true }
+    )
+
+    -- Log summary
+    if allocations and allocations.allocations and #allocations.allocations > 0 then
+        self:LogEvent("consumption", string.format("%d allocations (%d units)",
+            #allocations.allocations, allocations.stats.totalUnits or 0), {})
     end
 end
 

@@ -1,5 +1,5 @@
 -- AllocationEngineV2.lua
--- Refactored allocation engine to work with CharacterV2 (6-layer state model)
+-- Refactored allocation engine to work with CharacterV3 (6-layer state model)
 -- Key changes from V1:
 -- 1. Works with 49D fine-grained dimensions internally
 -- 2. Aggregates to 9D coarse dimensions for allocation decisions
@@ -11,11 +11,14 @@ local AllocationEngineV2 = {}
 local ConsumptionMechanics = nil
 local FulfillmentVectors = nil
 local SubstitutionRules = nil
-local CharacterV2 = nil
+local CharacterModule = nil  -- CharacterV3 module (passed via Init)
 local CommodityCache = nil
 
--- Class-based consumption budget (items per cycle)
--- Wealthier classes can consume more resources to satisfy more cravings
+-- Minimum accumulated craving value to trigger allocation attempt
+local CRAVING_THRESHOLD = 1.0
+
+-- Class-based consumption budget (items per cycle) - DEPRECATED in V2
+-- Kept for backwards compatibility with AllocateCycle (original function)
 AllocationEngineV2.classConsumptionBudget = {
     Elite = 10,
     Upper = 7,
@@ -26,11 +29,11 @@ AllocationEngineV2.classConsumptionBudget = {
 }
 
 -- Initialize data
-function AllocationEngineV2.Init(mechanicsData, fulfillmentData, substitutionData, characterV2Module, cacheModule)
+function AllocationEngineV2.Init(mechanicsData, fulfillmentData, substitutionData, characterModule, cacheModule)
     ConsumptionMechanics = mechanicsData
     FulfillmentVectors = fulfillmentData
     SubstitutionRules = substitutionData
-    CharacterV2 = characterV2Module
+    CharacterModule = characterModule
     CommodityCache = cacheModule
 end
 
@@ -351,14 +354,14 @@ function AllocationEngineV2.SelectTargetCraving(character, townInventory, curren
 
     -- Iterate through fine dimensions and find best available commodity
     -- This avoids the problem where high-value items (medicine=50) dominate coarse categories
-    local fineMaxIdx = CharacterV2.GetFineMaxIndex and CharacterV2.GetFineMaxIndex() or 48
+    local fineMaxIdx = CharacterModule.GetFineMaxIndex and CharacterModule.GetFineMaxIndex() or 48
     for fineIdx = 0, fineMaxIdx do
         local fineCraving = character.currentCravings[fineIdx] or 0
 
         if fineCraving > 0 then
-            local fineName = CharacterV2.fineNames[fineIdx]
-            local coarseIdx = CharacterV2.fineToCoarseMap[fineIdx]
-            local coarseName = CharacterV2.coarseNames[coarseIdx]
+            local fineName = CharacterModule.fineNames[fineIdx]
+            local coarseIdx = CharacterModule.fineToCoarseMap[fineIdx]
+            local coarseName = CharacterModule.coarseNames[coarseIdx]
             local coarseWeight = config.cravingPriorityWeights[coarseName] or 0.5
 
             -- Check all available commodities that fulfill this fine dimension
@@ -407,14 +410,14 @@ function AllocationEngineV2.GetBestCommodityForCraving(coarseCraving, character,
     local bestCommodity = nil
     local bestScore = 0
 
-    -- Map coarse craving to coarse dimension index (0-8 for CharacterV2)
-    local coarseIndex = CharacterV2.coarseNameToIndex[coarseCraving]
+    -- Map coarse craving to coarse dimension index (0-8 for CharacterV3)
+    local coarseIndex = CharacterModule.coarseNameToIndex[coarseCraving]
     if not coarseIndex then
         return nil
     end
 
     -- Get fine dimension indices for this coarse dimension
-    local fineIndices = CharacterV2.coarseToFineMap[coarseIndex]
+    local fineIndices = CharacterModule.coarseToFineMap[coarseIndex]
     if not fineIndices or #fineIndices == 0 then
         print("Warning: No fine dimensions for coarse index " .. tostring(coarseIndex))
         return nil
@@ -443,7 +446,7 @@ function AllocationEngineV2.GetBestCommodityForCraving(coarseCraving, character,
 
                 for _, fineIdx in ipairs(fineIndices) do
                     -- Get the string name for this fine dimension (e.g., "biological_nutrition_grain")
-                    local fineName = CharacterV2.fineNames[fineIdx]
+                    local fineName = CharacterModule.fineNames[fineIdx]
                     if fineName then
                         local points = fineVector[fineName] or 0
                         if points > 0 then
@@ -554,7 +557,7 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
         local desperationConfig = SubstitutionRules.desperationRules
         if desperationConfig.enabled then
             -- Get average satisfaction for this coarse dimension
-            local coarseIndex = CharacterV2.coarseNameToIndex[targetCoarseCraving]
+            local coarseIndex = CharacterModule.coarseNameToIndex[targetCoarseCraving]
             local avgSatisfaction = 50
 
             if coarseIndex then
@@ -648,6 +651,226 @@ function AllocationEngineV2.CalculatePriorityWithPolicy(character, currentCycle,
     end
 
     return priority
+end
+
+-- =============================================================================
+-- V2 ALLOCATION: Performance-optimized allocation using active cravings
+-- =============================================================================
+
+-- Calculate priority based only on ACTIVE cravings for this slot
+-- Unlike CalculatePriorityWithPolicy which uses ALL coarse cravings,
+-- this only considers the fine cravings that are actually active in the current slot
+function AllocationEngineV2.CalculatePriorityForActiveCravings(character, currentCycle, activeCravings, policy)
+    local priority = 0
+    local priorityMode = policy.priorityMode or "need_based"
+
+    if priorityMode == "equality" then
+        -- Everyone gets same base priority with small random factor
+        priority = 100 + math.random(0, 10)
+    else -- need_based
+        -- Calculate desperation only from ACTIVE cravings (not all 49)
+        local desperationScore = 0
+
+        for _, cravingId in ipairs(activeCravings) do
+            local fineIdx = CharacterModule.GetFineIndexFromCravingId(cravingId)
+            if fineIdx then
+                local craving = character.currentCravings[fineIdx] or 0
+
+                -- Optional: weight by dimension priority if provided
+                local coarseIdx = CharacterModule.fineToCoarseMap[fineIdx]
+                local coarseName = CharacterModule.coarseNames[coarseIdx]
+                local weight = 1.0
+                if policy.dimensionPriorities and coarseName then
+                    weight = policy.dimensionPriorities[coarseName] or 1.0
+                end
+
+                desperationScore = desperationScore + (craving * weight)
+            end
+        end
+
+        priority = desperationScore
+    end
+
+    -- Apply fairness boost if enabled
+    if policy.fairnessEnabled then
+        priority = priority + (character.fairnessPenalty or 0)
+    end
+
+    return priority
+end
+
+-- Allocate multiple units of a commodity to a character
+-- Returns success (bool), total satisfaction gain (number)
+function AllocationEngineV2.AllocateMultipleUnits(character, commodityId, quantity, townInventory, currentCycle, allocationLog)
+    -- Check durable ownership limits (durables should only be 1 at a time)
+    if AllocationEngineV2.IsDurable(commodityId) then
+        if not character:CanAcquireDurable(commodityId) then
+            return false, 0
+        end
+        quantity = 1  -- Force single unit for durables
+    end
+
+    -- Check commodity fatigue
+    local commodityMultiplier = character:CalculateCommodityMultiplier(commodityId, currentCycle)
+    if commodityMultiplier < 0.3 then
+        return false, 0  -- Too fatigued, try next commodity
+    end
+
+    -- Allocate from inventory
+    townInventory[commodityId] = townInventory[commodityId] - quantity
+
+    -- Invalidate cache
+    if CommodityCache then
+        CommodityCache.InvalidateCommodity(commodityId)
+    end
+
+    -- Process allocation (fulfill craving with quantity)
+    local success, gain, allocType = AllocationEngineV2.ProcessAllocation(
+        character, commodityId, quantity, currentCycle
+    )
+
+    -- Record attempt (success/fail affects fairness penalty)
+    character:RecordAllocationAttempt(success, currentCycle)
+
+    -- Log allocation
+    table.insert(allocationLog.allocations, {
+        characterId = character.id,
+        characterName = character.name,
+        allocatedCommodity = commodityId,
+        quantity = quantity,
+        status = success and "granted" or "failed",
+        satisfactionGain = gain or 0
+    })
+
+    allocationLog.stats.granted = allocationLog.stats.granted + (success and 1 or 0)
+    allocationLog.stats.totalUnits = allocationLog.stats.totalUnits + quantity
+
+    return success, gain or 0
+end
+
+-- V2 Allocation: Loop by active cravings, not by citizens
+-- Processes only cravings that are active for the current slot
+-- Characters consume as many units as needed to drain their accumulated craving
+function AllocationEngineV2.AllocateCycleV2(characters, townInventory, currentCycle, activeCravings, mode, policy)
+    policy = policy or {}
+    mode = mode or "need_based"
+
+    local allocationLog = {
+        cycle = currentCycle,
+        timestamp = os.time(),
+        mode = mode,
+        allocations = {},
+        stats = {
+            granted = 0,
+            failed = 0,
+            totalUnits = 0,
+            cravingsProcessed = 0
+        }
+    }
+
+    -- 1. Calculate priorities based on ACTIVE cravings only, then sort
+    local sortedCharacters = {}
+    for _, character in ipairs(characters) do
+        if not character.hasEmigrated then
+            -- Use new priority function that only considers active cravings
+            character.allocationPriority = AllocationEngineV2.CalculatePriorityForActiveCravings(
+                character, currentCycle, activeCravings, policy
+            )
+            table.insert(sortedCharacters, character)
+        end
+    end
+    table.sort(sortedCharacters, function(a, b)
+        return a.allocationPriority > b.allocationPriority
+    end)
+
+    -- 2. For each active fine craving in this slot
+    for _, cravingId in ipairs(activeCravings) do
+        local fineIdx = CharacterModule.GetFineIndexFromCravingId(cravingId)
+        if fineIdx then
+            allocationLog.stats.cravingsProcessed = allocationLog.stats.cravingsProcessed + 1
+
+            -- Get pre-sorted commodities from cache
+            local cachedCommodities = CommodityCache.GetCommoditiesForFineDimension(cravingId, townInventory)
+
+            -- PRE-FILTER: Build list of available commodities with quantities and fulfillment values
+            local availableCommodities = {}
+            for _, commodityId in ipairs(cachedCommodities) do
+                local qty = townInventory[commodityId] or 0
+                if qty > 0 then
+                    local commodityData = FulfillmentVectors.commodities[commodityId]
+                    local fulfillmentValue = 0
+                    if commodityData and commodityData.fulfillmentVector and commodityData.fulfillmentVector.fine then
+                        fulfillmentValue = commodityData.fulfillmentVector.fine[cravingId] or 0
+                    end
+                    table.insert(availableCommodities, {
+                        id = commodityId,
+                        qty = qty,
+                        fulfillmentValue = fulfillmentValue,
+                        quality = commodityData and commodityData.quality or "basic"
+                    })
+                end
+            end
+
+            -- For each citizen in priority order
+            for _, character in ipairs(sortedCharacters) do
+                -- Check if citizen has accumulated craving for this dimension
+                local currentCraving = character.currentCravings[fineIdx] or 0
+
+                -- Keep consuming until craving drained or no commodities available
+                while currentCraving > CRAVING_THRESHOLD and #availableCommodities > 0 do
+                    local allocated = false
+
+                    -- Find first commodity that character accepts quality for
+                    local i = 1
+                    while i <= #availableCommodities do
+                        local entry = availableCommodities[i]
+
+                        if entry.qty > 0 and character:AcceptsQuality(entry.quality) then
+                            -- Calculate how many units needed to drain this craving
+                            local unitsNeeded = math.ceil(currentCraving / math.max(entry.fulfillmentValue, 1))
+                            local unitsToAllocate = math.min(unitsNeeded, entry.qty)
+
+                            -- Allocate multiple units
+                            local success, totalGain = AllocationEngineV2.AllocateMultipleUnits(
+                                character, entry.id, unitsToAllocate, townInventory, currentCycle, allocationLog
+                            )
+
+                            if success then
+                                -- Update local tracking
+                                entry.qty = entry.qty - unitsToAllocate
+                                currentCraving = currentCraving - totalGain
+
+                                -- Remove depleted commodity
+                                if entry.qty == 0 then
+                                    table.remove(availableCommodities, i)
+                                end
+
+                                allocated = true
+                                break
+                            end
+                        end
+                        i = i + 1
+                    end
+
+                    -- If no allocation possible (no acceptable commodities), move to next citizen
+                    if not allocated then
+                        -- Record failed attempt for fairness system
+                        if currentCraving > CRAVING_THRESHOLD then
+                            character:RecordAllocationAttempt(false, currentCycle)
+                            allocationLog.stats.failed = allocationLog.stats.failed + 1
+                        end
+                        break
+                    end
+                end
+            end
+        end
+    end
+
+    print(string.format("[AllocationEngineV2.V2] Cycle %d: %d cravings, %d allocations, %d units, %d failed",
+        currentCycle, allocationLog.stats.cravingsProcessed, allocationLog.stats.granted,
+        allocationLog.stats.totalUnits, allocationLog.stats.failed))
+
+    return allocationLog
 end
 
 return AllocationEngineV2
