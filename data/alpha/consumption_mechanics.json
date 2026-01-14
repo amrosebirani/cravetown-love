@@ -241,10 +241,10 @@
   },
 
   "vocations": [
-    "Farmer", "Baker", "Cook", "Barman", "Carpenter", "Woodworker",
+    "Farmer", "Baker", "Cook", "Barman", "Barista", "Carpenter", "Woodworker", "Grain Processor", "Oil Presser", "Sugar Processor", "Dairy Worker",
     "Lumberjack", "Woodcutter", "Miner", "Blacksmith", "Smelter", "Metalworker",
     "Goldsmith", "Tailor", "Weaver", "Spinner", "Shoemaker", "Mason",
-    "Glassblower", "Artisan", "Herder", "General Worker", "Doctor", "Nurse",
+    "Glassblower", "Artisan", "Herder", "Animal Herder", "General Worker", "Apprentice", "Doctor", "Nurse",
     "Teacher", "Merchant", "Banker", "Philosopher"
   ],
 

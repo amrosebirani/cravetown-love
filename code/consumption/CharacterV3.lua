@@ -3,7 +3,7 @@
 -- Alpha prototype version with slot-based craving system
 -- Layers: Identity → Base Cravings → Current Cravings → Satisfaction → Commodity Multipliers → History
 
-CharacterV3 = CharacterV3 or {}  -- Preserve table across hot reloads
+CharacterV3 = CharacterV3 or {} -- Preserve table across hot reloads
 CharacterV3.__index = CharacterV3
 
 -- Data stored on CharacterV3 table (survives hot reload)
@@ -14,17 +14,17 @@ CharacterV3._CharacterClasses = CharacterV3._CharacterClasses or nil
 CharacterV3._DimensionDefinitions = CharacterV3._DimensionDefinitions or nil
 CharacterV3._CommodityFatigueRates = CharacterV3._CommodityFatigueRates or nil
 CharacterV3._EnablementRules = CharacterV3._EnablementRules or nil
-CharacterV3._ClassThresholds = CharacterV3._ClassThresholds or nil  -- For emergent class calculation
-CharacterV3._DifficultySettings = CharacterV3._DifficultySettings or nil  -- For delayed reaction system
+CharacterV3._ClassThresholds = CharacterV3._ClassThresholds or nil       -- For emergent class calculation
+CharacterV3._DifficultySettings = CharacterV3._DifficultySettings or nil -- For delayed reaction system
 
 -- Default difficulty settings for delayed reaction satisfaction system
 CharacterV3.DEFAULT_DIFFICULTY_SETTINGS = {
     easy = {
         bufferDays = 7,
-        decayMultiplier = 0.5,   -- slower decay
-        gainMultiplier = 1.5,    -- faster gain
-        decayExponent = 0.06,    -- gentler curve
-        gainLogScale = 25        -- more generous
+        decayMultiplier = 0.5, -- slower decay
+        gainMultiplier = 1.5,  -- faster gain
+        decayExponent = 0.06,  -- gentler curve
+        gainLogScale = 25      -- more generous
     },
     normal = {
         bufferDays = 5,
@@ -35,10 +35,10 @@ CharacterV3.DEFAULT_DIFFICULTY_SETTINGS = {
     },
     hard = {
         bufferDays = 3,
-        decayMultiplier = 1.5,   -- faster decay
-        gainMultiplier = 0.7,    -- slower gain
-        decayExponent = 0.10,    -- steeper curve
-        gainLogScale = 15        -- stingier
+        decayMultiplier = 1.5, -- faster decay
+        gainMultiplier = 0.7,  -- slower gain
+        decayExponent = 0.10,  -- steeper curve
+        gainLogScale = 15      -- stingier
     },
     brutal = {
         bufferDays = 2,
@@ -50,7 +50,8 @@ CharacterV3.DEFAULT_DIFFICULTY_SETTINGS = {
 }
 
 -- Initialize data (called once at prototype start)
-function CharacterV3.Init(mechanicsData, fulfillmentData, traitsData, classesData, dimensionsData, fatigueData, enablementData, classThresholdsData)
+function CharacterV3.Init(mechanicsData, fulfillmentData, traitsData, classesData, dimensionsData, fatigueData,
+                          enablementData, classThresholdsData)
     CharacterV3._ConsumptionMechanics = mechanicsData
     CharacterV3._FulfillmentVectors = fulfillmentData
     CharacterV3._CharacterTraits = traitsData
@@ -90,8 +91,8 @@ function CharacterV3.BuildDimensionMaps()
     end
 
     -- Map fine dimensions to their parent coarse and store aggregation weights
-    CharacterV3.fineAggregationWeights = {}  -- fineIndex -> aggregationWeight
-    CharacterV3.coarseWeightSums = {}  -- coarseIndex -> sum of weights for normalization
+    CharacterV3.fineAggregationWeights = {} -- fineIndex -> aggregationWeight
+    CharacterV3.coarseWeightSums = {}       -- coarseIndex -> sum of weights for normalization
 
     for _, fineDim in ipairs(CharacterV3._DimensionDefinitions.fineDimensions) do
         CharacterV3.fineNames[fineDim.index] = fineDim.id
@@ -103,9 +104,11 @@ function CharacterV3.BuildDimensionMaps()
         if parentCoarseIndex then
             CharacterV3.fineToCoarseMap[fineDim.index] = parentCoarseIndex
             -- Accumulate weight sums for each coarse dimension
-            CharacterV3.coarseWeightSums[parentCoarseIndex] = (CharacterV3.coarseWeightSums[parentCoarseIndex] or 0) + (fineDim.aggregationWeight or 1.0)
+            CharacterV3.coarseWeightSums[parentCoarseIndex] = (CharacterV3.coarseWeightSums[parentCoarseIndex] or 0) +
+                (fineDim.aggregationWeight or 1.0)
         else
-            print("Warning: Unknown parent coarse '" .. tostring(fineDim.parentCoarse) .. "' for fine dimension " .. tostring(fineDim.index))
+            print("Warning: Unknown parent coarse '" ..
+                tostring(fineDim.parentCoarse) .. "' for fine dimension " .. tostring(fineDim.index))
         end
     end
 
@@ -118,11 +121,11 @@ function CharacterV3.BuildDimensionMaps()
 
     -- Get dimension counts from loaded data
     local coarseCount = CharacterV3._DimensionDefinitions.dimensionCount and
-                        CharacterV3._DimensionDefinitions.dimensionCount.coarse or
-                        #CharacterV3._DimensionDefinitions.coarseDimensions
+        CharacterV3._DimensionDefinitions.dimensionCount.coarse or
+        #CharacterV3._DimensionDefinitions.coarseDimensions
     local fineCount = CharacterV3._DimensionDefinitions.dimensionCount and
-                      CharacterV3._DimensionDefinitions.dimensionCount.fine or
-                      #CharacterV3._DimensionDefinitions.fineDimensions
+        CharacterV3._DimensionDefinitions.dimensionCount.fine or
+        #CharacterV3._DimensionDefinitions.fineDimensions
 
     -- Build coarse to fine mapping (array of fine indices for each coarse)
     -- This correctly handles non-contiguous fine dimension indices
@@ -153,7 +156,8 @@ function CharacterV3.BuildDimensionMaps()
     print("  coarseToFineMap entries: " .. tostring(#CharacterV3.coarseToFineMap))
     for idx, fineIndices in pairs(CharacterV3.coarseToFineMap) do
         local name = CharacterV3.coarseNames[idx] or "unknown"
-        print(string.format("    [%d] %s: %d fine dimensions [%s]", idx, name, #fineIndices, table.concat(fineIndices, ", ")))
+        print(string.format("    [%d] %s: %d fine dimensions [%s]", idx, name, #fineIndices,
+            table.concat(fineIndices, ", ")))
     end
 end
 
@@ -219,7 +223,7 @@ function CharacterV3:New(class, id)
     -- Initialize with several cycles worth of cravings so characters can consume
     -- multiple resources per cycle from the start
     char.currentCravings = {}
-    local startingCravingMultiplier = 10  -- Start with 10 cycles worth of accumulated cravings
+    local startingCravingMultiplier = 10 -- Start with 10 cycles worth of accumulated cravings
     for i = 0, CharacterV3.GetFineMaxIndex() do
         local baseRate = char.baseCravings[i] or 0
         char.currentCravings[i] = baseRate * startingCravingMultiplier
@@ -231,7 +235,7 @@ function CharacterV3:New(class, id)
     -- Fine satisfaction (50D) - primary tracking, ranges -100 to 300
     -- Coarse satisfaction (9D) - computed from fine, for display
     char.satisfactionFine = {}
-    char.satisfaction = {}  -- Coarse satisfaction (computed from fine)
+    char.satisfaction = {} -- Coarse satisfaction (computed from fine)
 
     -- Initialize fine-level satisfaction
     CharacterV3.GenerateStartingSatisfactionFine(char, char.class)
@@ -240,12 +244,12 @@ function CharacterV3:New(class, id)
     -- LAYER 5: Commodity Multipliers (fatigue system, 0.0 to 1.0)
     -- =============================================================================
     -- Tracks fatigue for each commodity (personalized variety-seeking)
-    char.commodityMultipliers = {}  -- [commodityId] = {multiplier, consecutiveCount, lastConsumed}
+    char.commodityMultipliers = {} -- [commodityId] = {multiplier, consecutiveCount, lastConsumed}
 
     -- =============================================================================
     -- LAYER 6: Consumption History (last 20 decisions)
     -- =============================================================================
-    char.consumptionHistory = {}  -- Array of {cycle, commodity, quantity, gain, multiplier}
+    char.consumptionHistory = {} -- Array of {cycle, commodity, quantity, gain, multiplier}
     char.maxHistoryLength = 20
 
     -- =============================================================================
@@ -272,8 +276,8 @@ function CharacterV3:New(class, id)
     -- =============================================================================
     -- Enablement State (tracks which rules have been applied)
     -- =============================================================================
-    char.appliedEnablements = {}  -- Set of enablement rule IDs that have been applied
-    char.enablementTriggers = {}  -- Tracks conditions for enablement triggers
+    char.appliedEnablements = {} -- Set of enablement rule IDs that have been applied
+    char.enablementTriggers = {} -- Tracks conditions for enablement triggers
 
     -- =============================================================================
     -- Allocation State
@@ -289,7 +293,7 @@ function CharacterV3:New(class, id)
     -- Emigration tracking
     -- =============================================================================
     char.consecutiveLowSatisfactionCycles = 0
-    char.emigrationThreshold = 30  -- Will be set from config
+    char.emigrationThreshold = 30 -- Will be set from config
     char.hasEmigrated = false
 
     -- =============================================================================
@@ -297,8 +301,8 @@ function CharacterV3:New(class, id)
     -- =============================================================================
     -- Tracks consecutive days of met/unmet cravings per fine dimension
     -- Satisfaction only changes after N buffer days (asymmetric decay/gain curves)
-    char.cravingStreaks = {}  -- [fineIndex] = {type = "met"|"unmet", days = count, lastUpdated = dayNumber}
-    char.todayFulfillment = {}  -- [fineIndex] = points fulfilled today (reset daily)
+    char.cravingStreaks = {}   -- [fineIndex] = {type = "met"|"unmet", days = count, lastUpdated = dayNumber}
+    char.todayFulfillment = {} -- [fineIndex] = points fulfilled today (reset daily)
     char.lastDayProcessed = 0  -- Track which game day was last processed
 
     -- Initialize streak tracking for all fine dimensions
@@ -317,16 +321,16 @@ function CharacterV3:New(class, id)
     -- =============================================================================
     -- Phase 5: Productivity and Protest tracking
     -- =============================================================================
-    char.productivityMultiplier = 1.0  -- 1.0 = full productivity, 0.0 = no work
-    char.consecutiveFailedAllocations = 0  -- Track failures for protest trigger
-    char.isProtesting = false  -- Whether character is actively protesting
+    char.productivityMultiplier = 1.0     -- 1.0 = full productivity, 0.0 = no work
+    char.consecutiveFailedAllocations = 0 -- Track failures for protest trigger
+    char.isProtesting = false             -- Whether character is actively protesting
 
     -- =============================================================================
     -- Visual state
     -- =============================================================================
-    char.position = {x = 0, y = 0}
+    char.position = { x = 0, y = 0 }
     char.highlighted = false
-    char.status = "idle"  -- idle/happy/stressed/leaving/variety_seeking
+    char.status = "idle" -- idle/happy/stressed/leaving/variety_seeking
     char.statusMessage = ""
 
     -- =============================================================================
@@ -334,18 +338,18 @@ function CharacterV3:New(class, id)
     -- =============================================================================
     -- Note: Main economics tracking is in EconomicsSystem.lua
     -- These fields are for quick reference and backward compatibility
-    char.emergentClass = nil  -- Calculated from economics, not assigned
-    char.lastClassCalculation = 0  -- Cycle number when class was last calculated
+    char.emergentClass = nil      -- Calculated from economics, not assigned
+    char.lastClassCalculation = 0 -- Cycle number when class was last calculated
 
     -- Housing reference (managed by HousingSystem)
-    char.housingId = nil  -- Building ID where character lives
-    char.householdId = nil  -- Household group ID (for families)
+    char.housingId = nil   -- Building ID where character lives
+    char.householdId = nil -- Household group ID (for families)
 
     -- Employment (managed by workplace assignment)
     char.employment = {
         employerId = nil,  -- Owner ID of workplace
-        workplaceId = nil,  -- Building ID (redundant with workplace for clarity)
-        wageRate = 0,  -- Per-cycle wage
+        workplaceId = nil, -- Building ID (redundant with workplace for clarity)
+        wageRate = 0,      -- Per-cycle wage
     }
 
     -- Relationships with other characters
@@ -414,7 +418,7 @@ function CharacterV3.GenerateBaseCravings(class, traits)
 
     -- Copy fine-grained base cravings from class
     for i = 0, CharacterV3.GetFineMaxIndex() do
-        baseCravings[i] = classData.baseCravingVector.fine[i + 1] or 0  -- Lua 1-indexed
+        baseCravings[i] = classData.baseCravingVector.fine[i + 1] or 0 -- Lua 1-indexed
     end
 
     -- Debug: print first few base cravings
@@ -470,8 +474,8 @@ function CharacterV3.GenerateStartingSatisfactionFine(char, class)
     -- Get coarse starting ranges from consumption_mechanics
     local coarseRanges = {}
     if CharacterV3._ConsumptionMechanics and CharacterV3._ConsumptionMechanics.characterGeneration and
-       CharacterV3._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges and
-       CharacterV3._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges[classKey] then
+        CharacterV3._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges and
+        CharacterV3._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges[classKey] then
         coarseRanges = CharacterV3._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges[classKey]
     end
 
@@ -530,8 +534,8 @@ function CharacterV3.GenerateStartingSatisfaction(class)
     end
 
     if CharacterV3._ConsumptionMechanics and CharacterV3._ConsumptionMechanics.characterGeneration and
-       CharacterV3._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges and
-       CharacterV3._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges[classKey] then
+        CharacterV3._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges and
+        CharacterV3._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges[classKey] then
         local ranges = CharacterV3._ConsumptionMechanics.characterGeneration.startingSatisfactionRanges[classKey]
         for cravingType, range in pairs(ranges) do
             satisfaction[cravingType] = math.random(range[1], range[2])
@@ -550,13 +554,14 @@ end
 -- LAYER 3: Update Current Cravings (Accumulation)
 -- =============================================================================
 
-function CharacterV3:UpdateCurrentCravings(deltaTime, activeCravings)
+function CharacterV3:UpdateCurrentCravings(deltaTime, activeCravings, secondsPerSlot)
     -- Accumulate cravings based on baseCravings decay rates
-    -- currentCravings += baseCravings * (deltaTime / cycleTime)
+    -- currentCravings += baseCravings * (deltaTime / secondsPerSlot)
     -- If activeCravings provided, only accumulate those (slot-based system)
 
-    local cycleTime = 60.0  -- 60 seconds per cycle
-    local ratio = deltaTime / cycleTime
+    -- Use passed slot duration or fallback to baseline (50s at normal speed: 300s/day / 6 slots)
+    secondsPerSlot = secondsPerSlot or 50
+    local ratio = deltaTime / secondsPerSlot
 
     -- Max craving is relative to base craving (e.g., 50x base rate)
     -- This represents the maximum intensity a craving can reach
@@ -629,7 +634,7 @@ function CharacterV3:UpdateSatisfaction(currentCycle)
 
         -- Decay accelerates with unfulfilled cravings
         local cravingMultiplier = 1.0 + (currentCraving / 50.0)
-        local decay = baseDecay * cravingMultiplier * 0.2  -- Scale down for fine-level
+        local decay = baseDecay * cravingMultiplier * 0.2 -- Scale down for fine-level
 
         -- Apply decay to fine satisfaction
         local currentSat = self.satisfactionFine[fineIdx] or 50
@@ -666,11 +671,11 @@ function CharacterV3:CalculateCommodityMultiplier(commodity, currentSlotOrCycle)
     local slotsSinceLast = currentSlot - (history.lastConsumedSlot or history.lastConsumed or 0)
 
     -- Get commodity-specific fatigue config
-    local baseFatigueRate = 0.12  -- default
+    local baseFatigueRate = 0.12 -- default
     local traitModifier = 1.0
 
     if CharacterV3._CommodityFatigueRates and CharacterV3._CommodityFatigueRates.commodities and
-       CharacterV3._CommodityFatigueRates.commodities[commodity] then
+        CharacterV3._CommodityFatigueRates.commodities[commodity] then
         local fatigueData = CharacterV3._CommodityFatigueRates.commodities[commodity]
         baseFatigueRate = fatigueData.baseFatigueRate or baseFatigueRate
 
@@ -688,8 +693,8 @@ function CharacterV3:CalculateCommodityMultiplier(commodity, currentSlotOrCycle)
 
     -- Check if enough slots have passed for cooldown (default 4 slots = ~2/3 of a day)
     local cooldownSlots = CharacterV3._ConsumptionMechanics and
-                          CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
-                          CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.varietyCooldownSlots or 4
+        CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
+        CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.varietyCooldownSlots or 4
 
     if slotsSinceLast > cooldownSlots then
         -- Reset fatigue
@@ -702,8 +707,8 @@ function CharacterV3:CalculateCommodityMultiplier(commodity, currentSlotOrCycle)
 
     -- Apply min threshold
     local minMultiplier = CharacterV3._ConsumptionMechanics and
-                         CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
-                         CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.minMultiplier or 0.25
+        CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
+        CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.minMultiplier or 0.25
 
     multiplier = math.max(minMultiplier, multiplier)
 
@@ -730,8 +735,8 @@ function CharacterV3:UpdateCommodityHistory(commodity, currentSlotOrCycle)
 
         -- Cooldown in slots (default 4 = about 2/3 of a day)
         local cooldownSlots = CharacterV3._ConsumptionMechanics and
-                              CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
-                              CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.varietyCooldownSlots or 4
+            CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
+            CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.varietyCooldownSlots or 4
 
         if slotsSinceLast <= cooldownSlots then
             -- Still in fatigue period
@@ -746,12 +751,12 @@ function CharacterV3:UpdateCommodityHistory(commodity, currentSlotOrCycle)
 
     -- Decay other commodities' consecutive counts over time (in slots)
     local decaySlots = CharacterV3._ConsumptionMechanics and
-                       CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
-                       CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.otherCommodityDecaySlots or 2
+        CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
+        CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.otherCommodityDecaySlots or 2
 
     local decayRate = CharacterV3._ConsumptionMechanics and
-                     CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
-                     CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.otherCommodityDecayRate or 1
+        CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
+        CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.otherCommodityDecayRate or 1
 
     for otherCommodity, otherHistory in pairs(self.commodityMultipliers) do
         if otherCommodity ~= commodity then
@@ -768,7 +773,7 @@ end
 -- =============================================================================
 
 function CharacterV3:FulfillCraving(commodity, quantity, currentCycle, allocationType)
-    allocationType = allocationType or "consumed"  -- Default to consumed for backward compatibility
+    allocationType = allocationType or "consumed" -- Default to consumed for backward compatibility
 
     if not CharacterV3._FulfillmentVectors or not CharacterV3._FulfillmentVectors.commodities then
         print("Error: CharacterV3._FulfillmentVectors not initialized")
@@ -785,7 +790,7 @@ function CharacterV3:FulfillCraving(commodity, quantity, currentCycle, allocatio
     local fatigueMultiplier = self:CalculateCommodityMultiplier(commodity, currentCycle)
 
     -- Get quality multiplier (default to basic)
-    local qualityMultipliers = commodityData.qualityMultipliers or {basic = 1.0}
+    local qualityMultipliers = commodityData.qualityMultipliers or { basic = 1.0 }
     local qualityMultiplier = qualityMultipliers.basic or 1.0
 
     -- Use fine-grained fulfillment vector (49D)
@@ -851,7 +856,7 @@ function CharacterV3:FulfillCraving(commodity, quantity, currentCycle, allocatio
         quantity = quantity,
         cravingReduction = totalCravingReduction,
         fatigueMultiplier = fatigueMultiplier,
-        allocationType = allocationType  -- "consumed" or "acquired"
+        allocationType = allocationType -- "consumed" or "acquired"
     })
 
     -- Trim history to max length
@@ -861,8 +866,8 @@ function CharacterV3:FulfillCraving(commodity, quantity, currentCycle, allocatio
 
     -- Visual feedback
     local varietyThreshold = CharacterV3._ConsumptionMechanics and
-                            CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
-                            CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.varietySeekingThreshold or 0.70
+        CharacterV3._ConsumptionMechanics.commodityDiminishingReturns and
+        CharacterV3._ConsumptionMechanics.commodityDiminishingReturns.varietySeekingThreshold or 0.70
 
     if fatigueMultiplier < varietyThreshold then
         self.status = "variety_seeking"
@@ -906,10 +911,10 @@ function CharacterV3:ApplyEnablement(ruleId, currentCycle)
     local fineModifier = rule.effect.cravingModifier.fine
     if fineModifier then
         for i = 0, CharacterV3.GetFineMaxIndex() do
-            local modifier = fineModifier[i + 1] or 0  -- Lua 1-indexed
+            local modifier = fineModifier[i + 1] or 0 -- Lua 1-indexed
             if modifier ~= 0 then
                 self.baseCravings[i] = self.baseCravings[i] + modifier
-                self.baseCravings[i] = math.max(0, self.baseCravings[i])  -- Can't be negative
+                self.baseCravings[i] = math.max(0, self.baseCravings[i]) -- Can't be negative
             end
         end
     end
@@ -1013,7 +1018,7 @@ end
 -- TODO: Define quality tiers properly at commodity level, production level, and inventory level
 function CharacterV3:AcceptsQuality(quality)
     if not quality then
-        return true  -- No quality specified = accept
+        return true -- No quality specified = accept
     end
 
     -- Phase 5: Use emergent class for quality acceptance
@@ -1042,7 +1047,7 @@ function CharacterV3:AcceptsQuality(quality)
     if classData.rejectedQualityTiers then
         for _, rejectedTier in ipairs(classData.rejectedQualityTiers) do
             if string.lower(rejectedTier) == qualityLower then
-                return false  -- Quality is explicitly rejected
+                return false -- Quality is explicitly rejected
             end
         end
     end
@@ -1051,7 +1056,7 @@ function CharacterV3:AcceptsQuality(quality)
     if classData.acceptedQualityTiers and #classData.acceptedQualityTiers > 0 then
         for _, acceptedTier in ipairs(classData.acceptedQualityTiers) do
             if string.lower(acceptedTier) == qualityLower then
-                return true  -- Quality is explicitly accepted
+                return true -- Quality is explicitly accepted
             end
         end
         -- Has accepted list but quality not in it = reject
@@ -1087,8 +1092,8 @@ end
 
 function CharacterV3.GetRandomTraits(count, class)
     if not CharacterV3._ConsumptionMechanics or not CharacterV3._ConsumptionMechanics.characterGeneration or
-       not CharacterV3._ConsumptionMechanics.characterGeneration.traits or
-       not CharacterV3._ConsumptionMechanics.characterGeneration.traits.available then
+        not CharacterV3._ConsumptionMechanics.characterGeneration.traits or
+        not CharacterV3._ConsumptionMechanics.characterGeneration.traits.available then
         return {}
     end
 
@@ -1131,7 +1136,7 @@ function CharacterV3:GetCriticalCravingCount()
     local count = 0
     local coarseCravings = self:AggregateCurrentCravingsToCoarse()
     for _, value in pairs(coarseCravings) do
-        if value > 80 then  -- Critical threshold
+        if value > 80 then -- Critical threshold
             count = count + 1
         end
     end
@@ -1144,7 +1149,7 @@ function CharacterV3:CheckEmigration(currentCycle)
     end
 
     if not CharacterV3._ConsumptionMechanics or not CharacterV3._ConsumptionMechanics.consequenceThresholds or
-       not CharacterV3._ConsumptionMechanics.consequenceThresholds.emigration then
+        not CharacterV3._ConsumptionMechanics.consequenceThresholds.emigration then
         return false
     end
 
@@ -1168,7 +1173,7 @@ function CharacterV3:CheckEmigration(currentCycle)
     local cycleThreshold = config.consecutiveLowSatisfactionCycles[self.class] or 5
 
     if self.consecutiveLowSatisfactionCycles >= cycleThreshold and
-       criticalCount >= (config.criticalCravingsRequired or 2) then
+        criticalCount >= (config.criticalCravingsRequired or 2) then
         -- Roll for emigration
         if math.random() < (config.emigrationChancePerCycle or 0.1) then
             self.hasEmigrated = true
@@ -1209,7 +1214,7 @@ function CharacterV3:UpdateProductivity()
     -- When satisfaction >= 50, productivity is at full (1.0)
 
     if not CharacterV3._ConsumptionMechanics or not CharacterV3._ConsumptionMechanics.consequenceThresholds or
-       not CharacterV3._ConsumptionMechanics.consequenceThresholds.productivity then
+        not CharacterV3._ConsumptionMechanics.consequenceThresholds.productivity then
         return
     end
 
@@ -1250,7 +1255,7 @@ function CharacterV3:CheckProtest(currentCycle)
     end
 
     if not CharacterV3._ConsumptionMechanics or not CharacterV3._ConsumptionMechanics.consequenceThresholds or
-       not CharacterV3._ConsumptionMechanics.consequenceThresholds.protest then
+        not CharacterV3._ConsumptionMechanics.consequenceThresholds.protest then
         return false
     end
 
@@ -1266,7 +1271,7 @@ function CharacterV3:CheckProtest(currentCycle)
     local failureThreshold = config.consecutiveFailuresRequired or 10
 
     if avgSatisfaction < satisfactionThreshold and
-       self.consecutiveFailedAllocations >= failureThreshold then
+        self.consecutiveFailedAllocations >= failureThreshold then
         -- Roll for protest (random chance per cycle)
         local protestChance = config.protestChancePerCycle or 0.2
         if math.random() < protestChance then
@@ -1349,7 +1354,7 @@ function CharacterV3:AddActiveEffect(commodityId, currentCycle)
         durationCycles = commodityData.durationCycles,  -- nil for permanent
         remainingCycles = commodityData.durationCycles, -- nil for permanent
         effectDecayRate = commodityData.effectDecayRate or 0,
-        currentEffectiveness = 1.0,  -- Start at full effectiveness
+        currentEffectiveness = 1.0,                     -- Start at full effectiveness
         fulfillmentVector = fulfillmentVector,
         maxOwned = maxOwned
     }
@@ -1419,7 +1424,7 @@ function CharacterV3:ApplyActiveEffectsSatisfaction(currentSlotId, durableSlots)
             elseif category and category:find("decoration") then
                 effectSlot = "evening"
             else
-                effectSlot = "late_night"  -- Default for other durables
+                effectSlot = "late_night" -- Default for other durables
             end
         end
 
@@ -1436,7 +1441,7 @@ function CharacterV3:ApplyActiveEffectsSatisfaction(currentSlotId, durableSlots)
 
                         if fineIndex then
                             -- Passive effects are applied once per day (stronger than per-cycle)
-                            local passiveMultiplier = 1.0  -- Full effect since it's once per day
+                            local passiveMultiplier = 1.0 -- Full effect since it's once per day
                             local gain = points * effectiveness * passiveMultiplier
                             local oldValue = self.currentCravings[fineIndex] or 0
                             self.currentCravings[fineIndex] = math.max(0, oldValue - gain)
@@ -1501,7 +1506,7 @@ function CharacterV3:RemoveOldestEffectInCategory(category)
             -- Ensure acquiredCycle is a number (handle legacy data where it might be a table)
             local cycle = effect.acquiredCycle
             if type(cycle) ~= "number" then
-                cycle = 0  -- Treat invalid/legacy data as oldest
+                cycle = 0 -- Treat invalid/legacy data as oldest
             end
             if cycle < oldestCycle then
                 oldestCycle = cycle
@@ -1563,7 +1568,7 @@ function CharacterV3:CanAcquireDurable(commodityId)
 
     local durability = commodityData.durability or "consumable"
     if durability == "consumable" then
-        return true  -- Consumables can always be acquired
+        return true -- Consumables can always be acquired
     end
 
     local category = commodityData.category or commodityId
@@ -1572,7 +1577,7 @@ function CharacterV3:CanAcquireDurable(commodityId)
     -- Check current count - if at max, can still acquire (will replace oldest)
     -- Return true but indicate replacement will happen
     local currentCount = self:GetActiveEffectCountByCategory(category)
-    return true, currentCount >= maxOwned  -- second return indicates replacement
+    return true, currentCount >= maxOwned -- second return indicates replacement
 end
 
 -- Get total possession count
@@ -1627,17 +1632,17 @@ function CharacterV3:CalculateEmergentClass(netWorth, capitalRatio, currentCycle
         middle = 0.2
     }
 
-    local newClass = "lower"  -- Default
+    local newClass = "lower" -- Default
 
     -- Check thresholds from highest to lowest
     if netWorth >= (netWorthThresholds.elite and netWorthThresholds.elite.min or 10000) and
-       capitalRatio >= (capitalRatioThresholds.elite or 0.8) then
+        capitalRatio >= (capitalRatioThresholds.elite or 0.8) then
         newClass = "elite"
     elseif netWorth >= (netWorthThresholds.upper and netWorthThresholds.upper.min or 3000) and
-           capitalRatio >= (capitalRatioThresholds.upper or 0.5) then
+        capitalRatio >= (capitalRatioThresholds.upper or 0.5) then
         newClass = "upper"
     elseif netWorth >= (netWorthThresholds.middle and netWorthThresholds.middle.min or 500) and
-           capitalRatio >= (capitalRatioThresholds.middle or 0.2) then
+        capitalRatio >= (capitalRatioThresholds.middle or 0.2) then
         newClass = "middle"
     end
 
@@ -1664,7 +1669,7 @@ function CharacterV3:OnClassChange(oldClass, newClass, currentCycle)
     local newBaseCravings = CharacterV3.GenerateBaseCravings(newClass, self.traits)
 
     -- Blend old and new cravings (gradual transition, not instant)
-    local blendFactor = 0.3  -- 30% new cravings per calculation
+    local blendFactor = 0.3 -- 30% new cravings per calculation
     for i = 0, CharacterV3.GetFineMaxIndex() do
         local oldValue = self.baseCravings[i] or 0
         local newValue = newBaseCravings[i] or 0
@@ -1801,9 +1806,9 @@ end
 -- Get housing satisfaction modifier (for craving system integration)
 function CharacterV3:GetHousingSatisfactionModifier()
     if not self.housingId then
-        return 0.5  -- Penalty for being homeless
+        return 0.5 -- Penalty for being homeless
     end
-    return 1.0  -- Normal satisfaction when housed
+    return 1.0     -- Normal satisfaction when housed
 end
 
 -- Apply housing fulfillment to satisfaction (called daily by AlphaWorld)
@@ -1815,28 +1820,23 @@ function CharacterV3:ApplyHousingFulfillment(fulfillmentVector, crowdingModifier
     -- Apply each dimension's fulfillment to the character's fine satisfaction
     for dimensionId, value in pairs(fulfillmentVector) do
         -- Find the dimension index
-        local fineIndex = nil
-        if dimensionDefinitionsRef and dimensionDefinitionsRef.fineDimensions then
-            for _, dim in ipairs(dimensionDefinitionsRef.fineDimensions) do
-                if dim.id == dimensionId then
-                    fineIndex = dim.index
-                    break
-                end
-            end
-        end
+        local fineIndex = CharacterV3.GetFineIndexFromCravingId(dimensionId)
 
         if fineIndex then
-            -- Apply fulfillment to fine satisfaction
+            -- Apply fulfillment to fine satisfaction (range: -100 to 300)
             -- Housing provides baseline satisfaction, doesn't fully fulfill
-            local currentValue = self.fineSatisfaction[fineIndex] or 0
-            local fulfillmentAmount = value * crowdingModifier * 0.01  -- Scale to 0-1 range
-            local newValue = math.min(1.0, currentValue + fulfillmentAmount)
-            self.fineSatisfaction[fineIndex] = newValue
+            local currentValue = self.satisfactionFine[fineIndex] or 50
+            local fulfillmentAmount = value * crowdingModifier -- value is already in satisfaction points
+            local newValue = math.max(-100, math.min(300, currentValue + fulfillmentAmount))
+            self.satisfactionFine[fineIndex] = newValue
         end
     end
 
+    -- Recompute coarse satisfaction from fine
+    CharacterV3.ComputeCoarseSatisfaction(self)
+
     -- Track that housing fulfillment was applied this cycle
-    self.lastHousingFulfillmentCycle = CharacterV3.currentGlobalSlot
+    self.lastHousingFulfillmentCycle = CharacterV3._currentGlobalSlot
 end
 
 -- Apply penalty for being homeless
@@ -1852,28 +1852,22 @@ function CharacterV3:ApplyHomelessPenalty(penaltyAmount)
 
     for _, dimensionId in ipairs(shelterDimensions) do
         -- Find the dimension index
-        local fineIndex = nil
-        if dimensionDefinitionsRef and dimensionDefinitionsRef.fineDimensions then
-            for _, dim in ipairs(dimensionDefinitionsRef.fineDimensions) do
-                if dim.id == dimensionId then
-                    fineIndex = dim.index
-                    break
-                end
-            end
-        end
+        local fineIndex = CharacterV3.GetFineIndexFromCravingId(dimensionId)
 
         if fineIndex then
-            -- Reduce satisfaction for shelter-related dimensions
-            local currentValue = self.fineSatisfaction[fineIndex] or 0.5
-            local penaltyFraction = penaltyAmount * 0.01  -- Convert to 0-1 scale
-            local newValue = math.max(0, currentValue + penaltyFraction)
-            self.fineSatisfaction[fineIndex] = newValue
+            -- Reduce satisfaction for shelter-related dimensions (range: -100 to 300)
+            local currentValue = self.satisfactionFine[fineIndex] or 50
+            local newValue = math.max(-100, math.min(300, currentValue + penaltyAmount))
+            self.satisfactionFine[fineIndex] = newValue
         end
     end
 
+    -- Recompute coarse satisfaction from fine
+    CharacterV3.ComputeCoarseSatisfaction(self)
+
     -- Mark as homeless for UI purposes
     self.isHomeless = true
-    self.lastHomelessPenaltyCycle = CharacterV3.currentGlobalSlot
+    self.lastHomelessPenaltyCycle = CharacterV3._currentGlobalSlot
 end
 
 return CharacterV3

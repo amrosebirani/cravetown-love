@@ -22,7 +22,7 @@ AllocationEngineV2.classConsumptionBudget = {
     Middle = 5,
     Working = 3,
     Poor = 2,
-    Lower = 3  -- Alias for Working
+    Lower = 3 -- Alias for Working
 }
 
 -- Initialize data
@@ -37,7 +37,7 @@ end
 -- Allocate resources for one cycle
 -- policy is optional and contains: priorityMode, fairnessEnabled, classPriorities, dimensionPriorities
 function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycle, mode, policy)
-    mode = mode or "standard"  -- "standard" or "fairness"
+    mode = mode or "standard" -- "standard" or "fairness"
 
     local allocationLog = {
         cycle = currentCycle,
@@ -60,7 +60,8 @@ function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycl
     for _, character in ipairs(characters) do
         if not character.hasEmigrated then
             if policy then
-                character.allocationPriority = AllocationEngineV2.CalculatePriorityWithPolicy(character, currentCycle, policy)
+                character.allocationPriority = AllocationEngineV2.CalculatePriorityWithPolicy(character, currentCycle,
+                    policy)
             else
                 character:CalculatePriority(currentCycle, mode)
             end
@@ -89,8 +90,10 @@ function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycl
             budget = AllocationEngineV2.classConsumptionBudget[character.class] or 3
         end
         remainingBudget[character] = budget
-        allocationLog.consumptionByClass[character.class] = allocationLog.consumptionByClass[character.class] or {budget = 0, consumed = 0}
-        allocationLog.consumptionByClass[character.class].budget = allocationLog.consumptionByClass[character.class].budget + budget
+        allocationLog.consumptionByClass[character.class] = allocationLog.consumptionByClass[character.class] or
+            { budget = 0, consumed = 0 }
+        allocationLog.consumptionByClass[character.class].budget = allocationLog.consumptionByClass[character.class]
+            .budget + budget
     end
 
     -- Sequential allocation: each character exhausts their budget before moving to next
@@ -113,12 +116,14 @@ function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycl
             if allocation.status == "granted" then
                 allocationLog.stats.granted = allocationLog.stats.granted + 1
                 remainingBudget[character] = remainingBudget[character] - 1
-                allocationLog.consumptionByClass[character.class].consumed = allocationLog.consumptionByClass[character.class].consumed + 1
+                allocationLog.consumptionByClass[character.class].consumed = allocationLog.consumptionByClass
+                    [character.class].consumed + 1
                 allocationsForCharacter = allocationsForCharacter + 1
             elseif allocation.status == "substituted" then
                 allocationLog.stats.substituted = allocationLog.stats.substituted + 1
                 remainingBudget[character] = remainingBudget[character] - 1
-                allocationLog.consumptionByClass[character.class].consumed = allocationLog.consumptionByClass[character.class].consumed + 1
+                allocationLog.consumptionByClass[character.class].consumed = allocationLog.consumptionByClass
+                    [character.class].consumed + 1
                 allocationsForCharacter = allocationsForCharacter + 1
             elseif allocation.status == "no_needs" then
                 allocationLog.stats.noNeeds = allocationLog.stats.noNeeds + 1
@@ -128,8 +133,8 @@ function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycl
                 allocationLog.stats.failed = allocationLog.stats.failed + 1
                 -- Track shortages
                 if allocation.requestedCommodity then
-                    local commodity = allocation.requestedCommodity
-                    allocationLog.shortages[commodity] = (allocationLog.shortages[commodity] or 0) + 1
+                    allocationLog.shortages[allocation.requestedCommodity] = (allocationLog.shortages[allocation.requestedCommodity] or 0) +
+                        1
                 end
                 -- Failed to get this commodity, but try next craving
                 remainingBudget[character] = remainingBudget[character] - 1
@@ -209,15 +214,16 @@ function AllocationEngineV2.AllocateForCharacter(character, townInventory, curre
         requestedCommodity = nil,
         allocatedCommodity = nil,
         quantity = 1,
-        status = "failed",  -- granted/substituted/failed/no_needs/acquired
+        status = "failed", -- granted/substituted/failed/no_needs/acquired
         satisfactionGain = 0,
         commodityMultiplier = 1.0,
         substitutionChain = {},
-        allocationType = "consumed"  -- "consumed" or "acquired" (for durables)
+        allocationType = "consumed" -- "consumed" or "acquired" (for durables)
     }
 
     -- Determine which craving to address (highest currentCraving with highest weight)
-    local targetCoarseCraving, targetCommodity = AllocationEngineV2.SelectTargetCraving(character, townInventory, currentCycle)
+    local targetCoarseCraving, targetCommodity = AllocationEngineV2.SelectTargetCraving(character, townInventory,
+        currentCycle)
 
     if not targetCoarseCraving then
         allocation.status = "no_needs"
@@ -254,7 +260,7 @@ function AllocationEngineV2.AllocateForCharacter(character, townInventory, curre
                 end
 
                 -- Process allocation (handles durables vs consumables)
-                local success, gain, allocType = AllocationEngineV2.ProcessAllocation(
+                local _, gain, allocType = AllocationEngineV2.ProcessAllocation(
                     character, substitute, allocation.quantity, currentCycle
                 )
                 allocation.satisfactionGain = gain
@@ -271,7 +277,9 @@ function AllocationEngineV2.AllocateForCharacter(character, townInventory, curre
         allocation.commodityMultiplier = commodityMultiplier
 
         -- Consume from inventory
-        townInventory[targetCommodity] = townInventory[targetCommodity] - allocation.quantity
+        if targetCommodity then
+            townInventory[targetCommodity] = townInventory[targetCommodity] - allocation.quantity
+        end
 
         -- Invalidate cache for this commodity
         if CommodityCache then
@@ -279,7 +287,7 @@ function AllocationEngineV2.AllocateForCharacter(character, townInventory, curre
         end
 
         -- Process allocation (handles durables vs consumables)
-        local success, gain, allocType = AllocationEngineV2.ProcessAllocation(
+        local _, gain, allocType = AllocationEngineV2.ProcessAllocation(
             character, targetCommodity, allocation.quantity, currentCycle
         )
         allocation.satisfactionGain = gain
@@ -459,7 +467,8 @@ function AllocationEngineV2.GetBestCommodityForCraving(coarseCraving, character,
                             bestCommodity = commodityId
                         end
                     else
-                        print(string.format("      %s: totalPoints=%.1f but quality '%s' not accepted", commodityId, totalPoints, quality))
+                        print(string.format("      %s: totalPoints=%.1f but quality '%s' not accepted", commodityId,
+                            totalPoints, quality))
                     end
                 end
             end
@@ -467,14 +476,16 @@ function AllocationEngineV2.GetBestCommodityForCraving(coarseCraving, character,
         ::continue_commodity_best::
     end
 
-    print(string.format("    Checked %d commodities, best: %s (score=%.2f)", checkedCount, tostring(bestCommodity), bestScore))
+    print(string.format("    Checked %d commodities, best: %s (score=%.2f)", checkedCount, tostring(bestCommodity),
+        bestScore))
 
     return bestCommodity
 end
 
 -- Find best available substitute for a commodity
 -- Includes distance-based boost calculation
-function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCraving, character, townInventory, currentCycle)
+function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCraving, character, townInventory,
+                                               currentCycle)
     local bestSubstitute = nil
     local bestScore = 0
     local bestChain = {}
@@ -485,7 +496,7 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
             for _, substituteRule in ipairs(commodities[primaryCommodity].substitutes) do
                 local substituteCommodity = substituteRule.commodity
                 local efficiency = substituteRule.efficiency
-                local distance = substituteRule.distance or 0.5  -- Fallback if distance missing
+                local distance = substituteRule.distance or 0.5 -- Fallback if distance missing
 
                 -- Check availability
                 if townInventory[substituteCommodity] and townInventory[substituteCommodity] > 0 then
@@ -500,7 +511,8 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
                     local substData = FulfillmentVectors.commodities[substituteCommodity]
                     if substData and character:AcceptsQuality(substData.quality) then
                         -- Calculate commodity multiplier for substitute
-                        local commodityMultiplier = character:CalculateCommodityMultiplier(substituteCommodity, currentCycle)
+                        local commodityMultiplier = character:CalculateCommodityMultiplier(substituteCommodity,
+                            currentCycle)
 
                         -- Calculate distance-based boost
                         -- When fatigued (low multiplier), closer substitutes get stronger boost
@@ -509,7 +521,7 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
 
                         if primaryMultiplier < 1.0 then
                             -- Boost = (1 - currentMultiplier) * (1 - distance) * boostFactor
-                            local boostFactor = 0.5  -- Configurable boost strength
+                            local boostFactor = 0.5 -- Configurable boost strength
                             distanceBoost = 1.0 + ((1.0 - primaryMultiplier) * (1.0 - distance) * boostFactor)
                         end
 
@@ -520,7 +532,7 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
                             bestScore = score
                             bestSubstitute = substituteCommodity
                             bestChain = {
-                                {commodity = primaryCommodity, available = 0},
+                                { commodity = primaryCommodity, available = 0 },
                                 {
                                     commodity = substituteCommodity,
                                     available = townInventory[substituteCommodity],
@@ -555,7 +567,7 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
                     for _, rule in ipairs(desperateSubstitutes) do
                         local substituteCommodity = rule.commodity
                         local efficiency = rule.efficiency
-                        local distance = rule.distance or 0.8  -- Desperation = distant
+                        local distance = rule.distance or 0.8 -- Desperation = distant
 
                         if townInventory[substituteCommodity] and townInventory[substituteCommodity] > 0 then
                             -- Skip durables that character already owns at max capacity
@@ -567,14 +579,15 @@ function AllocationEngineV2.FindBestSubstitute(primaryCommodity, targetCoarseCra
 
                             local substData = FulfillmentVectors.commodities[substituteCommodity]
                             if substData and character:AcceptsQuality(substData.quality) then
-                                local commodityMultiplier = character:CalculateCommodityMultiplier(substituteCommodity, currentCycle)
-                                local score = efficiency * commodityMultiplier * 0.8  -- Penalty for desperation
+                                local commodityMultiplier = character:CalculateCommodityMultiplier(substituteCommodity,
+                                    currentCycle)
+                                local score = efficiency * commodityMultiplier * 0.8 -- Penalty for desperation
 
                                 if score > bestScore then
                                     bestScore = score
                                     bestSubstitute = substituteCommodity
                                     bestChain = {
-                                        {commodity = primaryCommodity, available = 0},
+                                        { commodity = primaryCommodity, available = 0 },
                                         {
                                             commodity = substituteCommodity,
                                             available = townInventory[substituteCommodity],
@@ -608,7 +621,6 @@ function AllocationEngineV2.CalculatePriorityWithPolicy(character, currentCycle,
     if priorityMode == "equality" then
         -- Everyone gets same base priority with small random factor
         priority = 100 + math.random(0, 10)
-
     else -- need_based (default) - Phase 5: desperation-based, no class weight
         -- Use dimension priorities to weight cravings (desperation score)
         local coarseCravings = character:AggregateCurrentCravingsToCoarse()
@@ -630,9 +642,9 @@ function AllocationEngineV2.CalculatePriorityWithPolicy(character, currentCycle,
         priority = desperationScore
     end
 
-    -- Apply fairness penalty if enabled (reduces priority for recently satisfied characters)
+    -- Apply fairness boost if enabled (increases priority for characters who failed recent allocations)
     if policy.fairnessEnabled then
-        priority = priority - (character.fairnessPenalty or 0)
+        priority = priority + (character.fairnessPenalty or 0)
     end
 
     return priority

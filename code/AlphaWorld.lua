@@ -60,12 +60,13 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
         world.dimensionDefinitions,
         world.commodityFatigueRates,
         world.enablementRules,
-        world.classThresholds  -- Phase 3: for emergent class calculation
+        world.classThresholds -- Phase 3: for emergent class calculation
     )
     reportProgress(0.15, "Initializing commodity cache...")
     CommodityCache.Init(world.fulfillmentVectors, world.dimensionDefinitions, world.substitutionRules, CharacterV3)
     reportProgress(0.2, "Initializing allocation engine...")
-    AllocationEngineV2.Init(world.consumptionMechanics, world.fulfillmentVectors, world.substitutionRules, CharacterV3, CommodityCache)
+    AllocationEngineV2.Init(world.consumptionMechanics, world.fulfillmentVectors, world.substitutionRules, CharacterV3,
+        CommodityCache)
     -- Alpha: No consequences system (no emigration/riots/protests)
 
     -- Town state
@@ -132,8 +133,8 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
     world.maxEvents = 100
 
     -- Selection state (for UI)
-    world.selectedEntity = nil  -- Can be citizen or building
-    world.selectedEntityType = nil  -- "citizen" or "building"
+    world.selectedEntity = nil     -- Can be citizen or building
+    world.selectedEntityType = nil -- "citizen" or "building"
 
     -- Immigration system
     world.immigrationSystem = ImmigrationSystem:Create(world)
@@ -148,12 +149,12 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
         maxX = world.worldWidth,
         minY = 0,
         maxY = world.worldHeight,
-        river = nil,  -- River will be set after creation
+        river = nil, -- River will be set after creation
         cellSize = 20,
         seed = os.time()
     })
 
-    local tc = terrainConfig or {}  -- terrain config shorthand
+    local tc = terrainConfig or {} -- terrain config shorthand
     local halfW = world.worldWidth / 2
     local halfH = world.worldHeight / 2
 
@@ -223,7 +224,7 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
         maxX = world.worldWidth,
         maxY = world.worldHeight,
         river = world.river,
-        zones = forestZones  -- Pass zone boundaries instead of numRegions
+        zones = forestZones -- Pass zone boundaries instead of numRegions
     })
 
     -- ==========================================================================
@@ -262,8 +263,8 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
     end
 
     -- Store ground and water colors from terrain config
-    world.groundColor = tc.groundColor or {0.4, 0.5, 0.3}
-    world.waterColor = tc.waterColor or {0.2, 0.4, 0.7}
+    world.groundColor = tc.groundColor or { 0.4, 0.5, 0.3 }
+    world.waterColor = tc.waterColor or { 0.2, 0.4, 0.7 }
 
     -- Now set the river reference and generate resources
     reportProgress(0.7, "Generating natural resources...")
@@ -332,7 +333,7 @@ function AlphaWorld:InitializeLandTerrain(progressCallback)
     local totalPlots = gridColumns * gridRows
 
     local plotsProcessed = 0
-    local yieldEvery = 50  -- Yield every 50 plots to keep UI responsive
+    local yieldEvery = 50 -- Yield every 50 plots to keep UI responsive
 
     for gx = 0, gridColumns - 1 do
         for gy = 0, gridRows - 1 do
@@ -343,25 +344,25 @@ function AlphaWorld:InitializeLandTerrain(progressCallback)
             -- Check if plot is in water
             if self:IsPositionInWater(worldX, worldY) then
                 self.landSystem:SetPlotTerrain(plotId, "water", true)
-            -- Check if plot is in mountains
+                -- Check if plot is in mountains
             elseif self.mountains and self.mountains:CheckRectCollision(
-                gx * plotWidth, gy * plotHeight, plotWidth, plotHeight
-            ) then
+                    gx * plotWidth, gy * plotHeight, plotWidth, plotHeight
+                ) then
                 self.landSystem:SetPlotTerrain(plotId, "mountain", true)
-            -- Check if plot is in forest
+                -- Check if plot is in forest
             elseif self.forest and self.forest:CheckRectCollision(
-                gx * plotWidth, gy * plotHeight, plotWidth, plotHeight
-            ) then
+                    gx * plotWidth, gy * plotHeight, plotWidth, plotHeight
+                ) then
                 self.landSystem:SetPlotTerrain(plotId, "forest", false)
                 -- Set natural resources for forest plots
-                self.landSystem:SetPlotResources(plotId, {"timber"})
+                self.landSystem:SetPlotResources(plotId, { "timber" })
             end
 
             plotsProcessed = plotsProcessed + 1
 
             -- Yield every N plots for smooth progress
             if progressCallback and plotsProcessed % yieldEvery == 0 then
-                local progress = 0.85 + (plotsProcessed / totalPlots) * 0.05  -- 85% to 90%
+                local progress = 0.85 + (plotsProcessed / totalPlots) * 0.05 -- 85% to 90%
                 local message = string.format("Marking terrain... (%d/%d plots)", plotsProcessed, totalPlots)
                 progressCallback(progress, message)
             end
@@ -398,8 +399,8 @@ function AlphaWorld:MaskResourcesInBlockedAreas()
                     local inForest = false
                     if self.forest then
                         inForest = self.forest:CheckRectCollision(
-                            worldX - cellSize/2,
-                            worldY - cellSize/2,
+                            worldX - cellSize / 2,
+                            worldY - cellSize / 2,
                             cellSize,
                             cellSize
                         )
@@ -508,10 +509,10 @@ function AlphaWorld:LoadData(progressCallback)
         else
             print("  WARNING: Could not load time slots, using minimal defaults")
             self.timeSlots = {
-                {id = "morning", name = "Morning", startHour = 6, endHour = 12, color = {1.0, 0.95, 0.7}},
-                {id = "afternoon", name = "Afternoon", startHour = 12, endHour = 18, color = {1.0, 1.0, 0.85}},
-                {id = "evening", name = "Evening", startHour = 18, endHour = 22, color = {1.0, 0.75, 0.5}},
-                {id = "night", name = "Night", startHour = 22, endHour = 6, color = {0.2, 0.2, 0.4}}
+                { id = "morning",   name = "Morning",   startHour = 6,  endHour = 12, color = { 1.0, 0.95, 0.7 } },
+                { id = "afternoon", name = "Afternoon", startHour = 12, endHour = 18, color = { 1.0, 1.0, 0.85 } },
+                { id = "evening",   name = "Evening",   startHour = 18, endHour = 22, color = { 1.0, 0.75, 0.5 } },
+                { id = "night",     name = "Night",     startHour = 22, endHour = 6,  color = { 0.2, 0.2, 0.4 } }
             }
         end
     end
@@ -595,7 +596,7 @@ end
 -- Callback when slot changes
 function AlphaWorld:OnSlotChange(slotIndex, slot)
     self.stats.currentSlotName = slot and slot.name or "Unknown"
-    self:LogEvent("slot", slot.name .. " begins", {slotId = slot.id})
+    self:LogEvent("slot", slot.name .. " begins", { slotId = slot.id })
 
     -- Update global slot counter for fatigue tracking
     -- Global slot = (day - 1) * slotsPerDay + slotIndex
@@ -607,6 +608,8 @@ function AlphaWorld:OnSlotChange(slotIndex, slot)
     -- Apply durable goods effects (slot-aware)
     local currentSlotId = slot and slot.id or "unknown"
     local durableSlots = self.cravingSlots.durableSlots and self.cravingSlots.durableSlots.categorySlots or {}
+    -- TODO: Optimization loop 1
+    -- here we are calling for all citizens and then checking for currentSlotId == effectSlot inside the function, that check can be done here before we enter the loop itself
     for _, citizen in ipairs(self.citizens) do
         citizen:ApplyActiveEffectsSatisfaction(currentSlotId, durableSlots)
     end
@@ -871,15 +874,15 @@ function AlphaWorld:IsBuildingInWater(x, y, width, height)
 
     -- Check corners and center of building
     local checkPoints = {
-        {x, y},                           -- Top-left
-        {x + width, y},                   -- Top-right
-        {x, y + height},                  -- Bottom-left
-        {x + width, y + height},          -- Bottom-right
-        {x + width/2, y + height/2},      -- Center
-        {x + width/2, y},                 -- Top-center
-        {x + width/2, y + height},        -- Bottom-center
-        {x, y + height/2},                -- Left-center
-        {x + width, y + height/2}         -- Right-center
+        { x,             y },              -- Top-left
+        { x + width,     y },              -- Top-right
+        { x,             y + height },     -- Bottom-left
+        { x + width,     y + height },     -- Bottom-right
+        { x + width / 2, y + height / 2 }, -- Center
+        { x + width / 2, y },              -- Top-center
+        { x + width / 2, y + height },     -- Bottom-center
+        { x,             y + height / 2 }, -- Left-center
+        { x + width,     y + height / 2 }  -- Right-center
     }
 
     for _, point in ipairs(checkPoints) do
@@ -935,9 +938,9 @@ function AlphaWorld:AddCitizen(class, name, traits, options)
         if hasBuildings then
             -- Pick a random building and spawn near it
             local building = self.buildings[math.random(#self.buildings)]
-            local spawnRadius = 80 + math.random(0, 60)  -- 80-140 pixels from building
+            local spawnRadius = 80 + math.random(0, 60)         -- 80-140 pixels from building
             local angle = math.random() * 2 * math.pi
-            x = building.x + 30 + math.cos(angle) * spawnRadius  -- 30 = half building width (approximate center)
+            x = building.x + 30 + math.cos(angle) * spawnRadius -- 30 = half building width (approximate center)
             y = building.y + 30 + math.sin(angle) * spawnRadius
 
             -- Clamp to world bounds
@@ -1005,7 +1008,7 @@ function AlphaWorld:AddCitizen(class, name, traits, options)
     table.insert(self.citizens, citizen)
     self.stats.totalPopulation = #self.citizens
 
-    self:LogEvent("immigration", citizen.name .. " joined the town", {class = citizen.class})
+    self:LogEvent("immigration", citizen.name .. " joined the town", { class = citizen.class })
 
     return citizen
 end
@@ -1013,14 +1016,44 @@ end
 function AlphaWorld:RemoveCitizen(citizen, reason)
     for i, c in ipairs(self.citizens) do
         if c.id == citizen.id then
+            -- Remove from workplace if assigned
+            if citizen.workplace then
+                for j, w in ipairs(citizen.workplace.workers) do
+                    if w.id == citizen.id then
+                        table.remove(citizen.workplace.workers, j)
+                        break
+                    end
+                end
+                citizen.workplace = nil
+            end
+
+            -- Remove from housing system
+            if self.housingSystem and citizen.housingId then
+                self.housingSystem:UnassignHousing(citizen.id)
+            end
+
+            -- Remove from economics system
+            if self.economicsSystem then
+                self.economicsSystem:RemoveCharacter(citizen.id)
+            end
+
+            -- Remove from spatial hash
+            if self.citizenHash then
+                self.citizenHash:Remove(citizen)
+            end
+
+            -- Clean up movement state
+            CharacterMovement.CleanupCitizen(citizen)
+
+            -- Remove from citizens table
             table.remove(self.citizens, i)
             self.stats.totalPopulation = #self.citizens
 
             if reason == "emigration" then
                 self.stats.totalEmigrations = self.stats.totalEmigrations + 1
-                self:LogEvent("emigration", citizen.name .. " left the town (unsatisfied)", {class = citizen.class})
+                self:LogEvent("emigration", citizen.name .. " left the town (unsatisfied)", { class = citizen.class })
             elseif reason == "death" then
-                self:LogEvent("death", citizen.name .. " passed away", {class = citizen.class})
+                self:LogEvent("death", citizen.name .. " passed away", { class = citizen.class })
             end
 
             return true
@@ -1104,7 +1137,7 @@ function AlphaWorld:AddBuilding(buildingTypeId, x, y, options)
             id = i,
             recipe = nil,
             progress = 0,
-            state = "IDLE",  -- IDLE, PRODUCING, NO_MATERIALS, NO_WORKER
+            state = "IDLE", -- IDLE, PRODUCING, NO_MATERIALS, NO_WORKER
             worker = nil
         })
     end
@@ -1114,7 +1147,8 @@ function AlphaWorld:AddBuilding(buildingTypeId, x, y, options)
 
     -- Register building ownership
     local ownerId = options.ownerId or OwnershipManager.TOWN_OWNER_ID
-    local purchasePrice = options.purchasePrice or (buildingType.constructionCost and buildingType.constructionCost.gold) or 0
+    local purchasePrice = options.purchasePrice or (buildingType.constructionCost and buildingType.constructionCost.gold) or
+        0
     if self.ownershipManager then
         self.ownershipManager:RegisterBuilding(building.id, ownerId, purchasePrice, self.timeManager:GetDay())
     end
@@ -1146,7 +1180,7 @@ function AlphaWorld:AddBuilding(buildingTypeId, x, y, options)
         self.navigationGrid:MarkBuildingArea(x, y, width, height, true)
     end
 
-    self:LogEvent("construction", building.name .. " built", {type = buildingTypeId})
+    self:LogEvent("construction", building.name .. " built", { type = buildingTypeId })
 
     return building
 end
@@ -1217,7 +1251,8 @@ function AlphaWorld:RunFreeAgency()
         if not citizen.workplace then
             local bestBuilding = self:FindBestBuildingForCitizen(citizen)
             if bestBuilding then
-                print("[FreeAgency] " .. citizen.name .. " (" .. (citizen.vocation or "?") .. ") -> " .. bestBuilding.name)
+                print("[FreeAgency] " ..
+                    citizen.name .. " (" .. (citizen.vocation or "?") .. ") -> " .. bestBuilding.name)
                 self:AssignWorkerToBuilding(citizen, bestBuilding)
                 self:LogEvent("employment", citizen.name .. " started working at " .. bestBuilding.name, {})
             end
@@ -1226,14 +1261,15 @@ function AlphaWorld:RunFreeAgency()
             -- Only consider switching if satisfaction at current job is low
             local currentSatisfaction = self:CalculateJobSatisfaction(citizen, citizen.workplace)
             if currentSatisfaction < 50 then
-                local bestBuilding = self:FindBestBuildingForCitizen(citizen, true)  -- exclude current
+                local bestBuilding = self:FindBestBuildingForCitizen(citizen, true) -- exclude current
                 if bestBuilding then
                     local newSatisfaction = self:CalculateJobSatisfaction(citizen, bestBuilding)
                     -- Only switch if new job is significantly better (20+ points)
                     if newSatisfaction > currentSatisfaction + 20 then
                         local oldWorkplace = citizen.workplace
                         self:AssignWorkerToBuilding(citizen, bestBuilding)
-                        self:LogEvent("employment", citizen.name .. " left " .. oldWorkplace.name .. " for " .. bestBuilding.name, {})
+                        self:LogEvent("employment",
+                            citizen.name .. " left " .. oldWorkplace.name .. " for " .. bestBuilding.name, {})
                     end
                 end
             end
@@ -1244,7 +1280,6 @@ end
 function AlphaWorld:FindBestBuildingForCitizen(citizen, excludeCurrent)
     local bestBuilding = nil
     local bestScore = -math.huge
-    local debugVocation = citizen.vocation or "?"
 
     for _, building in ipairs(self.buildings) do
         -- Skip current workplace if requested
@@ -1270,24 +1305,10 @@ function AlphaWorld:FindBestBuildingForCitizen(citizen, excludeCurrent)
             goto continue
         end
 
-        -- Check if citizen is qualified for this building type
-        local buildingType = self.buildingTypesById[building.typeId]
-        local qualified = self:IsCitizenQualifiedForBuilding(citizen, buildingType)
-        if not qualified then
-            -- Debug: Print why Shoemaker was rejected
-            if debugVocation == "Shoemaker" then
-                print("[FindBest] " .. debugVocation .. " NOT qualified for " .. building.name .. " (" .. (building.typeId or "?") .. ")")
-            end
-            goto continue
-        end
 
         -- Calculate job satisfaction score
         local score = self:CalculateJobSatisfaction(citizen, building)
 
-        -- Debug: Print qualified buildings for Shoemaker
-        if debugVocation == "Shoemaker" then
-            print("[FindBest] " .. debugVocation .. " qualified for " .. building.name .. " score=" .. score)
-        end
 
         if score > bestScore then
             bestScore = score
@@ -1301,12 +1322,12 @@ function AlphaWorld:FindBestBuildingForCitizen(citizen, excludeCurrent)
 end
 
 function AlphaWorld:IsCitizenQualifiedForBuilding(citizen, buildingType)
-    if not buildingType then return true end  -- Default allow if no type info
+    if not buildingType then return true end -- Default allow if no type info
 
     -- Check work categories if defined
     local buildingCategories = buildingType.workCategories
     if not buildingCategories or #buildingCategories == 0 then
-        return true  -- No restrictions
+        return true -- No restrictions
     end
 
     -- Get citizen's vocation and look up their work categories from worker_types.json
@@ -1330,7 +1351,7 @@ function AlphaWorld:IsCitizenQualifiedForBuilding(citizen, buildingType)
         if count > 10 then
             print("  ... and " .. (count - 10) .. " more")
         end
-        citizenCategories = {"General Labor"}
+        citizenCategories = { "General Labor" }
     end
 
     -- Check for overlap between citizen's work categories and building's requirements
@@ -1342,11 +1363,11 @@ function AlphaWorld:IsCitizenQualifiedForBuilding(citizen, buildingType)
         end
     end
 
-    return false  -- No matching work categories
+    return false -- No matching work categories
 end
 
 function AlphaWorld:CalculateJobSatisfaction(citizen, building)
-    local score = 50  -- Base score
+    local score = 50 -- Base score
 
     -- Factor 1: Distance from home (citizens prefer closer workplaces)
     if citizen.homeX and citizen.homeY and building.x and building.y then
@@ -1396,19 +1417,31 @@ function AlphaWorld:GetClassBuildingPreference(class, buildingType)
     -- Class preferences for different building types
     local preferences = {
         elite = {
-            luxury = 20, commerce = 15, services = 10,
-            farming = -20, mining = -30, labor = -30
+            luxury = 20,
+            commerce = 15,
+            services = 10,
+            farming = -20,
+            mining = -30,
+            labor = -30
         },
         upper = {
-            commerce = 15, services = 10, manufacturing = 5,
-            farming = -10, mining = -15
+            commerce = 15,
+            services = 10,
+            manufacturing = 5,
+            farming = -10,
+            mining = -15
         },
         middle = {
-            manufacturing = 10, crafting = 10, commerce = 5,
-            farming = 0, mining = -5
+            manufacturing = 10,
+            crafting = 10,
+            commerce = 5,
+            farming = 0,
+            mining = -5
         },
         lower = {
-            farming = 10, mining = 5, labor = 10,
+            farming = 10,
+            mining = 5,
+            labor = 10,
             luxury = -10
         }
     }
@@ -1432,10 +1465,10 @@ function AlphaWorld:DoesCitizenDesireCommodity(citizen, commodity)
     if not commodity.category then return false end
 
     local classDesires = {
-        elite = {"luxury", "exotic", "vice", "services"},
-        upper = {"luxury", "processed_food", "services", "exotic"},
-        middle = {"processed_food", "basic_goods", "services"},
-        lower = {"basic_food", "basic_goods"}
+        elite = { "luxury", "exotic", "vice", "services" },
+        upper = { "luxury", "processed_food", "services", "exotic" },
+        middle = { "processed_food", "basic_goods", "services" },
+        lower = { "basic_food", "basic_goods" }
     }
 
     local desires = classDesires[citizen.class] or classDesires.middle
@@ -1564,7 +1597,7 @@ function AlphaWorld:ValidateBuildingPlacement(buildingType, x, y, width, height)
         local bw = 60
         local bh = 60
         if x < building.x + bw and x + width > building.x and
-           y < building.y + bh and y + height > building.y then
+            y < building.y + bh and y + height > building.y then
             table.insert(errors, "Overlaps with " .. (building.name or "building"))
         end
     end
@@ -1589,7 +1622,7 @@ function AlphaWorld:PlaceBuilding(buildingType, x, y)
     -- Check affordability
     local canAfford, affordError = self:CanAffordBuilding(buildingType)
     if not canAfford then
-        return nil, {affordError}
+        return nil, { affordError }
     end
 
     -- Deduct costs
@@ -1654,9 +1687,9 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
             if not hasWorker then
                 station.state = "NO_WORKER"
                 -- Record blocked state if we were producing
-                if station.cycleStartTime then
+                if station.gameTimeElapsed then
                     self:RecordProductionHistory(building, station, "blocked_no_worker", {}, {})
-                    station.cycleStartTime = nil
+                    station.gameTimeElapsed = nil
                 end
             else
                 -- Check if we have materials
@@ -1664,7 +1697,8 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
                 local hasMaterials = true
                 for commodityId, quantity in pairs(station.recipe.inputs or {}) do
                     -- Handle both dictionary format and array format
-                    local inputId = type(commodityId) == "string" and commodityId or (quantity.commodityId or commodityId)
+                    local inputId = type(commodityId) == "string" and commodityId or
+                        (quantity.commodityId or commodityId)
                     local inputQty = type(quantity) == "number" and quantity or (quantity.quantity or 1)
                     local available = self:GetInventoryCount(inputId)
                     if available < inputQty then
@@ -1676,17 +1710,19 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
                 if not hasMaterials then
                     station.state = "NO_MATERIALS"
                     -- Record blocked state if we were producing
-                    if station.cycleStartTime then
+                    if station.gameTimeElapsed then
                         self:RecordProductionHistory(building, station, "blocked_no_materials", {}, {})
-                        station.cycleStartTime = nil
+                        station.gameTimeElapsed = nil
                     end
                 else
                     station.state = "PRODUCING"
 
-                    -- Track cycle start time for history
-                    if not station.cycleStartTime then
-                        station.cycleStartTime = love.timer.getTime()
+                    -- Track game-time elapsed for history (initialize if starting new cycle)
+                    if not station.gameTimeElapsed then
+                        station.gameTimeElapsed = 0
                     end
+                    -- Accumulate game-time (dt is already scaled by speed multiplier)
+                    station.gameTimeElapsed = station.gameTimeElapsed + dt
 
                     -- Progress production
                     local productionTime = station.recipe.productionTime or 10
@@ -1705,7 +1741,8 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
 
                         -- Consume inputs and record stats
                         for commodityId, quantity in pairs(station.recipe.inputs or {}) do
-                            local inputId = type(commodityId) == "string" and commodityId or (quantity.commodityId or commodityId)
+                            local inputId = type(commodityId) == "string" and commodityId or
+                                (quantity.commodityId or commodityId)
                             local inputQty = type(quantity) == "number" and quantity or (quantity.quantity or 1)
                             self:RemoveFromInventory(inputId, inputQty)
                             inputsConsumed[inputId] = inputQty
@@ -1717,7 +1754,8 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
 
                         -- Produce outputs and record stats
                         for commodityId, quantity in pairs(station.recipe.outputs or {}) do
-                            local outputId = type(commodityId) == "string" and commodityId or (quantity.commodityId or commodityId)
+                            local outputId = type(commodityId) == "string" and commodityId or
+                                (quantity.commodityId or commodityId)
                             local outputQty = type(quantity) == "number" and quantity or (quantity.quantity or 1)
                             self:AddToInventory(outputId, outputQty)
                             outputsProduced[outputId] = outputQty
@@ -1729,7 +1767,7 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
 
                         -- Record production history
                         self:RecordProductionHistory(building, station, "completed", inputsConsumed, outputsProduced)
-                        station.cycleStartTime = nil  -- Reset for next cycle
+                        station.gameTimeElapsed = nil -- Reset for next cycle
 
                         self:LogEvent("production", building.name .. " produced " .. station.recipe.name, {})
                     end
@@ -1748,10 +1786,8 @@ function AlphaWorld:RecordProductionHistory(building, station, status, inputs, o
     end
 
     local now = love.timer.getTime()
-    local duration = 0
-    if station.cycleStartTime then
-        duration = now - station.cycleStartTime
-    end
+    -- Use accumulated game-time elapsed (already scaled by speed multiplier)
+    local duration = station.gameTimeElapsed or 0
 
     -- Calculate current game cycle
     local day = self.timeManager:GetDay() or 1
@@ -1785,11 +1821,14 @@ function AlphaWorld:UpdateConsumption(dt)
     local speedMultiplier = 300 / self.timeManager.secondsPerDay
     local scaledDt = dt * speedMultiplier
 
+    -- Baseline slot duration (at normal speed: 300s/day / 6 slots = 50s)
+    local baselineSecondsPerSlot = 300 / #self.timeSlots
+
     -- Accumulate cravings for each citizen
     -- Pass active cravings for current slot for slot-based accumulation
     local activeCravings = self:GetActiveCravingsForSlot()
     for _, citizen in ipairs(self.citizens) do
-        citizen:UpdateCurrentCravings(scaledDt, activeCravings)
+        citizen:UpdateCurrentCravings(scaledDt, activeCravings, baselineSecondsPerSlot)
     end
 end
 
@@ -1804,23 +1843,11 @@ function AlphaWorld:ProcessSlotConsumption()
         fairnessEnabled = true
     })
 
-    -- Apply allocations (result is the list of allocations directly)
+    -- Note: AllocateCycle already handles inventory modification and craving fulfillment
+    -- via AllocateForCharacter -> ProcessAllocation -> FulfillCraving
+    -- We just need to log the summary here
+
     if allocations and #allocations > 0 then
-        for _, allocation in ipairs(allocations) do
-            local citizen = allocation.character
-            local commodityId = allocation.commodityId
-            local quantity = allocation.quantity
-
-            if citizen and commodityId and quantity then
-                -- Remove from inventory
-                self:RemoveFromInventory(commodityId, quantity)
-
-                -- Apply to character
-                citizen:Consume(commodityId, quantity)
-            end
-        end
-
-        -- Log summary
         self:LogEvent("consumption", #allocations .. " allocations made", {})
     end
 end
@@ -1853,10 +1880,10 @@ end
 
 function AlphaWorld:GetBuildingAt(x, y)
     for _, building in ipairs(self.buildings) do
-        local bw = 60  -- building width
-        local bh = 60  -- building height
+        local bw = 60 -- building width
+        local bh = 60 -- building height
         if x >= building.x and x <= building.x + bw and
-           y >= building.y and y <= building.y + bh then
+            y >= building.y and y <= building.y + bh then
             return building
         end
     end
@@ -1954,7 +1981,7 @@ end
 function AlphaWorld:UpdatePathfinding(dt)
     if not self.pathfinder then return end
 
-    local maxPerFrame = 3  -- Limit path calculations per frame
+    local maxPerFrame = 3 -- Limit path calculations per frame
     local count = 0
 
     for _, citizen in ipairs(self.citizens) do
@@ -2325,8 +2352,8 @@ function AlphaWorld:CreateBuildingFromData(data)
         x = data.x,
         y = data.y,
         name = data.name or buildingDef.name,
-        workers = {},  -- Will be filled when loading citizens
-        workerIds = data.workers or {},  -- Store for later linking
+        workers = {},                   -- Will be filled when loading citizens
+        workerIds = data.workers or {}, -- Store for later linking
         stations = data.stations or buildingDef.stations or 1,
         maxWorkers = buildingDef.maxWorkers or 2,
         isPaused = data.isPaused or false,

@@ -2972,6 +2972,15 @@ function AlphaUI:UpdatePlacement(mouseX, mouseY)
             table.insert(self.placementErrors, "Must build on your purchased land plots")
         end
     end
+
+    -- Additional validation: check affordability (only for town placement, not immigrant placement)
+    if self.placementValid and not self.placementOwnerCitizen then
+        local canAfford, affordError = self.world:CanAffordBuilding(self.placementBuildingType)
+        if not canAfford then
+            self.placementValid = false
+            table.insert(self.placementErrors, affordError or "Cannot afford building")
+        end
+    end
 end
 
 -- Check if the building placement is within any of the restricted plots

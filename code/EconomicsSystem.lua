@@ -421,6 +421,23 @@ function EconomicsSystem:Deserialize(data)
     print("[EconomicsSystem] Deserialized economic data")
 end
 
+-- Remove a character from the economics system (e.g., on emigration/death)
+function EconomicsSystem:RemoveCharacter(characterId)
+    if not characterId then return false end
+
+    -- Remove from finances tracking
+    if self.characterFinances[characterId] then
+        self.characterFinances[characterId] = nil
+    end
+
+    -- Remove from class cache
+    if self.classCache[characterId] then
+        self.classCache[characterId] = nil
+    end
+
+    return true
+end
+
 -- ============================================================================
 -- Constants
 -- ============================================================================
