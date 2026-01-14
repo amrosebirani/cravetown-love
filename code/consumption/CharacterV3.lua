@@ -49,6 +49,35 @@ CharacterV3.DEFAULT_DIFFICULTY_SETTINGS = {
     }
 }
 
+-- Current difficulty level (default to normal)
+CharacterV3._currentDifficulty = "normal"
+
+-- Set difficulty settings for the satisfaction system
+function CharacterV3.SetDifficultySettings(difficulty)
+    if CharacterV3.DEFAULT_DIFFICULTY_SETTINGS[difficulty] then
+        CharacterV3._currentDifficulty = difficulty
+        CharacterV3._DifficultySettings = CharacterV3.DEFAULT_DIFFICULTY_SETTINGS[difficulty]
+        print("[CharacterV3] Difficulty set to: " .. difficulty)
+    else
+        print("[CharacterV3] Warning: Unknown difficulty '" .. tostring(difficulty) .. "', using normal")
+        CharacterV3._currentDifficulty = "normal"
+        CharacterV3._DifficultySettings = CharacterV3.DEFAULT_DIFFICULTY_SETTINGS.normal
+    end
+end
+
+-- Get current difficulty settings
+function CharacterV3.GetDifficultySettings()
+    if not CharacterV3._DifficultySettings then
+        CharacterV3._DifficultySettings = CharacterV3.DEFAULT_DIFFICULTY_SETTINGS[CharacterV3._currentDifficulty or "normal"]
+    end
+    return CharacterV3._DifficultySettings
+end
+
+-- Get current difficulty level name
+function CharacterV3.GetCurrentDifficulty()
+    return CharacterV3._currentDifficulty or "normal"
+end
+
 -- Initialize data (called once at prototype start)
 function CharacterV3.Init(mechanicsData, fulfillmentData, traitsData, classesData, dimensionsData, fatigueData,
                           enablementData, classThresholdsData)
@@ -646,6 +675,172 @@ function CharacterV3:UpdateSatisfaction(currentCycle)
 end
 
 -- =============================================================================
+-- LAYER 8: Streak Tracking Functions (Delayed Reaction Satisfaction System)
+-- =============================================================================
+
+-- Record fulfillment for a fine dimension (called when craving is successfully satisfied)
+function CharacterV3:RecordFulfillment(fineIndex, points)
+    if not self.todayFulfillment then
+        self.todayFulfillment = {}
+    end
+    self.todayFulfillment[fineIndex] = (self.todayFulfillment[fineIndex] or 0) + points
+end
+
+-- Reset daily fulfillment tracking (called at start of each new day)
+function CharacterV3:ResetDailyFulfillment()
+    self.todayFulfillment = {}
+    for i = 0, CharacterV3.GetFineMaxIndex() do
+        self.todayFulfillment[i] = 0
+    end
+end
+
+-- Update streak for a specific dimension based on whether it was fulfilled this slot
+-- Called during slot processing when allocation succeeds or fails
+function CharacterV3:UpdateStreakForDimension(fineIndex, wasFulfilled, currentDay)
+    if not self.cravingStreaks then
+        self.cravingStreaks = {}
+    end
+
+    -- Initialize streak if not present
+    if not self.cravingStreaks[fineIndex] then
+        self.cravingStreaks[fineIndex] = {
+            type = "met",
+            days = 1,
+            lastUpdated = currentDay or 0
+        }
+    end
+
+    local streak = self.cravingStreaks[fineIndex]
+
+    -- Determine the new streak type based on fulfillment
+    local newType = wasFulfilled and "met" or "unmet"
+
+    -- Update streak
+    if streak.type == newType then
+        -- Same type continues, increment days
+        streak.days = streak.days + 1
+    else
+        -- Type changed, reset to 1 day
+        streak.type = newType
+        streak.days = 1
+    end
+
+    streak.lastUpdated = currentDay or 0
+end
+
+-- Check if craving is considered "met" based on today's fulfillment
+-- A craving is met if it received at least some fulfillment points today
+function CharacterV3:IsCravingMet(fineIndex, threshold)
+    threshold = threshold or 0.1 -- Minimal threshold for "met"
+
+    if not self.todayFulfillment then
+        return false
+    end
+
+    local fulfilled = self.todayFulfillment[fineIndex] or 0
+    return fulfilled >= threshold
+end
+
+-- Calculate penalty for an unfulfilled craving based on streak
+-- Returns the penalty amount to subtract from satisfaction
+function CharacterV3:CalculatePenaltyForStreak(fineIndex)
+    local streak = self.cravingStreaks and self.cravingStreaks[fineIndex]
+
+    -- If no streak tracking yet or craving was being met, small base penalty
+    if not streak or streak.type ~= "unmet" then
+        return 1.0  -- Base penalty for first failure
+    end
+
+    local settings = CharacterV3.GetDifficultySettings()
+    local N = settings.bufferDays or 5
+    local days = streak.days
+
+    if days <= N then
+        -- Within buffer period: small linear penalty (0.5 to 1.0)
+        -- Grace period where penalties are minimal
+        return 0.5 + (days / N) * 0.5
+    else
+        -- Beyond buffer: exponential increase based on PR #2 formula
+        -- penalty = exp((days - N) * decayExponent) * decayMultiplier
+        local x = days - N
+        local baseDecay = math.exp(x * (settings.decayExponent or 0.08))
+        return math.min(10, baseDecay * (settings.decayMultiplier or 1.0))
+    end
+end
+
+-- Calculate satisfaction gain for a fulfilled craving based on streak
+-- Returns the gain multiplier
+function CharacterV3:CalculateGainForStreak(fineIndex)
+    local streak = self.cravingStreaks and self.cravingStreaks[fineIndex]
+
+    -- If no streak tracking yet or craving was being unmet, use base gain
+    if not streak or streak.type ~= "met" then
+        return 1.0  -- Base gain
+    end
+
+    local settings = CharacterV3.GetDifficultySettings()
+    local N = settings.bufferDays or 5
+    local days = streak.days
+
+    if days <= N then
+        -- Within buffer period: normal gain
+        return 1.0
+    else
+        -- Beyond buffer: logarithmic increase (slower than decay)
+        -- gain = 1 + log(1 + (days - N) / gainLogScale) * gainMultiplier
+        local x = days - N
+        local logGain = math.log(1 + x / (settings.gainLogScale or 20))
+        return 1.0 + logGain * (settings.gainMultiplier or 1.0)
+    end
+end
+
+-- Apply penalty when a craving cannot be fulfilled during slot allocation
+-- This is the main function called by AllocationEngineV2 on failure
+function CharacterV3:ApplyUnfulfilledCravingPenalty(fineIndex, currentDay)
+    -- Update streak: craving was NOT met this slot
+    self:UpdateStreakForDimension(fineIndex, false, currentDay)
+
+    -- Calculate penalty based on streak
+    local penalty = self:CalculatePenaltyForStreak(fineIndex)
+
+    -- Apply penalty to fine satisfaction
+    if penalty > 0 then
+        local currentSat = self.satisfactionFine[fineIndex] or 50
+        local newSat = math.max(-100, currentSat - penalty)
+        self.satisfactionFine[fineIndex] = newSat
+
+        -- Recompute coarse satisfaction
+        CharacterV3.ComputeCoarseSatisfaction(self)
+
+        -- Debug logging (can be removed later)
+        if penalty > 2.0 then
+            local fineName = CharacterV3.fineNames[fineIndex] or "unknown"
+            local streak = self.cravingStreaks[fineIndex]
+            print(string.format("  [Penalty] %s: %s (idx %d) penalty=%.2f, streak=%d days, sat: %.1f -> %.1f",
+                self.name, fineName, fineIndex, penalty,
+                streak and streak.days or 0, currentSat, newSat))
+        end
+    end
+
+    return penalty
+end
+
+-- Apply satisfaction gain when craving is successfully fulfilled
+-- This enhances the existing gain based on streak
+function CharacterV3:ApplyFulfilledCravingBonus(fineIndex, baseGain, currentDay)
+    -- Update streak: craving WAS met this slot
+    self:UpdateStreakForDimension(fineIndex, true, currentDay)
+
+    -- Record fulfillment for daily tracking
+    self:RecordFulfillment(fineIndex, baseGain)
+
+    -- Calculate gain multiplier based on streak
+    local gainMultiplier = self:CalculateGainForStreak(fineIndex)
+
+    return baseGain * gainMultiplier
+end
+
+-- =============================================================================
 -- LAYER 5: Calculate Commodity Multiplier (Slot-Based Fatigue)
 -- =============================================================================
 
@@ -823,6 +1018,7 @@ function CharacterV3:FulfillCraving(commodity, quantity, currentCycle, allocatio
     end
 
     -- LAYER 4: Increase fine-level satisfaction (then compute coarse)
+    -- LAYER 8: Apply streak-based gain bonus and record fulfillment
     for fineDimId, points in pairs(fineVector) do
         if points and points > 0 then
             -- Find fine dimension index
@@ -835,10 +1031,16 @@ function CharacterV3:FulfillCraving(commodity, quantity, currentCycle, allocatio
             end
 
             if fineIndex then
-                -- Boost fine satisfaction directly
-                local boost = points * qualityMultiplier * fatigueMultiplier * quantity * 0.5
+                -- Calculate base boost for fine satisfaction
+                local baseBoost = points * qualityMultiplier * fatigueMultiplier * quantity * 0.5
+
+                -- LAYER 8: Apply streak-based gain multiplier and record fulfillment
+                -- This updates the streak to "met" and potentially increases gain for long streaks
+                local enhancedBoost = self:ApplyFulfilledCravingBonus(fineIndex, baseBoost, currentCycle)
+
+                -- Apply enhanced boost to fine satisfaction
                 local currentSat = self.satisfactionFine[fineIndex] or 50
-                self.satisfactionFine[fineIndex] = math.min(300, currentSat + boost)
+                self.satisfactionFine[fineIndex] = math.min(300, currentSat + enhancedBoost)
             end
         end
     end

@@ -625,6 +625,14 @@ end
 function AlphaWorld:OnDayChange(dayNumber)
     self:LogEvent("day", "Day " .. dayNumber .. " begins", {})
 
+    -- LAYER 8: Reset daily fulfillment tracking for all citizens (Streak System)
+    -- This prepares streak tracking for the new day
+    for _, citizen in ipairs(self.citizens) do
+        if citizen.ResetDailyFulfillment then
+            citizen:ResetDailyFulfillment()
+        end
+    end
+
     -- Update immigration system
     if self.immigrationSystem then
         self.immigrationSystem:Update(dayNumber)

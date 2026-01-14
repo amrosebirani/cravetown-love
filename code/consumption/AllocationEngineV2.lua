@@ -857,6 +857,14 @@ function AllocationEngineV2.AllocateCycleV2(characters, townInventory, currentCy
                         -- Record failed attempt for fairness system
                         if currentCraving > CRAVING_THRESHOLD then
                             character:RecordAllocationAttempt(false, currentCycle)
+
+                            -- LAYER 8: Apply immediate satisfaction penalty based on streak
+                            -- This penalizes citizens whose active cravings cannot be fulfilled
+                            -- Penalty magnitude increases with consecutive days of unmet craving
+                            if character.ApplyUnfulfilledCravingPenalty then
+                                character:ApplyUnfulfilledCravingPenalty(fineIdx, currentCycle)
+                            end
+
                             allocationLog.stats.failed = allocationLog.stats.failed + 1
                         end
                         break
