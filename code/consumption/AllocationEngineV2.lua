@@ -816,6 +816,24 @@ function AllocationEngineV2.AllocateCycleV2(characters, townInventory, currentCy
                 -- Check if citizen has accumulated craving for this dimension
                 local currentCraving = character.currentCravings[fineIdx] or 0
 
+                -- Skip if no craving to fulfill
+                if currentCraving <= CRAVING_THRESHOLD then
+                    goto continue_character
+                end
+
+                -- Check if ANY commodities are available for this craving
+                if #availableCommodities == 0 then
+                    -- No commodities available at all - apply penalty immediately
+                    character:RecordAllocationAttempt(false, currentCycle)
+
+                    if character.ApplyUnfulfilledCravingPenalty then
+                        character:ApplyUnfulfilledCravingPenalty(fineIdx, currentCycle)
+                    end
+
+                    allocationLog.stats.failed = allocationLog.stats.failed + 1
+                    goto continue_character
+                end
+
                 -- Keep consuming until craving drained or no commodities available
                 while currentCraving > CRAVING_THRESHOLD and #availableCommodities > 0 do
                     local allocated = false
@@ -831,14 +849,16 @@ function AllocationEngineV2.AllocateCycleV2(characters, townInventory, currentCy
                             local unitsToAllocate = math.min(unitsNeeded, entry.qty)
 
                             -- Allocate multiple units
-                            local success, totalGain = AllocationEngineV2.AllocateMultipleUnits(
+                            local success, _ = AllocationEngineV2.AllocateMultipleUnits(
                                 character, entry.id, unitsToAllocate, townInventory, currentCycle, allocationLog
                             )
 
                             if success then
-                                -- Update local tracking
+                                -- Update local commodity tracking
                                 entry.qty = entry.qty - unitsToAllocate
-                                currentCraving = currentCraving - totalGain
+
+                                -- Re-read actual craving from character (FulfillCraving already applied the gain)
+                                currentCraving = character.currentCravings[fineIdx] or 0
 
                                 -- Remove depleted commodity
                                 if entry.qty == 0 then
@@ -855,21 +875,21 @@ function AllocationEngineV2.AllocateCycleV2(characters, townInventory, currentCy
                     -- If no allocation possible (no acceptable commodities), move to next citizen
                     if not allocated then
                         -- Record failed attempt for fairness system
-                        if currentCraving > CRAVING_THRESHOLD then
-                            character:RecordAllocationAttempt(false, currentCycle)
+                        character:RecordAllocationAttempt(false, currentCycle)
 
-                            -- LAYER 8: Apply immediate satisfaction penalty based on streak
-                            -- This penalizes citizens whose active cravings cannot be fulfilled
-                            -- Penalty magnitude increases with consecutive days of unmet craving
-                            if character.ApplyUnfulfilledCravingPenalty then
-                                character:ApplyUnfulfilledCravingPenalty(fineIdx, currentCycle)
-                            end
-
-                            allocationLog.stats.failed = allocationLog.stats.failed + 1
+                        -- LAYER 8: Apply immediate satisfaction penalty based on streak
+                        -- This penalizes citizens whose active cravings cannot be fulfilled
+                        -- Penalty magnitude increases with consecutive days of unmet craving
+                        if character.ApplyUnfulfilledCravingPenalty then
+                            character:ApplyUnfulfilledCravingPenalty(fineIdx, currentCycle)
                         end
+
+                        allocationLog.stats.failed = allocationLog.stats.failed + 1
                         break
                     end
                 end
+
+                ::continue_character::
             end
         end
     end
