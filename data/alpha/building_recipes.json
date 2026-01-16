@@ -49,35 +49,35 @@
       "name": "Bakery",
       "recipeName": "Bread Baking",
       "category": "Consumable",
-      "productionTime": 180,
+      "productionTime": 120,
       "inputs": {
         "wheat": 10
       },
       "outputs": {
-        "bread": 8
+        "bread": 10
       },
-      "notes": "3 minutes. 10 wheat produces 8 bread loaves."
+      "notes": "2 min. Rebalanced from 180s. 3 minutes. 10 wheat produces 8 bread loaves...."
     },
     {
       "buildingType": "bakery",
       "name": "Bakery",
       "recipeName": "Pav Baking",
       "category": "Consumable",
-      "productionTime": 240,
+      "productionTime": 180,
       "inputs": {
         "flour": 12
       },
       "outputs": {
         "pav": 20
       },
-      "notes": "4 minutes. 12 kg flour produces 20 pav buns."
+      "notes": "3 min. Rebalanced from 240s. 4 minutes. 12 kg flour produces 20 pav buns...."
     },
     {
       "buildingType": "restaurant",
       "name": "Restaurant",
       "recipeName": "Meal Preparation",
       "category": "Consumable",
-      "productionTime": 300,
+      "productionTime": 180,
       "inputs": {
         "grain": 5,
         "vegetable": 5
@@ -85,36 +85,36 @@
       "outputs": {
         "meal": 10
       },
-      "notes": "5 minutes. Makes 10 meals from grains and vegetables."
+      "notes": "3 min. Rebalanced from 300s. 5 minutes. Makes 10 meals from grains and vegetabl..."
     },
     {
       "buildingType": "bar",
       "name": "Bar",
       "recipeName": "Beer Brewing",
       "category": "Consumable",
-      "productionTime": 7200,
+      "productionTime": 900,
       "inputs": {
-        "wheat": 20,
-        "barley": 20
+        "wheat": 5,
+        "barley": 5
       },
       "outputs": {
-        "beer": 30
+        "beer": 7
       },
-      "notes": "2 hours brewing. 40 grain produces 30 beer bottles."
+      "notes": "15 min. Rebalanced from 7200s. 2 hours brewing. 40 grain produces 30 beer bottles..."
     },
     {
       "buildingType": "bar",
       "name": "Bar",
       "recipeName": "Whiskey Distilling",
       "category": "Consumable",
-      "productionTime": 14400,
+      "productionTime": 1140,
       "inputs": {
-        "rye": 30
+        "rye": 7
       },
       "outputs": {
-        "whiskey": 20
+        "whiskey": 5
       },
-      "notes": "4 hours distilling. 30 rye produces 20 whiskey bottles."
+      "notes": "19 min. Rebalanced from 14400s. 4 hours distilling. 30 rye produces 20 whiskey bot..."
     },
     {
       "buildingType": "butcher",
@@ -206,14 +206,14 @@
       "name": "Textile Mill",
       "recipeName": "Linen Weaving",
       "category": "Merchandise",
-      "productionTime": 2400,
+      "productionTime": 480,
       "inputs": {
-        "flax": 30
+        "flax": 15
       },
       "outputs": {
-        "linen": 15
+        "linen": 7
       },
-      "notes": "40 minutes. 30 kg flax produces 15 meters linen."
+      "notes": "8 min. Rebalanced from 2400s. 40 minutes. 30 kg flax produces 15 meters linen...."
     },
     {
       "buildingType": "textile_mill",
@@ -325,79 +325,79 @@
       "name": "Tailor Shop",
       "recipeName": "Work Clothes Making",
       "category": "Merchandise",
-      "productionTime": 2400,
+      "productionTime": 786,
       "inputs": {
-        "cloth": 15,
-        "thread": 10,
-        "leather": 3
+        "cloth": 7,
+        "thread": 5,
+        "leather": 1
       },
       "outputs": {
-        "work_clothes": 3
+        "work_clothes": 1
       },
-      "notes": "40 minutes. Reinforced work clothes with leather patches."
+      "notes": "13m 6s. Rebalanced from 2400s. 40 minutes. Reinforced work clothes with leather p..."
     },
     {
       "buildingType": "tailor_shop",
       "name": "Tailor Shop",
       "recipeName": "Fine Clothes Making",
       "category": "Merchandise",
-      "productionTime": 3000,
+      "productionTime": 786,
       "inputs": {
-        "linen": 12,
-        "thread": 10
+        "linen": 6,
+        "thread": 5
       },
       "outputs": {
-        "fine_clothes": 3
+        "fine_clothes": 1
       },
-      "notes": "50 minutes. Fine linen clothes."
+      "notes": "13m 6s. Rebalanced from 3000s. 50 minutes. Fine linen clothes...."
     },
     {
       "buildingType": "tailor_shop",
       "name": "Tailor Shop",
       "recipeName": "Luxury Clothes Making",
       "category": "Merchandise",
-      "productionTime": 5400,
+      "productionTime": 990,
       "inputs": {
-        "silk": 8,
-        "thread": 15,
+        "silk": 4,
+        "thread": 7,
         "gold": 1
       },
       "outputs": {
-        "luxury_clothes": 2
+        "luxury_clothes": 1
       },
-      "notes": "1.5 hours. Luxurious silk clothing with gold trim."
+      "notes": "16m 30s. Rebalanced from 5400s. 1.5 hours. Luxurious silk clothing with gold trim...."
     },
     {
       "buildingType": "tailor_shop",
       "name": "Tailor Shop",
       "recipeName": "Winter Coat Making",
       "category": "Merchandise",
-      "productionTime": 3600,
+      "productionTime": 786,
       "inputs": {
-        "wool": 20,
-        "cloth": 10,
-        "thread": 12
+        "wool": 10,
+        "cloth": 5,
+        "thread": 6
       },
       "outputs": {
-        "winter_coat": 2
+        "winter_coat": 1
       },
-      "notes": "1 hour. Warm wool winter coats."
+      "notes": "13m 6s. Rebalanced from 3600s. 1 hour. Warm wool winter coats...."
     },
     {
       "buildingType": "tailor_shop",
       "name": "Tailor Shop",
       "recipeName": "Boots Making",
       "category": "Merchandise",
-      "productionTime": 2400,
+      "productionTime": 786,
       "inputs": {
-        "leather": 15,
-        "thread": 8,
-        "nails": 10
+        "leather": 7,
+        "thread": 4,
+        "nails": 5
       },
       "outputs": {
-        "boots": 4
+        "boots": 2
       },
-      "notes": "40 minutes. Sturdy leather boots."
+      "notes": "13m 6s. Rebalanced from 2400s. 40 minutes. Sturdy leather boots...."
     },
     {
       "buildingType": "tailor_shop",
@@ -434,28 +434,28 @@
       "name": "Brickyard",
       "recipeName": "Brick Production",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1080,
       "inputs": {
-        "clay": 50
+        "clay": 20
       },
       "outputs": {
-        "bricks": 100
+        "bricks": 40
       },
-      "notes": "1 hour. 50 kg clay produces 100 bricks."
+      "notes": "18 min. Rebalanced from 3600s. 1 hour. 50 kg clay produces 100 bricks...."
     },
     {
       "buildingType": "brickyard",
       "name": "Brickyard",
       "recipeName": "Tile Production",
       "category": "Production",
-      "productionTime": 2700,
+      "productionTime": 1080,
       "inputs": {
-        "clay": 40
+        "clay": 16
       },
       "outputs": {
-        "tiles": 80
+        "tiles": 32
       },
-      "notes": "45 minutes. 40 kg clay produces 80 tiles."
+      "notes": "18 min. Rebalanced from 2700s. 45 minutes. 40 kg clay produces 80 tiles...."
     },
     {
       "buildingType": "brickyard",
@@ -476,548 +476,548 @@
       "name": "Farm",
       "recipeName": "Wheat Farming",
       "category": "Production",
-      "productionTime": 2880,
+      "productionTime": 480,
       "inputs": {
-        "wheat_seed": 20
+        "wheat_seed": 5
       },
       "outputs": {
-        "wheat": 100,
-        "wheat_seed": 30
+        "wheat": 25,
+        "wheat_seed": 7
       },
-      "notes": "2 hours. 20 seeds produces 10 wheat and 30 seeds."
+      "notes": "8 min. Rebalanced from 2880s. 2 hours. 20 seeds produces 10 wheat and 30 seeds...."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Apple Cultivation",
       "category": "Production",
-      "productionTime": 259200,
+      "productionTime": 1440,
       "inputs": {
-        "apple_sapling": 5
+        "apple_sapling": 2
       },
       "outputs": {
-        "apple": 150,
-        "apple_sapling": 8
+        "apple": 22,
+        "apple_sapling": 3
       },
-      "notes": "3 days. 5 saplings produces 150 apples and 8 new saplings."
+      "notes": "24 min. 2 saplings produces 22 apples and 3 new saplings. Rebalanced from 259200s."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Mango Cultivation",
       "category": "Production",
-      "productionTime": 345600,
+      "productionTime": 1560,
       "inputs": {
-        "mango_sapling": 4
+        "mango_sapling": 2
       },
       "outputs": {
-        "mango": 120,
-        "mango_sapling": 6
+        "mango": 18,
+        "mango_sapling": 3
       },
-      "notes": "4 days. 4 saplings produces 120 mangoes and 6 new saplings."
+      "notes": "26 min. 2 saplings produces 18 mangoes and 3 new saplings. Rebalanced from 345600s."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Orange Cultivation",
       "category": "Production",
-      "productionTime": 259200,
+      "productionTime": 1440,
       "inputs": {
-        "orange_sapling": 5
+        "orange_sapling": 2
       },
       "outputs": {
-        "orange": 180,
-        "orange_sapling": 7
+        "orange": 26,
+        "orange_sapling": 3
       },
-      "notes": "3 days. 5 saplings produces 180 oranges and 7 new saplings."
+      "notes": "24 min. 2 saplings produces 26 oranges and 3 new saplings. Rebalanced from 259200s."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Grape Cultivation",
       "category": "Production",
-      "productionTime": 172800,
+      "productionTime": 1320,
       "inputs": {
-        "grape_vine": 10
+        "grape_vine": 3
       },
       "outputs": {
-        "grapes": 200,
-        "grape_vine": 15
+        "grapes": 30,
+        "grape_vine": 4
       },
-      "notes": "2 days. 10 vines produces 200 grapes and 15 new vine cuttings."
+      "notes": "22 min. 3 vines produces 30 grapes and 4 new vine cuttings. Rebalanced from 172800s."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Berry Cultivation",
       "category": "Production",
-      "productionTime": 86400,
+      "productionTime": 1200,
       "inputs": {
-        "berry_bush": 12
+        "berry_bush": 3
       },
       "outputs": {
-        "berries": 100,
-        "berry_bush": 18
+        "berries": 15,
+        "berry_bush": 4
       },
-      "notes": "1 day. 12 bushes produces 100 berries and 18 new bush seedlings."
+      "notes": "20 min. 3 bushes produces 15 berries and 4 new bush seedlings. Rebalanced from 86400s."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Peach Cultivation",
       "category": "Production",
-      "productionTime": 259200,
+      "productionTime": 1440,
       "inputs": {
-        "peach_sapling": 5
+        "peach_sapling": 2
       },
       "outputs": {
-        "peach": 130,
-        "peach_sapling": 7
+        "peach": 20,
+        "peach_sapling": 3
       },
-      "notes": "3 days. 5 saplings produces 130 peaches and 7 new saplings."
+      "notes": "24 min. 2 saplings produces 20 peaches and 3 new saplings. Rebalanced from 259200s."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Pear Cultivation",
       "category": "Production",
-      "productionTime": 259200,
+      "productionTime": 1440,
       "inputs": {
-        "pear_sapling": 5
+        "pear_sapling": 2
       },
       "outputs": {
-        "pear": 140,
-        "pear_sapling": 7
+        "pear": 21,
+        "pear_sapling": 3
       },
-      "notes": "3 days. 5 saplings produces 140 pears and 7 new saplings."
+      "notes": "24 min. 2 saplings produces 21 pears and 3 new saplings. Rebalanced from 259200s."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Watermelon Cultivation",
       "category": "Production",
-      "productionTime": 129600,
+      "productionTime": 1200,
       "inputs": {
-        "watermelon_seed": 15
+        "watermelon_seed": 4
       },
       "outputs": {
-        "watermelon": 40,
-        "watermelon_seed": 25
+        "watermelon": 6,
+        "watermelon_seed": 6
       },
-      "notes": "1.5 days. 15 seeds produces 40 watermelons and 25 new seeds."
+      "notes": "20 min. 4 seeds produces 6 watermelons and 6 new seeds. Rebalanced from 129600s."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Date Palm Cultivation",
       "category": "Production",
-      "productionTime": 432000,
+      "productionTime": 1680,
       "inputs": {
-        "date_palm_sapling": 3
+        "date_palm_sapling": 1
       },
       "outputs": {
-        "date": 200,
-        "date_palm_sapling": 5
+        "date": 25,
+        "date_palm_sapling": 2
       },
-      "notes": "5 days. 3 saplings produces 200 dates and 5 new saplings."
+      "notes": "28 min. 1 sapling produces 25 dates and 2 new saplings. Rebalanced from 432000s."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Cotton Farming",
       "category": "Production",
-      "productionTime": 2880,
+      "productionTime": 480,
       "inputs": {
-        "cotton_seed": 10
+        "cotton_seed": 2
       },
       "outputs": {
-        "cotton": 80,
-        "cotton_seed": 15
+        "cotton": 20,
+        "cotton_seed": 3
       },
-      "notes": "2 hours. 10 seeds produces 80 cotton."
+      "notes": "8 min. Rebalanced from 2880s. 2 hours. 10 seeds produces 80 cotton...."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Flax Farming",
       "category": "Production",
-      "productionTime": 2520,
+      "productionTime": 480,
       "inputs": {
-        "flax_seed": 15
+        "flax_seed": 3
       },
       "outputs": {
-        "flax": 80,
-        "flax_seed": 25
+        "flax": 20,
+        "flax_seed": 6
       },
-      "notes": "1.75 hours. 15 seeds produces 80 kg flax and 25 seeds."
+      "notes": "8 min. Rebalanced from 2520s. 1.75 hours. 15 seeds produces 80 kg flax and 25 se..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Maize Farming",
       "category": "Production",
-      "productionTime": 2880,
+      "productionTime": 480,
       "inputs": {
-        "maize_seed": 20
+        "maize_seed": 5
       },
       "outputs": {
-        "maize": 100,
-        "maize_seed": 30
+        "maize": 25,
+        "maize_seed": 7
       },
-      "notes": "2 hours. 20 seeds produces 10 maize and 30 seeds."
+      "notes": "8 min. Rebalanced from 2880s. 2 hours. 20 seeds produces 10 maize and 30 seeds...."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Rice Farming",
       "category": "Production",
-      "productionTime": 2880,
+      "productionTime": 480,
       "inputs": {
-        "rice_seed": 20
+        "rice_seed": 5
       },
       "outputs": {
-        "rice": 100,
-        "rice_seed": 30
+        "rice": 25,
+        "rice_seed": 7
       },
-      "notes": "2 hours. 20 seeds produces 10 rice and 30 seeds."
+      "notes": "8 min. Rebalanced from 2880s. 2 hours. 20 seeds produces 10 rice and 30 seeds...."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Barley Farming",
       "category": "Production",
-      "productionTime": 2880,
+      "productionTime": 480,
       "inputs": {
-        "barley_seeds": 20
+        "barley_seeds": 5
       },
       "outputs": {
-        "barley": 100,
-        "barley_seeds": 30
+        "barley": 25,
+        "barley_seeds": 7
       },
-      "notes": "2 hours. 20 seeds produces 10 barley and 30 seeds."
+      "notes": "8 min. Rebalanced from 2880s. 2 hours. 20 seeds produces 10 barley and 30 seeds...."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Oats Farming",
       "category": "Production",
-      "productionTime": 2880,
+      "productionTime": 480,
       "inputs": {
-        "oats_seeds": 20
+        "oats_seeds": 5
       },
       "outputs": {
-        "oats": 100,
-        "oats_seeds": 30
+        "oats": 25,
+        "oats_seeds": 7
       },
-      "notes": "2 hours. 20 seeds produces 10 oats and 30 seeds."
+      "notes": "8 min. Rebalanced from 2880s. 2 hours. 20 seeds produces 10 oats and 30 seeds...."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Rye Farming",
       "category": "Production",
-      "productionTime": 2880,
+      "productionTime": 480,
       "inputs": {
-        "rye_seeds": 20
+        "rye_seeds": 5
       },
       "outputs": {
-        "rye": 90,
-        "rye_seeds": 30
+        "rye": 22,
+        "rye_seeds": 7
       },
-      "notes": "2 hours. 20 seeds produces 10 rye and 30 seeds."
+      "notes": "8 min. Rebalanced from 2880s. 2 hours. 20 seeds produces 10 rye and 30 seeds...."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Ragi Farming",
       "category": "Production",
-      "productionTime": 2990,
+      "productionTime": 480,
       "inputs": {
-        "ragi_seeds": 85
+        "ragi_seeds": 21
       },
       "outputs": {
-        "ragi": 10,
-        "ragi_seeds": 30
+        "ragi": 2,
+        "ragi_seeds": 7
       },
-      "notes": "2 hours. 20 seeds produces 10 ragi and 30 seeds."
+      "notes": "8 min. Rebalanced from 2990s. 2 hours. 20 seeds produces 10 ragi and 30 seeds...."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Potato Farming",
       "category": "Production",
-      "productionTime": 2880,
+      "productionTime": 480,
       "inputs": {
-        "potato_seed": 15
+        "potato_seed": 3
       },
       "outputs": {
-        "potato": 120,
-        "potato_seed": 25
+        "potato": 30,
+        "potato_seed": 6
       },
-      "notes": "2 hours. 15 seed potatoes produces 120 potatoes and 25 seed potatoes."
+      "notes": "8 min. Rebalanced from 2880s. 2 hours. 15 seed potatoes produces 120 potatoes an..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Carrot Farming",
       "category": "Production",
-      "productionTime": 2700,
+      "productionTime": 480,
       "inputs": {
-        "carrot_seed": 20
+        "carrot_seed": 5
       },
       "outputs": {
-        "carrot": 100,
-        "carrot_seed": 30
+        "carrot": 25,
+        "carrot_seed": 7
       },
-      "notes": "1.5 hours. 20 seeds produces 100 carrots and 30 seeds."
+      "notes": "8 min. Rebalanced from 2700s. 1.5 hours. 20 seeds produces 100 carrots and 30 se..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Onion Farming",
       "category": "Production",
-      "productionTime": 3150,
+      "productionTime": 480,
       "inputs": {
-        "onion_seed": 20
+        "onion_seed": 5
       },
       "outputs": {
-        "onion": 90,
-        "onion_seed": 30
+        "onion": 22,
+        "onion_seed": 7
       },
-      "notes": "1.75 hours. 20 seeds produces 90 onions and 30 seeds."
+      "notes": "8 min. Rebalanced from 3150s. 1.75 hours. 20 seeds produces 90 onions and 30 see..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Cabbage Farming",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 480,
       "inputs": {
-        "cabbage_seed": 15
+        "cabbage_seed": 3
       },
       "outputs": {
-        "cabbage": 60,
-        "cabbage_seed": 22
+        "cabbage": 15,
+        "cabbage_seed": 5
       },
-      "notes": "2 hours. 15 seeds produces 60 cabbages and 22 seeds."
+      "notes": "8 min. Rebalanced from 3600s. 2 hours. 15 seeds produces 60 cabbages and 22 seed..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Tomato Farming",
       "category": "Production",
-      "productionTime": 2700,
+      "productionTime": 480,
       "inputs": {
-        "tomato_seed": 12
+        "tomato_seed": 3
       },
       "outputs": {
-        "tomato": 80,
-        "tomato_seed": 20
+        "tomato": 20,
+        "tomato_seed": 5
       },
-      "notes": "1.5 hours. 12 seeds produces 80 tomatoes and 20 seeds."
+      "notes": "8 min. Rebalanced from 2700s. 1.5 hours. 12 seeds produces 80 tomatoes and 20 se..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Lettuce Farming",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 480,
       "inputs": {
-        "lettuce_seed": 25
+        "lettuce_seed": 6
       },
       "outputs": {
-        "lettuce": 70,
-        "lettuce_seed": 35
+        "lettuce": 17,
+        "lettuce_seed": 8
       },
-      "notes": "1 hour. 25 seeds produces 70 lettuce heads and 35 seeds."
+      "notes": "8 min. Rebalanced from 3600s. 1 hour. 25 seeds produces 70 lettuce heads and 35 ..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Bean Farming",
       "category": "Production",
-      "productionTime": 4500,
+      "productionTime": 600,
       "inputs": {
-        "bean_seed": 20
+        "bean_seed": 5
       },
       "outputs": {
-        "beans": 100,
-        "bean_seed": 35
+        "beans": 25,
+        "bean_seed": 8
       },
-      "notes": "1.25 hours. 20 seeds produces 100 beans and 35 seeds."
+      "notes": "10 min. Rebalanced from 4500s. 1.25 hours. 20 seeds produces 100 beans and 35 see..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Pumpkin Farming",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 600,
       "inputs": {
-        "pumpkin_seed": 10
+        "pumpkin_seed": 2
       },
       "outputs": {
-        "pumpkin": 30,
-        "pumpkin_seed": 20
+        "pumpkin": 7,
+        "pumpkin_seed": 5
       },
-      "notes": "3 hours. 10 seeds produces 30 pumpkins and 20 seeds."
+      "notes": "10 min. Rebalanced from 5400s. 3 hours. 10 seeds produces 30 pumpkins and 20 seed..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Broccoli Farming",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 600,
       "inputs": {
-        "broccoli_seed": 15
+        "broccoli_seed": 3
       },
       "outputs": {
-        "broccoli": 50,
-        "broccoli_seed": 22
+        "broccoli": 12,
+        "broccoli_seed": 5
       },
-      "notes": "1.5 hours. 15 seeds produces 50 broccoli heads and 22 seeds."
+      "notes": "10 min. Rebalanced from 5400s. 1.5 hours. 15 seeds produces 50 broccoli heads and..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Pepper Farming",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 600,
       "inputs": {
-        "pepper_seed": 15
+        "pepper_seed": 3
       },
       "outputs": {
-        "pepper": 70,
-        "pepper_seed": 25
+        "pepper": 17,
+        "pepper_seed": 6
       },
-      "notes": "1.5 hours. 15 seeds produces 70 peppers and 25 seeds."
+      "notes": "10 min. Rebalanced from 5400s. 1.5 hours. 15 seeds produces 70 peppers and 25 see..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Lentil Farming",
       "category": "Production",
-      "productionTime": 3150,
+      "productionTime": 480,
       "inputs": {
-        "lentil_seed": 15
+        "lentil_seed": 3
       },
       "outputs": {
-        "lentils": 80,
-        "lentil_seed": 25
+        "lentils": 20,
+        "lentil_seed": 6
       },
-      "notes": "1.75 hours. 15 seeds produces 80 kg lentils and 25 seeds."
+      "notes": "8 min. Rebalanced from 3150s. 1.75 hours. 15 seeds produces 80 kg lentils and 25..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Mustard Farming",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 600,
       "inputs": {
-        "mustard_seed": 10
+        "mustard_seed": 2
       },
       "outputs": {
-        "mustard_seed": 60
+        "mustard_seed": 15
       },
-      "notes": "1.5 hours. 10 seeds produces 60 kg mustard seeds."
+      "notes": "10 min. Rebalanced from 5400s. 1.5 hours. 10 seeds produces 60 kg mustard seeds...."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Sesame Farming",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 600,
       "inputs": {
-        "sesame_seed": 10
+        "sesame_seed": 2
       },
       "outputs": {
-        "sesame_seed": 50
+        "sesame_seed": 12
       },
-      "notes": "1.5 hours. 10 seeds produces 50 kg sesame seeds."
+      "notes": "10 min. Rebalanced from 5400s. 1.5 hours. 10 seeds produces 50 kg sesame seeds...."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Groundnut Farming",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 480,
       "inputs": {
-        "groundnut_seed": 15
+        "groundnut_seed": 3
       },
       "outputs": {
-        "groundnut": 100,
-        "groundnut_seed": 25
+        "groundnut": 25,
+        "groundnut_seed": 6
       },
-      "notes": "2 hours. 15 seeds produces 100 kg groundnuts and 25 seeds."
+      "notes": "8 min. Rebalanced from 3600s. 2 hours. 15 seeds produces 100 kg groundnuts and 2..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Sunflower Farming",
       "category": "Production",
-      "productionTime": 6300,
+      "productionTime": 600,
       "inputs": {
-        "sunflower_seed": 12
+        "sunflower_seed": 3
       },
       "outputs": {
-        "sunflower_seed": 70
+        "sunflower_seed": 17
       },
-      "notes": "1.75 hours. 12 seeds produces 70 kg sunflower seeds."
+      "notes": "10 min. Rebalanced from 6300s. 1.75 hours. 12 seeds produces 70 kg sunflower seed..."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Coconut Cultivation",
       "category": "Production",
-      "productionTime": 518400,
+      "productionTime": 1800,
       "inputs": {
-        "coconut_palm_sapling": 3
+        "coconut_palm_sapling": 1
       },
       "outputs": {
-        "coconut": 100,
-        "coconut_palm_sapling": 5
+        "coconut": 15,
+        "coconut_palm_sapling": 2
       },
-      "notes": "6 days. 3 palms produces 100 coconuts and 5 new saplings."
+      "notes": "30 min. 1 palm produces 15 coconuts and 2 new saplings. Rebalanced from 518400s."
     },
     {
       "buildingType": "orchard",
       "name": "Orchard",
       "recipeName": "Rubber Tree Cultivation",
       "category": "Production",
-      "productionTime": 259200,
+      "productionTime": 1440,
       "inputs": {
-        "rubber_tree_sapling": 5
+        "rubber_tree_sapling": 2
       },
       "outputs": {
-        "latex": 80,
-        "rubber_tree_sapling": 7
+        "latex": 12,
+        "rubber_tree_sapling": 3
       },
-      "notes": "3 days. 5 rubber trees produces 80L latex and 7 new saplings."
+      "notes": "24 min. 2 rubber trees produces 12L latex and 3 new saplings. Rebalanced from 259200s."
     },
     {
       "buildingType": "hunting_lodge",
       "name": "Hunting Lodge",
       "recipeName": "Chicken Hunting",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1080,
       "inputs": {},
       "outputs": {
-        "chicken_meat": 8,
-        "feathers": 12
+        "chicken_meat": 2,
+        "feathers": 3
       },
-      "notes": "1 hour. Hunts wild fowl, produces 8 chicken meat and 12 feathers."
+      "notes": "18 min. Rebalanced from 3600s. 1 hour. Hunts wild fowl, produces 8 chicken meat a..."
     },
     {
       "buildingType": "hunting_lodge",
       "name": "Hunting Lodge",
       "recipeName": "Cattle Hunting",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 1320,
       "inputs": {},
       "outputs": {
-        "beef": 25,
-        "leather": 6
+        "beef": 6,
+        "leather": 1
       },
-      "notes": "3 hours. Hunts wild cattle, produces 25 beef and 6 leather."
+      "notes": "22 min. Rebalanced from 10800s. 3 hours. Hunts wild cattle, produces 25 beef and 6..."
     },
     {
       "buildingType": "furniture_shop",
@@ -1039,46 +1039,46 @@
       "name": "Furniture Shop",
       "recipeName": "Table & Chairs Set",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 1080,
       "inputs": {
-        "lumber": 50,
-        "nails": 30
+        "lumber": 25,
+        "nails": 15
       },
       "outputs": {
         "table": 1,
-        "chair": 4
+        "chair": 2
       },
-      "notes": "40 minutes. Makes 1 table and 4 chairs."
+      "notes": "18 min. Rebalanced from 2400s. 40 minutes. Makes 1 table and 4 chairs...."
     },
     {
       "buildingType": "furniture_shop",
       "name": "Furniture Shop",
       "recipeName": "Wardrobe Crafting",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1080,
       "inputs": {
-        "lumber": 80,
-        "nails": 40
+        "lumber": 40,
+        "nails": 20
       },
       "outputs": {
         "wardrobe": 1
       },
-      "notes": "1 hour. Makes 1 wardrobe."
+      "notes": "18 min. Rebalanced from 3600s. 1 hour. Makes 1 wardrobe...."
     },
     {
       "buildingType": "furniture_shop",
       "name": "Furniture Shop",
       "recipeName": "Cabinet Crafting",
       "category": "Production",
-      "productionTime": 2700,
+      "productionTime": 1080,
       "inputs": {
-        "lumber": 60,
-        "nails": 30
+        "lumber": 30,
+        "nails": 15
       },
       "outputs": {
         "cabinet": 1
       },
-      "notes": "45 minutes. Makes 1 cabinet."
+      "notes": "18 min. Rebalanced from 2700s. 45 minutes. Makes 1 cabinet...."
     },
     {
       "buildingType": "furniture_shop",
@@ -1100,30 +1100,30 @@
       "name": "Furniture Shop",
       "recipeName": "Bookshelf Crafting",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 1080,
       "inputs": {
-        "lumber": 45,
-        "nails": 25
+        "lumber": 22,
+        "nails": 12
       },
       "outputs": {
         "bookshelf": 1
       },
-      "notes": "40 minutes. Makes 1 bookshelf."
+      "notes": "18 min. Rebalanced from 2400s. 40 minutes. Makes 1 bookshelf...."
     },
     {
       "buildingType": "furniture_shop",
       "name": "Furniture Shop",
       "recipeName": "Desk Crafting",
       "category": "Production",
-      "productionTime": 2100,
+      "productionTime": 1080,
       "inputs": {
-        "lumber": 40,
-        "nails": 20
+        "lumber": 20,
+        "nails": 10
       },
       "outputs": {
         "desk": 1
       },
-      "notes": "35 minutes. Makes 1 desk."
+      "notes": "18 min. Rebalanced from 2100s. 35 minutes. Makes 1 desk...."
     },
     {
       "buildingType": "furniture_shop",
@@ -1176,16 +1176,16 @@
       "name": "Furniture Shop",
       "recipeName": "Chest Crafting",
       "category": "Production",
-      "productionTime": 2100,
+      "productionTime": 1080,
       "inputs": {
-        "lumber": 30,
-        "iron": 5,
-        "nails": 20
+        "lumber": 15,
+        "iron": 2,
+        "nails": 10
       },
       "outputs": {
         "chest": 1
       },
-      "notes": "35 minutes. Makes 1 chest with lock."
+      "notes": "18 min. Rebalanced from 2100s. 35 minutes. Makes 1 chest with lock...."
     },
     {
       "buildingType": "furniture_shop",
@@ -1251,90 +1251,90 @@
       "name": "Forge",
       "recipeName": "Iron Smelting",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 954,
       "inputs": {
-        "iron_ore": 50,
-        "coal": 20
+        "iron_ore": 15,
+        "coal": 6
       },
       "outputs": {
-        "iron": 30
+        "iron": 9
       },
-      "notes": "1 hour. 50 kg iron ore + 20 kg coal produces 30 kg refined iron."
+      "notes": "15m 54s. Rebalanced from 3600s. 1 hour. 50 kg iron ore + 20 kg coal produces 30 kg..."
     },
     {
       "buildingType": "forge",
       "name": "Forge",
       "recipeName": "Copper Smelting",
       "category": "Production",
-      "productionTime": 3000,
+      "productionTime": 954,
       "inputs": {
-        "copper_ore": 40,
-        "coal": 15
+        "copper_ore": 12,
+        "coal": 4
       },
       "outputs": {
-        "copper": 25
+        "copper": 7
       },
-      "notes": "50 minutes. 40 kg copper ore + 15 kg coal produces 25 kg refined copper."
+      "notes": "15m 54s. Rebalanced from 3000s. 50 minutes. 40 kg copper ore + 15 kg coal produces..."
     },
     {
       "buildingType": "forge",
       "name": "Forge",
       "recipeName": "Steel Production",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 1110,
       "inputs": {
-        "iron": 30,
-        "coal": 30
+        "iron": 9,
+        "coal": 9
       },
       "outputs": {
-        "steel": 20
+        "steel": 6
       },
-      "notes": "1.5 hours. 30 kg iron + 30 kg coal produces 20 kg steel."
+      "notes": "18m 30s. Rebalanced from 5400s. 1.5 hours. 30 kg iron + 30 kg coal produces 20 kg ..."
     },
     {
       "buildingType": "forge",
       "name": "Forge",
       "recipeName": "Gold Refining",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1110,
       "inputs": {
-        "gold_ore": 20,
-        "coal": 10
+        "gold_ore": 6,
+        "coal": 3
       },
       "outputs": {
-        "gold": 5
+        "gold": 1
       },
-      "notes": "2 hours. 20 kg gold ore + 10 kg coal produces 5 kg refined gold."
+      "notes": "18m 30s. Rebalanced from 7200s. 2 hours. 20 kg gold ore + 10 kg coal produces 5 kg..."
     },
     {
       "buildingType": "forge",
       "name": "Forge",
       "recipeName": "Silver Refining",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 1110,
       "inputs": {
-        "silver_ore": 25,
-        "coal": 10
+        "silver_ore": 7,
+        "coal": 3
       },
       "outputs": {
-        "silver": 12
+        "silver": 3
       },
-      "notes": "1.5 hours. 25 kg silver ore + 10 kg coal produces 12 kg refined silver."
+      "notes": "18m 30s. Rebalanced from 5400s. 1.5 hours. 25 kg silver ore + 10 kg coal produces ..."
     },
     {
       "buildingType": "forge",
       "name": "Forge",
       "recipeName": "Bronze Alloy",
       "category": "Production",
-      "productionTime": 2700,
+      "productionTime": 954,
       "inputs": {
-        "copper": 20,
-        "coal": 10
+        "copper": 6,
+        "coal": 3
       },
       "outputs": {
-        "bronze": 18
+        "bronze": 5
       },
-      "notes": "45 minutes. 20 kg copper + 10 kg coal produces 18 kg bronze alloy."
+      "notes": "15m 54s. Rebalanced from 2700s. 45 minutes. 20 kg copper + 10 kg coal produces 18 ..."
     },
     {
       "buildingType": "blacksmith",
@@ -1386,30 +1386,30 @@
       "name": "Blacksmith",
       "recipeName": "Saw Forging",
       "category": "Production",
-      "productionTime": 2100,
+      "productionTime": 960,
       "inputs": {
-        "iron": 20,
-        "wood": 8
+        "iron": 6,
+        "wood": 2
       },
       "outputs": {
-        "saw": 4
+        "saw": 1
       },
-      "notes": "35 minutes. Iron and wood produces 4 saws."
+      "notes": "16 min. Rebalanced from 2100s. 35 minutes. Iron and wood produces 4 saws...."
     },
     {
       "buildingType": "blacksmith",
       "name": "Blacksmith",
       "recipeName": "Pickaxe Forging",
       "category": "Production",
-      "productionTime": 2100,
+      "productionTime": 960,
       "inputs": {
-        "iron": 18,
-        "wood": 12
+        "iron": 5,
+        "wood": 3
       },
       "outputs": {
-        "pickaxe": 4
+        "pickaxe": 1
       },
-      "notes": "35 minutes. Iron and wood produces 4 pickaxes."
+      "notes": "16 min. Rebalanced from 2100s. 35 minutes. Iron and wood produces 4 pickaxes...."
     },
     {
       "buildingType": "blacksmith",
@@ -1431,15 +1431,15 @@
       "name": "Blacksmith",
       "recipeName": "Scythe Forging",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "iron": 20,
-        "wood": 15
+        "iron": 6,
+        "wood": 4
       },
       "outputs": {
-        "scythe": 3
+        "scythe": 1
       },
-      "notes": "40 minutes. Iron and wood produces 3 scythes."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Iron and wood produces 3 scythes...."
     },
     {
       "buildingType": "blacksmith",
@@ -1488,108 +1488,108 @@
       "name": "Mine",
       "recipeName": "Iron Ore Mining",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1350,
       "inputs": {},
       "outputs": {
-        "iron_ore": 50
+        "iron_ore": 10
       },
-      "notes": "2 hours. Extracts 50 kg iron ore."
+      "notes": "22m 30s. Rebalanced from 7200s. 2 hours. Extracts 50 kg iron ore...."
     },
     {
       "buildingType": "mine",
       "name": "Mine",
       "recipeName": "Copper Ore Mining",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1350,
       "inputs": {},
       "outputs": {
-        "copper_ore": 40
+        "copper_ore": 8
       },
-      "notes": "2 hours. Extracts 40 kg copper ore."
+      "notes": "22m 30s. Rebalanced from 7200s. 2 hours. Extracts 40 kg copper ore...."
     },
     {
       "buildingType": "mine",
       "name": "Mine",
       "recipeName": "Gold Ore Mining",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 1530,
       "inputs": {},
       "outputs": {
-        "gold_ore": 5
+        "gold_ore": 1
       },
-      "notes": "3 hours. Extracts 5 kg gold ore. Precious and rare."
+      "notes": "25m 30s. Rebalanced from 10800s. 3 hours. Extracts 5 kg gold ore. Precious and rare..."
     },
     {
       "buildingType": "mine",
       "name": "Mine",
       "recipeName": "Silver Ore Mining",
       "category": "Production",
-      "productionTime": 9000,
+      "productionTime": 1530,
       "inputs": {},
       "outputs": {
-        "silver_ore": 10
+        "silver_ore": 2
       },
-      "notes": "2.5 hours. Extracts 10 kg silver ore."
+      "notes": "25m 30s. Rebalanced from 9000s. 2.5 hours. Extracts 10 kg silver ore...."
     },
     {
       "buildingType": "mine",
       "name": "Mine",
       "recipeName": "Coal Mining",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 1350,
       "inputs": {},
       "outputs": {
-        "coal": 100
+        "coal": 20
       },
-      "notes": "1.5 hours. Extracts 100 kg coal."
+      "notes": "22m 30s. Rebalanced from 5400s. 1.5 hours. Extracts 100 kg coal...."
     },
     {
       "buildingType": "mine",
       "name": "Mine",
       "recipeName": "Stone Quarrying",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1170,
       "inputs": {},
       "outputs": {
-        "stone": 150
+        "stone": 30
       },
-      "notes": "1 hour. Quarries 150 kg stone."
+      "notes": "19m 30s. Rebalanced from 3600s. 1 hour. Quarries 150 kg stone...."
     },
     {
       "buildingType": "mine",
       "name": "Mine",
       "recipeName": "Marble Quarrying",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 1530,
       "inputs": {},
       "outputs": {
-        "marble": 30
+        "marble": 6
       },
-      "notes": "3 hours. Carefully quarries 30 kg marble."
+      "notes": "25m 30s. Rebalanced from 10800s. 3 hours. Carefully quarries 30 kg marble...."
     },
     {
       "buildingType": "mine",
       "name": "Mine",
       "recipeName": "Clay Extraction",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1170,
       "inputs": {},
       "outputs": {
-        "clay": 80
+        "clay": 16
       },
-      "notes": "1 hour. Extracts 80 kg clay."
+      "notes": "19m 30s. Rebalanced from 3600s. 1 hour. Extracts 80 kg clay...."
     },
     {
       "buildingType": "mine",
       "name": "Mine",
       "recipeName": "Sand Extraction",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1170,
       "inputs": {},
       "outputs": {
-        "sand": 120
+        "sand": 24
       },
-      "notes": "1 hour. Extracts 120 kg sand."
+      "notes": "19m 30s. Rebalanced from 3600s. 1 hour. Extracts 120 kg sand...."
     },
     {
       "buildingType": "bakery",
@@ -1612,44 +1612,44 @@
       "name": "Farm",
       "recipeName": "Sugarcane Farming",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 600,
       "inputs": {
-        "sugarcane_cutting": 10
+        "sugarcane_cutting": 2
       },
       "outputs": {
-        "sugar_cane": 90,
-        "sugarcane_cutting": 15
+        "sugar_cane": 22,
+        "sugarcane_cutting": 3
       },
-      "notes": "3 hours. 10 cuttings produces 80 kg sugarcane and 15 new cuttings."
+      "notes": "10 min. Rebalanced from 5400s. 3 hours. 10 cuttings produces 80 kg sugarcane and ..."
     },
     {
       "buildingType": "sugar_mill",
       "name": "Sugar Mill",
       "recipeName": "Sugar Refining",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "sugar_cane": 50
+        "sugar_cane": 15
       },
       "outputs": {
-        "sugar": 10,
-        "molasses": 5
+        "sugar": 3,
+        "molasses": 1
       },
-      "notes": "1 hour. 50 kg sugarcane produces 10 kg sugar and 5 L molasses."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. 50 kg sugarcane produces 10 kg sugar and 5..."
     },
     {
       "buildingType": "distillery",
       "name": "Distillery",
       "recipeName": "Rum Distilling",
       "category": "Production",
-      "productionTime": 14400,
+      "productionTime": 1440,
       "inputs": {
-        "molasses": 20
+        "molasses": 5
       },
       "outputs": {
-        "rum": 15
+        "rum": 3
       },
-      "notes": "4 hours. 20 L molasses produces 15 bottles of rum."
+      "notes": "24 min. Rebalanced from 14400s. 4 hours. 20 L molasses produces 15 bottles of rum...."
     },
     {
       "buildingType": "confectionery",
@@ -1670,12 +1670,12 @@
       "name": "Logging Camp",
       "recipeName": "Tree Felling",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {},
       "outputs": {
-        "tree": 4
+        "tree": 1
       },
-      "notes": "1 hour. Fells 4 trees from the forest."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Fells 4 trees from the forest...."
     },
     {
       "buildingType": "logging_camp",
@@ -1710,43 +1710,43 @@
       "name": "Charcoal Kiln",
       "recipeName": "Charcoal Burning",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1050,
       "inputs": {
-        "firewood": 100
+        "firewood": 25
       },
       "outputs": {
-        "charcoal": 40
+        "charcoal": 10
       },
-      "notes": "2 hours. 100 kg firewood produces 40 kg charcoal through slow burning."
+      "notes": "17m 30s. Rebalanced from 7200s. 2 hours. 100 kg firewood produces 40 kg charcoal t..."
     },
     {
       "buildingType": "charcoal_kiln",
       "name": "Charcoal Kiln",
       "recipeName": "Charcoal from Timber",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 1110,
       "inputs": {
-        "timber": 5
+        "timber": 1
       },
       "outputs": {
-        "charcoal": 60
+        "charcoal": 15
       },
-      "notes": "3 hours. 5 timber produces 60 kg charcoal directly."
+      "notes": "18m 30s. Rebalanced from 10800s. 3 hours. 5 timber produces 60 kg charcoal directly..."
     },
     {
       "buildingType": "cooperage",
       "name": "Cooperage",
       "recipeName": "Barrel Making",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "planks": 20,
-        "iron": 5
+        "planks": 6,
+        "iron": 1
       },
       "outputs": {
-        "barrel": 4
+        "barrel": 1
       },
-      "notes": "40 minutes. 20 planks and 5 iron produces 4 barrels."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. 20 planks and 5 iron produces 4 barrel..."
     },
     {
       "buildingType": "cooperage",
@@ -1768,12 +1768,12 @@
       "name": "Clay Pit",
       "recipeName": "Clay Extraction",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {},
       "outputs": {
-        "clay": 100
+        "clay": 30
       },
-      "notes": "1 hour. Extracts 100 kg clay from the deposit."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Extracts 100 kg clay from the deposit...."
     },
     {
       "buildingType": "pottery_workshop",
@@ -1808,45 +1808,45 @@
       "name": "Pottery Workshop",
       "recipeName": "Terracotta Crafting",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "clay": 25
+        "clay": 7
       },
       "outputs": {
-        "terracotta": 5
+        "terracotta": 1
       },
-      "notes": "40 minutes. 25 kg clay produces 5 decorative terracotta pieces."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. 25 kg clay produces 5 decorative terra..."
     },
     {
       "buildingType": "pottery_workshop",
       "name": "Pottery Workshop",
       "recipeName": "Fine Pottery Making",
       "category": "Luxury",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "clay": 30,
-        "blue_dye": 2
+        "clay": 9,
+        "blue_dye": 1
       },
       "outputs": {
-        "pottery": 6,
-        "terracotta": 2
+        "pottery": 1,
+        "terracotta": 1
       },
-      "notes": "1 hour. Creates decorated pottery and terracotta using dye."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Creates decorated pottery and terracotta u..."
     },
     {
       "buildingType": "glassworks",
       "name": "Glassworks",
       "recipeName": "Glass Making",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "sand": 50,
-        "coal": 20
+        "sand": 15,
+        "coal": 6
       },
       "outputs": {
-        "glass": 30
+        "glass": 9
       },
-      "notes": "1 hour. 50 kg sand + 20 kg coal produces 30 kg glass."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. 50 kg sand + 20 kg coal produces 30 kg gla..."
     },
     {
       "buildingType": "glassworks",
@@ -1895,15 +1895,15 @@
       "name": "Glassworks",
       "recipeName": "Mirror Making",
       "category": "Luxury",
-      "productionTime": 2700,
+      "productionTime": 960,
       "inputs": {
-        "glass": 10,
-        "silver": 5
+        "glass": 3,
+        "silver": 1
       },
       "outputs": {
-        "mirror": 4
+        "mirror": 1
       },
-      "notes": "45 minutes. 10 kg glass + 5 kg silver produces 4 mirrors."
+      "notes": "16 min. Rebalanced from 2700s. 45 minutes. 10 kg glass + 5 kg silver produces 4 m..."
     },
     {
       "buildingType": "stonecutters",
@@ -1924,98 +1924,98 @@
       "name": "Stonecutters",
       "recipeName": "Column Carving",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 1500,
       "inputs": {
-        "stone": 200
+        "stone": 60
       },
       "outputs": {
-        "column": 2
+        "column": 1
       },
-      "notes": "1.5 hours. 200 kg stone produces 2 architectural columns."
+      "notes": "25 min. Rebalanced from 5400s. 1.5 hours. 200 kg stone produces 2 architectural c..."
     },
     {
       "buildingType": "stonecutters",
       "name": "Stonecutters",
       "recipeName": "Marble Sculpting",
       "category": "Luxury",
-      "productionTime": 10800,
+      "productionTime": 1620,
       "inputs": {
-        "marble": 100
+        "marble": 30
       },
       "outputs": {
         "statue": 1
       },
-      "notes": "3 hours. 100 kg marble produces 1 decorative statue."
+      "notes": "27 min. Rebalanced from 10800s. 3 hours. 100 kg marble produces 1 decorative statu..."
     },
     {
       "buildingType": "stonecutters",
       "name": "Stonecutters",
       "recipeName": "Gravestone Carving",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 1380,
       "inputs": {
-        "stone": 50
+        "stone": 15
       },
       "outputs": {
-        "gravestone": 2
+        "gravestone": 1
       },
-      "notes": "40 minutes. 50 kg stone produces 2 gravestones."
+      "notes": "23 min. Rebalanced from 2400s. 40 minutes. 50 kg stone produces 2 gravestones...."
     },
     {
       "buildingType": "stonecutters",
       "name": "Stonecutters",
       "recipeName": "Marble Column Carving",
       "category": "Luxury",
-      "productionTime": 7200,
+      "productionTime": 1500,
       "inputs": {
-        "marble": 150
+        "marble": 45
       },
       "outputs": {
-        "column": 2
+        "column": 1
       },
-      "notes": "2 hours. 150 kg marble produces 2 decorative marble columns."
+      "notes": "25 min. Rebalanced from 7200s. 2 hours. 150 kg marble produces 2 decorative marbl..."
     },
     {
       "buildingType": "dairy_farm",
       "name": "Dairy Farm",
       "recipeName": "Milk Production",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {},
       "outputs": {
-        "milk": 50
+        "milk": 15
       },
-      "notes": "1 hour. Produces 50 liters of fresh milk."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Produces 50 liters of fresh milk...."
     },
     {
       "buildingType": "sheep_farm",
       "name": "Sheep Farm",
       "recipeName": "Sheep Breeding",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1200,
       "inputs": {
-        "sheep": 4
+        "sheep": 1
       },
       "outputs": {
-        "sheep": 6,
-        "wool": 30
+        "sheep": 1,
+        "wool": 9
       },
-      "notes": "3 days. 4 sheep breeds to 6 sheep plus 30 kg wool."
+      "notes": "20 min. Rebalanced from 7200s. 3 days. 4 sheep breeds to 6 sheep plus 30 kg wool...."
     },
     {
       "buildingType": "sheep_farm",
       "name": "Sheep Farm",
       "recipeName": "Wool Shearing",
       "category": "Production",
-      "productionTime": 6100,
+      "productionTime": 1200,
       "inputs": {
-        "sheep": 10
+        "sheep": 3
       },
       "outputs": {
-        "wool": 40,
-        "sheep": 10
+        "wool": 12,
+        "sheep": 3
       },
-      "notes": "1 day. Shear 10 sheep for 40 kg wool. Non-destructive."
+      "notes": "20 min. Rebalanced from 6100s. 1 day. Shear 10 sheep for 40 kg wool. Non-destruct..."
     },
     {
       "buildingType": "dairy",
@@ -2037,42 +2037,42 @@
       "name": "Dairy",
       "recipeName": "Ghee Making",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 780,
       "inputs": {
-        "butter": 5
+        "butter": 1
       },
       "outputs": {
-        "ghee": 4
+        "ghee": 1
       },
-      "notes": "40 minutes. 5 kg butter produces 4 kg ghee."
+      "notes": "13 min. Rebalanced from 2400s. 40 minutes. 5 kg butter produces 4 kg ghee...."
     },
     {
       "buildingType": "dairy",
       "name": "Dairy",
       "recipeName": "Curd Making",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 900,
       "inputs": {
-        "milk": 15
+        "milk": 4
       },
       "outputs": {
-        "curd": 14
+        "curd": 4
       },
-      "notes": "2 hours. 15L milk produces 14L curd."
+      "notes": "15 min. Rebalanced from 7200s. 2 hours. 15L milk produces 14L curd...."
     },
     {
       "buildingType": "dairy",
       "name": "Dairy",
       "recipeName": "Paneer Making",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 780,
       "inputs": {
-        "milk": 25
+        "milk": 7
       },
       "outputs": {
-        "paneer": 4
+        "paneer": 1
       },
-      "notes": "1 hour. 25L milk produces 4 kg paneer."
+      "notes": "13 min. Rebalanced from 3600s. 1 hour. 25L milk produces 4 kg paneer...."
     },
     {
       "buildingType": "dairy",
@@ -2094,14 +2094,14 @@
       "name": "Dairy",
       "recipeName": "Cheese Making",
       "category": "Production",
-      "productionTime": 14400,
+      "productionTime": 1140,
       "inputs": {
-        "milk": 40
+        "milk": 12
       },
       "outputs": {
-        "cheese": 5
+        "cheese": 1
       },
-      "notes": "4 hours. 40L milk produces 5 kg cheese."
+      "notes": "19 min. Rebalanced from 14400s. 4 hours. 40L milk produces 5 kg cheese...."
     },
     {
       "buildingType": "flour_mill",
@@ -2178,112 +2178,112 @@
       "name": "Rice Mill",
       "recipeName": "Rice Flattening",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "rice": 35
+        "rice": 10
       },
       "outputs": {
-        "flattened_rice": 30
+        "flattened_rice": 9
       },
-      "notes": "40 minutes. 35 kg rice produces 30 kg flattened rice (poha/chiwda)."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. 35 kg rice produces 30 kg flattened ri..."
     },
     {
       "buildingType": "oil_press",
       "name": "Oil Press",
       "recipeName": "Mustard Oil Pressing",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "mustard_seed": 30
+        "mustard_seed": 9
       },
       "outputs": {
-        "oil": 10
+        "oil": 3
       },
-      "notes": "40 minutes. 30 kg mustard seeds produces 10L oil."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. 30 kg mustard seeds produces 10L oil...."
     },
     {
       "buildingType": "oil_press",
       "name": "Oil Press",
       "recipeName": "Sesame Oil Pressing",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "sesame_seed": 25
+        "sesame_seed": 7
       },
       "outputs": {
-        "oil": 10
+        "oil": 3
       },
-      "notes": "40 minutes. 25 kg sesame seeds produces 10L oil."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. 25 kg sesame seeds produces 10L oil...."
     },
     {
       "buildingType": "oil_press",
       "name": "Oil Press",
       "recipeName": "Groundnut Oil Pressing",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "groundnut": 30
+        "groundnut": 9
       },
       "outputs": {
-        "oil": 12
+        "oil": 3
       },
-      "notes": "40 minutes. 30 kg groundnuts produces 12L oil."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. 30 kg groundnuts produces 12L oil...."
     },
     {
       "buildingType": "oil_press",
       "name": "Oil Press",
       "recipeName": "Coconut Oil Pressing",
       "category": "Production",
-      "productionTime": 3000,
+      "productionTime": 960,
       "inputs": {
-        "coconut": 20
+        "coconut": 6
       },
       "outputs": {
-        "oil": 8
+        "oil": 2
       },
-      "notes": "50 minutes. 20 coconuts produces 8L oil."
+      "notes": "16 min. Rebalanced from 3000s. 50 minutes. 20 coconuts produces 8L oil...."
     },
     {
       "buildingType": "oil_press",
       "name": "Oil Press",
       "recipeName": "Sunflower Oil Pressing",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "sunflower_seed": 35
+        "sunflower_seed": 10
       },
       "outputs": {
-        "oil": 12
+        "oil": 3
       },
-      "notes": "40 minutes. 35 kg sunflower seeds produces 12L oil."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. 35 kg sunflower seeds produces 12L oil..."
     },
     {
       "buildingType": "winery",
       "name": "Winery",
       "recipeName": "Wine Making",
       "category": "Production",
-      "productionTime": 86400,
+      "productionTime": 1500,
       "inputs": {
-        "grapes": 100
+        "grapes": 25
       },
       "outputs": {
-        "wine": 30
+        "wine": 8
       },
-      "notes": "1 day. 100 kg grapes produces 30 bottles of wine."
+      "notes": "25 min. Rebalanced from 86400s. 1 day. 100 kg grapes produces 30 bottles of wine...."
     },
     {
       "buildingType": "winery",
       "name": "Winery",
       "recipeName": "Cider Making",
       "category": "Production",
-      "productionTime": 43200,
+      "productionTime": 1200,
       "inputs": {
-        "apple": 80
+        "apple": 20
       },
       "outputs": {
-        "cider": 40
+        "cider": 10
       },
-      "notes": "12 hours. 80 apples produces 40 bottles of cider."
+      "notes": "20 min. Rebalanced from 43200s. 12 hours. 80 apples produces 40 bottles of cider...."
     },
     {
       "buildingType": "winery",
@@ -2304,105 +2304,105 @@
       "name": "Preservery",
       "recipeName": "Berry Jam Making",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 780,
       "inputs": {
-        "berries": 20,
-        "sugar": 10
+        "berries": 6,
+        "sugar": 3
       },
       "outputs": {
-        "jam": 8
+        "jam": 2
       },
-      "notes": "1 hour. 20 kg berries + 10 kg sugar produces 8 kg jam."
+      "notes": "13 min. Rebalanced from 3600s. 1 hour. 20 kg berries + 10 kg sugar produces 8 kg ..."
     },
     {
       "buildingType": "preservery",
       "name": "Preservery",
       "recipeName": "Mango Jam Making",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 780,
       "inputs": {
-        "mango": 25,
-        "sugar": 10
+        "mango": 7,
+        "sugar": 3
       },
       "outputs": {
-        "jam": 10
+        "jam": 3
       },
-      "notes": "1 hour. 25 mangoes + 10 kg sugar produces 10 kg jam."
+      "notes": "13 min. Rebalanced from 3600s. 1 hour. 25 mangoes + 10 kg sugar produces 10 kg ja..."
     },
     {
       "buildingType": "preservery",
       "name": "Preservery",
       "recipeName": "Vegetable Pickling",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 900,
       "inputs": {
-        "carrot": 15,
-        "onion": 10,
-        "salt": 2
+        "carrot": 4,
+        "onion": 3,
+        "salt": 1
       },
       "outputs": {
-        "pickles": 12
+        "pickles": 3
       },
-      "notes": "2 hours. Vegetables + salt produces 12 kg pickles."
+      "notes": "15 min. Rebalanced from 7200s. 2 hours. Vegetables + salt produces 12 kg pickles...."
     },
     {
       "buildingType": "preservery",
       "name": "Preservery",
       "recipeName": "Mango Pickle Making",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 1020,
       "inputs": {
-        "mango": 20,
-        "oil": 5,
-        "spices": 2
+        "mango": 6,
+        "oil": 1,
+        "spices": 1
       },
       "outputs": {
-        "pickles": 15
+        "pickles": 4
       },
-      "notes": "3 hours. 20 mangoes + oil + spices produces 15 kg pickle."
+      "notes": "17 min. Rebalanced from 10800s. 3 hours. 20 mangoes + oil + spices produces 15 kg ..."
     },
     {
       "buildingType": "preservery",
       "name": "Preservery",
       "recipeName": "Fruit Drying",
       "category": "Production",
-      "productionTime": 14400,
+      "productionTime": 1140,
       "inputs": {
-        "grapes": 30
+        "grapes": 9
       },
       "outputs": {
-        "dried_fruit": 8
+        "dried_fruit": 2
       },
-      "notes": "4 hours. 30 kg grapes produces 8 kg dried fruit (raisins)."
+      "notes": "19 min. Rebalanced from 14400s. 4 hours. 30 kg grapes produces 8 kg dried fruit (r..."
     },
     {
       "buildingType": "preservery",
       "name": "Preservery",
       "recipeName": "Date Drying",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 1020,
       "inputs": {
-        "date": 40
+        "date": 12
       },
       "outputs": {
-        "dried_fruit": 12
+        "dried_fruit": 3
       },
-      "notes": "3 hours. 40 dates produces 12 kg dried dates."
+      "notes": "17 min. Rebalanced from 10800s. 3 hours. 40 dates produces 12 kg dried dates...."
     },
     {
       "buildingType": "preservery",
       "name": "Preservery",
       "recipeName": "Tomato Sauce Making",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 780,
       "inputs": {
-        "tomato": 30,
+        "tomato": 9,
         "salt": 1
       },
       "outputs": {
-        "tomato_sauce": 10
+        "tomato_sauce": 3
       },
-      "notes": "40 minutes. 30 tomatoes produces 10L tomato sauce."
+      "notes": "13 min. Rebalanced from 2400s. 40 minutes. 30 tomatoes produces 10L tomato sauce...."
     },
     {
       "buildingType": "tandoor",
@@ -2514,31 +2514,31 @@
       "name": "Sweet Shop",
       "recipeName": "Halwa Making",
       "category": "Production",
-      "productionTime": 2100,
+      "productionTime": 960,
       "inputs": {
-        "flour": 3,
-        "ghee": 2,
-        "sugar": 3
+        "flour": 1,
+        "ghee": 1,
+        "sugar": 1
       },
       "outputs": {
-        "halwa": 10
+        "halwa": 3
       },
-      "notes": "35 minutes. Flour + ghee + sugar produces 10 servings halwa."
+      "notes": "16 min. Rebalanced from 2100s. 35 minutes. Flour + ghee + sugar produces 10 servi..."
     },
     {
       "buildingType": "sweet_shop",
       "name": "Sweet Shop",
       "recipeName": "Rasogulla Making",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "paneer": 8,
-        "sugar": 6
+        "paneer": 2,
+        "sugar": 1
       },
       "outputs": {
-        "rasogulla": 15
+        "rasogulla": 4
       },
-      "notes": "1 hour. 8 kg paneer + 6 kg sugar produces 15 servings of rasogulla."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. 8 kg paneer + 6 kg sugar produces 15 servi..."
     },
     {
       "buildingType": "street_food_kitchen",
@@ -2629,31 +2629,31 @@
       "name": "Restaurant",
       "recipeName": "Idli Making",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 720,
       "inputs": {
-        "rice": 5,
-        "lentils": 2
+        "rice": 1,
+        "lentils": 1
       },
       "outputs": {
-        "idli": 30
+        "idli": 10
       },
-      "notes": "3 hours (includes fermentation). Rice + lentils produces 30 idlis."
+      "notes": "12 min. Rebalanced from 10800s. 3 hours (includes fermentation). Rice + lentils pr..."
     },
     {
       "buildingType": "restaurant",
       "name": "Restaurant",
       "recipeName": "Dosa Making",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 720,
       "inputs": {
-        "rice": 5,
-        "lentils": 2,
+        "rice": 1,
+        "lentils": 1,
         "oil": 1
       },
       "outputs": {
-        "dosa": 20
+        "dosa": 7
       },
-      "notes": "3 hours (includes fermentation). Rice + lentils produces 20 dosas."
+      "notes": "12 min. Rebalanced from 10800s. 3 hours (includes fermentation). Rice + lentils pr..."
     },
     {
       "buildingType": "restaurant",
@@ -2676,17 +2676,17 @@
       "name": "Restaurant",
       "recipeName": "Biryani Cooking",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 480,
       "inputs": {
-        "rice": 5,
-        "chicken_meat": 5,
-        "ghee": 2,
-        "spices": 2
+        "rice": 1,
+        "chicken_meat": 1,
+        "ghee": 1,
+        "spices": 1
       },
       "outputs": {
-        "biryani": 10
+        "biryani": 3
       },
-      "notes": "1 hour. Rice + chicken meat + ghee + spices produces 10 servings biryani."
+      "notes": "8 min. Rebalanced from 3600s. 1 hour. Rice + chicken meat + ghee + spices produc..."
     },
     {
       "buildingType": "restaurant",
@@ -2709,17 +2709,17 @@
       "name": "Restaurant",
       "recipeName": "Pulao Cooking",
       "category": "Production",
-      "productionTime": 2100,
+      "productionTime": 480,
       "inputs": {
-        "rice": 5,
-        "carrot": 5,
-        "beans": 5,
+        "rice": 1,
+        "carrot": 1,
+        "beans": 1,
         "ghee": 1
       },
       "outputs": {
-        "pulao": 10
+        "pulao": 3
       },
-      "notes": "35 minutes. Rice + vegetables + ghee produces 10 servings pulao."
+      "notes": "8 min. Rebalanced from 2100s. 35 minutes. Rice + vegetables + ghee produces 10 s..."
     },
     {
       "buildingType": "restaurant",
@@ -2773,17 +2773,17 @@
       "name": "Restaurant",
       "recipeName": "Stew Cooking",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 480,
       "inputs": {
-        "beef": 5,
-        "potato": 10,
-        "carrot": 5,
-        "onion": 5
+        "beef": 1,
+        "potato": 3,
+        "carrot": 1,
+        "onion": 1
       },
       "outputs": {
-        "stew": 10
+        "stew": 3
       },
-      "notes": "1 hour. Meat + vegetables produces 10 servings stew."
+      "notes": "8 min. Rebalanced from 3600s. 1 hour. Meat + vegetables produces 10 servings ste..."
     },
     {
       "buildingType": "bakery",
@@ -2804,30 +2804,30 @@
       "name": "Bakery",
       "recipeName": "Pie Baking",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "flour": 3,
+        "flour": 1,
         "butter": 1,
-        "apple": 10
+        "apple": 3
       },
       "outputs": {
-        "pie": 4
+        "pie": 1
       },
-      "notes": "40 minutes. Flour + butter + apples produces 4 pies."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Flour + butter + apples produces 4 pie..."
     },
     {
       "buildingType": "rubber_processing",
       "name": "Rubber Processing",
       "recipeName": "Rubber Vulcanization",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "latex": 30
+        "latex": 9
       },
       "outputs": {
-        "rubber": 20
+        "rubber": 6
       },
-      "notes": "1 hour. 30L latex produces 20 kg vulcanized rubber."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. 30L latex produces 20 kg vulcanized rubber..."
     },
     {
       "buildingType": "farm",
@@ -2849,136 +2849,134 @@
       "name": "Farm",
       "recipeName": "Goat Raising",
       "category": "Production",
-      "productionTime": 259200,
+      "productionTime": 1800,
       "inputs": {
-        "goat": 4,
-        "feed": 30
+        "goat": 1
       },
       "outputs": {
-        "goat": 10
+        "goat": 2
       },
-      "notes": "3 days. 4 goats breed to 10 goats with proper feed."
+      "notes": "30 min. Rebalanced from 259200s. 3 days. 4 goats breed to 10 goats with proper feed..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Indigo Farming",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 480,
       "inputs": {
-        "indigo_seed": 10
+        "indigo_seed": 2
       },
       "outputs": {
-        "indigo": 60,
-        "indigo_seed": 15
+        "indigo": 15,
+        "indigo_seed": 3
       },
-      "notes": "2 hours. 10 seeds produces 60 kg indigo and 15 seeds."
+      "notes": "8 min. Rebalanced from 3600s. 2 hours. 10 seeds produces 60 kg indigo and 15 see..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Flower Farming",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 600,
       "inputs": {
-        "flower_seed": 20
+        "flower_seed": 5
       },
       "outputs": {
-        "flowers": 100,
-        "flower_seed": 30
+        "flowers": 25,
+        "flower_seed": 7
       },
-      "notes": "1.5 hours. 20 seeds produces 100 flowers and 30 seeds."
+      "notes": "10 min. Rebalanced from 5400s. 1.5 hours. 20 seeds produces 100 flowers and 30 se..."
     },
     {
       "buildingType": "poultry_farm",
       "name": "Poultry Farm",
       "recipeName": "Egg Collection",
       "category": "Production",
-      "productionTime": 8640,
+      "productionTime": 1440,
       "inputs": {
-        "chicken": 20,
-        "feed": 10
+        "chicken": 6,
+        "feed": 3
       },
       "outputs": {
-        "eggs": 80,
-        "chicken": 20
+        "eggs": 24,
+        "chicken": 6
       },
-      "notes": "1 day. 20 chickens produce 80 eggs. Non-destructive."
+      "notes": "24 min. Rebalanced from 8640s. 1 day. 20 chickens produce 80 eggs. Non-destructiv..."
     },
     {
       "buildingType": "poultry_farm",
       "name": "Poultry Farm",
       "recipeName": "Chicken Raising",
       "category": "Production",
-      "productionTime": 9100,
+      "productionTime": 1440,
       "inputs": {
-        "chicken": 10,
-        "feed": 20
+        "chicken": 3,
+        "feed": 6
       },
       "outputs": {
-        "hen": 12,
-        "chicken": 25,
-        "eggs": 30
+        "hen": 3,
+        "chicken": 7,
+        "eggs": 9
       },
-      "notes": "2 days. 10 chickens breed to 22 chickens plus 30 eggs."
+      "notes": "24 min. Rebalanced from 9100s. 2 days. 10 chickens breed to 22 chickens plus 30 e..."
     },
     {
       "buildingType": "apiary",
       "name": "Apiary",
       "recipeName": "Honey Production",
       "category": "Production",
-      "productionTime": 259200,
+      "productionTime": 1800,
       "inputs": {
         "bee_colony": 5
       },
       "outputs": {
-        "honey": 30,
-        "beeswax": 10,
-        "bee_colony": 6
+        "honey": 5,
+        "beeswax": 2
       },
-      "notes": "3 days. 5 colonies produce 30 honey, 10 beeswax, and grow to 6 colonies."
+      "notes": "30 min. Rebalanced from 259200s. 3 days. 5 colonies produce 30 honey, 10 beeswax, a..."
     },
     {
       "buildingType": "dye_workshop",
       "name": "Dye Workshop",
       "recipeName": "Red Dye Production",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "berries": 30
+        "berries": 9
       },
       "outputs": {
-        "red_dye": 10
+        "red_dye": 3
       },
-      "notes": "40 minutes. 30 kg berries produces 10 kg red dye."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. 30 kg berries produces 10 kg red dye...."
     },
     {
       "buildingType": "dye_workshop",
       "name": "Dye Workshop",
       "recipeName": "Blue Dye Production",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "indigo": 20
+        "indigo": 6
       },
       "outputs": {
-        "blue_dye": 12
+        "blue_dye": 3
       },
-      "notes": "1 hour. 20 kg indigo produces 12 kg blue dye."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. 20 kg indigo produces 12 kg blue dye...."
     },
     {
       "buildingType": "dye_workshop",
       "name": "Dye Workshop",
       "recipeName": "Yellow Dye Production",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "flowers": 40
+        "flowers": 12
       },
       "outputs": {
-        "yellow_dye": 10
+        "yellow_dye": 3
       },
-      "notes": "40 minutes. 40 flowers produces 10 kg yellow dye."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. 40 flowers produces 10 kg yellow dye...."
     },
     {
       "buildingType": "dye_workshop",
@@ -3044,71 +3042,71 @@
       "name": "Tannery",
       "recipeName": "Basic Leather Tanning",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1050,
       "inputs": {
-        "raw_hide": 10
+        "raw_hide": 3
       },
       "outputs": {
-        "leather": 8
+        "leather": 2
       },
-      "notes": "2 hours. 10 raw hides produces 8 leather."
+      "notes": "17m 30s. Rebalanced from 7200s. 2 hours. 10 raw hides produces 8 leather...."
     },
     {
       "buildingType": "tannery",
       "name": "Tannery",
       "recipeName": "Fine Leather Tanning",
       "category": "Production",
-      "productionTime": 14400,
+      "productionTime": 1410,
       "inputs": {
-        "raw_hide": 10
+        "raw_hide": 3
       },
       "outputs": {
-        "tanned_leather": 6
+        "tanned_leather": 2
       },
-      "notes": "4 hours. 10 raw hides produces 6 fine tanned leather."
+      "notes": "23m 30s. Rebalanced from 14400s. 4 hours. 10 raw hides produces 6 fine tanned leath..."
     },
     {
       "buildingType": "paper_mill",
       "name": "Paper Mill",
       "recipeName": "Wood Pulp Production",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "timber": 10
+        "timber": 3
       },
       "outputs": {
-        "wood_pulp": 30
+        "wood_pulp": 9
       },
-      "notes": "1 hour. 10 timber produces 30 kg wood pulp."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. 10 timber produces 30 kg wood pulp...."
     },
     {
       "buildingType": "paper_mill",
       "name": "Paper Mill",
       "recipeName": "Paper Making",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "wood_pulp": 20
+        "wood_pulp": 6
       },
       "outputs": {
-        "paper": 40
+        "paper": 12
       },
-      "notes": "40 minutes. 20 kg wood pulp produces 40 sheets paper."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. 20 kg wood pulp produces 40 sheets pap..."
     },
     {
       "buildingType": "paper_mill",
       "name": "Paper Mill",
       "recipeName": "Fine Paper Making",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "wood_pulp": 25,
-        "cloth": 5
+        "wood_pulp": 7,
+        "cloth": 1
       },
       "outputs": {
-        "fine_paper": 20
+        "fine_paper": 6
       },
-      "notes": "1 hour. Wood pulp with cloth produces fine paper."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Wood pulp with cloth produces fine paper...."
     },
     {
       "buildingType": "dye_workshop",
@@ -3130,95 +3128,95 @@
       "name": "Scriptorium",
       "recipeName": "Book Binding",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1500,
       "inputs": {
-        "paper": 20,
-        "leather": 2,
-        "thread": 5,
-        "ink": 3
+        "paper": 6,
+        "leather": 1,
+        "thread": 1,
+        "ink": 1
       },
       "outputs": {
-        "book": 2
+        "book": 1
       },
-      "notes": "2 hours. Paper, leather, thread, and ink produces 2 books."
+      "notes": "25 min. Rebalanced from 7200s. 2 hours. Paper, leather, thread, and ink produces ..."
     },
     {
       "buildingType": "scriptorium",
       "name": "Scriptorium",
       "recipeName": "Illuminated Manuscript",
       "category": "Production",
-      "productionTime": 14400,
+      "productionTime": 1740,
       "inputs": {
-        "fine_paper": 15,
-        "ink": 5,
-        "gold": 2,
-        "blue_dye": 2,
-        "red_dye": 2
+        "fine_paper": 4,
+        "ink": 1,
+        "gold": 1,
+        "blue_dye": 1,
+        "red_dye": 1
       },
       "outputs": {
         "manuscript": 1
       },
-      "notes": "4 hours. Fine paper with gold and colored inks creates illuminated manuscript."
+      "notes": "29 min. Rebalanced from 14400s. 4 hours. Fine paper with gold and colored inks cre..."
     },
     {
       "buildingType": "farm",
       "name": "Farm",
       "recipeName": "Herb Farming",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 600,
       "inputs": {
-        "herb_seed": 15
+        "herb_seed": 3
       },
       "outputs": {
-        "medicinal_herbs": 50,
-        "herb_seed": 25
+        "medicinal_herbs": 12,
+        "herb_seed": 6
       },
-      "notes": "1.5 hours. 15 seeds produces 50 kg medicinal herbs and 25 seeds."
+      "notes": "10 min. Rebalanced from 5400s. 1.5 hours. 15 seeds produces 50 kg medicinal herbs..."
     },
     {
       "buildingType": "apothecary",
       "name": "Apothecary",
       "recipeName": "Basic Medicine",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "medicinal_herbs": 20
+        "medicinal_herbs": 6
       },
       "outputs": {
-        "medicine": 10
+        "medicine": 3
       },
-      "notes": "1 hour. 20 kg medicinal herbs produces 10 medicine."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. 20 kg medicinal herbs produces 10 medicine..."
     },
     {
       "buildingType": "apothecary",
       "name": "Apothecary",
       "recipeName": "Herbal Remedy",
       "category": "Production",
-      "productionTime": 2700,
+      "productionTime": 960,
       "inputs": {
-        "medicinal_herbs": 15,
-        "honey": 5
+        "medicinal_herbs": 4,
+        "honey": 1
       },
       "outputs": {
-        "medicine": 12
+        "medicine": 3
       },
-      "notes": "45 minutes. Herbs with honey produces enhanced medicine."
+      "notes": "16 min. Rebalanced from 2700s. 45 minutes. Herbs with honey produces enhanced med..."
     },
     {
       "buildingType": "apothecary",
       "name": "Apothecary",
       "recipeName": "Healing Salve",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "medicinal_herbs": 10,
-        "oil": 5,
-        "beeswax": 3
+        "medicinal_herbs": 3,
+        "oil": 1,
+        "beeswax": 1
       },
       "outputs": {
-        "healing_salve": 8
+        "healing_salve": 2
       },
-      "notes": "40 minutes. Herbs, oil, and beeswax produces healing salve."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Herbs, oil, and beeswax produces heali..."
     },
     {
       "buildingType": "apothecary",
@@ -3254,304 +3252,304 @@
       "name": "Chandlery",
       "recipeName": "Tallow Candle Making",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "tallow": 10,
-        "thread": 5
+        "tallow": 3,
+        "thread": 1
       },
       "outputs": {
-        "candle": 20
+        "candle": 6
       },
-      "notes": "40 minutes. Tallow and wicks produces 20 candles."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Tallow and wicks produces 20 candles...."
     },
     {
       "buildingType": "chandlery",
       "name": "Chandlery",
       "recipeName": "Beeswax Candle Making",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "beeswax": 8,
-        "thread": 5
+        "beeswax": 2,
+        "thread": 1
       },
       "outputs": {
-        "beeswax_candle": 15
+        "beeswax_candle": 4
       },
-      "notes": "40 minutes. Premium clean-burning beeswax candles."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Premium clean-burning beeswax candles...."
     },
     {
       "buildingType": "chandlery",
       "name": "Chandlery",
       "recipeName": "Lye Production",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "wood": 20
+        "wood": 6
       },
       "outputs": {
-        "lye": 15
+        "lye": 4
       },
-      "notes": "1 hour. Wood ash processed into lye."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Wood ash processed into lye...."
     },
     {
       "buildingType": "chandlery",
       "name": "Chandlery",
       "recipeName": "Soap Making",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1200,
       "inputs": {
-        "oil": 10,
-        "lye": 8
+        "oil": 3,
+        "lye": 2
       },
       "outputs": {
-        "soap": 15
+        "soap": 4
       },
-      "notes": "2 hours. Oil and lye produces soap (requires curing)."
+      "notes": "20 min. Rebalanced from 7200s. 2 hours. Oil and lye produces soap (requires curin..."
     },
     {
       "buildingType": "perfumery",
       "name": "Perfumery",
       "recipeName": "Flower Water Distillation",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "flowers": 50
+        "flowers": 15
       },
       "outputs": {
-        "flower_water": 30
+        "flower_water": 9
       },
-      "notes": "1 hour. Flowers distilled into fragrant water."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Flowers distilled into fragrant water...."
     },
     {
       "buildingType": "perfumery",
       "name": "Perfumery",
       "recipeName": "Basic Perfume",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "flower_water": 20,
-        "oil": 5
+        "flower_water": 6,
+        "oil": 1
       },
       "outputs": {
-        "perfume": 8
+        "perfume": 2
       },
-      "notes": "40 minutes. Flower water and oil creates perfume."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Flower water and oil creates perfume...."
     },
     {
       "buildingType": "perfumery",
       "name": "Perfumery",
       "recipeName": "Fine Perfume",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "flower_water": 15,
-        "medicinal_herbs": 10,
-        "oil": 5
+        "flower_water": 4,
+        "medicinal_herbs": 3,
+        "oil": 1
       },
       "outputs": {
-        "perfume": 6
+        "perfume": 1
       },
-      "notes": "1 hour. Enhanced perfume with aromatic herbs."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Enhanced perfume with aromatic herbs...."
     },
     {
       "buildingType": "dye_house",
       "name": "Dye House",
       "recipeName": "Red Cloth Dyeing",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "cloth": 10,
-        "red_dye": 5
+        "cloth": 3,
+        "red_dye": 1
       },
       "outputs": {
-        "red_cloth": 10
+        "red_cloth": 3
       },
-      "notes": "40 minutes. Cloth dyed vibrant red."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Cloth dyed vibrant red...."
     },
     {
       "buildingType": "dye_house",
       "name": "Dye House",
       "recipeName": "Blue Cloth Dyeing",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "cloth": 10,
-        "blue_dye": 5
+        "cloth": 3,
+        "blue_dye": 1
       },
       "outputs": {
-        "blue_cloth": 10
+        "blue_cloth": 3
       },
-      "notes": "40 minutes. Cloth dyed deep blue."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Cloth dyed deep blue...."
     },
     {
       "buildingType": "dye_house",
       "name": "Dye House",
       "recipeName": "Yellow Cloth Dyeing",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "cloth": 10,
-        "yellow_dye": 5
+        "cloth": 3,
+        "yellow_dye": 1
       },
       "outputs": {
-        "yellow_cloth": 10
+        "yellow_cloth": 3
       },
-      "notes": "40 minutes. Cloth dyed bright yellow."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Cloth dyed bright yellow...."
     },
     {
       "buildingType": "dye_house",
       "name": "Dye House",
       "recipeName": "Green Cloth Dyeing",
       "category": "Production",
-      "productionTime": 2700,
+      "productionTime": 960,
       "inputs": {
-        "cloth": 10,
-        "green_dye": 5
+        "cloth": 3,
+        "green_dye": 1
       },
       "outputs": {
-        "green_cloth": 10
+        "green_cloth": 3
       },
-      "notes": "45 minutes. Cloth dyed forest green."
+      "notes": "16 min. Rebalanced from 2700s. 45 minutes. Cloth dyed forest green...."
     },
     {
       "buildingType": "dye_house",
       "name": "Dye House",
       "recipeName": "Purple Cloth Dyeing",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "cloth": 10,
-        "purple_dye": 5
+        "cloth": 3,
+        "purple_dye": 1
       },
       "outputs": {
-        "purple_cloth": 10
+        "purple_cloth": 3
       },
-      "notes": "1 hour. Rare purple cloth for nobility."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Rare purple cloth for nobility...."
     },
     {
       "buildingType": "dye_house",
       "name": "Dye House",
       "recipeName": "Black Cloth Dyeing",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "cloth": 10,
-        "black_dye": 5
+        "cloth": 3,
+        "black_dye": 1
       },
       "outputs": {
-        "black_cloth": 10
+        "black_cloth": 3
       },
-      "notes": "40 minutes. Cloth dyed deep black."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Cloth dyed deep black...."
     },
     {
       "buildingType": "dye_house",
       "name": "Dye House",
       "recipeName": "Orange Cloth Dyeing",
       "category": "Production",
-      "productionTime": 2700,
+      "productionTime": 960,
       "inputs": {
-        "cloth": 10,
-        "orange_dye": 5
+        "cloth": 3,
+        "orange_dye": 1
       },
       "outputs": {
-        "orange_cloth": 10
+        "orange_cloth": 3
       },
-      "notes": "45 minutes. Cloth dyed bright orange."
+      "notes": "16 min. Rebalanced from 2700s. 45 minutes. Cloth dyed bright orange...."
     },
     {
       "buildingType": "dye_house",
       "name": "Dye House",
       "recipeName": "Linen Dyeing",
       "category": "Production",
-      "productionTime": 3000,
+      "productionTime": 960,
       "inputs": {
-        "linen": 8,
-        "blue_dye": 4
+        "linen": 2,
+        "blue_dye": 1
       },
       "outputs": {
-        "dyed_linen": 8
+        "dyed_linen": 2
       },
-      "notes": "50 minutes. Fine linen dyed in rich colors."
+      "notes": "16 min. Rebalanced from 3000s. 50 minutes. Fine linen dyed in rich colors...."
     },
     {
       "buildingType": "dye_house",
       "name": "Dye House",
       "recipeName": "Embroidered Linen",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1200,
       "inputs": {
-        "dyed_linen": 5,
-        "thread": 10,
-        "gold": 2
+        "dyed_linen": 1,
+        "thread": 3,
+        "gold": 1
       },
       "outputs": {
-        "embroidered_linen": 5
+        "embroidered_linen": 1
       },
-      "notes": "2 hours. Luxury embroidered linen with gold thread."
+      "notes": "20 min. Rebalanced from 7200s. 2 hours. Luxury embroidered linen with gold thread..."
     },
     {
       "buildingType": "tailor",
       "name": "Tailor",
       "recipeName": "Formal Attire",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 1200,
       "inputs": {
-        "fine_clothes": 2,
-        "blue_cloth": 3,
-        "thread": 5
+        "fine_clothes": 1,
+        "blue_cloth": 1,
+        "thread": 1
       },
       "outputs": {
-        "formal_attire": 2
+        "formal_attire": 1
       },
-      "notes": "1.5 hours. High-end formal clothing."
+      "notes": "20 min. Rebalanced from 5400s. 1.5 hours. High-end formal clothing...."
     },
     {
       "buildingType": "tailor",
       "name": "Tailor",
       "recipeName": "Ceremonial Robes",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 1320,
       "inputs": {
-        "silk": 5,
-        "purple_dye": 3,
-        "gold": 2,
-        "thread": 10
+        "silk": 1,
+        "purple_dye": 1,
+        "gold": 1,
+        "thread": 3
       },
       "outputs": {
         "ceremonial_robes": 1
       },
-      "notes": "3 hours. Extremely valuable ceremonial garments."
+      "notes": "22 min. Rebalanced from 10800s. 3 hours. Extremely valuable ceremonial garments...."
     },
     {
       "buildingType": "tailor",
       "name": "Tailor",
       "recipeName": "Uniform Making",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1080,
       "inputs": {
-        "work_clothes": 3,
-        "black_dye": 2,
-        "thread": 5
+        "work_clothes": 1,
+        "black_dye": 1,
+        "thread": 1
       },
       "outputs": {
-        "uniform": 3
+        "uniform": 1
       },
-      "notes": "1 hour. Standardized work uniforms."
+      "notes": "18 min. Rebalanced from 3600s. 1 hour. Standardized work uniforms...."
     },
     {
       "buildingType": "tailor",
       "name": "Tailor",
       "recipeName": "Leather Gloves",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 1080,
       "inputs": {
-        "leather": 4,
-        "thread": 3
+        "leather": 1,
+        "thread": 1
       },
       "outputs": {
-        "gloves": 4
+        "gloves": 1
       },
-      "notes": "40 minutes. Leather hand protection."
+      "notes": "18 min. Rebalanced from 2400s. 40 minutes. Leather hand protection...."
     },
     {
       "buildingType": "tailor",
@@ -3588,92 +3586,92 @@
       "name": "Gemstone Mine",
       "recipeName": "Gemstone Mining",
       "category": "Extraction",
-      "productionTime": 7200,
+      "productionTime": 1200,
       "inputs": {},
       "outputs": {
-        "gemstone": 3
+        "gemstone": 1
       },
-      "notes": "2 hours. Extract precious gemstones from the earth."
+      "notes": "20 min. Rebalanced from 7200s. 2 hours. Extract precious gemstones from the earth..."
     },
     {
       "buildingType": "jewelry_workshop",
       "name": "Jewelry Workshop",
       "recipeName": "Silver Ring Crafting",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 1590,
       "inputs": {
-        "silver": 3
+        "silver": 1
       },
       "outputs": {
-        "silver_ring": 4
+        "silver_ring": 1
       },
-      "notes": "40 minutes. Simple silver rings."
+      "notes": "26m 30s. Rebalanced from 2400s. 40 minutes. Simple silver rings...."
     },
     {
       "buildingType": "jewelry_workshop",
       "name": "Jewelry Workshop",
       "recipeName": "Gold Ring Crafting",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1590,
       "inputs": {
-        "gold": 3
+        "gold": 1
       },
       "outputs": {
-        "gold_ring": 3
+        "gold_ring": 1
       },
-      "notes": "1 hour. Elegant gold rings."
+      "notes": "26m 30s. Rebalanced from 3600s. 1 hour. Elegant gold rings...."
     },
     {
       "buildingType": "jewelry_workshop",
       "name": "Jewelry Workshop",
       "recipeName": "Silver Necklace Crafting",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1590,
       "inputs": {
-        "silver": 5,
-        "thread": 2
+        "silver": 1,
+        "thread": 1
       },
       "outputs": {
-        "silver_necklace": 3
+        "silver_necklace": 1
       },
-      "notes": "1 hour. Silver chain necklaces."
+      "notes": "26m 30s. Rebalanced from 3600s. 1 hour. Silver chain necklaces...."
     },
     {
       "buildingType": "jewelry_workshop",
       "name": "Jewelry Workshop",
       "recipeName": "Gold Necklace Crafting",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 1650,
       "inputs": {
-        "gold": 5,
-        "thread": 2
+        "gold": 1,
+        "thread": 1
       },
       "outputs": {
-        "gold_necklace": 2
+        "gold_necklace": 1
       },
-      "notes": "1.5 hours. Elegant gold necklaces."
+      "notes": "27m 30s. Rebalanced from 5400s. 1.5 hours. Elegant gold necklaces...."
     },
     {
       "buildingType": "jewelry_workshop",
       "name": "Jewelry Workshop",
       "recipeName": "Gemstone Jewelry Crafting",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1650,
       "inputs": {
-        "gold": 4,
-        "gemstone": 3
+        "gold": 1,
+        "gemstone": 1
       },
       "outputs": {
-        "gemstone_jewelry": 2
+        "gemstone_jewelry": 1
       },
-      "notes": "2 hours. Gold jewelry set with precious gemstones."
+      "notes": "27m 30s. Rebalanced from 7200s. 2 hours. Gold jewelry set with precious gemstones...."
     },
     {
       "buildingType": "jewelry_workshop",
       "name": "Jewelry Workshop",
       "recipeName": "Crown Crafting",
       "category": "Production",
-      "productionTime": 21600,
+      "productionTime": 1800,
       "inputs": {
         "gold": 20,
         "gemstone": 10
@@ -3681,106 +3679,106 @@
       "outputs": {
         "crown": 1
       },
-      "notes": "6 hours. Royal crown of gold and gemstones."
+      "notes": "30 min. Rebalanced from 21600s. 6 hours. Royal crown of gold and gemstones...."
     },
     {
       "buildingType": "art_workshop",
       "name": "Art Workshop",
       "recipeName": "Painting",
       "category": "Production",
-      "productionTime": 7200,
+      "productionTime": 1500,
       "inputs": {
-        "cloth": 3,
-        "red_dye": 2,
-        "blue_dye": 2,
-        "yellow_dye": 2
+        "cloth": 1,
+        "red_dye": 1,
+        "blue_dye": 1,
+        "yellow_dye": 1
       },
       "outputs": {
         "painting": 1
       },
-      "notes": "2 hours. Basic painting on canvas."
+      "notes": "25 min. Rebalanced from 7200s. 2 hours. Basic painting on canvas...."
     },
     {
       "buildingType": "art_workshop",
       "name": "Art Workshop",
       "recipeName": "Portrait Painting",
       "category": "Production",
-      "productionTime": 14400,
+      "productionTime": 1740,
       "inputs": {
-        "cloth": 4,
-        "red_dye": 3,
-        "blue_dye": 3,
-        "yellow_dye": 3,
-        "gold": 2
+        "cloth": 1,
+        "red_dye": 1,
+        "blue_dye": 1,
+        "yellow_dye": 1,
+        "gold": 1
       },
       "outputs": {
         "portrait": 1
       },
-      "notes": "4 hours. Commissioned portrait with gold accents."
+      "notes": "29 min. Rebalanced from 14400s. 4 hours. Commissioned portrait with gold accents...."
     },
     {
       "buildingType": "art_workshop",
       "name": "Art Workshop",
       "recipeName": "Clay Figurine",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1380,
       "inputs": {
-        "clay": 5
+        "clay": 1
       },
       "outputs": {
-        "figurine": 3
+        "figurine": 1
       },
-      "notes": "1 hour. Small decorative clay figures."
+      "notes": "23 min. Rebalanced from 3600s. 1 hour. Small decorative clay figures...."
     },
     {
       "buildingType": "art_workshop",
       "name": "Art Workshop",
       "recipeName": "Bronze Sculpture",
       "category": "Production",
-      "productionTime": 10800,
+      "productionTime": 1620,
       "inputs": {
-        "bronze": 15
+        "bronze": 4
       },
       "outputs": {
         "bronze_sculpture": 1
       },
-      "notes": "3 hours. Cast bronze artwork."
+      "notes": "27 min. Rebalanced from 10800s. 3 hours. Cast bronze artwork...."
     },
     {
       "buildingType": "art_workshop",
       "name": "Art Workshop",
       "recipeName": "Marble Sculpture",
       "category": "Production",
-      "productionTime": 14400,
+      "productionTime": 1740,
       "inputs": {
-        "marble": 25,
+        "marble": 7,
         "chisel": 1
       },
       "outputs": {
         "sculpture": 1
       },
-      "notes": "4 hours. Carved marble sculpture (chisel has chance of wear)."
+      "notes": "29 min. Rebalanced from 14400s. 4 hours. Carved marble sculpture (chisel has chanc..."
     },
     {
       "buildingType": "art_workshop",
       "name": "Art Workshop",
       "recipeName": "Glassware Creation",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 1380,
       "inputs": {
-        "glass": 8
+        "glass": 2
       },
       "outputs": {
-        "glassware": 6
+        "glassware": 1
       },
-      "notes": "1 hour. Glass cups, bowls, and decorative items."
+      "notes": "23 min. Rebalanced from 3600s. 1 hour. Glass cups, bowls, and decorative items...."
     },
     {
       "buildingType": "weaving_workshop",
       "name": "Weaving Workshop",
       "recipeName": "Tapestry Weaving",
       "category": "Production",
-      "productionTime": 21600,
+      "productionTime": 1800,
       "inputs": {
         "wool": 30,
         "thread": 20,
@@ -3790,111 +3788,111 @@
       "outputs": {
         "tapestry": 1
       },
-      "notes": "6 hours. Large decorative woven wall hanging."
+      "notes": "30 min. Rebalanced from 21600s. 6 hours. Large decorative woven wall hanging...."
     },
     {
       "buildingType": "lime_kiln",
       "name": "Lime Kiln",
       "recipeName": "Limestone Quarrying",
       "category": "Extraction",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {},
       "outputs": {
-        "limestone": 50
+        "limestone": 15
       },
-      "notes": "1 hour. Extract limestone from quarry."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Extract limestone from quarry...."
     },
     {
       "buildingType": "lime_kiln",
       "name": "Lime Kiln",
       "recipeName": "Quicklime Production",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 1200,
       "inputs": {
-        "limestone": 40,
-        "coal": 10
+        "limestone": 12,
+        "coal": 3
       },
       "outputs": {
-        "quickite": 30
+        "quickite": 9
       },
-      "notes": "1.5 hours. Burn limestone to produce quicklime."
+      "notes": "20 min. Rebalanced from 5400s. 1.5 hours. Burn limestone to produce quicklime...."
     },
     {
       "buildingType": "cement_works",
       "name": "Cement Works",
       "recipeName": "Cement Production",
       "category": "Production",
-      "productionTime": 5400,
+      "productionTime": 1200,
       "inputs": {
-        "quickite": 20,
-        "clay": 10,
-        "coal": 10
+        "quickite": 6,
+        "clay": 3,
+        "coal": 3
       },
       "outputs": {
-        "cement": 40
+        "cement": 12
       },
-      "notes": "1.5 hours. Produce cement from quicklime and clay."
+      "notes": "20 min. Rebalanced from 5400s. 1.5 hours. Produce cement from quicklime and clay...."
     },
     {
       "buildingType": "cement_works",
       "name": "Cement Works",
       "recipeName": "Mortar Mixing",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "cement": 15,
-        "sand": 30
+        "cement": 4,
+        "sand": 9
       },
       "outputs": {
-        "mortar": 40
+        "mortar": 12
       },
-      "notes": "40 minutes. Mix cement and sand into mortar."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Mix cement and sand into mortar...."
     },
     {
       "buildingType": "cement_works",
       "name": "Cement Works",
       "recipeName": "Concrete Production",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "cement": 20,
-        "sand": 30,
-        "stone": 40
+        "cement": 6,
+        "sand": 9,
+        "stone": 12
       },
       "outputs": {
-        "concrete": 80
+        "concrete": 24
       },
-      "notes": "1 hour. Strong concrete for construction."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Strong concrete for construction...."
     },
     {
       "buildingType": "cement_works",
       "name": "Cement Works",
       "recipeName": "Plaster Production",
       "category": "Production",
-      "productionTime": 2400,
+      "productionTime": 960,
       "inputs": {
-        "quickite": 15,
-        "sand": 20
+        "quickite": 4,
+        "sand": 6
       },
       "outputs": {
-        "plaster": 30
+        "plaster": 9
       },
-      "notes": "40 minutes. Wall finishing material."
+      "notes": "16 min. Rebalanced from 2400s. 40 minutes. Wall finishing material...."
     },
     {
       "buildingType": "cement_works",
       "name": "Cement Works",
       "recipeName": "Stucco Production",
       "category": "Production",
-      "productionTime": 3600,
+      "productionTime": 960,
       "inputs": {
-        "plaster": 20,
-        "marble": 5
+        "plaster": 6,
+        "marble": 1
       },
       "outputs": {
-        "stucco": 20
+        "stucco": 6
       },
-      "notes": "1 hour. Decorative exterior coating."
+      "notes": "16 min. Rebalanced from 3600s. 1 hour. Decorative exterior coating...."
     },
     {
       "buildingType": "tea_farm",

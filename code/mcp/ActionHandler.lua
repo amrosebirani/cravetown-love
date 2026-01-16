@@ -952,16 +952,17 @@ end
 
 function ActionHandler:alphaSetSpeed(world, params)
     local speed = params.speed or 1
-    -- Map speed values: 1 = normal, 2 = fast, 3 = very fast
+    -- Map speed values to TimeManager speed names
     local speedMap = {
-        [1] = 1,
-        [2] = 2,
-        [3] = 4,
-        [4] = 8
+        [1] = "normal",   -- 1x
+        [2] = "fast",     -- 2x
+        [3] = "faster",   -- 5x
+        [4] = "fastest",  -- 10x
+        [5] = "turbo"     -- 20x
     }
-    local actualSpeed = speedMap[speed] or speed
-    world:SetTimeScale(actualSpeed)
-    return {success = true, speed = actualSpeed}
+    local speedName = speedMap[speed] or "normal"
+    world:SetTimeScale(speedName)
+    return {success = true, speed = speed, speedName = speedName}
 end
 
 -- Camera actions

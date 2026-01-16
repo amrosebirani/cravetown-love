@@ -29,7 +29,8 @@ function TimeManager:Create()
         normal = 300,    -- seconds per game day (1x)
         fast = 150,      -- seconds per game day (2x)
         faster = 60,     -- seconds per game day (5x)
-        fastest = 30     -- seconds per game day (10x)
+        fastest = 30,    -- seconds per game day (10x)
+        turbo = 15       -- seconds per game day (20x)
     }
     tm.currentSpeed = "normal"
     tm.secondsPerDay = tm.speedSettings.normal

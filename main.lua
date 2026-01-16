@@ -1,4 +1,7 @@
 -- Hot reloading (manual mode - press F5 to reload)
+if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
+  require("lldebugger").start()
+end
 local lurker = require("lurker")
 local manualHotReload = true  -- Set to true for manual reload, false for automatic
 

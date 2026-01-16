@@ -174,7 +174,11 @@ function DebugPanel:Render()
     self:InitFonts()
     self.buttons = {}
 
+<<<<<<< HEAD
     -- Toggle button now in left panel (AlphaUI), no longer rendered here
+=======
+    -- Toggle button removed - use F12 hotkey instead
+>>>>>>> b39cb6c4caed29d7944912f9a2a658f5b1caa413
 
     if not self.visible then return end
 

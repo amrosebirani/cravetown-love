@@ -17,26 +17,26 @@ local HOUSING_STATUS = {
 
 -- Occupancy types
 local OCCUPANCY_TYPE = {
-    FAMILY = "family",       -- Family unit (cannot be split)
-    SINGLE = "single",       -- Single occupant
-    ROOMMATE = "roommate"    -- Single sharing with others
+    FAMILY = "family",    -- Family unit (cannot be split)
+    SINGLE = "single",    -- Single occupant
+    ROOMMATE = "roommate" -- Single sharing with others
 }
 
 -- Rent payment status
 local RENT_STATUS = {
     CURRENT = "current",
-    OVERDUE_1 = "overdue_1",   -- 1 cycle overdue
-    OVERDUE_2 = "overdue_2",   -- 2 cycles overdue
-    EVICTION_WARNING = "eviction_warning",  -- 3+ cycles, final warning
+    OVERDUE_1 = "overdue_1",               -- 1 cycle overdue
+    OVERDUE_2 = "overdue_2",               -- 2 cycles overdue
+    EVICTION_WARNING = "eviction_warning", -- 3+ cycles, final warning
     EVICTED = "evicted"
 }
 
 -- Crowding thresholds (occupants / capacity)
 local CROWDING_THRESHOLDS = {
-    COMFORTABLE = 0.5,    -- <= 50% capacity
-    NORMAL = 0.75,        -- <= 75% capacity
-    CROWDED = 1.0,        -- <= 100% capacity
-    OVERCROWDED = 1.25    -- > 100% (if allowed)
+    COMFORTABLE = 0.5, -- <= 50% capacity
+    NORMAL = 0.75,     -- <= 75% capacity
+    CROWDED = 1.0,     -- <= 100% capacity
+    OVERCROWDED = 1.25 -- > 100% (if allowed)
 }
 
 function HousingSystem:Create(buildingManager, economicsSystem, cravingSystem, landSystem)
@@ -76,17 +76,17 @@ function HousingSystem:Create(buildingManager, economicsSystem, cravingSystem, l
 
     -- Configuration
     system.config = {
-        maxRentOverdueCycles = 60,        -- Cycles before eviction
-        evictionGracePeriod = 10,         -- Extra cycle after warning
-        roommateCompatibilityThreshold = 0.3,  -- Min relationship score for roommates
+        maxRentOverdueCycles = 60,            -- Cycles before eviction
+        evictionGracePeriod = 10,             -- Extra cycle after warning
+        roommateCompatibilityThreshold = 0.3, -- Min relationship score for roommates
         crowdingSatisfactionPenalty = {
             comfortable = 0,
             normal = 0,
             crowded = -10,
             overcrowded = -25
         },
-        allowOvercrowding = false,       -- Whether to allow > 100% capacity
-        landRentEnabled = true           -- Whether to charge land rent separately
+        allowOvercrowding = false, -- Whether to allow > 100% capacity
+        landRentEnabled = true     -- Whether to charge land rent separately
     }
 
     print("[HousingSystem] Created with family tracking")
@@ -202,7 +202,7 @@ function HousingSystem:AssignHousing(characterId, buildingId)
         buildingId = buildingId,
         buildingTypeId = occupancy.buildingTypeId,
         status = HOUSING_STATUS.HOUSED,
-        assignedCycle = 0,  -- Should be set by caller
+        assignedCycle = 0, -- Should be set by caller
         housingQuality = occupancy.housingQuality,
         qualityTier = occupancy.qualityTier,
         rentAmount = occupancy.rentPerOccupant
@@ -290,8 +290,8 @@ local function normalizeClass(class)
         elite = "elite",
         upper = "upper",
         middle = "middle",
-        working = "lower",  -- Working class maps to lower
-        poor = "lower",     -- Poor class maps to lower
+        working = "lower", -- Working class maps to lower
+        poor = "lower",    -- Poor class maps to lower
         lower = "lower"
     }
 
@@ -392,7 +392,7 @@ function HousingSystem:AddToRelocationQueue(characterId, reason)
     table.insert(self.relocationQueue, {
         characterId = characterId,
         reason = reason or "seeking",
-        addedCycle = 0,  -- Should be set by caller
+        addedCycle = 0, -- Should be set by caller
         priority = self:CalculateRelocationPriority(characterId, reason)
     })
 
@@ -651,28 +651,6 @@ function HousingSystem:UpgradeBuilding(buildingId, newBuildingTypeId)
 end
 
 -- ============================================================================
--- Serialization
--- ============================================================================
-
-function HousingSystem:Serialize()
-    return {
-        housingAssignments = self.housingAssignments,
-        buildingOccupancy = self.buildingOccupancy,
-        relocationQueue = self.relocationQueue
-    }
-end
-
-function HousingSystem:Deserialize(data)
-    if not data then return end
-
-    self.housingAssignments = data.housingAssignments or {}
-    self.buildingOccupancy = data.buildingOccupancy or {}
-    self.relocationQueue = data.relocationQueue or {}
-
-    print("[HousingSystem] Deserialized housing data")
-end
-
--- ============================================================================
 -- Constants
 -- ============================================================================
 
@@ -692,7 +670,7 @@ function HousingSystem:RegisterFamilyUnit(headId, memberIds, familyId)
         headId = headId,
         memberIds = memberIds or {},
         housingNeeded = 1 + #(memberIds or {}),
-        createdCycle = 0  -- Set by caller
+        createdCycle = 0 -- Set by caller
     }
 
     print(string.format("[HousingSystem] Registered family unit %s with %d members",
@@ -722,7 +700,7 @@ function HousingSystem:GetFamilySize(characterId)
     if family then
         return family.housingNeeded
     end
-    return 1  -- Single person
+    return 1 -- Single person
 end
 
 function HousingSystem:AssignFamilyToHousing(familyId, buildingId)
@@ -875,7 +853,7 @@ function HousingSystem:CanAddOccupant(buildingId, characterId)
 
     if newTotal > occupancy.capacity then
         if self.config.allowOvercrowding and newTotal <= occupancy.capacity * CROWDING_THRESHOLDS.OVERCROWDED then
-            return true, "overcrowded"  -- Allow but warn
+            return true, "overcrowded" -- Allow but warn
         end
         return false, "Would exceed capacity"
     end
@@ -986,7 +964,7 @@ function HousingSystem:CanAffordHousing(characterId, buildingId)
     end
 
     if not self.economicsSystem then
-        return true  -- No economics system, assume affordable
+        return true -- No economics system, assume affordable
     end
 
     local rentAmount = occupancy.rentPerOccupant
@@ -998,7 +976,7 @@ function HousingSystem:CanAffordHousing(characterId, buildingId)
     if rentAmount <= maxAffordableRent then
         return true, "affordable"
     elseif rentAmount <= citizenIncome then
-        return true, "stretched"  -- Can afford but tight
+        return true, "stretched" -- Can afford but tight
     else
         return false, "unaffordable"
     end
@@ -1038,8 +1016,8 @@ function HousingSystem:ReserveHousingForImmigrant(buildingId, immigrantId, famil
     self.housingAssignments[immigrantId] = {
         buildingId = buildingId,
         buildingTypeId = occupancy.buildingTypeId,
-        status = HOUSING_STATUS.SEEKING,  -- Will become HOUSED on arrival
-        reservedCycle = 0,  -- Set by caller
+        status = HOUSING_STATUS.SEEKING, -- Will become HOUSED on arrival
+        reservedCycle = 0,               -- Set by caller
         housingQuality = occupancy.housingQuality,
         qualityTier = occupancy.qualityTier,
         rentAmount = occupancy.rentPerOccupant,
@@ -1067,7 +1045,7 @@ function HousingSystem:ConfirmImmigrantArrival(immigrantId)
 
     assignment.status = HOUSING_STATUS.HOUSED
     assignment.isReservation = nil
-    assignment.arrivalCycle = 0  -- Set by caller
+    assignment.arrivalCycle = 0 -- Set by caller
 
     print(string.format("[HousingSystem] Confirmed immigrant %s arrival at %s", immigrantId, buildingId))
 
@@ -1085,7 +1063,7 @@ function HousingSystem:ApplyHousingFulfillment(characterId, character, currentCy
         return {
             applied = false,
             reason = "homeless",
-            penalty = -50  -- Significant penalty for being homeless
+            penalty = -50 -- Significant penalty for being homeless
         }
     end
 
@@ -1105,7 +1083,7 @@ function HousingSystem:ApplyHousingFulfillment(characterId, character, currentCy
     local crowdingModifier = 1.0
     local crowdingStatus = self:GetCrowdingStatus(buildingId)
     if crowdingStatus == "comfortable" then
-        crowdingModifier = 1.1  -- Bonus for spacious
+        crowdingModifier = 1.1 -- Bonus for spacious
     elseif crowdingStatus == "crowded" then
         crowdingModifier = 0.95
     elseif crowdingStatus == "overcrowded" then
@@ -1146,8 +1124,8 @@ function HousingSystem:IsDimensionEnabled(character, dimensionId)
 
     -- Basic housing is always enabled
     if dimensionId == "safety_shelter_housing_basic" or
-       dimensionId == "safety_shelter_weather" or
-       dimensionId == "safety_shelter_warmth" then
+        dimensionId == "safety_shelter_weather" or
+        dimensionId == "safety_shelter_warmth" then
         return true
     end
 
@@ -1164,11 +1142,11 @@ function HousingSystem:IsDimensionEnabled(character, dimensionId)
     local charClassOrder = classOrder[characterClass] or 1
 
     if dimensionId == "safety_shelter_housing_good" then
-        return charClassOrder >= 2  -- Middle+
+        return charClassOrder >= 2 -- Middle+
     elseif dimensionId == "safety_shelter_housing_luxury" then
-        return charClassOrder >= 3  -- Upper+
+        return charClassOrder >= 3 -- Upper+
     elseif dimensionId == "safety_shelter_housing_prestige" then
-        return charClassOrder >= 4  -- Elite only
+        return charClassOrder >= 4 -- Elite only
     end
 
     -- Other dimensions (furniture, etc.) - enabled for all

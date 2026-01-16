@@ -811,7 +811,7 @@ function GameStateCapture:captureConsumptionActions(proto)
     else
         table.insert(actions, {action = "pause_simulation", description = "Press SPACE to pause simulation"})
     end
-    table.insert(actions, {action = "set_simulation_speed", description = "Set speed (1x, 2x, 5x, 10x)"})
+    table.insert(actions, {action = "set_simulation_speed", description = "Set speed (1x, 2x, 5x, 10x, 20x)"})
     table.insert(actions, {action = "skip_cycles", description = "Skip N cycles instantly"})
 
     -- Character management
@@ -850,7 +850,8 @@ function GameStateCapture:getConsumptionControlsReference()
             ["1"] = "Set speed 1x",
             ["2"] = "Set speed 2x",
             ["3"] = "Set speed 5x",
-            ["4"] = "Set speed 10x"
+            ["4"] = "Set speed 10x",
+            ["5"] = "Set speed 20x"
         },
         navigation = {
             ["Arrow keys"] = "Navigate character selection",

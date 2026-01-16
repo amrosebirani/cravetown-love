@@ -490,4 +490,22 @@ function CharacterMovement.GetDebugInfo(citizen)
     )
 end
 
+-- Clean up movement state when citizen is removed (emigration/death)
+function CharacterMovement.CleanupCitizen(citizen)
+    if not citizen then return end
+
+    -- Clear movement-related fields
+    citizen.movementState = nil
+    citizen.targetX = nil
+    citizen.targetY = nil
+    citizen.targetBuildingId = nil
+    citizen.path = nil
+    citizen.pathIndex = nil
+    citizen.pathAge = nil
+    citizen.needsPath = nil
+    citizen.blockedTime = nil
+    citizen.wanderCooldown = nil
+    citizen.speed = nil
+end
+
 return CharacterMovement

@@ -66,8 +66,7 @@ function ImmigrationSystem:BuildVocationsFromWorkerTypes()
         Elite = {},
         Upper = {},
         Middle = {},
-        Working = {},
-        Poor = {}
+        Lower = {}
     }
 
     for _, wt in ipairs(self.workerTypes) do
@@ -82,10 +81,8 @@ function ImmigrationSystem:BuildVocationsFromWorkerTypes()
             table.insert(vocsByClass.Upper, name)
         elseif wage >= 10 then
             table.insert(vocsByClass.Middle, name)
-        elseif wage >= 8 then
-            table.insert(vocsByClass.Working, name)
         else
-            table.insert(vocsByClass.Poor, name)
+            table.insert(vocsByClass.Lower, name)
         end
     end
 
@@ -94,16 +91,10 @@ function ImmigrationSystem:BuildVocationsFromWorkerTypes()
         local wage = wt.minimumWage or 10
         local name = wt.name
 
-        -- Working class can also have some middle-tier jobs
-        if wage >= 10 and wage < 15 then
-            if not self:TableContains(vocsByClass.Working, name) then
-                table.insert(vocsByClass.Working, name)
-            end
-        end
-        -- Poor can also do basic working class jobs
-        if wage >= 7 and wage < 10 then
-            if not self:TableContains(vocsByClass.Poor, name) then
-                table.insert(vocsByClass.Poor, name)
+        -- Lower class can also have some middle-tier jobs
+        if wage >= 7 and wage < 15 then
+            if not self:TableContains(vocsByClass.Lower, name) then
+                table.insert(vocsByClass.Lower, name)
             end
         end
     end
@@ -141,8 +132,7 @@ function ImmigrationSystem:GetDefaultConfig()
             Elite = {ageMin = 30, ageMax = 70, wealthMin = 2000, wealthMax = 5000, familyChance = 0.40},
             Upper = {ageMin = 25, ageMax = 65, wealthMin = 800, wealthMax = 2500, familyChance = 0.35},
             Middle = {ageMin = 20, ageMax = 60, wealthMin = 200, wealthMax = 800, familyChance = 0.50},
-            Working = {ageMin = 18, ageMax = 55, wealthMin = 50, wealthMax = 300, familyChance = 0.45},
-            Poor = {ageMin = 16, ageMax = 50, wealthMin = 0, wealthMax = 100, familyChance = 0.30}
+            Lower = {ageMin = 16, ageMax = 55, wealthMin = 0, wealthMax = 300, familyChance = 0.40}
         },
         -- vocationsForClass is built dynamically from worker_types.json in BuildVocationsFromWorkerTypes()
         vocationsForClass = {}
@@ -599,7 +589,7 @@ end
 
 function ImmigrationSystem:GenerateRandomApplicant(currentDay)
     -- Fully random class selection
-    local classes = {"Elite", "Upper", "Middle", "Working", "Poor"}
+    local classes = {"Elite", "Upper", "Middle", "Lower"}
     local class = classes[math.random(1, #classes)]
 
     return self:GenerateApplicantOfClass(class, currentDay)
@@ -701,7 +691,7 @@ function ImmigrationSystem:DetermineIntendedRole(class, wealth)
         else
             return "craftsman"
         end
-    elseif class == "Working" or class == "Poor" then
+    elseif class == "Lower" then
         return "laborer"
     else
         return "laborer"
@@ -932,7 +922,7 @@ function ImmigrationSystem:CalculateJobMatch(applicant)
     if totalOpenings > 0 then
         -- Jobs exist - score based on class fit
         -- Lower classes are more flexible with job types
-        if class == "Poor" or class == "Working" then
+        if class == "Lower" then
             return 65  -- Can do most manual labor
         elseif class == "Middle" then
             return 55  -- Somewhat flexible
@@ -983,7 +973,7 @@ end
 
 function ImmigrationSystem:CalculateClassAttractiveness()
     local attractiveness = {}
-    local classes = {"Elite", "Upper", "Middle", "Working", "Poor"}
+    local classes = {"Elite", "Upper", "Middle", "Lower"}
 
     for _, class in ipairs(classes) do
         local baseAttraction = 50
@@ -1025,13 +1015,13 @@ function ImmigrationSystem:GetAverageClassSatisfaction(class)
 end
 
 function ImmigrationSystem:GetVacantHousingByClass()
-    local vacant = {Elite = 0, Upper = 0, Middle = 0, Working = 0, Poor = 0}
+    local vacant = {Elite = 0, Upper = 0, Middle = 0, Lower = 0}
 
     -- Use HousingSystem if available (preferred - accurate occupancy tracking)
     if self.world.housingSystem then
         local stats = self.world.housingSystem:GetHousingStatistics()
         -- Get available housing for each class
-        for _, class in ipairs({"Elite", "Upper", "Middle", "Working", "Poor"}) do
+        for _, class in ipairs({"Elite", "Upper", "Middle", "Lower"}) do
             local available = self.world.housingSystem:GetAvailableHousing(class)
             local totalSlots = 0
             for _, housing in ipairs(available) do
@@ -1056,7 +1046,7 @@ function ImmigrationSystem:GetVacantHousingByClass()
                     local targetClasses = building.type.housingConfig.targetClasses
                     if #targetClasses > 0 then
                         -- Map lowercase to our class names
-                        local classMap = {lower = "Working", middle = "Middle", upper = "Upper", elite = "Elite"}
+                        local classMap = {lower = "Lower", middle = "Middle", upper = "Upper", elite = "Elite"}
                         housingClass = classMap[targetClasses[1]] or "Middle"
                     end
                 end
@@ -1176,7 +1166,7 @@ function ImmigrationSystem:GetClassForVocation(vocation)
             end
         end
     end
-    return "Working"  -- Default
+    return "Lower"  -- Default
 end
 
 function ImmigrationSystem:RandomFirstName(gender)
@@ -1235,8 +1225,7 @@ function ImmigrationSystem:GenerateCravingProfile(class)
         Elite = {Biological = -20, Safety = -10, Status = 30, Exotic = 20, Shiny = 25},
         Upper = {Biological = -10, Safety = -5, Status = 20, Exotic = 10, Shiny = 15},
         Middle = {Biological = 0, Safety = 0, Psychological = 10, Social = 10},
-        Working = {Biological = 10, Safety = 10, Social = 5, Status = -10},
-        Poor = {Biological = 20, Safety = 20, Status = -20, Exotic = -20, Shiny = -20}
+        Lower = {Biological = 15, Safety = 15, Social = 5, Status = -15, Exotic = -15, Shiny = -15}
     }
 
     local mods = classModifiers[class] or {}
