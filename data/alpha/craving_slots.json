@@ -409,6 +409,35 @@
       ],
       "frequencyPerDay": 1,
       "description": ""
+    },
+    "biological_taste_spicy": {
+      "slots": [
+        "afternoon"
+      ],
+      "frequencyPerDay": 1,
+      "description": ""
+    },
+    "biological_taste_crunchy": {
+      "slots": [
+        "night"
+      ],
+      "frequencyPerDay": 1,
+      "description": ""
+    },
+    "biological_taste_wholesome": {
+      "slots": [
+        "early_morning"
+      ],
+      "frequencyPerDay": 1,
+      "description": ""
+    },
+    "touch_furniture_storage": {
+      "slots": [
+        "late_night",
+        "early_morning"
+      ],
+      "frequencyPerDay": 1,
+      "description": ""
     }
   },
   "classModifiers": {

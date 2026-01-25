@@ -30,6 +30,8 @@ local NavigationGrid = require("code.NavigationGrid")
 local Pathfinder = require("code.Pathfinder")
 local SpatialHash = require("code.SpatialHash")
 
+-- Note: DayEndSummaryModal is now handled by AlphaUI, not directly by AlphaWorld
+
 AlphaWorld = {}
 AlphaWorld.__index = AlphaWorld
 
@@ -88,6 +90,9 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
     world.isPaused = true
     world.timeManager:Pause()
 
+    -- Day End Summary Modal preference
+    world.showDayEndSummary = true  -- Auto-show day end summary modal
+
     -- Global slot counter for fatigue tracking (starts at 1)
     world.globalSlotCounter = 1
     CharacterV3.SetCurrentGlobalSlot(1)
@@ -106,8 +111,8 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
     -- Production tracking
     world.productionQueue = {}
 
-    -- Gold/Treasury
-    world.gold = 1000
+    -- Gold/Treasury (initialized to 0, set by starting location config)
+    world.gold = 0
 
     -- Statistics
     world.stats = {
@@ -127,6 +132,9 @@ function AlphaWorld:Create(terrainConfig, progressCallback)
     -- Production statistics tracking
     world.productionStats = ProductionStats.new()
     world.productionStatsTick = 0
+
+    -- Connect ProductionStats to AllocationEngineV2 for citizen consumption tracking
+    AllocationEngineV2.SetProductionStats(world.productionStats)
 
     -- Event log
     world.eventLog = {}
@@ -623,6 +631,20 @@ end
 
 -- Callback when day changes
 function AlphaWorld:OnDayChange(dayNumber)
+    -- Finalize previous day's production/consumption stats before resetting
+    -- This archives Day (dayNumber - 1) data into the 30-day history
+    local previousDayNumber = dayNumber - 1
+    if self.productionStats and previousDayNumber > 0 then
+        self.productionStats:finalizeDayAndReset(previousDayNumber)
+
+        -- Show Day End Summary Modal if enabled
+        -- Sets a pending flag that AlphaUI will pick up and show the modal
+        -- Always show the modal to display production/consumption stats, shortages, etc.
+        if self.showDayEndSummary then
+            self.pendingDayEndSummary = { dayNumber = previousDayNumber }
+        end
+    end
+
     self:LogEvent("day", "Day " .. dayNumber .. " begins", {})
 
     -- LAYER 8: Reset daily fulfillment tracking for all citizens (Streak System)
@@ -1754,9 +1776,9 @@ function AlphaWorld:UpdateBuildingProduction(building, dt)
                             local inputQty = type(quantity) == "number" and quantity or (quantity.quantity or 1)
                             self:RemoveFromInventory(inputId, inputQty)
                             inputsConsumed[inputId] = inputQty
-                            -- Record consumption in production stats
+                            -- Record building consumption in production stats (raw materials)
                             if self.productionStats then
-                                self.productionStats:recordConsumption(inputId, inputQty)
+                                self.productionStats:recordBuildingConsumption(inputId, inputQty)
                             end
                         end
 
@@ -1867,6 +1889,10 @@ function AlphaWorld:ProcessSlotConsumption()
         self:LogEvent("consumption", string.format("%d allocations (%d units)",
             #allocations.allocations, allocations.stats.totalUnits or 0), {})
     end
+
+    -- Record citizen issues for day end summary
+    -- This scans all citizens and records low satisfaction for any fine dimension
+    AllocationEngineV2.RecordCitizenIssues(self.citizens, 60, self.housingSystem)  -- Threshold = 60
 end
 
 -- =============================================================================

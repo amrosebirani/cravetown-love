@@ -187,7 +187,7 @@
         "poor": 0.5,
         "basic": 1,
         "good": 1.5,
-        "luxury": 2.0
+        "luxury": 2
       }
     },
     "goat_meat": {
@@ -321,7 +321,7 @@
         "poor": 0.6,
         "basic": 1,
         "good": 1.4,
-        "luxury": 2.0
+        "luxury": 2
       }
     },
     "vegetable": {
@@ -1130,9 +1130,10 @@
       "id": "apple",
       "fulfillmentVector": {
         "coarse": [
-          13,
+          12,
           0,
-          1,
+          0,
+          0,
           0,
           0,
           0,
@@ -1142,9 +1143,7 @@
         ],
         "fine": {
           "biological_nutrition_produce": 9.5,
-          "biological_hydration": 2.5,
-          "biological_health_medicine": 1,
-          "touch_sensory_luxury": 1
+          "biological_hydration": 2.5
         }
       },
       "tags": [
@@ -8580,7 +8579,7 @@
         "poor": 0.6,
         "basic": 1,
         "good": 1.5,
-        "luxury": 2.0
+        "luxury": 2
       },
       "durationCycles": 30,
       "effectDecayRate": 0.06,

@@ -40,6 +40,32 @@ function ProductionStats.new()
         activeWorkers = 0,
     }
 
+    -- Daily history tracking (last 30 days)
+    self.maxDailyHistory = 30
+    self.dailyHistory = {}  -- Array of daily records, newest at end
+    self.currentDayData = {
+        day = 0,
+        produced = {},           -- commodityId -> quantity
+        consumedByCitizens = {}, -- commodityId -> quantity
+        consumedByBuildings = {}, -- commodityId -> quantity
+        -- Citizen issues tracking
+        citizenIssues = {
+            -- Fine dimension issues: fineDimensionId -> { citizens = {id=true}, totalSatisfaction = 0, count = 0 }
+            fineIssues = {},
+            -- Coarse dimension issues: coarseDimensionId -> { citizens = {id=true}, totalSatisfaction = 0, count = 0 }
+            coarseIssues = {},
+            -- Housing issues
+            homelessCitizens = {},  -- Set of citizen IDs
+            homelessCount = 0
+        },
+        -- Allocation failure tracking (proactive warnings)
+        allocationFailures = {
+            -- commodityId -> { failedCount = N, citizensAffected = {id=true}, citizenCount = 0 }
+            shortages = {},
+            totalFailedAllocations = 0
+        }
+    }
+
     return self
 end
 
@@ -56,7 +82,7 @@ end
 
 -- Record production event
 function ProductionStats:recordProduction(commodityId, quantity, buildingId)
-    -- Accumulate in current period
+    -- Accumulate in current period (tick-level)
     self.currentPeriod.production[commodityId] = (self.currentPeriod.production[commodityId] or 0) + quantity
 
     if buildingId then
@@ -64,11 +90,32 @@ function ProductionStats:recordProduction(commodityId, quantity, buildingId)
         self.currentPeriod.buildingOutputs[buildingId][commodityId] =
             (self.currentPeriod.buildingOutputs[buildingId][commodityId] or 0) + quantity
     end
+
+    -- Also accumulate in daily tracking
+    self.currentDayData.produced[commodityId] = (self.currentDayData.produced[commodityId] or 0) + quantity
 end
 
--- Record consumption event
+-- Record consumption event (legacy - use recordBuildingConsumption or recordCitizenConsumption instead)
 function ProductionStats:recordConsumption(commodityId, quantity)
     self.currentPeriod.consumption[commodityId] = (self.currentPeriod.consumption[commodityId] or 0) + quantity
+end
+
+-- Record building consumption (raw materials used in production)
+function ProductionStats:recordBuildingConsumption(commodityId, quantity)
+    -- Accumulate in current period (tick-level)
+    self.currentPeriod.consumption[commodityId] = (self.currentPeriod.consumption[commodityId] or 0) + quantity
+
+    -- Also accumulate in daily tracking
+    self.currentDayData.consumedByBuildings[commodityId] = (self.currentDayData.consumedByBuildings[commodityId] or 0) + quantity
+end
+
+-- Record citizen consumption (direct consumption by citizens)
+function ProductionStats:recordCitizenConsumption(commodityId, quantity)
+    -- Accumulate in current period (tick-level)
+    self.currentPeriod.consumption[commodityId] = (self.currentPeriod.consumption[commodityId] or 0) + quantity
+
+    -- Also accumulate in daily tracking
+    self.currentDayData.consumedByCitizens[commodityId] = (self.currentDayData.consumedByCitizens[commodityId] or 0) + quantity
 end
 
 -- Record worker utilization
@@ -307,6 +354,407 @@ function ProductionStats:getMetricsSummary()
             and (self.metrics.activeWorkers / self.metrics.totalWorkers * 100) or 0,
         totalWorkers = self.metrics.totalWorkers,
         activeWorkers = self.metrics.activeWorkers,
+    }
+end
+
+-- =============================================================================
+-- DAILY HISTORY TRACKING
+-- =============================================================================
+
+-- Finalize the current day's data and archive it, then reset for new day
+-- Should be called at the start of each new day with the previous day number
+function ProductionStats:finalizeDayAndReset(completedDayNumber)
+    -- Only archive if there's data (day > 0 means we have actual data)
+    if completedDayNumber > 0 then
+        -- Check if we have any data to archive
+        local hasData = next(self.currentDayData.produced) ~= nil or
+                       next(self.currentDayData.consumedByCitizens) ~= nil or
+                       next(self.currentDayData.consumedByBuildings) ~= nil
+
+        -- Also check if we have citizen issues to archive
+        local hasIssues = (self.currentDayData.citizenIssues.homelessCount > 0) or
+                         (next(self.currentDayData.citizenIssues.coarseIssues) ~= nil)
+
+        -- Check if we have allocation failures to archive
+        local hasShortages = self.currentDayData.allocationFailures.totalFailedAllocations > 0
+
+        if hasData or hasIssues or hasShortages then
+            -- Create deep copy of current day data
+            local dayRecord = {
+                day = completedDayNumber,
+                produced = {},
+                consumedByCitizens = {},
+                consumedByBuildings = {},
+                citizenIssues = {
+                    fineIssues = {},
+                    coarseIssues = {},
+                    homelessCount = self.currentDayData.citizenIssues.homelessCount
+                },
+                allocationFailures = {
+                    shortages = {},
+                    totalFailedAllocations = self.currentDayData.allocationFailures.totalFailedAllocations
+                }
+            }
+
+            for commodityId, qty in pairs(self.currentDayData.produced) do
+                dayRecord.produced[commodityId] = qty
+            end
+            for commodityId, qty in pairs(self.currentDayData.consumedByCitizens) do
+                dayRecord.consumedByCitizens[commodityId] = qty
+            end
+            for commodityId, qty in pairs(self.currentDayData.consumedByBuildings) do
+                dayRecord.consumedByBuildings[commodityId] = qty
+            end
+
+            -- Copy citizen issues (we don't need the citizen ID sets, just counts and averages)
+            for fineId, fineData in pairs(self.currentDayData.citizenIssues.fineIssues) do
+                dayRecord.citizenIssues.fineIssues[fineId] = {
+                    count = fineData.count,
+                    totalSatisfaction = fineData.totalSatisfaction,
+                    coarseParent = fineData.coarseParent
+                }
+            end
+            for coarseId, coarseData in pairs(self.currentDayData.citizenIssues.coarseIssues) do
+                dayRecord.citizenIssues.coarseIssues[coarseId] = {
+                    count = coarseData.count,
+                    totalSatisfaction = coarseData.totalSatisfaction
+                }
+            end
+
+            -- Copy allocation failures (we don't need the citizen ID sets, just counts)
+            for commodityId, shortageData in pairs(self.currentDayData.allocationFailures.shortages) do
+                dayRecord.allocationFailures.shortages[commodityId] = {
+                    failedCount = shortageData.failedCount,
+                    citizenCount = shortageData.citizenCount
+                }
+            end
+
+            -- Add to history
+            table.insert(self.dailyHistory, dayRecord)
+
+            -- Prune if exceeds max history
+            while #self.dailyHistory > self.maxDailyHistory do
+                table.remove(self.dailyHistory, 1)
+            end
+
+            print(string.format("[ProductionStats] Archived Day %d: %d produced, %d citizen consumed, %d building consumed",
+                completedDayNumber,
+                self:countTableValues(dayRecord.produced),
+                self:countTableValues(dayRecord.consumedByCitizens),
+                self:countTableValues(dayRecord.consumedByBuildings)))
+        end
+    end
+
+    -- Reset current day data for the new day
+    self.currentDayData = {
+        day = completedDayNumber + 1,
+        produced = {},
+        consumedByCitizens = {},
+        consumedByBuildings = {},
+        citizenIssues = {
+            fineIssues = {},
+            coarseIssues = {},
+            homelessCitizens = {},
+            homelessCount = 0
+        },
+        allocationFailures = {
+            shortages = {},
+            totalFailedAllocations = 0
+        }
+    }
+end
+
+-- Helper to count total values in a commodity table
+function ProductionStats:countTableValues(tbl)
+    local total = 0
+    for _, qty in pairs(tbl) do
+        total = total + qty
+    end
+    return total
+end
+
+-- Get daily history (returns last N days, newest first)
+function ProductionStats:getDailyHistory(numDays)
+    numDays = numDays or self.maxDailyHistory
+
+    local result = {}
+    local startIdx = math.max(1, #self.dailyHistory - numDays + 1)
+
+    -- Return in reverse order (newest first)
+    for i = #self.dailyHistory, startIdx, -1 do
+        table.insert(result, self.dailyHistory[i])
+    end
+
+    return result
+end
+
+-- Get a specific day's data by day number
+function ProductionStats:getDayData(dayNumber)
+    for _, dayRecord in ipairs(self.dailyHistory) do
+        if dayRecord.day == dayNumber then
+            return dayRecord
+        end
+    end
+    return nil
+end
+
+-- Get the current (incomplete) day's data
+function ProductionStats:getCurrentDayData()
+    return self.currentDayData
+end
+
+-- Get list of all days with recorded data
+function ProductionStats:getRecordedDays()
+    local days = {}
+    for _, dayRecord in ipairs(self.dailyHistory) do
+        table.insert(days, dayRecord.day)
+    end
+    -- Sort ascending
+    table.sort(days)
+    return days
+end
+
+-- Get summary totals for a specific day
+function ProductionStats:getDaySummary(dayNumber)
+    local dayData = self:getDayData(dayNumber)
+    if not dayData then
+        return nil
+    end
+
+    return {
+        day = dayData.day,
+        totalProduced = self:countTableValues(dayData.produced),
+        totalConsumedByCitizens = self:countTableValues(dayData.consumedByCitizens),
+        totalConsumedByBuildings = self:countTableValues(dayData.consumedByBuildings),
+        producedItems = dayData.produced,
+        consumedByCitizensItems = dayData.consumedByCitizens,
+        consumedByBuildingsItems = dayData.consumedByBuildings
+    }
+end
+
+-- =============================================================================
+-- CITIZEN ISSUES TRACKING
+-- =============================================================================
+
+-- Record a citizen issue for a fine dimension
+-- Called when a citizen has low satisfaction in a specific fine dimension
+function ProductionStats:recordCitizenFineDimensionIssue(fineDimensionId, citizenId, satisfaction, coarseDimensionId)
+    local fineIssues = self.currentDayData.citizenIssues.fineIssues
+    local coarseIssues = self.currentDayData.citizenIssues.coarseIssues
+
+    -- Track fine dimension issue
+    if not fineIssues[fineDimensionId] then
+        fineIssues[fineDimensionId] = {
+            citizens = {},
+            totalSatisfaction = 0,
+            count = 0,
+            coarseParent = coarseDimensionId
+        }
+    end
+
+    -- Only count each citizen once per fine dimension per day
+    if not fineIssues[fineDimensionId].citizens[citizenId] then
+        fineIssues[fineDimensionId].citizens[citizenId] = true
+        fineIssues[fineDimensionId].totalSatisfaction = fineIssues[fineDimensionId].totalSatisfaction + satisfaction
+        fineIssues[fineDimensionId].count = fineIssues[fineDimensionId].count + 1
+    end
+
+    -- Also track at coarse level
+    if coarseDimensionId then
+        if not coarseIssues[coarseDimensionId] then
+            coarseIssues[coarseDimensionId] = {
+                citizens = {},
+                totalSatisfaction = 0,
+                count = 0
+            }
+        end
+
+        -- Only count each citizen once per coarse dimension per day
+        if not coarseIssues[coarseDimensionId].citizens[citizenId] then
+            coarseIssues[coarseDimensionId].citizens[citizenId] = true
+            coarseIssues[coarseDimensionId].totalSatisfaction = coarseIssues[coarseDimensionId].totalSatisfaction + satisfaction
+            coarseIssues[coarseDimensionId].count = coarseIssues[coarseDimensionId].count + 1
+        end
+    end
+end
+
+-- Record a homeless citizen
+function ProductionStats:recordHomelessCitizen(citizenId)
+    local homeless = self.currentDayData.citizenIssues.homelessCitizens
+    if not homeless[citizenId] then
+        homeless[citizenId] = true
+        self.currentDayData.citizenIssues.homelessCount = self.currentDayData.citizenIssues.homelessCount + 1
+    end
+end
+
+-- Clear homeless tracking (call at start of each slot to refresh)
+function ProductionStats:clearHomelessTracking()
+    self.currentDayData.citizenIssues.homelessCitizens = {}
+    self.currentDayData.citizenIssues.homelessCount = 0
+end
+
+-- =============================================================================
+-- ALLOCATION FAILURE TRACKING (Proactive Warnings)
+-- =============================================================================
+
+-- Record an allocation failure when a commodity couldn't be provided
+-- Called when AllocationEngineV2 fails to allocate a requested commodity
+function ProductionStats:recordAllocationFailure(commodityId, citizenId)
+    if not commodityId then return end
+
+    local shortages = self.currentDayData.allocationFailures.shortages
+
+    if not shortages[commodityId] then
+        shortages[commodityId] = {
+            failedCount = 0,
+            citizensAffected = {},
+            citizenCount = 0
+        }
+    end
+
+    -- Increment failed count for this commodity
+    shortages[commodityId].failedCount = shortages[commodityId].failedCount + 1
+
+    -- Track unique citizens affected (only count each citizen once per commodity)
+    if citizenId and not shortages[commodityId].citizensAffected[citizenId] then
+        shortages[commodityId].citizensAffected[citizenId] = true
+        shortages[commodityId].citizenCount = shortages[commodityId].citizenCount + 1
+    end
+
+    -- Increment total failed allocations
+    self.currentDayData.allocationFailures.totalFailedAllocations =
+        self.currentDayData.allocationFailures.totalFailedAllocations + 1
+end
+
+-- Clear allocation failure tracking (call at start of each day if needed)
+function ProductionStats:clearAllocationFailures()
+    self.currentDayData.allocationFailures = {
+        shortages = {},
+        totalFailedAllocations = 0
+    }
+end
+
+-- Get complete day end summary with issues aggregation
+-- Returns data formatted for DayEndSummaryModal
+function ProductionStats:getDayEndSummary(dayNumber)
+    local dayData = self:getDayData(dayNumber)
+    if not dayData then
+        return nil
+    end
+
+    -- Aggregate issues by severity
+    local issuesByCoarse = {}
+    local totalIssueCount = 0
+
+    -- Severity thresholds
+    local CRITICAL_THRESHOLD = 20
+    local WARNING_THRESHOLD = 40
+    local MILD_THRESHOLD = 60
+
+    -- Process coarse issues
+    if dayData.citizenIssues and dayData.citizenIssues.coarseIssues then
+        for coarseId, issueData in pairs(dayData.citizenIssues.coarseIssues) do
+            if issueData.count > 0 then
+                local avgSatisfaction = issueData.totalSatisfaction / issueData.count
+                local severity = "mild"
+                if avgSatisfaction < CRITICAL_THRESHOLD then
+                    severity = "critical"
+                elseif avgSatisfaction < WARNING_THRESHOLD then
+                    severity = "warning"
+                end
+
+                -- Collect fine dimension breakdowns for this coarse
+                local fineBreakdown = {}
+                if dayData.citizenIssues.fineIssues then
+                    for fineId, fineData in pairs(dayData.citizenIssues.fineIssues) do
+                        if fineData.coarseParent == coarseId and fineData.count > 0 then
+                            table.insert(fineBreakdown, {
+                                id = fineId,
+                                count = fineData.count,
+                                avgSatisfaction = fineData.totalSatisfaction / fineData.count
+                            })
+                        end
+                    end
+                end
+
+                -- Sort fine breakdown by count (most affected first)
+                table.sort(fineBreakdown, function(a, b) return a.count > b.count end)
+
+                issuesByCoarse[coarseId] = {
+                    coarseId = coarseId,
+                    count = issueData.count,
+                    avgSatisfaction = avgSatisfaction,
+                    severity = severity,
+                    fineBreakdown = fineBreakdown
+                }
+                totalIssueCount = totalIssueCount + 1
+            end
+        end
+    end
+
+    -- Add housing issues
+    local homelessCount = dayData.citizenIssues and dayData.citizenIssues.homelessCount or 0
+    local hasHousingIssue = homelessCount > 0
+
+    -- Process allocation failures (proactive warnings)
+    local shortagesList = {}
+    local totalFailedAllocations = 0
+    if dayData.allocationFailures then
+        totalFailedAllocations = dayData.allocationFailures.totalFailedAllocations or 0
+        if dayData.allocationFailures.shortages then
+            for commodityId, shortageData in pairs(dayData.allocationFailures.shortages) do
+                table.insert(shortagesList, {
+                    commodityId = commodityId,
+                    failedCount = shortageData.failedCount,
+                    citizenCount = shortageData.citizenCount
+                })
+            end
+            -- Sort by failed count (most failures first)
+            table.sort(shortagesList, function(a, b) return a.failedCount > b.failedCount end)
+        end
+    end
+    local hasShortages = totalFailedAllocations > 0
+
+    -- Determine overall hasIssues flag
+    local hasIssues = totalIssueCount > 0 or hasHousingIssue or hasShortages
+
+    -- Sort issues by severity (critical first) then by count
+    local sortedIssues = {}
+    for _, issue in pairs(issuesByCoarse) do
+        table.insert(sortedIssues, issue)
+    end
+    table.sort(sortedIssues, function(a, b)
+        local severityOrder = {critical = 1, warning = 2, mild = 3}
+        if severityOrder[a.severity] ~= severityOrder[b.severity] then
+            return severityOrder[a.severity] < severityOrder[b.severity]
+        end
+        return a.count > b.count
+    end)
+
+    return {
+        day = dayNumber,
+        hasIssues = hasIssues,
+
+        -- Issues data
+        issues = sortedIssues,
+        issuesByCoarse = issuesByCoarse,
+        totalIssueCategories = totalIssueCount,
+
+        -- Housing issues
+        homelessCount = homelessCount,
+
+        -- Allocation failure / shortage data (proactive warnings)
+        shortages = shortagesList,
+        totalFailedAllocations = totalFailedAllocations,
+        hasShortages = hasShortages,
+
+        -- Production/Consumption data
+        produced = dayData.produced,
+        consumedByCitizens = dayData.consumedByCitizens,
+        consumedByBuildings = dayData.consumedByBuildings,
+        totalProduced = self:countTableValues(dayData.produced),
+        totalConsumedByCitizens = self:countTableValues(dayData.consumedByCitizens),
+        totalConsumedByBuildings = self:countTableValues(dayData.consumedByBuildings)
     }
 end
 

@@ -329,6 +329,7 @@ const StartingLocationManager: React.FC = () => {
           starterBuildings: starterBuildings,
           starterResources: starterResources,
           starterGold: values.starterGold || 1000,
+          startingTreasury: values.startingTreasury || 1000,
           population: {
             initialCount: values.initialCount || 15,
             classDistribution: {},
@@ -734,9 +735,19 @@ const StartingLocationManager: React.FC = () => {
                 <Col span={8}>
                   <Form.Item
                     name="starterGold"
-                    label="Starter Gold"
+                    label="Starter Gold (Commodity)"
+                    tooltip="Gold added to town inventory as a tradeable commodity (gold bars/coins)"
                   >
                     <InputNumber min={0} style={{ width: '100%' }} />
+                  </Form.Item>
+                </Col>
+                <Col span={8}>
+                  <Form.Item
+                    name="startingTreasury"
+                    label="Town Treasury"
+                    tooltip="Initial gold in the town treasury (for wages, rent collection, building costs)"
+                  >
+                    <InputNumber min={0} style={{ width: '100%' }} placeholder="1000" />
                   </Form.Item>
                 </Col>
                 <Col span={8}>
@@ -768,15 +779,6 @@ const StartingLocationManager: React.FC = () => {
                             </Select.Option>
                           ))}
                         </Select>
-                      </Form.Item>
-                    </Col>
-                    <Col span={8}>
-                      <Form.Item
-                        name="startingTreasury"
-                        label="Town Starting Treasury"
-                        tooltip="Initial gold in the town treasury (for rent collection, wages, etc.)"
-                      >
-                        <InputNumber min={0} style={{ width: '100%' }} placeholder="0" />
                       </Form.Item>
                     </Col>
                   </Row>

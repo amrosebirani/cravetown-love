@@ -59,7 +59,10 @@ Research, analysis, and recommendations.
 - [Consumption System Architecture](systems/consumption_system_architecture_v2.md)
 - [Building System Design](systems/phase8_building_system_design.md)
 - [Immigration Design](systems/phase9_immigration_design.md)
+- [Era Progression System](systems/era_progression_system_design.md) - Progressive craving/building unlock system
+- [Era Narrative Script](systems/era_narrative_script.md) - Scripted Game System storytelling
 
 ### Active Plans
 - [Alpha Game Prototype TODO](todo-lists/alpha_game_prototype_todo.md)
 - [Missing Production Chains](todo-lists/missing_production_chains_plan.md)
+- [Era & Trade System TODO](todo-lists/era_trade_system_implementation_todo.md) - Implementation checklist

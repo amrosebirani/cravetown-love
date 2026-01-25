@@ -29,6 +29,9 @@ local CharacterDetailPanel = require("code.CharacterDetailPanel")
 -- CRAVE-6: Debug Panel
 local DebugPanel = require("code.DebugPanel")
 
+-- Day End Summary Modal
+local DayEndSummaryModal = require("code.DayEndSummaryModal")
+
 -- Supply Chain Viewer
 local SupplyChainViewer = require("code.SupplyChainViewer")
 
@@ -318,6 +321,10 @@ function AlphaUI:Create(world)
     ui.cheatConsoleCursorTimer = 0
     ui.cheatConsoleScrollOffset = 0
 
+    -- Day End Summary Modal state
+    ui.showDayEndSummaryModal = false
+    ui.dayEndSummaryModal = nil
+
     return ui
 end
 
@@ -450,6 +457,11 @@ function AlphaUI:Render()
     -- Render save/load modal on top of everything
     if self.showSaveLoadModal and self.saveLoadModal then
         self.saveLoadModal:Render()
+    end
+
+    -- Render day end summary modal (on top of most things)
+    if self.showDayEndSummaryModal and self.dayEndSummaryModal then
+        self.dayEndSummaryModal:Render()
     end
 
     -- Render notification toasts (almost on top)
@@ -5901,6 +5913,13 @@ end
 function AlphaUI:HandleClick(x, y, button)
     local screenW, screenH = love.graphics.getWidth(), love.graphics.getHeight()
 
+    -- Handle day end summary modal clicks (has priority)
+    if self.showDayEndSummaryModal and self.dayEndSummaryModal then
+        if self.dayEndSummaryModal.HandleClick then
+            return self.dayEndSummaryModal:HandleClick(x, y, button)
+        end
+    end
+
     -- Handle save/load modal clicks first (has priority)
     if self.showSaveLoadModal and self.saveLoadModal then
         return self.saveLoadModal:HandleClick(x, y, button)
@@ -7054,6 +7073,23 @@ function AlphaUI:HandleKeyPress(key)
         return false
     end
 
+    -- Handle day end summary modal keys
+    if self.showDayEndSummaryModal and self.dayEndSummaryModal then
+        if self.dayEndSummaryModal.HandleKeyPress then
+            if self.dayEndSummaryModal:HandleKeyPress(key) then
+                return true
+            end
+        end
+        -- Allow escape to close the modal
+        if key == "escape" then
+            self.showDayEndSummaryModal = false
+            self.dayEndSummaryModal = nil
+            return true
+        end
+        -- Consume other keys when modal is open
+        return true
+    end
+
     -- Handle save/load modal first (has priority)
     if self.showSaveLoadModal and self.saveLoadModal then
         return self.saveLoadModal:HandleKeyPress(key)
@@ -7403,6 +7439,26 @@ function AlphaUI:HandleKeyPress(key)
 end
 
 function AlphaUI:Update(dt)
+    -- Check for pending day end summary from world
+    if self.world.pendingDayEndSummary and not self.showDayEndSummaryModal then
+        local dayNumber = self.world.pendingDayEndSummary.dayNumber
+        self.world.pendingDayEndSummary = nil  -- Clear the pending flag
+
+        -- Create the modal with a close callback
+        self.dayEndSummaryModal = DayEndSummaryModal:Create(self.world, dayNumber, function()
+            self.showDayEndSummaryModal = false
+            self.dayEndSummaryModal = nil
+        end)
+        self.showDayEndSummaryModal = true
+    end
+
+    -- Update day end summary modal
+    if self.showDayEndSummaryModal and self.dayEndSummaryModal then
+        if self.dayEndSummaryModal.Update then
+            self.dayEndSummaryModal:Update(dt)
+        end
+    end
+
     -- Update save/load modal
     if self.showSaveLoadModal and self.saveLoadModal then
         self.saveLoadModal:Update(dt)
@@ -7464,6 +7520,14 @@ function AlphaUI:Update(dt)
 end
 
 function AlphaUI:HandleMouseWheel(x, y)
+    -- Handle day end summary modal scroll (highest priority when open)
+    if self.showDayEndSummaryModal and self.dayEndSummaryModal then
+        if self.dayEndSummaryModal.OnMouseWheel then
+            self.dayEndSummaryModal:OnMouseWheel(x, y)
+        end
+        return
+    end
+
     -- Handle cheat console scroll (highest priority when open)
     if self.showCheatConsole then
         if y > 0 then

@@ -44,6 +44,33 @@ CommodityCache.stats = {
     cacheMisses = 0
 }
 
+-- Primary dimension threshold: only cache commodities if their fulfillment
+-- value for a dimension is at least this fraction of their max fulfillment
+-- This prevents commodities from being allocated for secondary/incidental purposes
+-- (e.g., apples being used for medicine when they're primarily produce)
+CommodityCache.PRIMARY_THRESHOLD = 0.5  -- 50% of max value
+
+-- Helper: Get the maximum fulfillment value across all fine dimensions for a commodity
+function CommodityCache.GetMaxFulfillmentValue(fineVector)
+    local maxValue = 0
+    for _, value in pairs(fineVector) do
+        if value > maxValue then
+            maxValue = value
+        end
+    end
+    return maxValue
+end
+
+-- Helper: Check if a dimension is a "primary" dimension for a commodity
+-- A dimension is primary if its value is >= PRIMARY_THRESHOLD of the commodity's max value
+function CommodityCache.IsPrimaryDimension(fineVector, fineName)
+    local value = fineVector[fineName] or 0
+    if value == 0 then return false end
+    local maxValue = CommodityCache.GetMaxFulfillmentValue(fineVector)
+    if maxValue == 0 then return false end
+    return value >= (maxValue * CommodityCache.PRIMARY_THRESHOLD)
+end
+
 -- Try to load pre-computed cache from info-system
 function CommodityCache.TryLoadPrecomputed()
     local startTime = love.timer.getTime()
@@ -233,9 +260,12 @@ function CommodityCache.RebuildFullCache(inventory)
                 local fineVector = commodityData.fulfillmentVector and commodityData.fulfillmentVector.fine
 
                 if fineVector then
-                    -- Add to fine dimension caches
+                    -- Add to fine dimension caches (only for PRIMARY dimensions)
+                    -- This prevents commodities from being used for secondary/incidental purposes
                     for fineName, points in pairs(fineVector) do
-                        if points > 0 and cache.byFineDimension[fineName] then
+                        -- Only include if this is a primary dimension (>= threshold of max)
+                        local isPrimary = CommodityCache.IsPrimaryDimension(fineVector, fineName)
+                        if isPrimary and cache.byFineDimension[fineName] then
                             table.insert(cache.byFineDimension[fineName].available, {
                                 id = commodityId,
                                 value = points
@@ -244,10 +274,12 @@ function CommodityCache.RebuildFullCache(inventory)
                     end
 
                     -- Add to coarse dimension caches
-                    -- Aggregate fine values to coarse
+                    -- Aggregate ONLY primary fine dimension values to coarse
                     local coarseValues = {}
                     for fineName, points in pairs(fineVector) do
-                        if points > 0 then
+                        -- Only aggregate primary dimensions to coarse caches
+                        local isPrimary = CommodityCache.IsPrimaryDimension(fineVector, fineName)
+                        if isPrimary then
                             -- Find coarse parent
                             local fineIdx = CharacterV2.fineNames and CommodityCache.FindFineIndex(fineName)
                             if fineIdx then
@@ -418,6 +450,7 @@ function CommodityCache.GetCommoditiesForCoarseDimension(coarseName, inventory)
 end
 
 -- Rebuild a single fine dimension cache
+-- Only includes commodities for which this dimension is PRIMARY (>= threshold of max)
 function CommodityCache.RebuildFineDimensionCache(fineName, inventory)
     local cache = CommodityCache.cache.byFineDimension[fineName]
     if not cache then return end
@@ -428,11 +461,15 @@ function CommodityCache.RebuildFineDimensionCache(fineName, inventory)
         for commodityId, commodityData in pairs(FulfillmentVectors.commodities) do
             if inventory[commodityId] and inventory[commodityId] > 0 then
                 local fineVector = commodityData.fulfillmentVector and commodityData.fulfillmentVector.fine
-                if fineVector and fineVector[fineName] and fineVector[fineName] > 0 then
-                    table.insert(cache.available, {
-                        id = commodityId,
-                        value = fineVector[fineName]
-                    })
+                if fineVector and fineVector[fineName] then
+                    -- Only include if this is a primary dimension for this commodity
+                    local isPrimary = CommodityCache.IsPrimaryDimension(fineVector, fineName)
+                    if isPrimary then
+                        table.insert(cache.available, {
+                            id = commodityId,
+                            value = fineVector[fineName]
+                        })
+                    end
                 end
             end
         end
@@ -454,6 +491,7 @@ function CommodityCache.RebuildFineDimensionCache(fineName, inventory)
 end
 
 -- Rebuild a single coarse dimension cache
+-- Only aggregates PRIMARY fine dimensions (>= threshold of max)
 function CommodityCache.RebuildCoarseDimensionCache(coarseName, inventory)
     local cache = CommodityCache.cache.byCoarseDimension[coarseName]
     if not cache then return end
@@ -473,12 +511,16 @@ function CommodityCache.RebuildCoarseDimensionCache(coarseName, inventory)
             if inventory[commodityId] and inventory[commodityId] > 0 then
                 local fineVector = commodityData.fulfillmentVector and commodityData.fulfillmentVector.fine
                 if fineVector then
-                    -- Sum up all fine values in this coarse dimension
+                    -- Sum up only PRIMARY fine values in this coarse dimension
                     local totalValue = 0
                     for _, fineIdx in ipairs(fineIndices) do
                         local fineName = CharacterV2.fineNames[fineIdx]
                         if fineName and fineVector[fineName] then
-                            totalValue = totalValue + fineVector[fineName]
+                            -- Only include if this is a primary dimension
+                            local isPrimary = CommodityCache.IsPrimaryDimension(fineVector, fineName)
+                            if isPrimary then
+                                totalValue = totalValue + fineVector[fineName]
+                            end
                         end
                     end
 

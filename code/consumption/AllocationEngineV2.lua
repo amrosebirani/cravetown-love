@@ -8,11 +8,16 @@
 
 local AllocationEngineV2 = {}
 
-local ConsumptionMechanics = nil
-local FulfillmentVectors = nil
-local SubstitutionRules = nil
-local CharacterModule = nil  -- CharacterV3 module (passed via Init)
-local CommodityCache = nil
+-- Load DataLoader for loading JSON data directly (survives hot-reloads)
+local DataLoader = require("code.DataLoader")
+
+-- These are directly loaded/required to survive hot-reloads
+local ConsumptionMechanics = DataLoader.loadConsumptionMechanics()
+local FulfillmentVectors = DataLoader.loadFulfillmentVectors()
+local SubstitutionRules = DataLoader.loadSubstitutionRules()
+local CharacterModule = require("code.consumption.CharacterV3")
+local CommodityCache = require("code.consumption.CommodityCache")
+local ProductionStatsRef = nil  -- Reference to ProductionStats for tracking citizen consumption
 
 -- Minimum accumulated craving value to trigger allocation attempt
 local CRAVING_THRESHOLD = 1.0
@@ -29,12 +34,30 @@ AllocationEngineV2.classConsumptionBudget = {
 }
 
 -- Initialize data
+-- Note: All parameters are kept for API compatibility but data is now directly
+-- loaded/required at the top of this file to survive hot-reloads.
+-- Parameters can still override the defaults if explicitly passed.
 function AllocationEngineV2.Init(mechanicsData, fulfillmentData, substitutionData, characterModule, cacheModule)
-    ConsumptionMechanics = mechanicsData
-    FulfillmentVectors = fulfillmentData
-    SubstitutionRules = substitutionData
-    CharacterModule = characterModule
-    CommodityCache = cacheModule
+    if mechanicsData then
+        ConsumptionMechanics = mechanicsData
+    end
+    if fulfillmentData then
+        FulfillmentVectors = fulfillmentData
+    end
+    if substitutionData then
+        SubstitutionRules = substitutionData
+    end
+    if characterModule then
+        CharacterModule = characterModule
+    end
+    if cacheModule then
+        CommodityCache = cacheModule
+    end
+end
+
+-- Set ProductionStats reference for tracking citizen consumption
+function AllocationEngineV2.SetProductionStats(productionStats)
+    ProductionStatsRef = productionStats
 end
 
 -- Allocate resources for one cycle
@@ -138,6 +161,10 @@ function AllocationEngineV2.AllocateCycle(characters, townInventory, currentCycl
                 if allocation.requestedCommodity then
                     allocationLog.shortages[allocation.requestedCommodity] = (allocationLog.shortages[allocation.requestedCommodity] or 0) +
                         1
+                    -- Also record to ProductionStats for Day End Summary proactive warnings
+                    if ProductionStatsRef then
+                        ProductionStatsRef:recordAllocationFailure(allocation.requestedCommodity, character.id)
+                    end
                 end
                 -- Failed to get this commodity, but try next craving
                 remainingBudget[character] = remainingBudget[character] - 1
@@ -729,6 +756,11 @@ function AllocationEngineV2.AllocateMultipleUnits(character, commodityId, quanti
         character, commodityId, quantity, currentCycle
     )
 
+    -- Record citizen consumption in ProductionStats for daily tracking
+    if success and ProductionStatsRef then
+        ProductionStatsRef:recordCitizenConsumption(commodityId, quantity)
+    end
+
     -- Record attempt (success/fail affects fairness penalty)
     character:RecordAllocationAttempt(success, currentCycle)
 
@@ -831,6 +863,14 @@ function AllocationEngineV2.AllocateCycleV2(characters, townInventory, currentCy
                     end
 
                     allocationLog.stats.failed = allocationLog.stats.failed + 1
+
+                    -- Record to ProductionStats for Day End Summary proactive warnings
+                    -- Use cravingId as the "commodity" since no specific commodity was requested
+                    -- This tracks "no commodities available for dimension X"
+                    if ProductionStatsRef then
+                        ProductionStatsRef:recordAllocationFailure(cravingId, character.id)
+                    end
+
                     goto continue_character
                 end
 
@@ -885,6 +925,12 @@ function AllocationEngineV2.AllocateCycleV2(characters, townInventory, currentCy
                         end
 
                         allocationLog.stats.failed = allocationLog.stats.failed + 1
+
+                        -- Record to ProductionStats for Day End Summary proactive warnings
+                        if ProductionStatsRef then
+                            ProductionStatsRef:recordAllocationFailure(cravingId, character.id)
+                        end
+
                         break
                     end
                 end
@@ -899,6 +945,74 @@ function AllocationEngineV2.AllocateCycleV2(characters, townInventory, currentCy
         allocationLog.stats.totalUnits, allocationLog.stats.failed))
 
     return allocationLog
+end
+
+-- =============================================================================
+-- CITIZEN ISSUE TRACKING: Records low satisfaction issues for day end summary
+-- =============================================================================
+
+-- Scan all characters and record issues to ProductionStats
+-- Called at the end of each allocation cycle (typically at slot end)
+-- issueThreshold: satisfaction below this level is recorded as an issue (default 60)
+-- housingSystem: optional housing system to check for homeless citizens
+function AllocationEngineV2.RecordCitizenIssues(characters, issueThreshold, housingSystem)
+    if not ProductionStatsRef then
+        return -- No stats tracking available
+    end
+
+    issueThreshold = issueThreshold or 60
+
+    for _, character in ipairs(characters) do
+        if character.hasEmigrated then
+            goto continue_character_issues
+        end
+
+        -- Check housing (homeless)
+        -- Housing info is stored in housingSystem.housingAssignments, not on character directly
+        local isHomeless = true
+        local characterId = character.id or character.name
+        if housingSystem and housingSystem.housingAssignments then
+            local assignment = housingSystem.housingAssignments[characterId]
+            if assignment and assignment.buildingId then
+                isHomeless = false
+            end
+        elseif character.housingId then
+            -- Fallback to character property if no housing system provided
+            isHomeless = false
+        end
+
+        if isHomeless then
+            ProductionStatsRef:recordHomelessCitizen(characterId)
+        end
+
+        -- Check satisfaction at fine dimension level
+        local fineMaxIdx = CharacterModule.GetFineMaxIndex and CharacterModule.GetFineMaxIndex() or 65
+        for fineIdx = 0, fineMaxIdx do
+            local satisfaction = character.satisfaction[fineIdx]
+            if satisfaction and satisfaction < issueThreshold then
+                local fineName = CharacterModule.fineNames[fineIdx]
+                local coarseIdx = CharacterModule.fineToCoarseMap[fineIdx]
+                local coarseName = coarseIdx and CharacterModule.coarseNames[coarseIdx] or nil
+
+                if fineName and coarseName then
+                    ProductionStatsRef:recordCitizenFineDimensionIssue(
+                        fineName,
+                        character.id or character.name,
+                        satisfaction,
+                        coarseName
+                    )
+                end
+            end
+        end
+
+        ::continue_character_issues::
+    end
+end
+
+-- Wrapper for recording issues at end of AllocateCycleV2
+-- This is called automatically after each allocation cycle
+function AllocationEngineV2.PostAllocationIssueTracking(characters, issueThreshold, housingSystem)
+    AllocationEngineV2.RecordCitizenIssues(characters, issueThreshold, housingSystem)
 end
 
 return AllocationEngineV2

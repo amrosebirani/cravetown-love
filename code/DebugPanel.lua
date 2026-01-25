@@ -62,7 +62,8 @@ function DebugPanel:Create(world)
         {id = "cravings", label = "Cravings", icon = "[R]"},
         {id = "buildings", label = "Buildings", icon = "[B]"},
         {id = "economy", label = "Economy", icon = "[E]"},
-        {id = "events", label = "Events", icon = "[L]"}
+        {id = "events", label = "Events", icon = "[L]"},
+        {id = "history", label = "History", icon = "[H]"}
     }
 
     -- Buildings tab state
@@ -75,6 +76,10 @@ function DebugPanel:Create(world)
     panel.cravingsClassFilter = "all"  -- "all", "elite", "upper", "middle", "lower"
     panel.cravingsDimensionPickerOpen = false  -- Whether dimension picker dropdown is open
     panel.cravingsCoarseFilter = "all"  -- Filter dimensions in picker by coarse parent
+
+    -- History tab state
+    panel.selectedHistoryDay = nil  -- Currently selected day to view (nil = most recent)
+    panel.historyScrollOffset = 0   -- Scroll offset within the history data
 
     -- Fonts (initialized on first render)
     panel.fonts = nil
@@ -185,6 +190,8 @@ function DebugPanel:Render()
             self:RenderEconomyTab(self.x + 10, contentY - self.scrollOffset, self.width - 20)
         elseif self.currentTab == "events" then
             self:RenderEventsTab(self.x + 10, contentY - self.scrollOffset, self.width - 20)
+        elseif self.currentTab == "history" then
+            self:RenderHistoryTab(self.x + 10, contentY - self.scrollOffset, self.width - 20)
         end
 
         love.graphics.setScissor()
@@ -1360,6 +1367,329 @@ function DebugPanel:RenderEventsTab(x, startY, w)
     end
 
     self.maxScroll = math.max(0, y - startY - (self.height - 80))
+end
+
+-- =============================================================================
+-- HISTORY TAB (30-Day Production/Consumption Log)
+-- =============================================================================
+function DebugPanel:RenderHistoryTab(x, startY, w)
+    local y = startY + 10
+
+    love.graphics.setFont(self.fonts.header)
+    love.graphics.setColor(0.4, 0.7, 0.9)
+    love.graphics.print("DAILY PRODUCTION & CONSUMPTION LOG", x, y)
+    y = y + 22
+
+    -- Check if productionStats exists
+    if not self.world or not self.world.productionStats then
+        love.graphics.setFont(self.fonts.small)
+        love.graphics.setColor(self.colors.textMuted)
+        love.graphics.print("Production stats not available", x, y)
+        y = y + 20
+        self.maxScroll = 0
+        return
+    end
+
+    local productionStats = self.world.productionStats
+    local dailyHistory = productionStats:getDailyHistory(30)
+    local currentDayData = productionStats:getCurrentDayData()
+
+    -- Show current day info
+    local currentDay = self.world.timeManager and self.world.timeManager:GetDay() or 0
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print(string.format("Current Day: %d | History: %d days recorded", currentDay, #dailyHistory), x, y)
+    y = y + 18
+
+    -- Day selector
+    y = self:RenderDaySelector(x, y, w, dailyHistory, currentDay)
+    y = y + 10
+
+    -- Get data for selected day (or current day if no selection)
+    local dayData = nil
+    local isCurrentDay = false
+
+    if self.selectedHistoryDay then
+        dayData = productionStats:getDayData(self.selectedHistoryDay)
+    end
+
+    if not dayData then
+        -- Show current (incomplete) day data
+        dayData = currentDayData
+        isCurrentDay = true
+        self.selectedHistoryDay = nil
+    end
+
+    if not dayData then
+        love.graphics.setFont(self.fonts.small)
+        love.graphics.setColor(self.colors.textMuted)
+        love.graphics.print("No history recorded yet. Play for a few days!", x, y)
+        y = y + 20
+        self.maxScroll = 0
+        return
+    end
+
+    -- Day header
+    love.graphics.setFont(self.fonts.normal)
+    love.graphics.setColor(self.colors.text)
+    local dayLabel = isCurrentDay and string.format("Day %d (In Progress)", dayData.day or currentDay)
+                                   or string.format("Day %d", dayData.day)
+    love.graphics.print(dayLabel, x, y)
+    y = y + 20
+
+    -- Render the three sections
+    y = self:RenderProductionSection(x, y, w, dayData.produced or {})
+    y = y + 10
+    y = self:RenderCitizenConsumptionSection(x, y, w, dayData.consumedByCitizens or {})
+    y = y + 10
+    y = self:RenderBuildingConsumptionSection(x, y, w, dayData.consumedByBuildings or {})
+
+    self.maxScroll = math.max(0, y - startY - (self.height - 80))
+end
+
+function DebugPanel:RenderDaySelector(x, y, w, dailyHistory, currentDay)
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print("Select Day:", x, y + 3)
+
+    local btnX = x + 75
+    local btnW = 45
+    local btnH = 20
+
+    -- "Current" button
+    local isCurrent = self.selectedHistoryDay == nil
+    local color = isCurrent and {0.3, 0.6, 0.4} or {0.2, 0.3, 0.35}
+    self:RenderButton("Now", btnX, y, btnW, btnH, function()
+        self.selectedHistoryDay = nil
+    end, color)
+    btnX = btnX + btnW + 5
+
+    -- Navigation buttons if we have history
+    if #dailyHistory > 0 then
+        -- Previous button
+        self:RenderButton("<", btnX, y, 25, btnH, function()
+            if self.selectedHistoryDay then
+                -- Find index of current selection in history
+                local currentIdx = 0
+                for i, record in ipairs(dailyHistory) do
+                    if record.day == self.selectedHistoryDay then
+                        currentIdx = i
+                        break
+                    end
+                end
+                -- Go to previous (older) day
+                if currentIdx > 0 and currentIdx < #dailyHistory then
+                    self.selectedHistoryDay = dailyHistory[currentIdx + 1].day
+                end
+            else
+                -- Start from most recent
+                if #dailyHistory > 0 then
+                    self.selectedHistoryDay = dailyHistory[1].day
+                end
+            end
+        end, {0.3, 0.35, 0.4})
+        btnX = btnX + 30
+
+        -- Show selected day number
+        local selectedLabel = self.selectedHistoryDay and tostring(self.selectedHistoryDay) or tostring(currentDay)
+        love.graphics.setColor(self.colors.info)
+        love.graphics.print("Day " .. selectedLabel, btnX, y + 3)
+        btnX = btnX + 55
+
+        -- Next button
+        self:RenderButton(">", btnX, y, 25, btnH, function()
+            if self.selectedHistoryDay then
+                -- Find index of current selection in history
+                local currentIdx = 0
+                for i, record in ipairs(dailyHistory) do
+                    if record.day == self.selectedHistoryDay then
+                        currentIdx = i
+                        break
+                    end
+                end
+                -- Go to next (newer) day
+                if currentIdx > 1 then
+                    self.selectedHistoryDay = dailyHistory[currentIdx - 1].day
+                elseif currentIdx == 1 then
+                    -- Most recent history day, go to current (in-progress) day
+                    self.selectedHistoryDay = nil
+                end
+            end
+        end, {0.3, 0.35, 0.4})
+    end
+
+    return y + btnH + 5
+end
+
+function DebugPanel:RenderProductionSection(x, y, w, produced)
+    -- Section header
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.4, 0.8, 0.4)  -- Green for production
+
+    local total = 0
+    local count = 0
+    for _, qty in pairs(produced) do
+        total = total + qty
+        count = count + 1
+    end
+
+    love.graphics.print(string.format("PRODUCTION (%d items)", count), x, y)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print(string.format("Total: %d", total), x + w - 80, y)
+    y = y + 16
+
+    -- Separator
+    love.graphics.setColor(0.3, 0.5, 0.3, 0.5)
+    love.graphics.line(x, y, x + w, y)
+    y = y + 4
+
+    love.graphics.setFont(self.fonts.tiny)
+
+    if count == 0 then
+        love.graphics.setColor(self.colors.textMuted)
+        love.graphics.print("  No production recorded", x, y)
+        y = y + 12
+    else
+        -- Sort by quantity (highest first)
+        local sortedItems = {}
+        for commodityId, qty in pairs(produced) do
+            table.insert(sortedItems, {id = commodityId, qty = qty})
+        end
+        table.sort(sortedItems, function(a, b) return a.qty > b.qty end)
+
+        for i, item in ipairs(sortedItems) do
+            if i > 15 then
+                love.graphics.setColor(self.colors.textMuted)
+                love.graphics.print(string.format("  ... and %d more items", count - 15), x, y)
+                y = y + 11
+                break
+            end
+
+            love.graphics.setColor(0.5, 0.8, 0.5)  -- Light green
+            local label = item.id
+            if #label > 25 then label = label:sub(1, 22) .. "..." end
+            love.graphics.print(string.format("  %s", label), x, y)
+            love.graphics.setColor(self.colors.success)
+            love.graphics.print(string.format("+%d", item.qty), x + w - 50, y)
+            y = y + 11
+        end
+    end
+
+    return y
+end
+
+function DebugPanel:RenderCitizenConsumptionSection(x, y, w, consumed)
+    -- Section header
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.4, 0.6, 0.9)  -- Blue for citizen consumption
+
+    local total = 0
+    local count = 0
+    for _, qty in pairs(consumed) do
+        total = total + qty
+        count = count + 1
+    end
+
+    love.graphics.print(string.format("CITIZEN CONSUMPTION (%d items)", count), x, y)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print(string.format("Total: %d", total), x + w - 80, y)
+    y = y + 16
+
+    -- Separator
+    love.graphics.setColor(0.3, 0.4, 0.6, 0.5)
+    love.graphics.line(x, y, x + w, y)
+    y = y + 4
+
+    love.graphics.setFont(self.fonts.tiny)
+
+    if count == 0 then
+        love.graphics.setColor(self.colors.textMuted)
+        love.graphics.print("  No citizen consumption recorded", x, y)
+        y = y + 12
+    else
+        -- Sort by quantity (highest first)
+        local sortedItems = {}
+        for commodityId, qty in pairs(consumed) do
+            table.insert(sortedItems, {id = commodityId, qty = qty})
+        end
+        table.sort(sortedItems, function(a, b) return a.qty > b.qty end)
+
+        for i, item in ipairs(sortedItems) do
+            if i > 15 then
+                love.graphics.setColor(self.colors.textMuted)
+                love.graphics.print(string.format("  ... and %d more items", count - 15), x, y)
+                y = y + 11
+                break
+            end
+
+            love.graphics.setColor(0.5, 0.7, 0.9)  -- Light blue
+            local label = item.id
+            if #label > 25 then label = label:sub(1, 22) .. "..." end
+            love.graphics.print(string.format("  %s", label), x, y)
+            love.graphics.setColor(self.colors.info)
+            love.graphics.print(string.format("-%d", item.qty), x + w - 50, y)
+            y = y + 11
+        end
+    end
+
+    return y
+end
+
+function DebugPanel:RenderBuildingConsumptionSection(x, y, w, consumed)
+    -- Section header
+    love.graphics.setFont(self.fonts.small)
+    love.graphics.setColor(0.9, 0.6, 0.3)  -- Orange for building consumption
+
+    local total = 0
+    local count = 0
+    for _, qty in pairs(consumed) do
+        total = total + qty
+        count = count + 1
+    end
+
+    love.graphics.print(string.format("BUILDING CONSUMPTION (raw materials) (%d items)", count), x, y)
+    love.graphics.setColor(self.colors.textDim)
+    love.graphics.print(string.format("Total: %d", total), x + w - 80, y)
+    y = y + 16
+
+    -- Separator
+    love.graphics.setColor(0.6, 0.4, 0.2, 0.5)
+    love.graphics.line(x, y, x + w, y)
+    y = y + 4
+
+    love.graphics.setFont(self.fonts.tiny)
+
+    if count == 0 then
+        love.graphics.setColor(self.colors.textMuted)
+        love.graphics.print("  No building consumption recorded", x, y)
+        y = y + 12
+    else
+        -- Sort by quantity (highest first)
+        local sortedItems = {}
+        for commodityId, qty in pairs(consumed) do
+            table.insert(sortedItems, {id = commodityId, qty = qty})
+        end
+        table.sort(sortedItems, function(a, b) return a.qty > b.qty end)
+
+        for i, item in ipairs(sortedItems) do
+            if i > 15 then
+                love.graphics.setColor(self.colors.textMuted)
+                love.graphics.print(string.format("  ... and %d more items", count - 15), x, y)
+                y = y + 11
+                break
+            end
+
+            love.graphics.setColor(0.9, 0.7, 0.4)  -- Light orange
+            local label = item.id
+            if #label > 25 then label = label:sub(1, 22) .. "..." end
+            love.graphics.print(string.format("  %s", label), x, y)
+            love.graphics.setColor(self.colors.warning)
+            love.graphics.print(string.format("-%d", item.qty), x + w - 50, y)
+            y = y + 11
+        end
+    end
+
+    return y
 end
 
 -- =============================================================================

@@ -1,0 +1,608 @@
+{
+  "version": "1.0.0",
+  "coarseLabels": {
+    "biological": "Biological Needs",
+    "safety": "Safety & Shelter",
+    "touch": "Comfort & Touch",
+    "psychological": "Mental & Spiritual",
+    "social_status": "Social Status",
+    "social_connection": "Social Connection",
+    "exotic_goods": "Exotic Cravings",
+    "shiny_objects": "Material Desires",
+    "vice": "Vice & Indulgence",
+    "utility": "Utility Needs"
+  },
+  "fineHints": {
+    "biological_nutrition_grain": {
+      "issue": "lacking grain-based foods",
+      "hint": "Build a Farm to grow wheat, or a Mill to process flour",
+      "buildings": ["farm", "mill", "bakery"]
+    },
+    "biological_nutrition_protein": {
+      "issue": "lacking protein",
+      "hint": "Build a Ranch for meat, or a Fishery for fish",
+      "buildings": ["ranch", "fishery", "butcher"]
+    },
+    "biological_nutrition_produce": {
+      "issue": "lacking fresh produce",
+      "hint": "Build a Farm with vegetable fields, or an Orchard for fruit",
+      "buildings": ["farm", "orchard", "garden"]
+    },
+    "biological_hydration": {
+      "issue": "lacking beverages",
+      "hint": "Build a Well for clean water, or a Brewery for drinks",
+      "buildings": ["well", "brewery", "winery"]
+    },
+    "biological_health_medicine": {
+      "issue": "lacking medicine",
+      "hint": "Build an Apothecary or Herbalist for healing supplies",
+      "buildings": ["apothecary", "herbalist", "hospital"]
+    },
+    "biological_health_hygiene": {
+      "issue": "lacking hygiene supplies",
+      "hint": "Build a Soapmaker or Bathhouse for cleanliness",
+      "buildings": ["soapmaker", "bathhouse"]
+    },
+    "biological_energy_rest": {
+      "issue": "not getting proper rest",
+      "hint": "Ensure citizens have beds - build more housing or a Carpenter for furniture",
+      "buildings": ["carpenter", "lodge", "family_home"]
+    },
+    "biological_energy_stimulation": {
+      "issue": "lacking stimulating beverages",
+      "hint": "Import tea or coffee through a Trading Post",
+      "buildings": ["trading_post", "market"]
+    },
+    "biological_nutrition_fat": {
+      "issue": "lacking fats in diet",
+      "hint": "Build a Dairy or Ranch for butter and animal fats",
+      "buildings": ["dairy", "ranch", "butcher"]
+    },
+    "biological_taste_spicy": {
+      "issue": "craving spicy flavors",
+      "hint": "Import spices through a Trading Post or grow peppers",
+      "buildings": ["trading_post", "farm"]
+    },
+    "biological_taste_crunchy": {
+      "issue": "craving crunchy textures",
+      "hint": "Build a Bakery for crusty bread or import nuts",
+      "buildings": ["bakery", "trading_post"]
+    },
+    "biological_taste_wholesome": {
+      "issue": "craving hearty meals",
+      "hint": "Build a Bakery or Kitchen for complete meals",
+      "buildings": ["bakery", "kitchen", "inn"]
+    },
+    "biological_fragrance_exotic": {
+      "issue": "craving pleasant scents",
+      "hint": "Import perfumes or grow aromatic herbs",
+      "buildings": ["trading_post", "herbalist", "garden"]
+    },
+    "safety_security_law": {
+      "issue": "feeling unsafe from crime",
+      "hint": "Build a Watchtower or hire Guards for law enforcement",
+      "buildings": ["watchtower", "guardhouse", "jail"]
+    },
+    "safety_security_defense": {
+      "issue": "fearing external threats",
+      "hint": "Build Walls or a Barracks for military defense",
+      "buildings": ["wall", "barracks", "gatehouse"]
+    },
+    "safety_shelter_housing": {
+      "issue": "lacking proper shelter",
+      "hint": "Build Lodges or Family Homes for housing",
+      "buildings": ["lodge", "family_home", "manor"]
+    },
+    "safety_shelter_warmth": {
+      "issue": "lacking warmth",
+      "hint": "Ensure homes have fireplaces - build a Woodcutter for fuel",
+      "buildings": ["woodcutter", "charcoal_burner"]
+    },
+    "safety_fire_protection": {
+      "issue": "worried about fire hazards",
+      "hint": "Build a Fire Station or Well for fire safety",
+      "buildings": ["fire_station", "well"]
+    },
+    "safety_shelter_housing_basic": {
+      "issue": "lacking basic housing",
+      "hint": "Build Lodges to provide basic shelter",
+      "buildings": ["lodge"]
+    },
+    "safety_shelter_housing_good": {
+      "issue": "wanting better housing",
+      "hint": "Build Family Homes for quality housing",
+      "buildings": ["family_home"]
+    },
+    "safety_shelter_housing_luxury": {
+      "issue": "wanting luxury housing",
+      "hint": "Build Manors for luxury accommodations",
+      "buildings": ["manor"]
+    },
+    "safety_shelter_housing_prestige": {
+      "issue": "wanting prestigious housing",
+      "hint": "Build Elite Estates for prestige housing",
+      "buildings": ["estate", "manor"]
+    },
+    "safety_shelter_weather": {
+      "issue": "lacking weather protection",
+      "hint": "Ensure solid roofing - upgrade housing or build a Carpenter",
+      "buildings": ["carpenter", "lodge", "family_home"]
+    },
+    "safety_shelter_lighting": {
+      "issue": "lacking proper lighting",
+      "hint": "Build a Chandler for candles or import oil lamps",
+      "buildings": ["chandler", "trading_post"]
+    },
+    "touch_clothing_everyday": {
+      "issue": "lacking everyday clothes",
+      "hint": "Build a Tailor or Weaver for basic clothing",
+      "buildings": ["tailor", "weaver"]
+    },
+    "touch_clothing_formal": {
+      "issue": "lacking formal attire",
+      "hint": "Build a Fine Tailor for formal clothing",
+      "buildings": ["fine_tailor", "tailor"]
+    },
+    "touch_furniture_functional": {
+      "issue": "lacking basic furniture",
+      "hint": "Build a Carpenter for beds, chairs, and tables",
+      "buildings": ["carpenter", "furniture_maker"]
+    },
+    "touch_furniture_decorative": {
+      "issue": "wanting decorative furniture",
+      "hint": "Build a Fine Carpenter for decorative pieces",
+      "buildings": ["fine_carpenter", "furniture_maker"]
+    },
+    "touch_textiles_bedding": {
+      "issue": "lacking bedding and linens",
+      "hint": "Build a Weaver for cloth and blankets",
+      "buildings": ["weaver", "tailor"]
+    },
+    "touch_sensory_luxury": {
+      "issue": "craving sensory luxuries",
+      "hint": "Import perfumes and flowers through a Trading Post",
+      "buildings": ["trading_post", "garden", "perfumer"]
+    },
+    "touch_furniture_storage": {
+      "issue": "lacking storage furniture",
+      "hint": "Build a Carpenter for wardrobes and chests",
+      "buildings": ["carpenter", "furniture_maker"]
+    },
+    "touch_child_comfort": {
+      "issue": "children lacking comfort items",
+      "hint": "Build a Toymaker or provide soft toys",
+      "buildings": ["toymaker", "tailor"]
+    },
+    "touch_foot_care": {
+      "issue": "lacking proper footwear",
+      "hint": "Build a Cobbler for shoes and boots",
+      "buildings": ["cobbler", "tanner"]
+    },
+    "psychological_education_books": {
+      "issue": "lacking books and reading material",
+      "hint": "Build a Library or Scriptorium for books",
+      "buildings": ["library", "scriptorium", "bookbinder"]
+    },
+    "psychological_education_formal": {
+      "issue": "lacking formal education",
+      "hint": "Build a School or hire Tutors",
+      "buildings": ["school", "university"]
+    },
+    "psychological_entertainment_arts": {
+      "issue": "lacking arts and culture",
+      "hint": "Build a Theater or support local Artists",
+      "buildings": ["theater", "gallery", "workshop"]
+    },
+    "psychological_entertainment_games": {
+      "issue": "lacking games and leisure",
+      "hint": "Build a Tavern for games or a Sports Field",
+      "buildings": ["tavern", "sports_field", "park"]
+    },
+    "psychological_purpose_work": {
+      "issue": "lacking meaningful work",
+      "hint": "Create more jobs by building production buildings",
+      "buildings": ["workshop", "smithy", "mill"]
+    },
+    "psychological_purpose_religion": {
+      "issue": "lacking spiritual fulfillment",
+      "hint": "Build a Chapel or Church for worship",
+      "buildings": ["chapel", "church", "monastery"]
+    },
+    "psychological_purpose_civic": {
+      "issue": "lacking civic participation",
+      "hint": "Build a Town Hall or Market Square for gatherings",
+      "buildings": ["town_hall", "market", "forum"]
+    },
+    "psychological_detstress_relax": {
+      "issue": "stressed and need relaxation",
+      "hint": "Build a Tavern, Bathhouse, or Park for relaxation",
+      "buildings": ["tavern", "bathhouse", "park", "garden"]
+    },
+    "status_reputation_display": {
+      "issue": "wanting to display wealth",
+      "hint": "Produce jewelry or fine goods at a Goldsmith",
+      "buildings": ["goldsmith", "jeweler"]
+    },
+    "status_reputation_title": {
+      "issue": "wanting titles and recognition",
+      "hint": "Build a Town Hall for civic honors",
+      "buildings": ["town_hall", "guild_hall"]
+    },
+    "status_wealth_precious": {
+      "issue": "wanting precious possessions",
+      "hint": "Build a Jeweler for gold and gems",
+      "buildings": ["jeweler", "goldsmith"]
+    },
+    "status_wealth_property": {
+      "issue": "wanting property ownership",
+      "hint": "Build Manors or Estates for property",
+      "buildings": ["manor", "estate"]
+    },
+    "status_service_servants": {
+      "issue": "wanting household staff",
+      "hint": "Hire servants through a Staff Agency",
+      "buildings": ["staff_agency", "manor"]
+    },
+    "status_fashion_luxury": {
+      "issue": "wanting luxury fashion",
+      "hint": "Build a Fine Tailor for luxury clothing",
+      "buildings": ["fine_tailor", "silk_weaver"]
+    },
+    "social_friendship_casual": {
+      "issue": "lacking casual friendships",
+      "hint": "Build a Tavern or Market for social gathering",
+      "buildings": ["tavern", "market", "inn"]
+    },
+    "social_friendship_intimate": {
+      "issue": "lacking close bonds",
+      "hint": "Build cozy gathering places like a Cafe",
+      "buildings": ["cafe", "tavern", "park"]
+    },
+    "social_community_church": {
+      "issue": "lacking religious community",
+      "hint": "Build a Church for congregation",
+      "buildings": ["church", "chapel", "monastery"]
+    },
+    "social_community_civic": {
+      "issue": "lacking civic community",
+      "hint": "Build a Town Hall or Forum for civic life",
+      "buildings": ["town_hall", "forum", "market"]
+    },
+    "social_family_bonds": {
+      "issue": "families lacking togetherness",
+      "hint": "Build Family Homes with space for families",
+      "buildings": ["family_home", "park", "school"]
+    },
+    "exotic_food_spices": {
+      "issue": "craving exotic spices",
+      "hint": "Import spices through a Trading Post",
+      "buildings": ["trading_post", "market"]
+    },
+    "exotic_food_imports": {
+      "issue": "craving imported foods",
+      "hint": "Import wine and foreign delicacies via Trading Post",
+      "buildings": ["trading_post", "market", "warehouse"]
+    },
+    "exotic_items_textiles": {
+      "issue": "craving exotic textiles",
+      "hint": "Import silk and rare fabrics via Trading Post",
+      "buildings": ["trading_post", "silk_weaver"]
+    },
+    "exotic_items_novelty": {
+      "issue": "craving novelty items",
+      "hint": "Import curiosities via Trading Post",
+      "buildings": ["trading_post", "curiosity_shop"]
+    },
+    "shiny_precious_gold": {
+      "issue": "craving gold items",
+      "hint": "Build a Goldsmith or Mine for gold",
+      "buildings": ["goldsmith", "gold_mine"]
+    },
+    "shiny_precious_silver": {
+      "issue": "craving silver items",
+      "hint": "Build a Silversmith or Mine for silver",
+      "buildings": ["silversmith", "silver_mine"]
+    },
+    "shiny_precious_gems": {
+      "issue": "craving gems and jewelry",
+      "hint": "Build a Jeweler for precious gems",
+      "buildings": ["jeweler", "gem_cutter"]
+    },
+    "shiny_decorative_art": {
+      "issue": "craving decorative art",
+      "hint": "Build a Sculptor or support Artists",
+      "buildings": ["sculptor", "gallery", "workshop"]
+    },
+    "vice_alcohol_beer": {
+      "issue": "craving beer and ale",
+      "hint": "Build a Brewery for beer production",
+      "buildings": ["brewery", "tavern"]
+    },
+    "vice_alcohol_spirits": {
+      "issue": "craving wine and spirits",
+      "hint": "Build a Winery or Distillery",
+      "buildings": ["winery", "distillery", "tavern"]
+    },
+    "vice_gambling": {
+      "issue": "craving gambling",
+      "hint": "Build a Gambling Hall or Tavern with games",
+      "buildings": ["gambling_hall", "tavern"]
+    },
+    "vice_indulgence_sweets": {
+      "issue": "craving sweets",
+      "hint": "Build a Bakery for pastries or import sugar",
+      "buildings": ["bakery", "confectioner", "trading_post"]
+    },
+    "vice_indulgence_excess": {
+      "issue": "craving indulgence",
+      "hint": "Build fine establishments like Restaurants",
+      "buildings": ["restaurant", "tavern", "inn"]
+    },
+    "utility_essential_tools": {
+      "issue": "lacking essential tools",
+      "hint": "Build a Blacksmith or Toolmaker",
+      "buildings": ["blacksmith", "toolmaker"]
+    }
+  },
+  "housingIssues": {
+    "homeless": {
+      "issue": "homeless (no housing assigned)",
+      "hint": "Build more Lodges, Family Homes, or Manors",
+      "buildings": ["lodge", "family_home", "manor"]
+    },
+    "overcrowded": {
+      "issue": "living in overcrowded housing",
+      "hint": "Build more housing to reduce overcrowding",
+      "buildings": ["lodge", "family_home", "manor"]
+    }
+  },
+  "commodityHints": {
+    "wheat": {
+      "hint": "Build a Farm and assign workers to grow wheat",
+      "buildings": ["farm"]
+    },
+    "bread": {
+      "hint": "Build a Bakery to produce bread from flour",
+      "buildings": ["bakery"]
+    },
+    "flour": {
+      "hint": "Build a Mill to process wheat into flour",
+      "buildings": ["mill"]
+    },
+    "meat": {
+      "hint": "Build a Ranch for cattle, or a Butcher to process meat",
+      "buildings": ["ranch", "butcher"]
+    },
+    "chicken_meat": {
+      "hint": "Build a Chicken Farm and Butcher",
+      "buildings": ["chicken_farm", "butcher"]
+    },
+    "vegetable": {
+      "hint": "Build a Farm with vegetable fields",
+      "buildings": ["farm", "garden"]
+    },
+    "beer": {
+      "hint": "Build a Brewery to produce beer from grain",
+      "buildings": ["brewery"]
+    },
+    "wine": {
+      "hint": "Build a Winery with grape vines",
+      "buildings": ["winery", "vineyard"]
+    },
+    "simple_clothes": {
+      "hint": "Build a Tailor to produce basic clothing",
+      "buildings": ["tailor"]
+    },
+    "work_clothes": {
+      "hint": "Build a Tailor to produce work clothing",
+      "buildings": ["tailor"]
+    },
+    "fine_clothes": {
+      "hint": "Build a Fine Tailor for quality clothing",
+      "buildings": ["fine_tailor", "tailor"]
+    },
+    "luxury_clothes": {
+      "hint": "Build a Fine Tailor with silk for luxury clothing",
+      "buildings": ["fine_tailor"]
+    },
+    "bed": {
+      "hint": "Build a Carpenter to craft beds",
+      "buildings": ["carpenter"]
+    },
+    "chair": {
+      "hint": "Build a Carpenter to craft chairs",
+      "buildings": ["carpenter"]
+    },
+    "table": {
+      "hint": "Build a Carpenter to craft tables",
+      "buildings": ["carpenter"]
+    },
+    "book": {
+      "hint": "Build a Scriptorium or Library",
+      "buildings": ["scriptorium", "library"]
+    },
+    "medicine": {
+      "hint": "Build an Apothecary or Herbalist",
+      "buildings": ["apothecary", "herbalist"]
+    },
+    "soap": {
+      "hint": "Build a Soapmaker",
+      "buildings": ["soapmaker"]
+    },
+    "tools": {
+      "hint": "Build a Blacksmith or Toolmaker",
+      "buildings": ["blacksmith", "toolmaker"]
+    },
+    "cloth": {
+      "hint": "Build a Weaver to produce cloth",
+      "buildings": ["weaver"]
+    },
+    "thread": {
+      "hint": "Build a Spinner to produce thread",
+      "buildings": ["spinner"]
+    },
+    "wood": {
+      "hint": "Build a Woodcutter to harvest wood",
+      "buildings": ["woodcutter"]
+    },
+    "planks": {
+      "hint": "Build a Sawmill to process timber",
+      "buildings": ["sawmill"]
+    },
+    "timber": {
+      "hint": "Build a Woodcutter to harvest timber",
+      "buildings": ["woodcutter"]
+    },
+    "iron": {
+      "hint": "Build a Smelter to process iron ore",
+      "buildings": ["smelter"]
+    },
+    "gold": {
+      "hint": "Build a Goldsmith to work gold",
+      "buildings": ["goldsmith"]
+    },
+    "jewelry": {
+      "hint": "Build a Jeweler for precious items",
+      "buildings": ["jeweler"]
+    },
+    "painting": {
+      "hint": "Support Artists at a Workshop or Gallery",
+      "buildings": ["workshop", "gallery"]
+    },
+    "candle": {
+      "hint": "Build a Chandler to produce candles",
+      "buildings": ["chandler"]
+    },
+    "milk": {
+      "hint": "Build a Dairy to produce milk",
+      "buildings": ["dairy"]
+    },
+    "cheese": {
+      "hint": "Build a Dairy to produce cheese",
+      "buildings": ["dairy"]
+    },
+    "butter": {
+      "hint": "Build a Dairy to produce butter",
+      "buildings": ["dairy"]
+    },
+    "eggs": {
+      "hint": "Build a Chicken Farm to produce eggs",
+      "buildings": ["chicken_farm"]
+    },
+    "honey": {
+      "hint": "Build an Apiary for beekeeping",
+      "buildings": ["apiary"]
+    },
+    "shoes": {
+      "hint": "Build a Cobbler for footwear",
+      "buildings": ["cobbler"]
+    },
+    "boots": {
+      "hint": "Build a Cobbler for boots",
+      "buildings": ["cobbler"]
+    },
+    "water": {
+      "hint": "Build a Well for clean water",
+      "buildings": ["well"]
+    },
+    "coal": {
+      "hint": "Build a Mine to extract coal",
+      "buildings": ["mine"]
+    },
+    "stone": {
+      "hint": "Build a Quarry to extract stone",
+      "buildings": ["quarry"]
+    },
+    "bricks": {
+      "hint": "Build a Brick Kiln to produce bricks",
+      "buildings": ["brick_kiln"]
+    },
+    "glass": {
+      "hint": "Build a Glassblower",
+      "buildings": ["glassblower"]
+    },
+    "pottery": {
+      "hint": "Build a Potter to produce pottery",
+      "buildings": ["potter"]
+    },
+    "paper": {
+      "hint": "Build a Paper Mill",
+      "buildings": ["paper_mill"]
+    },
+    "ink": {
+      "hint": "Build a Scriptorium",
+      "buildings": ["scriptorium"]
+    },
+    "leather": {
+      "hint": "Build a Tannery to produce leather",
+      "buildings": ["tannery"]
+    },
+    "wool": {
+      "hint": "Build a Sheep Farm for wool",
+      "buildings": ["sheep_farm"]
+    },
+    "silk": {
+      "hint": "Import silk through a Trading Post",
+      "buildings": ["trading_post"]
+    },
+    "pastries": {
+      "hint": "Build a Bakery with sugar for pastries",
+      "buildings": ["bakery"]
+    },
+    "cake": {
+      "hint": "Build a Bakery with sugar for cakes",
+      "buildings": ["bakery"]
+    },
+    "preserved_food": {
+      "hint": "Build a Smokehouse or Salt Works",
+      "buildings": ["smokehouse", "salt_works"]
+    },
+    "cured_meat": {
+      "hint": "Build a Smokehouse for cured meats",
+      "buildings": ["smokehouse"]
+    },
+    "salt": {
+      "hint": "Build a Salt Works to produce salt",
+      "buildings": ["salt_works"]
+    },
+    "sugar": {
+      "hint": "Build a Sugar Mill to process sugarcane",
+      "buildings": ["sugar_mill"]
+    },
+    "tea_drink": {
+      "hint": "Import tea through a Trading Post",
+      "buildings": ["trading_post"]
+    },
+    "coffee_drink": {
+      "hint": "Import coffee through a Trading Post",
+      "buildings": ["trading_post"]
+    },
+    "axe": {
+      "hint": "Build a Blacksmith for tools",
+      "buildings": ["blacksmith"]
+    },
+    "hammer": {
+      "hint": "Build a Blacksmith for tools",
+      "buildings": ["blacksmith"]
+    },
+    "pickaxe": {
+      "hint": "Build a Blacksmith for mining tools",
+      "buildings": ["blacksmith"]
+    }
+  },
+  "severityThresholds": {
+    "critical": 20,
+    "warning": 40,
+    "mild": 60
+  },
+  "severityLabels": {
+    "critical": "CRITICAL",
+    "warning": "WARNING",
+    "mild": "MILD"
+  },
+  "severityColors": {
+    "critical": {"r": 0.8, "g": 0.1, "b": 0.1},
+    "warning": {"r": 0.9, "g": 0.5, "b": 0.0},
+    "mild": {"r": 0.8, "g": 0.6, "b": 0.0}
+  }
+}

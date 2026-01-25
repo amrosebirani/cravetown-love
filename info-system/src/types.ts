@@ -584,7 +584,8 @@ export interface StartingLocation {
   productionModifiers: Record<string, number>;  // category -> multiplier
   starterBuildings: StarterBuilding[];
   starterResources: StarterResource[];
-  starterGold: number;
+  starterGold: number;  // Gold commodity added to town inventory
+  startingTreasury?: number;  // Town treasury gold for wages, rent, building costs
   population: LocationPopulation;
 }
 
@@ -645,7 +646,6 @@ export interface StartingLocationV2 extends StartingLocation {
   // New fields
   starterLandPlots?: StarterLandPlot[];
   economicSystem?: EconomicSystemType;
-  startingTreasury?: number;  // Override default starting gold
   // V2 buildings and citizens (with ownership support)
   starterBuildingsV2?: StarterBuildingV2[];
   starterCitizensV2?: StarterCitizenV2[];

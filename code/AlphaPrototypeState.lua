@@ -255,6 +255,7 @@ function AlphaPrototypeState:SetupStarterContentAsync()
             starterBuildings = self.mStartingLocation.starterBuildings or {},
             starterResources = self.mStartingLocation.starterResources or {},
             starterGold = self.mStartingLocation.starterGold or 1000,
+            startingTreasury = self.mStartingLocation.startingTreasury or 1000,
             population = self.mStartingLocation.population or nil,
             starterCitizens = self.mStartingLocation.starterCitizens or nil,
             starterLandPlots = self.mStartingLocation.starterLandPlots or {}
@@ -266,7 +267,8 @@ function AlphaPrototypeState:SetupStarterContentAsync()
             config = {
                 starterBuildings = {},
                 starterResources = {},
-                starterGold = 1000
+                starterGold = 1000,
+                startingTreasury = 1000
             }
         end
         print("[SetupStarterContent] Using fallback alpha_starter_config")
@@ -276,13 +278,16 @@ function AlphaPrototypeState:SetupStarterContentAsync()
     if self.mGameConfig then
         if self.mGameConfig.difficulty == "relaxed" then
             config.starterGold = (config.starterGold or 1000) * 2
+            config.startingTreasury = (config.startingTreasury or 1000) * 2
             for _, res in ipairs(config.starterResources or {}) do
                 res.quantity = math.floor(res.quantity * 1.5)
             end
         elseif self.mGameConfig.difficulty == "challenging" then
             config.starterGold = math.floor((config.starterGold or 1000) * 0.5)
+            config.startingTreasury = math.floor((config.startingTreasury or 1000) * 0.5)
         elseif self.mGameConfig.difficulty == "survival" then
             config.starterGold = math.floor((config.starterGold or 1000) * 0.25)
+            config.startingTreasury = math.floor((config.startingTreasury or 1000) * 0.25)
             config.starterResources = {}
         end
     end
@@ -487,8 +492,14 @@ function AlphaPrototypeState:SetupStarterContentAsync()
         self.mWorld:AddToInventory(resource.commodityId, resource.quantity)
     end
 
-    if config.starterGold then
-        self.mWorld.gold = config.starterGold
+    -- Add starterGold as a commodity to inventory (gold bars/coins for trade)
+    if config.starterGold and config.starterGold > 0 then
+        self.mWorld:AddToInventory("gold", config.starterGold)
+    end
+
+    -- Set town treasury (economic system gold for wages, rent, etc.)
+    if config.startingTreasury then
+        self.mWorld.gold = config.startingTreasury
     end
 
     -- Finalize
